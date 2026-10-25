@@ -76,7 +76,9 @@ class Auth {
       }
       c.lastUsed = new Date().toISOString();
       c.uses = (c.uses || 0) + 1;
-      session = { role: 'user', codeId: c.id, label: c.label, expiresAt: c.expiresAt };
+      session = c.admin
+        ? { role: 'admin', codeId: c.id, label: c.label, expiresAt: new Date(Date.now() + 365 * DAY).toISOString() }
+        : { role: 'user', codeId: c.id, label: c.label, expiresAt: c.expiresAt };
     }
     this.fails.delete(ip);
     const token = crypto.randomBytes(32).toString('hex');
@@ -91,7 +93,7 @@ class Auth {
     const d = this.data;
     const s = d.sessions[hash(token)];
     if (!s || Date.now() > Date.parse(s.expiresAt)) return null;
-    if (s.role === 'user') {
+    if (s.codeId) {
       const c = d.codes.find((x) => x.id === s.codeId);
       if (!c || c.revoked || Date.now() > Date.parse(c.expiresAt)) return null;
     }
@@ -104,7 +106,7 @@ class Auth {
     if (!code) return null;
     if (sameText(code, this.masterKey())) return { role: 'admin' };
     const c = this.data.codes.find((x) => x.code === code);
-    return c && !c.revoked && Date.now() <= Date.parse(c.expiresAt) ? { role: 'user' } : null;
+    return c && !c.revoked && Date.now() <= Date.parse(c.expiresAt) ? { role: c.admin ? 'admin' : 'user' } : null;
   }
 
   logout(token) {
@@ -112,14 +114,17 @@ class Auth {
     this.persist();
   }
 
-  create({ label = '', days = 30 } = {}) {
+  // `admin: true` : ID admin permanent (pour un co-admin), sinon ID membre qui expire.
+  create({ label = '', days = 30, admin = false } = {}) {
     const d = this.data;
+    admin = admin === true || admin === 'true' || admin === 'on';
+    if (admin) days = 36500;
     let code;
-    do code = randomCode('RDH'); while (d.codes.some((c) => c.code === code));
+    do code = admin ? randomCode('ADMIN', 5) : randomCode('RDH'); while (d.codes.some((c) => c.code === code));
     const c = {
       id: crypto.randomBytes(6).toString('hex'), code, label: String(label).trim().slice(0, 60),
       createdAt: new Date().toISOString(), expiresAt: new Date(Date.now() + Math.max(1, Number(days) || 30) * DAY).toISOString(),
-      revoked: false, lastUsed: null, uses: 0,
+      revoked: false, lastUsed: null, uses: 0, admin,
     };
     d.codes.unshift(c);
     this.persist();

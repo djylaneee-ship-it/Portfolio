@@ -305,6 +305,7 @@ const server = http.createServer(async (req, res) => {
     if (await authRoutes(req, res, url) !== false) return;
     const bearer = String(req.headers.authorization || '').replace(/^Bearer\s+/i, '');
     const session = auth.check(cookies(req).rdh_session) || auth.checkCode(bearer);
+    if (session && url.pathname === '/api/admin/reset-key' && session.codeId) return send(res, 403, { error: 'Seule la clé admin principale peut faire ça' });
     if (!session) return send(res, 401, { error: 'Connecte-toi avec ton ID d\'accès' });
     if (session.role !== 'admin' && !(req.method === 'GET' && USER_ROUTES.some((re) => re.test(url.pathname)))) {
       return send(res, 403, { error: 'Réservé à l\'admin' });

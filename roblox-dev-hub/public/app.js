@@ -73,7 +73,7 @@ function renderSession() {
   document.body.classList.toggle('role-user', !isAdmin());
   const exp = new Date(SESSION.expiresAt);
   $('#side-user').innerHTML = `<div class="who"><span class="role ${SESSION.role}">${isAdmin() ? 'Admin' : 'Membre'}</span>
-    <small>${isAdmin() ? 'Accès permanent' : esc(SESSION.label || 'ID d\'accès') + ' · jusqu\'au ' + exp.toLocaleDateString('fr-FR')}</small></div>
+    <small>${isAdmin() ? (SESSION.label && SESSION.label !== 'Admin' ? esc(SESSION.label) + ' · ' : '') + 'Accès permanent' : esc(SESSION.label || 'ID d\'accès') + ' · jusqu\'au ' + exp.toLocaleDateString('fr-FR')}</small></div>
     <button class="btn small" id="logout">Se déconnecter</button>`;
   $('#logout').onclick = async () => { await api('/logout', { method: 'POST' }); location.reload(); };
 }
@@ -371,6 +371,7 @@ async function renderAdmin() {
         <select class="input" name="days" style="flex:1;min-width:150px">
           <option value="1">1 jour</option><option value="7">7 jours</option><option value="30" selected>1 mois</option><option value="90">3 mois</option><option value="365">1 an</option>
         </select>
+        <label class="chip" id="admin-toggle"><input type="checkbox" name="admin" hidden>👑 Admin permanent</label>
         <button class="btn primary">Créer l'ID</button>
       </form>
       <div id="new-code"></div>
@@ -378,12 +379,12 @@ async function renderAdmin() {
     <div class="section-head"><h2>${codes.length} ID${codes.length > 1 ? 's' : ''} · ${actifs} actif${actifs > 1 ? 's' : ''}</h2></div>
     <div class="codes">${codes.map((c) => `
       <div class="code-row ${c.status}">
-        <div class="code-main"><code>${esc(c.code)}</code><b>${esc(c.label || 'Sans nom')}</b>
-          <small>${c.status === 'actif' ? 'Expire le' : c.status === 'expiré' ? 'A expiré le' : 'Bloqué · expirait le'} ${new Date(c.expiresAt).toLocaleDateString('fr-FR')} · ${c.uses} connexion${c.uses > 1 ? 's' : ''}${c.lastUsed ? ' · dernière le ' + new Date(c.lastUsed).toLocaleString('fr-FR') : ''}</small></div>
+        <div class="code-main"><code>${esc(c.code)}</code><b>${c.admin ? '👑 ' : ''}${esc(c.label || 'Sans nom')}</b>
+          <small>${c.admin ? (c.revoked ? 'Admin · bloqué' : 'Admin · permanent') : (c.status === 'actif' ? 'Expire le' : c.status === 'expiré' ? 'A expiré le' : 'Bloqué · expirait le') + ' ' + new Date(c.expiresAt).toLocaleDateString('fr-FR')} · ${c.uses} connexion${c.uses > 1 ? 's' : ''}${c.lastUsed ? ' · dernière le ' + new Date(c.lastUsed).toLocaleString('fr-FR') : ''}</small></div>
         <span class="status ${c.status}">${c.status}</span>
         <div class="row">
           <button class="btn small" data-copy="${esc(c.code)}">Copier</button>
-          <button class="btn small" data-extend="${c.id}">+30 j</button>
+          ${c.admin ? '' : `<button class="btn small" data-extend="${c.id}">+30 j</button>`}
           <button class="btn small" data-block="${c.id}" data-v="${!c.revoked}">${c.revoked ? 'Débloquer' : 'Bloquer'}</button>
           <button class="btn small danger" data-remove="${c.id}">Supprimer</button>
         </div>
@@ -402,11 +403,20 @@ async function renderAdmin() {
       <p style="margin-top:14px">Pour un accès depuis n'importe où sur internet, il faut un tunnel (ex. <b>cloudflared tunnel --url http://localhost:${info.port}</b>) ou un hébergement.</p>
     </div>`;
   bindCopy();
+  $('#admin-toggle').onclick = (e) => {
+    e.preventDefault();
+    const i = $('input', e.currentTarget); i.checked = !i.checked;
+    e.currentTarget.classList.toggle('on', i.checked);
+    $('#code-form [name=days]').disabled = i.checked;
+  };
   $('#code-form').onsubmit = async (e) => {
     e.preventDefault();
     const d = Object.fromEntries(new FormData(e.target));
+    d.admin = $('#code-form [name=admin]').checked;
     const c = await api('/admin/codes', { method: 'POST', body: d });
-    const msg = `Voici ton ID d'accès à Roblox Dev Hub : ${c.code}\nValable jusqu'au ${new Date(c.expiresAt).toLocaleDateString('fr-FR')}.`;
+    const msg = c.admin
+      ? `Voici ton ID admin Roblox Dev Hub (permanent, ne le partage pas) : ${c.code}`
+      : `Voici ton ID d'accès à Roblox Dev Hub : ${c.code}\nValable jusqu'au ${new Date(c.expiresAt).toLocaleDateString('fr-FR')}.`;
     await renderAdmin();
     $('#new-code').innerHTML = `<div class="new-code"><span>Nouvel ID${c.label ? ' pour ' + esc(c.label) : ''} :</span><strong>${esc(c.code)}</strong>
       <div class="row"><button class="btn small primary" data-copy="${esc(c.code)}">Copier l'ID</button><button class="btn small" data-copy="${esc(msg)}">Copier le message à envoyer</button></div></div>`;
