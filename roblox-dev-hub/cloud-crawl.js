@@ -15,10 +15,10 @@ const BUDGET_MIN = Number(process.argv[2] || process.env.CRAWL_MINUTES || 45);
 const CYCLE = [
   { mode: 'sync' },
   { mode: 'channels', scope: 'all', intensity: 'normal' },
-  { mode: 'explore', intensity: 'normal' },
+  { mode: 'explore', intensity: 'normal', sources: ['youtube', 'devforum'] }, // Reddit bloque les serveurs GitHub
   { mode: 'sync' },
   { mode: 'opensource', intensity: 'normal' },
-  { mode: 'explore', intensity: 'massif' },
+  { mode: 'explore', intensity: 'massif', sources: ['youtube', 'devforum'] },
 ];
 
 function load() {

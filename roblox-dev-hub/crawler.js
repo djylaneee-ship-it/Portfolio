@@ -43,12 +43,17 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const decode = (s) => String(s || '').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>');
 const text = (t) => (t ? t.simpleText || (t.runs || []).map((r) => r.text).join('') : '');
 
-async function http(url, opts = {}) {
+async function http(url, opts = {}, tries = 3) {
   const res = await fetch(url, {
     ...opts,
     headers: { 'User-Agent': UA, 'Accept-Language': 'en-US,en;q=0.8,fr;q=0.6', ...(/youtube\.com/.test(url) && { Cookie: YT_COOKIE }), ...opts.headers },
     signal: AbortSignal.timeout(20000),
   });
+  // Trop de requêtes : on patiente puis on réessaie.
+  if (res.status === 429 && tries > 1) {
+    await sleep((Number(res.headers.get('retry-after')) || 20) * 1000);
+    return http(url, opts, tries - 1);
+  }
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res;
 }
