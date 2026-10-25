@@ -56,6 +56,14 @@ $ver = (& node --version)
 if ([int]($ver.TrimStart('v').Split('.')[0]) -lt 18) { throw "Node.js $ver est trop ancien : il faut la version 18 ou plus (https://nodejs.org)." }
 Ok "Node.js $ver"
 
+Step 'Arret de l''ancienne version'
+$old = Get-NetTCPConnection -LocalPort 4747 -State Listen -ErrorAction SilentlyContinue
+if ($old) {
+  $old | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }
+  Start-Sleep -Seconds 1
+  Ok 'Ancien serveur arrete'
+} else { Ok 'Rien a arreter' }
+
 Step "Copie des fichiers dans $Dir"
 $files = @{
 ${payload.join('\n')}

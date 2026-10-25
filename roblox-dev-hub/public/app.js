@@ -155,8 +155,8 @@ async function renderHome() {
       </div>
       <div class="stats">
         <div class="stat"><b>${STATS.total}</b><span>ressources</span></div>
-        <div class="stat"><b>${STATS.byType.video || 0}</b><span>vidéos</span></div>
-        <div class="stat"><b>${(STATS.byType.image || 0) + (STATS.byType.fichier || 0)}</b><span>fichiers & images</span></div>
+        <div class="stat"><b>${(STATS.byType || {}).video || 0}</b><span>vidéos</span></div>
+        <div class="stat"><b>${((STATS.byType || {}).image || 0) + ((STATS.byType || {}).fichier || 0)}</b><span>fichiers & images</span></div>
         <div class="stat"><b>${STATS.favorites}</b><span>favoris</span></div>
         <div class="stat"><b>${STATS.channels}</b><span>chaînes suivies</span></div>
       </div>
@@ -728,6 +728,7 @@ async function route() {
   $$('#nav a').forEach((a) => a.classList.toggle('active', a.dataset.route === name));
   $$('#side-cats a').forEach((a) => a.classList.toggle('active', a.getAttribute('href') === '#/library?cat=' + params.get('cat')));
   document.body.classList.remove('menu');
+  if (!SESSION || !SESSION.loggedIn) return;
   if (!isAdmin() && ['explore', 'mcp', 'settings', 'admin'].includes(path)) { location.hash = '#/'; return; }
   try {
     if (path === 'library') await renderLibrary(params);
@@ -774,7 +775,11 @@ window.addEventListener('drop', (e) => {
 
 window.addEventListener('hashchange', route);
 (async () => {
-  SESSION = await api('/session');
+  try { SESSION = await api('/session'); }
+  catch {
+    view.innerHTML = `<div class="empty"><b>Ancienne version encore ouverte</b>Ferme toutes les fenêtres noires « Roblox Dev Hub » (ou redémarre ton PC), puis relance le raccourci du Bureau.</div>`;
+    return;
+  }
   if (!SESSION.loggedIn) return showLogin();
   renderSession();
   META = await api('/meta');
