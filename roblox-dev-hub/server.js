@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const db = require('./db');
 const web = require('./web');
+const mcp = require('./mcp');
 
 const PORT = Number(process.env.PORT) || 4747;
 const PUBLIC = path.join(__dirname, 'public');
@@ -198,6 +199,17 @@ const server = http.createServer(async (req, res) => {
   // Protection : on refuse les requêtes d'écriture venant d'un autre site.
   if (req.method !== 'GET' && req.headers.origin && !/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(req.headers.origin)) {
     return send(res, 403, { error: 'Origine refusée' });
+  }
+  if (url.pathname === '/mcp') {
+    // Endpoint MCP « Streamable HTTP » (réponses JSON simples, pas de flux SSE).
+    if (!/^(localhost|127\.0\.0\.1)(:\d+)?$/.test(req.headers.host || '')) return send(res, 403, { error: 'Hôte refusé' });
+    if (req.method !== 'POST') { res.writeHead(405, { Allow: 'POST' }); return res.end(); }
+    let msg;
+    try { msg = JSON.parse((await readBody(req, 5 * 1024 * 1024)).toString('utf8')); }
+    catch { return send(res, 400, { jsonrpc: '2.0', id: null, error: { code: -32700, message: 'Parse error' } }); }
+    const out = Array.isArray(msg) ? (await Promise.all(msg.map(mcp.handle))).filter(Boolean) : await mcp.handle(msg);
+    if (!out || (Array.isArray(out) && !out.length)) { res.writeHead(202); return res.end(); }
+    return send(res, 200, out);
   }
   if (url.pathname.startsWith('/api/')) {
     refresh();

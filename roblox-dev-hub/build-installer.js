@@ -8,14 +8,13 @@ const OUT = path.join(ROOT, '..', 'Installer Roblox Dev Hub.bat');
 const FILES = [
   'db.js', 'mcp.js', 'server.js', 'web.js', 'seed.json', 'package.json', 'README.md',
   'public/index.html', 'public/style.css', 'public/app.js',
-  'Lancer Roblox Dev Hub.bat', 'Relier a Claude.bat',
+  'Lancer Roblox Dev Hub.bat',
 ];
 
 const crlf = (s) => s.replace(/\r?\n/g, '\r\n');
 
 const UNINSTALL = crlf(`@echo off
 echo Desinstallation de Roblox Dev Hub...
-where claude >nul 2>nul && claude mcp remove --scope user roblox-dev-hub >nul 2>nul
 del "%USERPROFILE%\\Desktop\\Roblox Dev Hub.lnk" >nul 2>nul
 del "%APPDATA%\\Microsoft\\Windows\\Start Menu\\Programs\\Roblox Dev Hub.lnk" >nul 2>nul
 echo.
@@ -84,27 +83,10 @@ foreach ($t in $targets) {
 }
 Ok 'Raccourci "Roblox Dev Hub" cree'
 
-Step 'Connexion a Claude Code'
-$mcp = Join-Path $Dir 'mcp.js'
-$hint = "claude mcp add --scope user roblox-dev-hub -- node \`"$mcp\`""
-$claudeOk = $false
-if (Get-Command claude -ErrorAction SilentlyContinue) {
-  try { $null = & claude --version 2>&1; $claudeOk = ($LASTEXITCODE -eq 0) } catch { $claudeOk = $false }
-}
-if ($claudeOk) {
-  try {
-    $prev = $ErrorActionPreference; $ErrorActionPreference = 'Continue'
-    & claude mcp remove --scope user roblox-dev-hub 2>$null | Out-Null
-    & claude mcp add --scope user roblox-dev-hub -- node "$mcp" 2>&1 | Out-Null
-    $code = $LASTEXITCODE
-    $ErrorActionPreference = $prev
-    if ($code -eq 0) { Ok 'Claude Code peut maintenant utiliser ta base' } else { Warn "Echec. Lance plus tard : $hint" }
-  } catch { $ErrorActionPreference = 'Stop'; Warn "Echec. Lance plus tard : $hint" }
-} else {
-  Warn 'Claude Code est absent ou mal installe : etape ignoree (l''app marche quand meme).'
-  Warn 'Une fois Claude Code repare, double-clique sur "Relier a Claude.bat" dans :'
-  Warn $Dir
-}
+Step 'Serveur MCP'
+Ok 'Adresse HTTP  : http://localhost:4747/mcp  (app ouverte)'
+Ok ('Commande stdio : node "' + (Join-Path $Dir 'mcp.js') + '"')
+Ok 'Tout est aussi affiche dans l''app, page "Serveur MCP".'
 
 Write-Host ''
 Write-Host '  Installation terminee ! Lancement de l''app...' -ForegroundColor Green

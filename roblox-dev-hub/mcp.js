@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// Serveur MCP (stdio) : donne à Claude l'accès à ta bibliothèque Roblox Dev Hub.
-// Ajout dans Claude Code :  claude mcp add roblox-dev-hub -- node "<chemin>/mcp.js"
+// Serveur MCP de Roblox Dev Hub : donne à n'importe quel client MCP l'accès à ta bibliothèque.
+// Deux modes : stdio (`node mcp.js`) ou HTTP via l'app (http://localhost:4747/mcp, voir server.js).
 const readline = require('readline');
 const db = require('./db');
 const web = require('./web');
@@ -136,40 +136,50 @@ async function call(name, a = {}) {
   }
 }
 
-function reply(id, result, error) {
-  const msg = { jsonrpc: '2.0', id };
-  if (error) msg.error = error; else msg.result = result;
-  process.stdout.write(JSON.stringify(msg) + '\n');
-}
-
-const rl = readline.createInterface({ input: process.stdin });
-rl.on('line', async (line) => {
-  if (!line.trim()) return;
-  let msg;
-  try { msg = JSON.parse(line); } catch { return reply(null, null, { code: -32700, message: 'Parse error' }); }
-  const { id, method, params = {} } = msg;
-  if (id === undefined) return; // notification
+// Traite un message JSON-RPC MCP. Renvoie la réponse, ou null pour une notification.
+async function handle(msg) {
+  const { id, method, params = {} } = msg || {};
+  const ok = (result) => ({ jsonrpc: '2.0', id, result });
+  const fail = (code, message) => ({ jsonrpc: '2.0', id: id ?? null, error: { code, message } });
+  if (!msg || msg.jsonrpc !== '2.0' || typeof method !== 'string') return fail(-32600, 'Requête invalide');
+  if (id === undefined) return null;
   try {
     if (method === 'initialize') {
-      return reply(id, {
+      return ok({
         protocolVersion: params.protocolVersion || '2025-06-18',
         capabilities: { tools: {} },
         serverInfo: { name: 'roblox-dev-hub', version: '1.0.0' },
         instructions: 'Bibliothèque personnelle de ressources de dev Roblox. Cherche ici (search_resources) avant de répondre à une question Roblox, et cite les liens trouvés.',
       });
     }
-    if (method === 'ping') return reply(id, {});
-    if (method === 'tools/list') return reply(id, { tools: TOOLS });
+    if (method === 'ping') return ok({});
+    if (method === 'tools/list') return ok({ tools: TOOLS });
     if (method === 'tools/call') {
       try {
         const out = await call(params.name, params.arguments);
-        return reply(id, { content: [{ type: 'text', text: JSON.stringify(out, null, 2) }] });
+        return ok({ content: [{ type: 'text', text: JSON.stringify(out, null, 2) }] });
       } catch (e) {
-        return reply(id, { content: [{ type: 'text', text: 'Erreur : ' + e.message }], isError: true });
+        return ok({ content: [{ type: 'text', text: 'Erreur : ' + e.message }], isError: true });
       }
     }
-    return reply(id, null, { code: -32601, message: 'Méthode inconnue : ' + method });
+    return fail(-32601, 'Méthode inconnue : ' + method);
   } catch (e) {
-    return reply(id, null, { code: -32603, message: e.message });
+    return fail(-32603, e.message);
   }
-});
+}
+
+module.exports = { handle };
+
+// Mode stdio : `node mcp.js` (le client MCP lance ce fichier lui-même).
+if (require.main === module) {
+  const rl = readline.createInterface({ input: process.stdin });
+  rl.on('line', async (line) => {
+    if (!line.trim()) return;
+    let msg;
+    try { msg = JSON.parse(line); } catch {
+      return process.stdout.write(JSON.stringify({ jsonrpc: '2.0', id: null, error: { code: -32700, message: 'Parse error' } }) + '\n');
+    }
+    const out = await handle(msg);
+    if (out) process.stdout.write(JSON.stringify(out) + '\n');
+  });
+}

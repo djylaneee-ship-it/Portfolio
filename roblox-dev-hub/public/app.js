@@ -112,11 +112,11 @@ async function renderHome() {
   view.innerHTML = `
     <div class="hero">
       <h1>Ta base de dev<br><span>Roblox ultime</span></h1>
-      <p>Tutos vidéo, docs, VFX, scripts, animations, GUI, GFX… tout au même endroit, consultable par toi <b>et par Claude</b>.</p>
+      <p>Tutos vidéo, docs, VFX, scripts, animations, GUI, GFX… tout au même endroit, consultable par toi <b>et par tes outils IA</b> via MCP.</p>
       <div class="row">
         <button class="btn primary" onclick="openAdd()"><svg viewBox="0 0 24 24"><path d="M11 4h2v7h7v2h-7v7h-2v-7H4v-2h7z"/></svg>Ajouter</button>
         <a class="btn" href="#/youtube">Chercher sur YouTube</a>
-        <a class="btn" href="#/claude">Relier à Claude</a>
+        <a class="btn" href="#/mcp">Serveur MCP</a>
       </div>
       <div class="stats">
         <div class="stat"><b>${STATS.total}</b><span>ressources</span></div>
@@ -250,29 +250,37 @@ async function renderChannels() {
   $$('[data-del]').forEach((b) => b.onclick = async () => { await api('/channels/' + b.dataset.del, { method: 'DELETE' }); refreshStats(); renderChannels(); });
 }
 
-async function renderClaude() {
+async function renderMcp() {
   const info = await api('/info');
-  const cmd = `claude mcp add --scope user roblox-dev-hub -- node "${info.mcpPath}"`;
-  const json = JSON.stringify({ mcpServers: { 'roblox-dev-hub': { command: 'node', args: [info.mcpPath] } } }, null, 2);
+  const http = `http://localhost:${info.port}/mcp`;
+  const stdio = JSON.stringify({ mcpServers: { 'roblox-dev-hub': { command: 'node', args: [info.mcpPath] } } }, null, 2);
+  const httpCfg = JSON.stringify({ mcpServers: { 'roblox-dev-hub': { type: 'http', url: http } } }, null, 2);
   view.innerHTML = `
-    <h1 class="h1">Relier à Claude</h1>
-    <p class="sub">Claude pourra chercher dans ta base, y ajouter des tutos et prendre des notes pendant qu'il t'aide à coder.</p>
+    <h1 class="h1">Serveur MCP</h1>
+    <p class="sub">Ta base est disponible pour n'importe quel client MCP (Claude Desktop, Cursor, VS Code, LM Studio…). Choisis le mode que ton client accepte.</p>
     <div class="panel">
-      <h3>Claude Code (terminal)</h3>
-      <div class="step"><span class="num">1</span><div><p>Ouvre un terminal (cmd ou PowerShell) et colle cette commande :</p>${codeBox(cmd)}</div></div>
-      <div class="step"><span class="num">2</span><div><p>Vérifie que c'est connecté :</p>${codeBox('claude mcp list')}</div></div>
-      <div class="step"><span class="num">3</span><div><p>Lance <b>claude</b> et demande par exemple :</p>${codeBox('Cherche dans ma base Roblox Dev Hub des tutos sur les slash VFX')}</div></div>
+      <h3>Mode HTTP — adresse du serveur</h3>
+      <p>Pour les clients qui demandent une URL. L'app doit être ouverte pendant que tu l'utilises.</p>
+      ${codeBox(http)}
+      <p style="margin-top:14px">Exemple de configuration JSON :</p>
+      ${jsonBox(httpCfg)}
     </div>
     <div class="panel">
-      <h3>Application Claude Desktop</h3>
-      <p>Réglages → Développeur → Modifier la config, puis ajoute ceci dans <b>claude_desktop_config.json</b> et redémarre Claude :</p>
-      <div class="code" style="align-items:start"><code style="white-space:pre">${esc(json)}</code><button class="btn small" data-copy="${esc(json)}">Copier</button></div>
+      <h3>Mode stdio — commande</h3>
+      <p>Pour les clients qui lancent une commande eux-mêmes. Fonctionne même si l'app est fermée.</p>
+      ${codeBox(`node "${info.mcpPath}"`)}
+      <p style="margin-top:14px">Exemple de configuration JSON (fichier de config <b>mcpServers</b> de ton client) :</p>
+      ${jsonBox(stdio)}
     </div>
     <div class="panel">
-      <h3>Ce que Claude peut faire</h3>
-      <div class="tags" style="gap:8px">${['search_resources — chercher', 'get_resource — détail + notes', 'list_categories', 'add_resource — ajouter', 'import_url — importer un lien', 'update_notes — résumer un tuto', 'sync_channels — nouvelles vidéos'].map((t) => `<span class="tag" style="font-size:13px;padding:5px 10px">${t}</span>`).join('')}</div>
+      <h3>Outils exposés</h3>
+      <div class="tags" style="gap:8px">${['search_resources — chercher', 'get_resource — détail + notes', 'list_categories', 'add_resource — ajouter', 'import_url — importer un lien', 'update_notes — écrire des notes', 'sync_channels — nouvelles vidéos'].map((t) => `<span class="tag" style="font-size:13px;padding:5px 10px">${t}</span>`).join('')}</div>
     </div>`;
   bindCopy();
+}
+
+function jsonBox(text) {
+  return `<div class="code" style="align-items:start"><code style="white-space:pre">${esc(text)}</code><button class="btn small" data-copy="${esc(text)}">Copier</button></div>`;
 }
 
 function codeBox(text) {
@@ -340,7 +348,7 @@ function openDetail(r) {
         <div class="field"><label>Tags (séparés par des virgules)</label><input name="tags" value="${esc(r.tags.join(', '))}"></div>
         <div class="field"><label>Niveau</label><select name="level"><option value="">—</option>${Object.entries(LEVEL_LABEL).map(([k, v]) => `<option value="${k}" ${k === r.level ? 'selected' : ''}>${v}</option>`).join('')}</select></div>
       </div>
-      <div class="field"><label>Mes notes (Claude peut les lire)</label><textarea name="notes" placeholder="Résumé, code clé, timestamps…">${esc(r.notes)}</textarea></div>
+      <div class="field"><label>Mes notes (lisibles via MCP)</label><textarea name="notes" placeholder="Résumé, code clé, timestamps…">${esc(r.notes)}</textarea></div>
       <button class="btn primary">Enregistrer</button>
     </form>`);
   $('#d-form').onsubmit = async (e) => {
@@ -479,7 +487,7 @@ async function route() {
     else if (path === 'favorites') await renderLibrary(params, true);
     else if (path === 'youtube') await renderYoutube(params);
     else if (path === 'channels') await renderChannels();
-    else if (path === 'claude') await renderClaude();
+    else if (path === 'mcp') await renderMcp();
     else if (path === 'settings') await renderSettings();
     else await renderHome();
   } catch (e) {
