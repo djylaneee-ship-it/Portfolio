@@ -6,6 +6,7 @@ const fs = require('fs');
 const path = require('path');
 const db = require('./db');
 const web = require('./web');
+const skills = require('./skills');
 
 const CAT_IDS = db.CATEGORIES.map((c) => c.id);
 
@@ -34,6 +35,11 @@ function clients() {
   return Object.values(readClients()).map((c) => ({ ...c, alive: Date.now() - Date.parse(c.lastSeen) < (c.mode === 'stdio' ? 3 : 15) * 60e3 }));
 }
 
+// Toujours ajouté aux consignes : passer par le skill de la catégorie avant toute tâche Roblox.
+const SKILL_RULE = `
+
+Skills: for every Roblox task, first identify its category (scripting, vfx, animation, gui, gfx, modeling, building, audio, design, tools) and call load_skill with that category and the task keywords. Read all of it before working.`;
+
 const DEFAULT_INSTRUCTIONS = `Before writing any Luau, search Rovex Hub.
 1. Start with the validated examples for the category (list_examples / get_example).
 2. Follow their structure: ModuleScripts, RemoteEvents validated on the server, never trust the client.
@@ -54,6 +60,23 @@ const TOOLS = [
         limit: { type: 'number', description: 'Max results (default 15)' },
       },
     },
+  },
+  {
+    name: 'load_skill',
+    description: 'START HERE for any Roblox task. Loads the Rovex skill of a category (scripting, vfx, animation, gui, gfx, modeling, building, audio, design, tools): instructions to follow, every validated example with full code, the best docs/videos (with the user\'s notes) and open source modules. Call it with the task category before writing anything.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        category: { type: 'string', enum: skills.SKILL_CATS },
+        query: { type: 'string', description: 'Task keywords to focus the resources (optional)' },
+      },
+      required: ['category'],
+    },
+  },
+  {
+    name: 'list_skills',
+    description: 'Lists the Rovex skills (one per Roblox category) with how much knowledge each contains.',
+    inputSchema: { type: 'object', properties: {} },
   },
   {
     name: 'search_opensource',
@@ -189,6 +212,14 @@ async function call(name, a = {}) {
       const examples = matchExamples(state, { query: a.query, category: a.category }).slice(0, 5).map(briefExample);
       return { count: res.length, examples, results: res.map(brief) };
     }
+    case 'load_skill':
+      return skills.load(state, a.category, { query: a.query || '' });
+    case 'list_skills':
+      return skills.SKILL_CATS.map((c) => {
+        const sk = skills.getSkill(state, c);
+        const ctx = skills.context(state, c);
+        return { name: sk.name, category: c, enabled: sk.enabled, ...ctx.totals };
+      });
     case 'search_opensource': {
       const res = db.search(state, { q: a.query || '', category: a.category || '', types: ['opensource', 'asset'], tag: a.source || '', sort: 'stars', limit: a.limit || 15 });
       return { count: res.length, results: res.map((r) => ({ ...brief(r), stars: r.stars || undefined })) };
@@ -307,13 +338,32 @@ async function handle(msg) {
       seen();
       return ok({
         protocolVersion: params.protocolVersion || '2025-06-18',
-        capabilities: { tools: {} },
+        capabilities: { tools: {}, prompts: {} },
         serverInfo: { name: 'rovex-hub', version: '2.0.0' },
-        instructions: (store.load().settings || {}).mcpInstructions || DEFAULT_INSTRUCTIONS,
+        instructions: ((store.load().settings || {}).mcpInstructions || DEFAULT_INSTRUCTIONS) + SKILL_RULE,
       });
     }
     if (method === 'ping') return ok({});
     if (method === 'tools/list') return ok({ tools: enabledTools() });
+    // Chaque skill est aussi un « prompt » MCP, sélectionnable dans Claude Desktop.
+    if (method === 'prompts/list') {
+      const st = store.load();
+      return ok({ prompts: skills.SKILL_CATS.map((c) => skills.getSkill(st, c)).filter((x) => x.enabled).map((x) => ({
+        name: x.name, description: `Rovex skill: ${db.CATEGORIES.find((k) => k.id === x.id).label} — loads the category knowledge, then does your task`,
+        arguments: [{ name: 'task', description: 'What you want Claude to do', required: false }],
+      })) });
+    }
+    if (method === 'prompts/get') {
+      const cat = String(params.name || '').replace(/^rovex-/, '');
+      if (!skills.SKILL_CATS.includes(cat)) return fail(-32602, 'Unknown prompt: ' + params.name);
+      const task = (params.arguments && params.arguments.task) || '';
+      const data = skills.load(store.load(), cat, { query: task });
+      logCall('load_skill', { category: cat, query: task }, { category: cat, examples: data.examples, count: data.totals.resources });
+      return ok({
+        description: `Rovex skill ${cat}`,
+        messages: [{ role: 'user', content: { type: 'text', text: `Use this Rovex Hub skill (Roblox ${cat}). Follow the instructions, reuse the validated examples and cite the resources.\n\n${JSON.stringify(data, null, 2)}${task ? `\n\nTask: ${task}` : ''}` } }],
+      });
+    }
     if (method === 'tools/call') {
       try {
         if (!enabledTools().some((x) => x.name === params.name)) throw new Error('Tool disabled in Rovex Hub: ' + params.name);

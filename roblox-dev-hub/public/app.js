@@ -473,6 +473,71 @@ async function refreshOs() {
   $('#more-row').hidden = items.length >= total;
 }
 
+// ---------- Skills : un skill Claude par catégorie ----------
+async function renderSkills() {
+  const data = await api('/skills');
+  view.innerHTML = `
+    ${pageHead(t('sk.eyebrow'), t('sk.title'), t('sk.sub'), `<button class="btn primary admin-only" id="sk-code">${data.codeInstalled ? '✓ ' + t('sk.codeUpdate') : t('sk.codeInstall')}</button>`)}
+    <div class="flow">
+      ${[['🎯', 'sk.f1'], ['📥', 'sk.f2'], ['📚', 'sk.f3'], ['⚙️', 'sk.f4']].map(([ico, k], i) => `<div class="flow-step" style="--i:${i}"><span>${ico}</span><b>${t(k + 't')}</b><small>${t(k)}</small></div>`).join('<i class="flow-arrow">→</i>')}
+    </div>
+    <div class="sk-grid">${data.skills.map((x) => {
+      const c = cat(x.id);
+      return `<button class="sk-card ${x.enabled ? '' : 'off'}" style="--c:${c.color}" data-sk="${x.id}" data-spot>
+        <span class="top"><span class="badge-ico">${esc(c.badge)}</span>${x.custom ? `<span class="st review">${t('sk.custom')}</span>` : ''}${x.enabled ? '' : `<span class="st draft">${t('sk.disabled')}</span>`}</span>
+        <code>${esc(x.name)}</code><h3>${esc(c.label)}</h3>
+        <span class="sk-counts"><span>📘 ${x.totals.examples}</span><span>🎬 ${num(x.totals.resources)}</span><span>📦 ${num(x.totals.opensource)}</span></span>
+      </button>`;
+    }).join('')}</div>
+    <div class="two-col">
+      <div class="panel" data-spot><h3>🖥️ Claude Desktop</h3><p>${t('sk.desktop')}</p></div>
+      <div class="panel" data-spot><h3>⌨️ Claude Code</h3><p>${t('sk.code', { dir: esc(data.codeDir) })}</p></div>
+    </div>`;
+  $$('[data-sk]').forEach((b) => b.onclick = () => openSkill(b.dataset.sk));
+  const btn = $('#sk-code');
+  if (btn) btn.onclick = async () => {
+    btn.disabled = true;
+    try { const r = await api('/skills/install-code', { method: 'POST' }); toast(t('sk.codeDone', { n: r.installed.length })); transition(renderSkills); }
+    catch (e) { toast(e.message, true); btn.disabled = false; }
+  };
+}
+
+async function openSkill(id) {
+  const sk = await api('/skills/' + id);
+  const c = cat(id);
+  const ctx = sk.context;
+  const list = (items, fmt) => items.length ? `<ul class="sk-list">${items.map(fmt).join('')}</ul>` : `<p class="sub" style="font-size:13px">${t('sk.empty')}</p>`;
+  openModal(`
+    <div class="card-cat"><span class="dot" style="background:${c.color}"></span>${esc(c.label)} · <span class="mono">${esc(sk.name)}</span></div>
+    <h2 class="detail-title" style="margin-top:8px">${t('sk.skillOf', { cat: esc(c.label) })}</h2>
+    <p class="sub" style="margin-bottom:18px">${t('sk.modalSub')}</p>
+    <div class="row admin-only" style="margin-bottom:18px">
+      <label class="switch"><input type="checkbox" id="sk-on" ${sk.enabled ? 'checked' : ''}><span></span></label><span>${t('sk.enabled')}</span>
+    </div>
+    <div class="field"><label>${t('sk.instr')}</label><textarea id="sk-instr" style="min-height:220px" spellcheck="false" ${isAdmin() ? '' : 'readonly'}>${esc(sk.instructions)}</textarea></div>
+    <div class="row admin-only" style="margin-bottom:22px">
+      <button class="btn primary" id="sk-save">${t('save')}</button>
+      <button class="btn" id="sk-reset">${t('cn.default')}</button>
+      <a class="btn" href="/api/skills/${id}/zip" download>⬇ ${t('sk.zip')}</a>
+    </div>
+    <p class="label">${t('sk.reads')}</p>
+    <div class="two">
+      <div><b>📘 ${t('sk.examples', { n: ctx.totals.examples })}</b>${list(ctx.examples, (e) => `<li>${esc(e.title)} <span class="mono">${esc(e.file)}</span></li>`)}</div>
+      <div><b>📦 ${t('sk.os', { n: num(ctx.totals.opensource) })}</b>${list(ctx.opensource, (r) => `<li>${esc(r.title)}${r.stars ? ` <span class="mono">★ ${r.stars}</span>` : ''}</li>`)}</div>
+    </div>
+    <b style="display:block;margin-top:14px">🎬 ${t('sk.res', { n: num(ctx.totals.resources) })}</b>
+    ${list(ctx.resources.slice(0, 12), (r) => `<li>${esc(r.title)} <span class="mono">${esc(typeLabel(r.type))}</span>${r.notes ? ' 📝' : ''}</li>`)}
+    <p class="label">SKILL.md</p>
+    <div class="code"><pre>${esc(sk.skillMd)}</pre></div>`);
+  if (!isAdmin()) return;
+  $('#sk-on').onchange = async (e) => { await api('/skills/' + id, { method: 'PUT', body: { enabled: e.target.checked } }); toast(t('toast.saved')); };
+  $('#sk-save').onclick = async () => { await api('/skills/' + id, { method: 'PUT', body: { instructions: $('#sk-instr').value } }); toast(t('toast.saved')); closeModal(); transition(renderSkills); };
+  $('#sk-reset').onclick = () => {
+    $('#sk-instr').value = sk.defaultInstructions;
+    $('#sk-instr').animate([{ background: 'rgba(124,58,237,.25)' }, { background: 'transparent' }], { duration: 700 });
+  };
+}
+
 // ---------- Exemples d'apprentissage ----------
 let EX_FILTER = '';
 let EX_SEL = null;
@@ -1346,7 +1411,7 @@ async function route() {
   const pages = {
     library: () => renderLibrary(params), favorites: () => renderLibrary(params, true), examples: renderExamples,
     youtube: () => renderYoutube(params), channels: () => renderChannels(params), explore: renderExplore,
-    connect: renderConnect, admin: renderAdmin, settings: renderSettings, level: renderLevel, opensource: renderOpenSource,
+    connect: renderConnect, admin: renderAdmin, settings: renderSettings, level: renderLevel, opensource: renderOpenSource, skills: renderSkills,
   };
   try {
     await transition(pages[path] || renderHome);

@@ -11,6 +11,7 @@ const os = require('os');
 const claude = require('./claude');
 const level = require('./level');
 const quality = require('./quality');
+const skills = require('./skills');
 
 const PORT = Number(process.env.PORT) || 4747;
 // HOST=0.0.0.0 rend le site accessible aux autres appareils (mode partagé).
@@ -213,6 +214,30 @@ const routes = [
   }],
   ['GET', /^\/api\/export$/, () => ({ ...state, auth: undefined })],
   ['POST', /^\/api\/cloud\/sync$/, () => cloudSync()],
+  // Skills : un par catégorie.
+  ['GET', /^\/api\/skills$/, () => ({
+    codeInstalled: skills.codeInstalled(), codeDir: skills.CODE_SKILLS,
+    skills: skills.SKILL_CATS.map((c) => ({ ...skills.getSkill(state, c), totals: skills.context(state, c).totals })),
+  })],
+  ['GET', /^\/api\/skills\/(\w+)$/, (req, m) => {
+    if (!skills.SKILL_CATS.includes(m[1])) throw Object.assign(new Error('Not found'), { code: 404, key: 'notFound' });
+    return { ...skills.getSkill(state, m[1]), defaultInstructions: skills.DEFAULTS[m[1]], context: skills.context(state, m[1]), skillMd: skills.skillMd(state, m[1]) };
+  }],
+  ['PUT', /^\/api\/skills\/(\w+)$/, async (req, m) => {
+    if (!skills.SKILL_CATS.includes(m[1])) throw Object.assign(new Error('Not found'), { code: 404, key: 'notFound' });
+    const b = await json(req);
+    state.skills = state.skills || {};
+    const cur = state.skills[m[1]] || {};
+    if (b.reset) delete cur.instructions;
+    if (typeof b.instructions === 'string') cur.instructions = b.instructions.trim() === skills.DEFAULTS[m[1]].trim() ? undefined : b.instructions;
+    if (typeof b.enabled === 'boolean') cur.enabled = b.enabled;
+    cur.updatedAt = new Date().toISOString();
+    state.skills[m[1]] = cur;
+    persist();
+    syncCodeSkills();
+    return skills.getSkill(state, m[1]);
+  }],
+  ['POST', /^\/api\/skills\/install-code$/, () => skills.installForClaudeCode(state)],
   ['POST', /^\/api\/clean$/, () => { const r = quality.purge(state); persist(); return r; }],
   // Exemples d'apprentissage : les membres voient les exemples validés, l'admin voit tout.
   ['GET', /^\/api\/examples$/, (req, m, url, session) => (state.examples || []).filter((e) => session.role === 'admin' || e.status === 'validated')],
@@ -221,6 +246,7 @@ const routes = [
     state.examples = state.examples || [];
     state.examples.unshift(e);
     persist();
+    syncCodeSkills();
     return e;
   }],
   ['PUT', /^\/api\/examples\/(\w+)$/, async (req, m) => {
@@ -228,6 +254,7 @@ const routes = [
     if (i < 0) throw Object.assign(new Error('Not found'), { code: 404, key: 'notFound' });
     state.examples[i] = db.normalizeExample({ ...state.examples[i], ...(await json(req)), id: m[1], createdAt: state.examples[i].createdAt });
     persist();
+    syncCodeSkills();
     return state.examples[i];
   }],
   ['DELETE', /^\/api\/examples\/(\w+)$/, (req, m) => {
@@ -294,7 +321,7 @@ const routes = [
 ];
 
 // Routes accessibles à un ID d'accès simple (lecture seule). Tout le reste est réservé à l'admin.
-const USER_ROUTES = [/^\/api\/level$/, /^\/api\/meta$/, /^\/api\/stats$/, /^\/api\/resources$/, /^\/api\/channels$/, /^\/api\/youtube$/, /^\/api\/crawl$/, /^\/api\/examples$/, /^\/api\/mcp$/];
+const USER_ROUTES = [/^\/api\/skills$/, /^\/api\/skills\/\w+$/, /^\/api\/level$/, /^\/api\/meta$/, /^\/api\/stats$/, /^\/api\/resources$/, /^\/api\/channels$/, /^\/api\/youtube$/, /^\/api\/crawl$/, /^\/api\/examples$/, /^\/api\/mcp$/];
 
 const cookies = (req) => Object.fromEntries(String(req.headers.cookie || '').split(';').map((c) => c.trim().split('=')).filter((p) => p[0]).map(([k, ...v]) => [k, decodeURIComponent(v.join('='))]));
 const clientIp = (req) => req.socket.remoteAddress || '';
@@ -397,6 +424,11 @@ const server = http.createServer(async (req, res) => {
     if (session.role !== 'admin' && !(req.method === 'GET' && USER_ROUTES.some((re) => re.test(url.pathname)))) {
       return send(res, 403, { error: 'Admin only', key: 'adminOnly' });
     }
+    const zipM = url.pathname.match(/^\/api\/skills\/(\w+)\/zip$/);
+    if (zipM && session.role === 'admin' && skills.SKILL_CATS.includes(zipM[1])) {
+      res.writeHead(200, { 'Content-Type': 'application/zip', 'Content-Disposition': `attachment; filename="rovex-${zipM[1]}.zip"` });
+      return res.end(skills.skillZip(state, zipM[1]));
+    }
     for (const [method, re, fn] of routes) {
       const m = url.pathname.match(re);
       if (m && method === req.method) {
@@ -433,6 +465,11 @@ server.listen(PORT, HOST, () => {
   autoConnectClaude();
 });
 
+// Les skills installés dans Claude Code sont réécrits quand un skill ou un exemple change.
+function syncCodeSkills() {
+  try { if (skills.codeInstalled()) skills.installForClaudeCode(state); } catch {}
+}
+
 // Au démarrage : si Claude Desktop est installé, on y branche Rovex Hub automatiquement
 // (sauf si l'admin l'a débranché). Claude Code est branché aussi s'il est présent.
 async function autoConnectClaude() {
@@ -451,6 +488,10 @@ async function autoConnectClaude() {
     if (code.installed && !code.linked) {
       await claude.linkCode(`http://localhost:${PORT}/mcp`);
       console.log('  Claude Code detected: Rovex Hub added.');
+    }
+    if (code.installed) {
+      skills.installForClaudeCode(state);
+      console.log('  Claude Code: Rovex skills installed in ' + skills.CODE_SKILLS);
     }
   } catch {}
 }

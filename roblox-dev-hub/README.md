@@ -12,6 +12,7 @@ Le cerveau Roblox de ton Claude : une bibliothèque de ressources de dev Roblox 
 - **Toutes les chaînes Roblox** : découvre et relie automatiquement les chaînes YouTube Roblox (dev, VFX, gameplay, YouTubeurs FR/EN/ES…), puis récupère leurs nouvelles vidéos. La mise à jour peut être automatique (Réglages).
 - **Open source et systèmes gratuits** (page à part, séparée de la bibliothèque d'apprentissage) : dépôts GitHub Roblox triés par étoiles, ressources communautaires du DevForum, modèles et plugins gratuits du Creator Store. Outil MCP `search_opensource`.
 - **Filtre qualité** : avant d'ajouter une vidéo ou un post, Rovex vérifie qu'il parle vraiment de développement Roblox (mots-clés FR/EN/ES/PT). Le troll, le gameplay, les mèmes, les histoires et la triche (exploits, « robux gratuits ») sont écartés. Les bases existantes sont nettoyées une fois au démarrage (favoris et notes jamais touchés), et l'algo cloud nettoie son fichier à chaque passage.
+- **Skills Claude** (page **Skills**) : un skill par catégorie (Scripting, VFX, Animation, GUI…). Avant une tâche, Claude identifie la catégorie, appelle `load_skill` et lit les règles du skill, les exemples validés avec leur code, les meilleures ressources (avec tes notes) et l'open source de la catégorie, puis fait la tâche. Les règles se modifient depuis la page.
 - **Import en un clic** : colle un lien YouTube, une chaîne, une page du DevForum ou une doc. Le titre, l'auteur et la miniature sont récupérés tout seuls.
 - **Tes fichiers** : glisse des images, vidéos, scripts `.lua`, modèles `.rbxm` / `.fbx` / `.blend` sur la page.
 - **Recherche YouTube intégrée**, sans clé (une clé YouTube Data API reste possible dans Réglages). Un jeton GitHub optionnel accélère la récupération de l'open source.
@@ -63,7 +64,13 @@ L'app expose un serveur MCP (`rovex-hub`), à brancher dans Claude ou tout autre
 - **Mode HTTP** (l'app doit être ouverte) : `http://localhost:4747/mcp` — libre depuis ton PC ; depuis un autre appareil, ajoute l'en-tête `Authorization: Bearer <ID ou clé admin>`.
 - **Mode stdio** (marche même app fermée) : `node "%LOCALAPPDATA%\RobloxDevHub\mcp.js"`
 
-Outils exposés (activables dans **Connexion Claude**) : `search_resources`, `list_examples`, `get_example`, `get_resource`, `list_categories`, `add_resource`, `import_url`, `update_notes`, `explore_internet`, `explore_status`, `list_channels`, `sync_channels`.
+Outils exposés (activables dans **Connexion Claude**) : `load_skill`, `list_skills`, `search_opensource`, `search_resources`, `list_examples`, `get_example`, `get_resource`, `list_categories`, `add_resource`, `import_url`, `update_notes`, `explore_internet`, `explore_status`, `list_channels`, `sync_channels`.
+
+### Skills
+
+- **Automatique** : les instructions du serveur MCP demandent à Claude d'appeler `load_skill` avant toute tâche Roblox.
+- **Claude Desktop** : chaque skill est aussi un prompt MCP (`rovex-scripting`, `rovex-vfx`…) dans le menu **+**. Tu peux aussi télécharger un skill en `.zip` depuis la page Skills et l'ajouter dans Paramètres → Capacités → Skills.
+- **Claude Code** : l'app écrit les skills dans `~/.claude/skills/rovex-<catégorie>/` au démarrage et à chaque modification (bouton « Installer pour Claude Code » sur la page Skills).
 
 ## Où sont mes données ?
 
