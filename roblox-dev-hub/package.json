@@ -1,0 +1,12 @@
+{
+  "name": "roblox-dev-hub",
+  "version": "1.0.0",
+  "description": "Bibliothèque locale de ressources de dev Roblox (vidéos, docs, VFX, scripts, animations, GUI, GFX) reliée à Claude via MCP.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "mcp": "node mcp.js"
+  },
+  "engines": { "node": ">=18" },
+  "license": "MIT"
+}

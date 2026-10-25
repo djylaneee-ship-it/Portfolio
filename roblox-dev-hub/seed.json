@@ -1,0 +1,1012 @@
+{
+ "resources": [
+  {
+   "title": "Documentation Roblox Creator Hub",
+   "url": "https://create.roblox.com/docs",
+   "type": "doc",
+   "category": "scripting",
+   "tags": [
+    "officiel",
+    "docs",
+    "base"
+   ],
+   "description": "La doc officielle : tout le moteur, les services et les tutoriels.",
+   "author": "Roblox",
+   "level": "",
+   "source": "seed"
+  },
+  {
+   "title": "Introduction au scripting",
+   "url": "https://create.roblox.com/docs/scripting",
+   "type": "doc",
+   "category": "scripting",
+   "tags": [
+    "luau",
+    "debutant",
+    "officiel"
+   ],
+   "description": "Point de départ officiel pour apprendre à scripter dans Studio.",
+   "author": "Roblox",
+   "level": "debutant",
+   "source": "seed"
+  },
+  {
+   "title": "Guide du langage Luau",
+   "url": "https://create.roblox.com/docs/luau",
+   "type": "doc",
+   "category": "scripting",
+   "tags": [
+    "luau",
+    "syntaxe",
+    "types"
+   ],
+   "description": "Variables, tables, fonctions, boucles, métatables : la référence du langage.",
+   "author": "Roblox",
+   "level": "debutant",
+   "source": "seed"
+  },
+  {
+   "title": "Luau.org",
+   "url": "https://luau.org",
+   "type": "doc",
+   "category": "scripting",
+   "tags": [
+    "luau",
+    "typage",
+    "performance"
+   ],
+   "description": "Site officiel du langage Luau : typage strict, nouveautés, RFC.",
+   "author": "Luau",
+   "level": "avance",
+   "source": "seed"
+  },
+  {
+   "title": "Événements distants (RemoteEvent / RemoteFunction)",
+   "url": "https://create.roblox.com/docs/scripting/events/remote",
+   "type": "doc",
+   "category": "scripting",
+   "tags": [
+    "remote",
+    "client",
+    "serveur",
+    "reseau"
+   ],
+   "description": "Communication client ↔ serveur sécurisée.",
+   "author": "Roblox",
+   "level": "intermediaire",
+   "source": "seed"
+  },
+  {
+   "title": "Data Stores (sauvegarde)",
+   "url": "https://create.roblox.com/docs/cloud-services/data-stores",
+   "type": "doc",
+   "category": "scripting",
+   "tags": [
+    "datastore",
+    "sauvegarde",
+    "donnees"
+   ],
+   "description": "Sauvegarder l'argent, l'inventaire et la progression des joueurs.",
+   "author": "Roblox",
+   "level": "intermediaire",
+   "source": "seed"
+  },
+  {
+   "title": "TweenService (référence)",
+   "url": "https://create.roblox.com/docs/reference/engine/classes/TweenService",
+   "type": "doc",
+   "category": "scripting",
+   "tags": [
+    "tween",
+    "animation",
+    "ui"
+   ],
+   "description": "Animer en douceur n'importe quelle propriété (taille, couleur, CFrame…).",
+   "author": "Roblox",
+   "level": "",
+   "source": "seed"
+  },
+  {
+   "title": "ModuleScript (référence)",
+   "url": "https://create.roblox.com/docs/reference/engine/classes/ModuleScript",
+   "type": "doc",
+   "category": "scripting",
+   "tags": [
+    "module",
+    "architecture"
+   ],
+   "description": "Organiser son code en modules réutilisables.",
+   "author": "Roblox",
+   "level": "intermediaire",
+   "source": "seed"
+  },
+  {
+   "title": "Roblox DevForum",
+   "url": "https://devforum.roblox.com",
+   "type": "article",
+   "category": "scripting",
+   "tags": [
+    "communaute",
+    "aide",
+    "forum"
+   ],
+   "description": "Le forum officiel des développeurs : questions, annonces, ressources.",
+   "author": "Roblox",
+   "level": "",
+   "source": "seed"
+  },
+  {
+   "title": "DevForum — Tutoriels communautaires",
+   "url": "https://devforum.roblox.com/c/resources/community-tutorials/",
+   "type": "article",
+   "category": "scripting",
+   "tags": [
+    "tutoriel",
+    "communaute"
+   ],
+   "description": "Des centaines de tutos écrits par la communauté (scripts, VFX, UI…).",
+   "author": "DevForum",
+   "level": "",
+   "source": "seed"
+  },
+  {
+   "title": "DevForum — Ressources communautaires",
+   "url": "https://devforum.roblox.com/c/resources/community-resources/",
+   "type": "article",
+   "category": "tools",
+   "tags": [
+    "modules",
+    "open source",
+    "plugins"
+   ],
+   "description": "Modules et systèmes open source partagés par la communauté.",
+   "author": "DevForum",
+   "level": "",
+   "source": "seed"
+  },
+  {
+   "title": "ProfileService (sauvegarde robuste)",
+   "url": "https://madstudioroblox.github.io/ProfileService/",
+   "type": "doc",
+   "category": "scripting",
+   "tags": [
+    "datastore",
+    "sauvegarde",
+    "module"
+   ],
+   "description": "Module populaire pour des sauvegardes sans perte de données.",
+   "author": "MadStudio",
+   "level": "avance",
+   "source": "seed"
+  },
+  {
+   "title": "YouTube : roblox studio scripting tutorial beginner",
+   "url": "https://www.youtube.com/results?search_query=roblox+studio+scripting+tutorial+beginner",
+   "type": "recherche",
+   "category": "scripting",
+   "tags": [
+    "debutant",
+    "luau"
+   ],
+   "description": "Séries pour débuter le scripting.",
+   "author": "YouTube",
+   "level": "debutant",
+   "source": "seed"
+  },
+  {
+   "title": "YouTube : roblox advanced scripting tutorial",
+   "url": "https://www.youtube.com/results?search_query=roblox+advanced+scripting+tutorial",
+   "type": "recherche",
+   "category": "scripting",
+   "tags": [
+    "avance",
+    "luau"
+   ],
+   "description": "Scripting avancé : POO, modules, frameworks.",
+   "author": "YouTube",
+   "level": "avance",
+   "source": "seed"
+  },
+  {
+   "title": "YouTube : roblox datastore tutorial",
+   "url": "https://www.youtube.com/results?search_query=roblox+datastore+tutorial",
+   "type": "recherche",
+   "category": "scripting",
+   "tags": [
+    "datastore",
+    "sauvegarde"
+   ],
+   "description": "Tutos vidéo sur la sauvegarde des données.",
+   "author": "YouTube",
+   "level": "",
+   "source": "seed"
+  },
+  {
+   "title": "YouTube : roblox remote events tutorial",
+   "url": "https://www.youtube.com/results?search_query=roblox+remote+events+tutorial",
+   "type": "recherche",
+   "category": "scripting",
+   "tags": [
+    "remote",
+    "reseau"
+   ],
+   "description": "Tutos vidéo client/serveur.",
+   "author": "YouTube",
+   "level": "",
+   "source": "seed"
+  },
+  {
+   "title": "YouTube : roblox combat system tutorial",
+   "url": "https://www.youtube.com/results?search_query=roblox+combat+system+tutorial",
+   "type": "recherche",
+   "category": "scripting",
+   "tags": [
+    "combat",
+    "hitbox",
+    "m1"
+   ],
+   "description": "Systèmes de combat, hitbox, combos.",
+   "author": "YouTube",
+   "level": "avance",
+   "source": "seed"
+  },
+  {
+   "title": "YouTube : roblox OOP luau tutorial",
+   "url": "https://www.youtube.com/results?search_query=roblox+OOP+luau+tutorial",
+   "type": "recherche",
+   "category": "scripting",
+   "tags": [
+    "poo",
+    "module"
+   ],
+   "description": "Programmation orientée objet en Luau.",
+   "author": "YouTube",
+   "level": "avance",
+   "source": "seed"
+  },
+  {
+   "title": "Particle Emitters",
+   "url": "https://create.roblox.com/docs/effects/particle-emitters",
+   "type": "doc",
+   "category": "vfx",
+   "tags": [
+    "particules",
+    "officiel"
+   ],
+   "description": "Créer et régler des émetteurs de particules.",
+   "author": "Roblox",
+   "level": "debutant",
+   "source": "seed"
+  },
+  {
+   "title": "Beams",
+   "url": "https://create.roblox.com/docs/effects/beams",
+   "type": "doc",
+   "category": "vfx",
+   "tags": [
+    "beam",
+    "laser",
+    "officiel"
+   ],
+   "description": "Faisceaux texturés entre deux attachments : lasers, éclairs, slashs.",
+   "author": "Roblox",
+   "level": "",
+   "source": "seed"
+  },
+  {
+   "title": "Trails",
+   "url": "https://create.roblox.com/docs/effects/trails",
+   "type": "doc",
+   "category": "vfx",
+   "tags": [
+    "trail",
+    "trainee",
+    "officiel"
+   ],
+   "description": "Traînées derrière les armes et les personnages.",
+   "author": "Roblox",
+   "level": "",
+   "source": "seed"
+  },
+  {
+   "title": "Éclairage et effets",
+   "url": "https://create.roblox.com/docs/environment",
+   "type": "doc",
+   "category": "vfx",
+   "tags": [
+    "lighting",
+    "bloom",
+    "atmosphere"
+   ],
+   "description": "Lighting, Atmosphere, post-traitement : l'ambiance qui fait ressortir les VFX.",
+   "author": "Roblox",
+   "level": "",
+   "source": "seed"
+  },
+  {
+   "title": "YouTube : roblox studio vfx tutorial",
+   "url": "https://www.youtube.com/results?search_query=roblox+studio+vfx+tutorial",
+   "type": "recherche",
+   "category": "vfx",
+   "tags": [
+    "particules",
+    "debutant"
+   ],
+   "description": "Bases des VFX dans Studio.",
+   "author": "YouTube",
+   "level": "debutant",
+   "source": "seed"
+  },
+  {
+   "title": "YouTube : roblox slash vfx tutorial",
+   "url": "https://www.youtube.com/results?search_query=roblox+slash+vfx+tutorial",
+   "type": "recherche",
+   "category": "vfx",
+   "tags": [
+    "slash",
+    "epee",
+    "combat"
+   ],
+   "description": "Slashs d'épée et effets de coup.",
+   "author": "YouTube",
+   "level": "",
+   "source": "seed"
+  },
+  {
+   "title": "YouTube : roblox anime vfx tutorial",
+   "url": "https://www.youtube.com/results?search_query=roblox+anime+vfx+tutorial",
+   "type": "recherche",
+   "category": "vfx",
+   "tags": [
+    "anime",
+    "aura",
+    "explosion"
+   ],
+   "description": "Effets style anime : auras, explosions, impacts.",
+   "author": "YouTube",
+   "level": "intermediaire",
+   "source": "seed"
+  },
+  {
+   "title": "YouTube : roblox vfx flipbook texture",
+   "url": "https://www.youtube.com/results?search_query=roblox+vfx+flipbook+texture",
+   "type": "recherche",
+   "category": "vfx",
+   "tags": [
+    "flipbook",
+    "texture"
+   ],
+   "description": "Textures animées en flipbook pour particules.",
+   "author": "YouTube",
+   "level": "avance",
+   "source": "seed"
+  },
+  {
+   "title": "YouTube : roblox vfx scripting tutorial",
+   "url": "https://www.youtube.com/results?search_query=roblox+vfx+scripting+tutorial",
+   "type": "recherche",
+   "category": "vfx",
+   "tags": [
+    "script",
+    "emit",
+    "tween"
+   ],
+   "description": "Déclencher et animer les VFX par script.",
+   "author": "YouTube",
+   "level": "intermediaire",
+   "source": "seed"
+  },
+  {
+   "title": "YouTube : roblox mesh vfx tutorial blender",
+   "url": "https://www.youtube.com/results?search_query=roblox+mesh+vfx+tutorial+blender",
+   "type": "recherche",
+   "category": "vfx",
+   "tags": [
+    "mesh",
+    "blender"
+   ],
+   "description": "VFX à base de meshes faits dans Blender.",
+   "author": "YouTube",
+   "level": "avance",
+   "source": "seed"
+  },
+  {
+   "title": "Animation Editor",
+   "url": "https://create.roblox.com/docs/animation/editor",
+   "type": "doc",
+   "category": "animation",
+   "tags": [
+    "animation editor",
+    "officiel"
+   ],
+   "description": "L'éditeur d'animation intégré à Studio.",
+   "author": "Roblox",
+   "level": "debutant",
+   "source": "seed"
+  },
+  {
+   "title": "Utiliser les animations en script",
+   "url": "https://create.roblox.com/docs/animation/using",
+   "type": "doc",
+   "category": "animation",
+   "tags": [
+    "animator",
+    "loadanimation",
+    "script"
+   ],
+   "description": "Charger et jouer des animations via Animator.",
+   "author": "Roblox",
+   "level": "intermediaire",
+   "source": "seed"
+  },
+  {
+   "title": "Mixamo",
+   "url": "https://www.mixamo.com",
+   "type": "outil",
+   "category": "animation",
+   "tags": [
+    "mocap",
+    "gratuit",
+    "r15"
+   ],
+   "description": "Animations motion-capture gratuites (à adapter aux rigs Roblox).",
+   "author": "Adobe",
+   "level": "",
+   "source": "seed"
+  },
+  {
+   "title": "YouTube : moon animator 2 tutorial",
+   "url": "https://www.youtube.com/results?search_query=moon+animator+2+tutorial",
+   "type": "recherche",
+   "category": "animation",
+   "tags": [
+    "moon animator",
+    "plugin"
+   ],
+   "description": "Tutos du plugin Moon Animator 2.",
+   "author": "YouTube",
+   "level": "",
+   "source": "seed"
+  },
+  {
+   "title": "YouTube : roblox r6 animation tutorial",
+   "url": "https://www.youtube.com/results?search_query=roblox+r6+animation+tutorial",
+   "type": "recherche",
+   "category": "animation",
+   "tags": [
+    "r6",
+    "combat"
+   ],
+   "description": "Animer des rigs R6.",
+   "author": "YouTube",
+   "level": "",
+   "source": "seed"
+  },
+  {
+   "title": "YouTube : roblox walk run animation tutorial",
+   "url": "https://www.youtube.com/results?search_query=roblox+walk+run+animation+tutorial",
+   "type": "recherche",
+   "category": "animation",
+   "tags": [
+    "marche",
+    "course",
+    "cycle"
+   ],
+   "description": "Cycles de marche et de course.",
+   "author": "YouTube",
+   "level": "",
+   "source": "seed"
+  },
+  {
+   "title": "YouTube : roblox blender animation rig export",
+   "url": "https://www.youtube.com/results?search_query=roblox+blender+animation+rig+export",
+   "type": "recherche",
+   "category": "animation",
+   "tags": [
+    "blender",
+    "rig",
+    "export"
+   ],
+   "description": "Animer dans Blender puis importer dans Roblox.",
+   "author": "YouTube",
+   "level": "avance",
+   "source": "seed"
+  },
+  {
+   "title": "Interfaces utilisateur (UI)",
+   "url": "https://create.roblox.com/docs/ui",
+   "type": "doc",
+   "category": "gui",
+   "tags": [
+    "ui",
+    "officiel",
+    "screengui"
+   ],
+   "description": "ScreenGui, Frames, layout, contraintes : la base des interfaces.",
+   "author": "Roblox",
+   "level": "debutant",
+   "source": "seed"
+  },
+  {
+   "title": "UIGradient / UIStroke / UICorner",
+   "url": "https://create.roblox.com/docs/ui/appearance-modifiers",
+   "type": "doc",
+   "category": "gui",
+   "tags": [
+    "uistroke",
+    "uigradient",
+    "uicorner",
+    "style"
+   ],
+   "description": "Les modificateurs pour des UI modernes : contours, dégradés, coins arrondis.",
+   "author": "Roblox",
+   "level": "",
+   "source": "seed"
+  },
+  {
+   "title": "Animation d'UI / tweens",
+   "url": "https://create.roblox.com/docs/ui/animation",
+   "type": "doc",
+   "category": "gui",
+   "tags": [
+    "tween",
+    "animation",
+    "ui"
+   ],
+   "description": "Animer position, taille, rotation et transparence des éléments d'UI.",
+   "author": "Roblox",
+   "level": "",
+   "source": "seed"
+  },
+  {
+   "title": "Figma",
+   "url": "https://www.figma.com",
+   "type": "outil",
+   "category": "gui",
+   "tags": [
+    "maquette",
+    "design"
+   ],
+   "description": "Maquetter ses interfaces avant de les construire dans Studio.",
+   "author": "Figma",
+   "level": "",
+   "source": "seed"
+  },
+  {
+   "title": "YouTube : roblox ui design tutorial",
+   "url": "https://www.youtube.com/results?search_query=roblox+ui+design+tutorial",
+   "type": "recherche",
+   "category": "gui",
+   "tags": [
+    "design",
+    "ui"
+   ],
+   "description": "Concevoir de belles interfaces.",
+   "author": "YouTube",
+   "level": "",
+   "source": "seed"
+  },
+  {
+   "title": "YouTube : roblox simulator ui tutorial",
+   "url": "https://www.youtube.com/results?search_query=roblox+simulator+ui+tutorial",
+   "type": "recherche",
+   "category": "gui",
+   "tags": [
+    "simulator",
+    "shop",
+    "hud"
+   ],
+   "description": "UI style simulator : boutique, HUD, boutons.",
+   "author": "YouTube",
+   "level": "",
+   "source": "seed"
+  },
+  {
+   "title": "YouTube : roblox tween ui animation tutorial",
+   "url": "https://www.youtube.com/results?search_query=roblox+tween+ui+animation+tutorial",
+   "type": "recherche",
+   "category": "gui",
+   "tags": [
+    "tween",
+    "animation",
+    "boutons"
+   ],
+   "description": "Animer ses UI (hover, ouverture de menus).",
+   "author": "YouTube",
+   "level": "intermediaire",
+   "source": "seed"
+  },
+  {
+   "title": "Blender",
+   "url": "https://www.blender.org",
+   "type": "outil",
+   "category": "gfx",
+   "tags": [
+    "blender",
+    "gratuit",
+    "rendu"
+   ],
+   "description": "Logiciel 3D gratuit : GFX, modélisation, animation, rendus.",
+   "author": "Blender Foundation",
+   "level": "",
+   "source": "seed"
+  },
+  {
+   "title": "Photopea",
+   "url": "https://www.photopea.com",
+   "type": "outil",
+   "category": "gfx",
+   "tags": [
+    "retouche",
+    "gratuit",
+    "photoshop"
+   ],
+   "description": "Éditeur d'images gratuit dans le navigateur (compatible PSD).",
+   "author": "Photopea",
+   "level": "",
+   "source": "seed"
+  },
+  {
+   "title": "Icônes de jeu (officiel)",
+   "url": "https://create.roblox.com/docs/production/publishing/experience-icons",
+   "type": "doc",
+   "category": "gfx",
+   "tags": [
+    "miniature",
+    "icone",
+    "publication"
+   ],
+   "description": "Format 512×512 et conseils pour une icône lisible.",
+   "author": "Roblox",
+   "level": "",
+   "source": "seed"
+  },
+  {
+   "title": "YouTube : roblox gfx tutorial blender",
+   "url": "https://www.youtube.com/results?search_query=roblox+gfx+tutorial+blender",
+   "type": "recherche",
+   "category": "gfx",
+   "tags": [
+    "blender",
+    "rendu"
+   ],
+   "description": "Faire des GFX Roblox dans Blender.",
+   "author": "YouTube",
+   "level": "",
+   "source": "seed"
+  },
+  {
+   "title": "YouTube : roblox thumbnail tutorial",
+   "url": "https://www.youtube.com/results?search_query=roblox+thumbnail+tutorial",
+   "type": "recherche",
+   "category": "gfx",
+   "tags": [
+    "miniature",
+    "clics"
+   ],
+   "description": "Miniatures de jeu qui donnent envie de cliquer.",
+   "author": "YouTube",
+   "level": "",
+   "source": "seed"
+  },
+  {
+   "title": "YouTube : roblox game icon tutorial",
+   "url": "https://www.youtube.com/results?search_query=roblox+game+icon+tutorial",
+   "type": "recherche",
+   "category": "gfx",
+   "tags": [
+    "icone"
+   ],
+   "description": "Icônes de jeu.",
+   "author": "YouTube",
+   "level": "",
+   "source": "seed"
+  },
+  {
+   "title": "YouTube : blender low poly tutorial for roblox",
+   "url": "https://www.youtube.com/results?search_query=blender+low+poly+tutorial+for+roblox",
+   "type": "recherche",
+   "category": "modeling",
+   "tags": [
+    "low poly",
+    "blender"
+   ],
+   "description": "Modélisation low poly pour Roblox.",
+   "author": "YouTube",
+   "level": "debutant",
+   "source": "seed"
+  },
+  {
+   "title": "Meshes (MeshPart)",
+   "url": "https://create.roblox.com/docs/parts/meshes",
+   "type": "doc",
+   "category": "modeling",
+   "tags": [
+    "import",
+    "fbx",
+    "mesh"
+   ],
+   "description": "Importer et utiliser des meshes faits dans Blender ou Maya.",
+   "author": "Roblox",
+   "level": "",
+   "source": "seed"
+  },
+  {
+   "title": "Spécifications des textures (PBR)",
+   "url": "https://create.roblox.com/docs/art/modeling/texture-specifications",
+   "type": "doc",
+   "category": "modeling",
+   "tags": [
+    "pbr",
+    "texture"
+   ],
+   "description": "Formats des cartes PBR (albedo, normal, roughness, metalness) pour SurfaceAppearance.",
+   "author": "Roblox",
+   "level": "avance",
+   "source": "seed"
+  },
+  {
+   "title": "YouTube : roblox texture painting blender",
+   "url": "https://www.youtube.com/results?search_query=roblox+texture+painting+blender",
+   "type": "recherche",
+   "category": "modeling",
+   "tags": [
+    "texture",
+    "uv"
+   ],
+   "description": "Peindre ses textures dans Blender.",
+   "author": "YouTube",
+   "level": "intermediaire",
+   "source": "seed"
+  },
+  {
+   "title": "Améliorer les performances",
+   "url": "https://create.roblox.com/docs/performance-optimization/improve",
+   "type": "doc",
+   "category": "building",
+   "tags": [
+    "performance",
+    "lag",
+    "optimisation"
+   ],
+   "description": "Réduire le lag : ombres, lumières, densité d'objets, MicroProfiler.",
+   "author": "Roblox",
+   "level": "avance",
+   "source": "seed"
+  },
+  {
+   "title": "YouTube : roblox building tips tutorial",
+   "url": "https://www.youtube.com/results?search_query=roblox+building+tips+tutorial",
+   "type": "recherche",
+   "category": "building",
+   "tags": [
+    "build",
+    "map"
+   ],
+   "description": "Astuces de build et de level design.",
+   "author": "YouTube",
+   "level": "",
+   "source": "seed"
+  },
+  {
+   "title": "YouTube : roblox lighting tutorial",
+   "url": "https://www.youtube.com/results?search_query=roblox+lighting+tutorial",
+   "type": "recherche",
+   "category": "building",
+   "tags": [
+    "lighting",
+    "ambiance"
+   ],
+   "description": "Éclairage et ambiance de map.",
+   "author": "YouTube",
+   "level": "",
+   "source": "seed"
+  },
+  {
+   "title": "YouTube : roblox sound design tutorial",
+   "url": "https://www.youtube.com/results?search_query=roblox+sound+design+tutorial",
+   "type": "recherche",
+   "category": "audio",
+   "tags": [
+    "sfx",
+    "ambiance"
+   ],
+   "description": "Sound design dans Roblox.",
+   "author": "YouTube",
+   "level": "",
+   "source": "seed"
+  },
+  {
+   "title": "Monétisation",
+   "url": "https://create.roblox.com/docs/production/monetization",
+   "type": "doc",
+   "category": "design",
+   "tags": [
+    "gamepass",
+    "robux",
+    "devproduct"
+   ],
+   "description": "Game passes, produits développeur, abonnements.",
+   "author": "Roblox",
+   "level": "intermediaire",
+   "source": "seed"
+  },
+  {
+   "title": "YouTube : roblox game design tips",
+   "url": "https://www.youtube.com/results?search_query=roblox+game+design+tips",
+   "type": "recherche",
+   "category": "design",
+   "tags": [
+    "game design",
+    "retention"
+   ],
+   "description": "Concevoir un jeu Roblox qui retient les joueurs.",
+   "author": "YouTube",
+   "level": "",
+   "source": "seed"
+  },
+  {
+   "title": "YouTube : how to make a popular roblox game",
+   "url": "https://www.youtube.com/results?search_query=how+to+make+a+popular+roblox+game",
+   "type": "recherche",
+   "category": "design",
+   "tags": [
+    "succes",
+    "marketing"
+   ],
+   "description": "Conseils pour lancer et faire connaître son jeu.",
+   "author": "YouTube",
+   "level": "",
+   "source": "seed"
+  },
+  {
+   "title": "Creator Store (modèles, plugins, sons)",
+   "url": "https://create.roblox.com/store",
+   "type": "outil",
+   "category": "tools",
+   "tags": [
+    "assets",
+    "plugins",
+    "gratuit"
+   ],
+   "description": "Boutique officielle de modèles, plugins, images, sons et meshes.",
+   "author": "Roblox",
+   "level": "",
+   "source": "seed"
+  },
+  {
+   "title": "Rojo",
+   "url": "https://rojo.space",
+   "type": "outil",
+   "category": "tools",
+   "tags": [
+    "vscode",
+    "git",
+    "workflow"
+   ],
+   "description": "Coder dans VS Code et synchroniser avec Studio.",
+   "author": "Rojo",
+   "level": "avance",
+   "source": "seed"
+  },
+  {
+   "title": "Wally",
+   "url": "https://wally.run",
+   "type": "outil",
+   "category": "tools",
+   "tags": [
+    "packages",
+    "modules"
+   ],
+   "description": "Gestionnaire de packages pour Roblox.",
+   "author": "Wally",
+   "level": "avance",
+   "source": "seed"
+  },
+  {
+   "title": "Visual Studio Code",
+   "url": "https://code.visualstudio.com",
+   "type": "outil",
+   "category": "tools",
+   "tags": [
+    "editeur",
+    "code"
+   ],
+   "description": "Éditeur de code à combiner avec Rojo.",
+   "author": "Microsoft",
+   "level": "",
+   "source": "seed"
+  },
+  {
+   "title": "YouTube : best roblox studio plugins",
+   "url": "https://www.youtube.com/results?search_query=best+roblox+studio+plugins",
+   "type": "recherche",
+   "category": "tools",
+   "tags": [
+    "plugins"
+   ],
+   "description": "Les plugins Studio incontournables.",
+   "author": "YouTube",
+   "level": "",
+   "source": "seed"
+  },
+  {
+   "title": "YouTube : roblox terrain tutorial",
+   "url": "https://www.youtube.com/results?search_query=roblox+terrain+tutorial",
+   "type": "recherche",
+   "category": "building",
+   "tags": [
+    "terrain"
+   ],
+   "description": "Recherche YouTube toujours à jour.",
+   "author": "YouTube",
+   "level": "",
+   "source": "seed"
+  },
+  {
+   "title": "YouTube : roblox studio audio sound tutorial",
+   "url": "https://www.youtube.com/results?search_query=roblox+studio+audio+sound+tutorial",
+   "type": "recherche",
+   "category": "audio",
+   "tags": [
+    "son",
+    "musique"
+   ],
+   "description": "Recherche YouTube toujours à jour.",
+   "author": "YouTube",
+   "level": "",
+   "source": "seed"
+  },
+  {
+   "title": "Créer des barres de HUD",
+   "url": "https://create.roblox.com/docs/tutorials/use-case-tutorials/ui/create-hud-meters",
+   "type": "doc",
+   "category": "gui",
+   "tags": [
+    "hud",
+    "vie",
+    "barre"
+   ],
+   "description": "Tutoriel officiel : barres de vie / énergie.",
+   "author": "Roblox",
+   "level": "intermediaire",
+   "source": "seed"
+  },
+  {
+   "title": "MicroProfiler",
+   "url": "https://create.roblox.com/docs/performance-optimization/microprofiler",
+   "type": "doc",
+   "category": "tools",
+   "tags": [
+    "performance",
+    "debug"
+   ],
+   "description": "Trouver ce qui fait laguer ton jeu.",
+   "author": "Roblox",
+   "level": "avance",
+   "source": "seed"
+  }
+ ],
+ "channels": [
+  {
+   "handle": "@TheDevKing",
+   "name": "TheDevKing",
+   "category": "scripting"
+  },
+  {
+   "handle": "@AlvinBlox",
+   "name": "AlvinBlox",
+   "category": "scripting"
+  },
+  {
+   "handle": "@GnomeCode",
+   "name": "GnomeCode",
+   "category": "scripting"
+  },
+  {
+   "handle": "@BrawlDev",
+   "name": "BrawlDev",
+   "category": "scripting"
+  }
+ ]
+}
