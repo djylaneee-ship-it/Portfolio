@@ -1008,5 +1008,80 @@
    "name": "BrawlDev",
    "category": "scripting"
   }
+ ],
+ "examples": [
+  {
+   "title": "Pets that follow the player",
+   "category": "scripting",
+   "status": "validated",
+   "filename": "PetFollow.lua",
+   "prompt": "Make a pet system where pets smoothly follow the player.",
+   "code": "-- PetFollow (ModuleScript in ServerScriptService)\nlocal RunService = game:GetService(\"RunService\")\n\nlocal PetFollow = {}\n\n-- Makes `pet` (a Model) follow `character` at `offset`, smoothly.\n-- Returns the connection: call :Disconnect() when the pet is removed.\nfunction PetFollow.follow(pet: Model, character: Model, offset: CFrame): RBXScriptConnection\n\tlocal root = character:WaitForChild(\"HumanoidRootPart\") :: BasePart\n\treturn RunService.Heartbeat:Connect(function(dt)\n\t\tif not pet.Parent or not root.Parent then\n\t\t\treturn\n\t\tend\n\t\tlocal goal = root.CFrame * offset\n\t\tlocal alpha = math.min(dt * 8, 1)\n\t\tpet:PivotTo(pet:GetPivot():Lerp(goal, alpha))\n\tend)\nend\n\nreturn PetFollow",
+   "why": [
+    "Lerp scaled by dt: same speed whatever the FPS",
+    "PivotTo moves the whole Model, not a single Part",
+    "Returns the connection so it can be disconnected (no leaks)",
+    "Small reusable function inside a ModuleScript"
+   ],
+   "sources": "Creator Docs: PVInstance:PivotTo, RunService.Heartbeat"
+  },
+  {
+   "title": "Saving player data with DataStore",
+   "category": "scripting",
+   "status": "validated",
+   "filename": "PlayerData.server.lua",
+   "prompt": "Save the player's coins without ever losing data.",
+   "code": "-- PlayerData (Script in ServerScriptService)\nlocal Players = game:GetService(\"Players\")\nlocal DataStoreService = game:GetService(\"DataStoreService\")\n\nlocal store = DataStoreService:GetDataStore(\"PlayerData_v1\")\nlocal DEFAULT = { Coins = 0 }\n\nlocal function load(player: Player)\n\tlocal ok, data = pcall(function()\n\t\treturn store:GetAsync(\"u_\" .. player.UserId)\n\tend)\n\tif not ok then\n\t\twarn(\"Load failed for\", player.Name, data)\n\t\tplayer:Kick(\"Your data could not be loaded, please rejoin.\")\n\t\treturn\n\tend\n\tdata = data or table.clone(DEFAULT)\n\n\tlocal leaderstats = Instance.new(\"Folder\")\n\tleaderstats.Name = \"leaderstats\"\n\tlocal coins = Instance.new(\"IntValue\")\n\tcoins.Name = \"Coins\"\n\tcoins.Value = data.Coins\n\tcoins.Parent = leaderstats\n\tleaderstats.Parent = player\nend\n\nlocal function save(player: Player)\n\tlocal stats = player:FindFirstChild(\"leaderstats\")\n\tif not stats then\n\t\treturn -- never overwrite saved data with empty data\n\tend\n\tlocal coins = stats.Coins.Value\n\tlocal ok, err = pcall(function()\n\t\tstore:UpdateAsync(\"u_\" .. player.UserId, function(old)\n\t\t\told = old or table.clone(DEFAULT)\n\t\t\told.Coins = coins\n\t\t\treturn old\n\t\tend)\n\tend)\n\tif not ok then\n\t\twarn(\"Save failed for\", player.Name, err)\n\tend\nend\n\nPlayers.PlayerAdded:Connect(load)\nPlayers.PlayerRemoving:Connect(save)\nfor _, player in Players:GetPlayers() do\n\ttask.spawn(load, player)\nend\n\ngame:BindToClose(function()\n\tfor _, player in Players:GetPlayers() do\n\t\ttask.spawn(save, player)\n\tend\n\ttask.wait(3)\nend)",
+   "why": [
+    "Every DataStore call is wrapped in pcall",
+    "If loading fails the player is kicked, so empty data can never overwrite a real save",
+    "UpdateAsync instead of SetAsync: safe against concurrent writes",
+    "BindToClose saves everyone when the server shuts down"
+   ],
+   "sources": "Creator Docs: Data stores, DataStore:UpdateAsync"
+  },
+  {
+   "title": "Shop opening with a tween",
+   "category": "gui",
+   "status": "validated",
+   "filename": "ShopToggle.client.lua",
+   "prompt": "Animate my shop opening like in simulator games.",
+   "code": "-- ShopToggle (LocalScript inside the shop button)\nlocal TweenService = game:GetService(\"TweenService\")\n\nlocal button = script.Parent\nlocal shop = button.Parent:WaitForChild(\"ShopFrame\")\n\nlocal scale = shop:FindFirstChildOfClass(\"UIScale\")\nif not scale then\n\tscale = Instance.new(\"UIScale\")\n\tscale.Parent = shop\nend\n\nlocal OPEN = TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out)\nlocal CLOSE = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In)\n\nlocal isOpen = false\nscale.Scale = 0\nshop.Visible = false\n\nbutton.Activated:Connect(function()\n\tisOpen = not isOpen\n\tif isOpen then\n\t\tshop.Visible = true\n\t\tTweenService:Create(scale, OPEN, { Scale = 1 }):Play()\n\telse\n\t\tlocal tween = TweenService:Create(scale, CLOSE, { Scale = 0 })\n\t\ttween.Completed:Once(function()\n\t\t\tif not isOpen then\n\t\t\t\tshop.Visible = false\n\t\t\tend\n\t\tend)\n\t\ttween:Play()\n\tend\nend)",
+   "why": [
+    "Tweening a UIScale keeps the layout intact (no Size/Position math)",
+    "Back easing gives the simulator-style pop",
+    "Activated works with mouse, touch and gamepad",
+    "Checks isOpen after the close tween, so a quick re-open is not hidden"
+   ],
+   "sources": "Creator Docs: UI animation / tweens, UIScale"
+  },
+  {
+   "title": "Sword slash with a Beam and particles",
+   "category": "vfx",
+   "status": "review",
+   "filename": "SlashVFX.lua",
+   "prompt": "Add a slash effect when the player attacks.",
+   "code": "-- SlashVFX (ModuleScript in ReplicatedStorage)\n-- Child template \"Slash\": a Part with a Beam and a ParticleEmitter named \"Sparks\".\nlocal Debris = game:GetService(\"Debris\")\nlocal TweenService = game:GetService(\"TweenService\")\n\nlocal template = script:WaitForChild(\"Slash\")\n\nlocal SlashVFX = {}\n\nfunction SlashVFX.play(origin: CFrame)\n\tlocal slash = template:Clone()\n\tslash.Anchored = true\n\tslash.CanCollide = false\n\tslash.CanQuery = false\n\tslash.Transparency = 1\n\tslash.CFrame = origin\n\tslash.Parent = workspace\n\n\tslash.Sparks:Emit(20)\n\tlocal sweep = origin * CFrame.Angles(0, math.rad(-120), 0)\n\tTweenService:Create(slash, TweenInfo.new(0.2, Enum.EasingStyle.Quad), { CFrame = sweep }):Play()\n\n\tlocal beam = slash:FindFirstChildOfClass(\"Beam\")\n\tif beam then\n\t\ttask.delay(0.15, function()\n\t\t\tbeam.Enabled = false\n\t\tend)\n\tend\n\tDebris:AddItem(slash, 1)\nend\n\nreturn SlashVFX",
+   "why": [
+    "Emit() gives one burst of particles instead of a constant stream",
+    "Debris cleans the effect up automatically",
+    "To check: play it on every client through a RemoteEvent so the server does not lag"
+   ],
+   "sources": "Creator Docs: Beams, ParticleEmitter:Emit"
+  },
+  {
+   "title": "R6 idle played on the Animator",
+   "category": "animation",
+   "status": "draft",
+   "filename": "IdleAnimation.client.lua",
+   "prompt": "Play my R6 idle animation when the character spawns.",
+   "code": "-- IdleAnimation (LocalScript in StarterCharacterScripts)\nlocal character = script.Parent\nlocal humanoid = character:WaitForChild(\"Humanoid\")\nlocal animator = humanoid:WaitForChild(\"Animator\")\n\nlocal idle = Instance.new(\"Animation\")\nidle.AnimationId = \"rbxassetid://0\" -- replace with your animation ID\n\nlocal track = animator:LoadAnimation(idle)\ntrack.Priority = Enum.AnimationPriority.Idle\ntrack.Looped = true\ntrack:Play()",
+   "why": [
+    "Animator:LoadAnimation (Humanoid:LoadAnimation is deprecated)",
+    "Idle priority so walking and attacks play on top",
+    "Draft: replacing the idle inside the default Animate script would be cleaner"
+   ],
+   "sources": "Creator Docs: Use animations"
+  }
  ]
 }

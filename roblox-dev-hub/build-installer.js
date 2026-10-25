@@ -1,22 +1,22 @@
-// Génère « Installer Roblox Dev Hub.bat » : un seul fichier qui contient toute l'app.
+// Génère « Installer Rovex Hub.bat » : un seul fichier qui contient toute l'app.
 // Usage : node build-installer.js
 const fs = require('fs');
 const path = require('path');
 
 const ROOT = __dirname;
-const OUT = path.join(ROOT, '..', 'Installer Roblox Dev Hub.bat');
+const OUT = path.join(ROOT, '..', 'Installer Rovex Hub.bat');
 const FILES = [
   'db.js', 'mcp.js', 'server.js', 'web.js', 'crawler.js', 'seed.json', 'package.json', 'README.md',
   'public/index.html', 'public/style.css', 'public/app.js', 'public/i18n.js',
-  'Lancer Roblox Dev Hub.bat', 'Lancer en mode partage.bat', 'auth.js',
+  'Lancer Rovex Hub.bat', 'Lancer en mode partage.bat', 'auth.js', 'rovex.ico', 'public/logo.png', 'public/icon.png',
 ];
 
 const crlf = (s) => s.replace(/\r?\n/g, '\r\n');
 
 const UNINSTALL = crlf(`@echo off
-echo Desinstallation de Roblox Dev Hub...
-del "%USERPROFILE%\\Desktop\\Roblox Dev Hub.lnk" >nul 2>nul
-del "%APPDATA%\\Microsoft\\Windows\\Start Menu\\Programs\\Roblox Dev Hub.lnk" >nul 2>nul
+echo Desinstallation de Rovex Hub...
+del "%USERPROFILE%\\Desktop\\Rovex Hub.lnk" >nul 2>nul
+del "%APPDATA%\\Microsoft\\Windows\\Start Menu\\Programs\\Rovex Hub.lnk" >nul 2>nul
 echo.
 echo Tes donnees (data et media) sont gardees dans : %~dp0
 echo Supprime ce dossier a la main si tu veux tout effacer.
@@ -38,7 +38,7 @@ function Warn($t) { Write-Host "    !   $t" -ForegroundColor Yellow }
 
 Write-Host ''
 Write-Host '  ==========================================' -ForegroundColor Magenta
-Write-Host '     ROBLOX DEV HUB  -  Installation' -ForegroundColor Magenta
+Write-Host '     ROVEX HUB  -  Installation' -ForegroundColor Magenta
 Write-Host '  ==========================================' -ForegroundColor Magenta
 
 Step 'Verification de Node.js'
@@ -77,19 +77,23 @@ New-Item -ItemType Directory -Force -Path (Join-Path $Dir 'media') | Out-Null
 Ok "$($files.Count) fichiers installes (tes donnees existantes sont conservees)"
 
 Step 'Raccourcis Bureau et menu Demarrer'
-$launcher = Join-Path $Dir 'Lancer Roblox Dev Hub.bat'
+$launcher = Join-Path $Dir 'Lancer Rovex Hub.bat'
+# Nettoyage de l'ancien nom (Roblox Dev Hub)
+Remove-Item (Join-Path $Dir 'Lancer Roblox Dev Hub.bat') -ErrorAction SilentlyContinue
+Remove-Item (Join-Path $Dir 'Relier a Claude.bat') -ErrorAction SilentlyContinue
 $shell = New-Object -ComObject WScript.Shell
 $targets = @([Environment]::GetFolderPath('Desktop'), (Join-Path $env:APPDATA 'Microsoft\\Windows\\Start Menu\\Programs'))
 foreach ($t in $targets) {
-  $lnk = $shell.CreateShortcut((Join-Path $t 'Roblox Dev Hub.lnk'))
+  Remove-Item (Join-Path $t 'Roblox Dev Hub.lnk') -ErrorAction SilentlyContinue
+  $lnk = $shell.CreateShortcut((Join-Path $t 'Rovex Hub.lnk'))
   $lnk.TargetPath = $launcher
   $lnk.WorkingDirectory = $Dir
   $lnk.WindowStyle = 7
-  $lnk.IconLocation = "$env:SystemRoot\\System32\\imageres.dll,186"
+  $lnk.IconLocation = (Join-Path $Dir 'rovex.ico')
   $lnk.Description = 'Bibliotheque de ressources de dev Roblox'
   $lnk.Save()
 }
-Ok 'Raccourci "Roblox Dev Hub" cree'
+Ok 'Raccourci "Rovex Hub" cree'
 
 Step 'Serveur MCP'
 Ok 'Adresse HTTP  : http://localhost:4747/mcp  (app ouverte)'
@@ -98,13 +102,13 @@ Ok 'Tout est aussi affiche dans l''app, page "Serveur MCP".'
 
 Write-Host ''
 Write-Host '  Installation terminee ! Lancement de l''app...' -ForegroundColor Green
-Write-Host '  (Prochaine fois : raccourci "Roblox Dev Hub" sur le Bureau)' -ForegroundColor Gray
+Write-Host '  (Prochaine fois : raccourci "Rovex Hub" sur le Bureau)' -ForegroundColor Gray
 Start-Process -FilePath $launcher -WorkingDirectory $Dir
 `;
 
 const bat = crlf(`@echo off
 setlocal
-title Installation de Roblox Dev Hub
+title Installation de Rovex Hub
 set "RDH_SELF=%~f0"
 powershell -NoProfile -ExecutionPolicy Bypass -Command "$s=[IO.File]::ReadAllText($env:RDH_SELF); $m='#PS'+'-START#'; try { iex $s.Substring($s.IndexOf($m)+$m.Length) } catch { Write-Host ''; Write-Host ('  ERREUR : '+$_.Exception.Message) -ForegroundColor Red }"
 echo.

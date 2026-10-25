@@ -42,11 +42,39 @@ function load() {
       version: 1,
       resources: seed.resources.map((r) => normalize({ ...r, createdAt: now })),
       channels: seed.channels.map((c) => ({ id: newId(), ...c, channelId: null, lastFetch: null })),
+      examples: (seed.examples || []).map((e) => normalizeExample({ ...e, createdAt: now })),
     };
     save(db);
     return db;
   }
-  return JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+  const db = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+  if (!db.examples) db.examples = seedExamples(); // bases créées avant les exemples
+  return db;
+}
+
+function seedExamples() {
+  const seed = JSON.parse(fs.readFileSync(SEED_FILE, 'utf8'));
+  const now = new Date().toISOString();
+  return (seed.examples || []).map((e) => normalizeExample({ ...e, createdAt: now }));
+}
+
+const EX_STATUS = ['draft', 'review', 'validated'];
+function normalizeExample(e) {
+  const why = Array.isArray(e.why) ? e.why : String(e.why || '').split('\n');
+  return {
+    id: e.id || newId(),
+    title: String(e.title || 'Untitled').trim().slice(0, 140),
+    category: CATEGORIES.some((c) => c.id === e.category) ? e.category : 'scripting',
+    status: EX_STATUS.includes(e.status) ? e.status : 'draft',
+    prompt: String(e.prompt || '').trim(),
+    filename: String(e.filename || 'Script.lua').trim().slice(0, 80),
+    language: e.language || 'Luau',
+    code: String(e.code || ''),
+    why: why.map((w) => String(w).trim()).filter(Boolean),
+    sources: String(e.sources || '').trim(),
+    createdAt: e.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
 }
 
 function save(db) {
@@ -157,5 +185,5 @@ function upsert(db, data, { fresh = false } = {}) {
 
 module.exports = {
   CATEGORIES, TYPES, DATA_DIR, MEDIA_DIR,
-  load, save, normalize, search, stats, upsert, newId, youtubeId, youtubeThumb,
+  load, save, normalize, normalizeExample, search, stats, upsert, newId, youtubeId, youtubeThumb,
 };

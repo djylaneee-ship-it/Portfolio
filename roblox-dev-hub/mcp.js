@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Serveur MCP de Roblox Dev Hub : donne à n'importe quel client MCP l'accès à ta bibliothèque.
+// Serveur MCP de Rovex Hub : donne à Claude (ou tout client MCP) l'accès à ta bibliothèque.
 // Deux modes : stdio (`node mcp.js`) ou HTTP via l'app (http://localhost:4747/mcp, voir server.js).
 const readline = require('readline');
 const db = require('./db');
@@ -7,10 +7,20 @@ const web = require('./web');
 
 const CAT_IDS = db.CATEGORIES.map((c) => c.id);
 
+// Accès aux données : fichier en mode stdio, mémoire du serveur en mode HTTP (voir useStore).
+let store = { load: db.load, save: db.save };
+const useStore = (s) => { store = s; };
+
+const DEFAULT_INSTRUCTIONS = `Before writing any Luau, search Rovex Hub.
+1. Start with the validated examples for the category (list_examples / get_example).
+2. Follow their structure: ModuleScripts, RemoteEvents validated on the server, never trust the client.
+3. Cite the video or doc you used.
+4. If no example fits, say so and offer to add one.`;
+
 const TOOLS = [
   {
     name: 'search_resources',
-    description: 'Search the Roblox Dev Hub library (videos, docs, open source repos, free models, tools, images, files) about Roblox development: scripting, VFX, animation, GUI, GFX, etc. Use it before answering a Roblox question to rely on the user\'s resources.',
+    description: 'Search the Rovex Hub library (videos, docs, open source repos, free models, tools, images, files) about Roblox development: scripting, VFX, animation, GUI, GFX, etc. Use it before answering a Roblox question to rely on the user\'s resources.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -21,6 +31,19 @@ const TOOLS = [
         limit: { type: 'number', description: 'Max results (default 15)' },
       },
     },
+  },
+  {
+    name: 'list_examples',
+    description: 'List the learning examples (a request, the right code, and why it is right). Validated examples are references to follow before writing code.',
+    inputSchema: {
+      type: 'object',
+      properties: { query: { type: 'string' }, category: { type: 'string', enum: CAT_IDS }, include_drafts: { type: 'boolean' } },
+    },
+  },
+  {
+    name: 'get_example',
+    description: 'Get one learning example with its full code, explanation and sources.',
+    inputSchema: { type: 'object', properties: { id: { type: 'string' } }, required: ['id'] },
   },
   {
     name: 'get_resource',
@@ -100,7 +123,7 @@ async function app(pathname, body) {
     if (!res.ok) throw new Error(j.error || 'Error');
     return j;
   } catch (e) {
-    if (e.cause && e.cause.code === 'ECONNREFUSED') throw new Error('Open the Roblox Dev Hub app (desktop shortcut), then try again.');
+    if (e.cause && e.cause.code === 'ECONNREFUSED') throw new Error('Open the Rovex Hub app (desktop shortcut), then try again.');
     throw e;
   }
 }
@@ -114,12 +137,30 @@ function brief(r) {
   };
 }
 
+function matchExamples(state, { query = '', category = '', drafts = false } = {}) {
+  const terms = String(query).toLowerCase().split(/\s+/).filter(Boolean);
+  return (state.examples || []).filter((e) => (drafts || e.status === 'validated')
+    && (!category || e.category === category)
+    && terms.every((t) => `${e.title} ${e.prompt} ${e.category} ${e.code}`.toLowerCase().includes(t)));
+}
+const briefExample = (e) => ({ id: e.id, title: e.title, category: e.category, status: e.status, request: e.prompt, file: e.filename });
+
 async function call(name, a = {}) {
-  const state = db.load();
+  const state = store.load();
   switch (name) {
     case 'search_resources': {
       const res = db.search(state, { q: a.query || '', category: a.category || '', type: a.type || '', favorite: Boolean(a.favorites_only), limit: a.limit || 15 });
-      return { count: res.length, results: res.map(brief) };
+      const examples = matchExamples(state, { query: a.query, category: a.category }).slice(0, 5).map(briefExample);
+      return { count: res.length, examples, results: res.map(brief) };
+    }
+    case 'list_examples': {
+      const list = matchExamples(state, { query: a.query, category: a.category, drafts: a.include_drafts });
+      return { count: list.length, examples: list.map(briefExample) };
+    }
+    case 'get_example': {
+      const e = (state.examples || []).find((x) => x.id === a.id);
+      if (!e) throw new Error('Example not found');
+      return e;
     }
     case 'get_resource': {
       const r = state.resources.find((x) => x.id === a.id);
@@ -132,20 +173,20 @@ async function call(name, a = {}) {
     }
     case 'add_resource': {
       const { resource, created } = db.upsert(state, { ...a, source: 'claude' });
-      db.save(state);
+      store.save(state);
       return { created, resource: brief(resource) };
     }
     case 'import_url': {
       const info = await web.importUrl(a.url);
       const { resource, created } = db.upsert(state, { ...info, ...(a.category && { category: a.category }), ...(a.tags && { tags: a.tags }), source: 'claude' });
-      db.save(state);
+      store.save(state);
       return { created, resource: brief(resource) };
     }
     case 'update_notes': {
       const r = state.resources.find((x) => x.id === a.id);
       if (!r) throw new Error('Resource not found');
       r.notes = String(a.notes);
-      db.save(state);
+      store.save(state);
       return { ok: true };
     }
     case 'explore_internet':
@@ -176,12 +217,32 @@ async function call(name, a = {}) {
           report.push({ channel: ch.name || ch.handle, error: e.message });
         }
       }
-      db.save(state);
+      store.save(state);
       return report;
     }
     default:
       throw new Error('Unknown tool: ' + name);
   }
+}
+
+// Outils activés dans la page « Connexion Claude » (tous par défaut).
+function enabledTools() {
+  const off = ((store.load().settings || {}).mcpTools) || {};
+  return TOOLS.filter((x) => off[x.name] !== false);
+}
+
+// Journal « Activité de Claude » : les 100 derniers appels d'outils.
+function logCall(tool, a, out) {
+  const st = store.load();
+  st.mcpLog = st.mcpLog || [];
+  st.mcpLog.unshift({
+    t: new Date().toISOString(), tool,
+    q: String(a.query || a.title || a.url || a.id || a.mode || '').slice(0, 80),
+    category: a.category || (out && out.category) || '',
+    count: out && typeof out.count === 'number' ? out.count : undefined,
+  });
+  st.mcpLog.length = Math.min(st.mcpLog.length, 100);
+  store.save(st);
 }
 
 // Traite un message JSON-RPC MCP. Renvoie la réponse, ou null pour une notification.
@@ -196,15 +257,17 @@ async function handle(msg) {
       return ok({
         protocolVersion: params.protocolVersion || '2025-06-18',
         capabilities: { tools: {} },
-        serverInfo: { name: 'roblox-dev-hub', version: '1.0.0' },
-        instructions: 'Personal library of Roblox development resources. Search it (search_resources) before answering a Roblox question, and cite the links you find.',
+        serverInfo: { name: 'rovex-hub', version: '2.0.0' },
+        instructions: (store.load().settings || {}).mcpInstructions || DEFAULT_INSTRUCTIONS,
       });
     }
     if (method === 'ping') return ok({});
-    if (method === 'tools/list') return ok({ tools: TOOLS });
+    if (method === 'tools/list') return ok({ tools: enabledTools() });
     if (method === 'tools/call') {
       try {
+        if (!enabledTools().some((x) => x.name === params.name)) throw new Error('Tool disabled in Rovex Hub: ' + params.name);
         const out = await call(params.name, params.arguments);
+        logCall(params.name, params.arguments || {}, out);
         return ok({ content: [{ type: 'text', text: JSON.stringify(out, null, 2) }] });
       } catch (e) {
         return ok({ content: [{ type: 'text', text: 'Error: ' + e.message }], isError: true });
@@ -216,7 +279,7 @@ async function handle(msg) {
   }
 }
 
-module.exports = { handle };
+module.exports = { handle, call, useStore, TOOLS, DEFAULT_INSTRUCTIONS };
 
 // Mode stdio : `node mcp.js` (le client MCP lance ce fichier lui-même).
 if (require.main === module) {

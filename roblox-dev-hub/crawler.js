@@ -354,6 +354,18 @@ class Crawler {
     return true;
   }
 
+  // Progression par source (barres de la page Exploration).
+  plan(src, total, add) {
+    const p = this.status.progress[src] || { done: 0, total: 0 };
+    p.total = add ? p.total + total : total;
+    this.status.progress[src] = p;
+  }
+
+  tick(src) {
+    const p = this.status.progress[src];
+    if (p) p.done = Math.min(p.total, p.done + 1);
+  }
+
   stop() { if (this.status.running) { this.status.cancel = true; this.log('stopping'); } }
 
   start(opts = {}) {
@@ -362,17 +374,21 @@ class Crawler {
     const level = INTENSITY[opts.intensity] || INTENSITY.normal;
     this.status = {
       running: true, cancel: false, mode, startedAt: new Date().toISOString(), finishedAt: null,
-      intensity: opts.intensity || 'normal', step: 0, steps: 1, current: null, found: 0, added: 0, channels: 0, errors: 0, log: [],
+      intensity: opts.intensity || 'normal', step: 0, steps: 1, current: null, found: 0, added: 0, channels: 0, errors: 0, log: [], progress: {},
     };
     this.urls = new Set(this.getState().resources.map((r) => r.url).filter(Boolean));
     let job;
     if (mode === 'channels') {
       const queries = CHANNEL_QUERIES.dev.concat(opts.scope === 'dev' ? [] : CHANNEL_QUERIES.all);
       this.status.steps = queries.length + (opts.syncAfter ? 1 : 0);
+      this.plan('youtube', queries.length);
       job = this.discover(queries, level, opts);
     } else if (mode === 'opensource') {
       const src = opts.sources && opts.sources.length ? opts.sources : ['github', 'devforum', 'store'];
       this.status.sources = src;
+      if (src.includes('github')) this.plan('github', GITHUB_TOPICS.length + GITHUB_QUERIES.length);
+      if (src.includes('devforum')) this.plan('devforum', FORUM_RESOURCE_SEARCH.length + 1);
+      if (src.includes('store')) this.plan('store', STORE_MODELS.length + STORE_PLUGINS.length);
       this.status.steps = (src.includes('github') ? GITHUB_TOPICS.length + GITHUB_QUERIES.length : 0)
         + (src.includes('devforum') ? FORUM_RESOURCE_SEARCH.length + 1 : 0)
         + (src.includes('store') ? STORE_MODELS.length + STORE_PLUGINS.length : 0);
@@ -385,6 +401,7 @@ class Crawler {
       const jobs = cats.flatMap((c) => QUERIES[c].map((q) => ({ c, q })));
       this.status.sources = sources;
       this.status.steps = jobs.length + (sources.includes('youtube') && level.expandChannels ? 1 : 0) + (sources.includes('devforum') ? 1 : 0);
+      for (const src of sources) this.plan(src, jobs.length + (src === 'devforum' ? 1 : 0) + (src === 'youtube' && level.expandChannels ? 1 : 0));
       job = this.run(jobs, sources, level, opts.apiKey);
     }
     this.done = job.catch((e) => this.log('error', { msg: e.message }, true)).finally(() => {
@@ -405,6 +422,7 @@ class Crawler {
       this.status.step++;
       this.status.current = { k: 'channels', p: { q } };
       const found = await this.safe(`Channels "${q}"`, () => youtubeChannelSearch(q, pages));
+      this.tick('youtube');
       if (found) {
         // Recherche « roblox … » : YouTube renvoie des chaînes Roblox. Sinon on exige « roblox » dans la fiche.
         const keep = /roblox/i.test(q) ? found : found.filter((c) => ROBLOX_RE.test(`${c.name} ${c.handle} ${c.description}`));
@@ -443,6 +461,7 @@ class Crawler {
           if (res.items.length < 100 || p * 100 >= Math.min(res.total, 1000)) break;
         }
         this.log('query', { q: 'GitHub ' + label, n });
+        this.tick('github');
         this.persist();
       }
     }
@@ -452,11 +471,13 @@ class Crawler {
         this.status.step++;
         this.status.current = { k: 'query', p: { q: 'DevForum ' + q } };
         const topics = await this.safe(`DevForum "${q}"`, () => forumSearch(`${q} #resources:community-resources`, level.forumPages));
+        this.tick('devforum');
         if (topics) this.log('query', { q: 'DevForum ' + q, n: this.add(topics.map((t) => ({ ...t, type: 'opensource' })), { category: '', type: 'opensource', source: 'devforum', tags: ['open source', 'ressource'] }) });
         this.persist();
         await sleep(800);
       }
       this.status.step++;
+      this.tick('devforum');
       await this.safe('DevForum resources', () => forumBrowse('resources/community-resources', level.browsePages, async (topics, p) => {
         if (this.status.cancel) throw new Error('stopped');
         this.status.current = { k: 'forumRes', p: { page: p + 1 } };
@@ -472,6 +493,7 @@ class Crawler {
         this.status.step++;
         this.status.current = { k: kind === 'plugin' ? 'storePlugins' : 'storeModels', p: { q: k } };
         const items = await this.safe(`Store "${k}"`, () => storeSearch(k, kind, level.storePages));
+        this.tick('store');
         if (items) {
           const cat = kind === 'plugin' ? 'tools' : '';
           this.log(kind === 'plugin' ? 'storePlugins' : 'storeModels', { q: k, n: this.add(items, { category: cat, type: 'asset', source: 'creator-store', tags: [k, 'gratuit'] }) });
@@ -487,11 +509,13 @@ class Crawler {
     const chans = this.getState().channels;
     if (!nested) this.status.steps = chans.length;
     else this.status.steps += chans.length;
+    this.plan('youtube', chans.length, nested);
     this.log('syncStart', { n: chans.length });
     for (const ch of chans) {
       if (this.status.cancel) return;
       this.status.step++;
       this.status.current = { k: 'videosOf', p: { name: ch.name || ch.handle } };
+      this.tick('youtube');
       if (!ch.channelId) {
         const info = await this.safe(`Channel ${ch.handle}`, () => resolveChannel(ch.handle));
         if (!info) continue;
@@ -524,6 +548,7 @@ class Crawler {
       let n = 0;
       if (sources.includes('youtube')) {
         const vids = await this.safe(`YouTube "${q}"`, () => youtubeSearch(q, level.ytPages, apiKey));
+        this.tick('youtube');
         if (vids) {
           const keep = vids.filter((v) => ROBLOX_RE.test(v.title + ' ' + v.author));
           for (const v of keep) {
@@ -538,11 +563,13 @@ class Crawler {
       }
       if (sources.includes('devforum') && !this.status.cancel) {
         const topics = await this.safe(`DevForum "${plain}"`, () => forumSearch(plain, level.forumPages));
+        this.tick('devforum');
         if (topics) n += this.add(topics, { category: c, type: 'article', source: 'devforum', tags: [plain] });
         await sleep(700);
       }
       if (sources.includes('reddit') && !this.status.cancel) {
         const posts = await this.safe(`Reddit "${plain}"`, () => redditSearch(plain, level.redditLimit));
+        this.tick('reddit');
         if (posts) n += this.add(posts, { category: c, type: 'article', source: 'reddit', tags: [plain] });
         await sleep(1200);
       }
@@ -555,6 +582,7 @@ class Crawler {
       this.status.step++;
       const top = [...channels.entries()].filter(([, v]) => v.n >= 2).sort((a, b) => b[1].n - a[1].n).slice(0, level.expandChannels);
       this.log('expandStart', { n: top.length });
+      this.tick('youtube');
       for (const [id, info] of top) {
         if (this.status.cancel) return;
         this.status.current = { k: 'videosOf', p: { name: info.name } };
@@ -580,6 +608,7 @@ class Crawler {
     if (sources.includes('devforum') && !this.status.cancel) {
       this.status.step++;
       this.log('forumTutStart');
+      this.tick('devforum');
       await this.safe('DevForum tutorials', () => forumBrowse('resources/community-tutorials', level.browsePages, async (topics, p) => {
         if (this.status.cancel) throw new Error('stopped');
         this.status.current = { k: 'forumTut', p: { page: p + 1 } };

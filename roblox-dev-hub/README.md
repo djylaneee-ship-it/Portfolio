@@ -1,7 +1,10 @@
-# Roblox Dev Hub
+# Rovex Hub
 
-Ta bibliothèque perso de ressources de dev Roblox : scripting, VFX, animation, GUI, GFX, modélisation, build, audio, game design et outils. Elle tourne sur ton PC et s'expose en serveur MCP.
+Le cerveau Roblox de ton Claude : une bibliothèque de ressources de dev Roblox (scripting, VFX, animation, GUI, GFX, modélisation, build, audio, game design, outils) et d'**exemples d'apprentissage** que Claude suit avant de coder. Elle tourne sur ton PC et s'expose en serveur MCP.
 
+- **Exemples d'apprentissage** : une demande, le bon code Luau et pourquoi il est bon. Les exemples validés sont servis en priorité à Claude (`list_examples`, `get_example`).
+- **Connexion Claude** : config prête à copier, outils activables un par un, consignes envoyées à Claude, test d'une question et journal de son activité en direct.
+- **Interface animée** : transitions entre les pages, boutons qui grossissent et ondes au clic, halo qui suit la souris, compteurs animés.
 - **Près de 70 ressources de départ** : docs officielles Roblox, outils (Blender, Rojo, Mixamo…) et recherches YouTube par thème.
 - **Exploration automatique** : fouille YouTube, le DevForum Roblox et Reddit (r/robloxgamedev) pour référencer des milliers de vidéos, tutos et images, rangés par catégorie.
 - **Toutes les chaînes Roblox** : découvre et relie automatiquement les chaînes YouTube Roblox (dev, VFX, gameplay, YouTubeurs FR/EN/ES…), puis récupère leurs nouvelles vidéos. La mise à jour peut être automatique (Réglages).
@@ -14,11 +17,11 @@ Ta bibliothèque perso de ressources de dev Roblox : scripting, VFX, animation, 
 
 ## Installation (Windows) : un seul fichier
 
-1. Télécharge **`Installer Roblox Dev Hub.bat`** (à la racine du dépôt).
+1. Télécharge **`Installer Rovex Hub.bat`** (à la racine du dépôt).
 2. Double-clique dessus. L'installateur :
    - vérifie Node.js et l'installe avec winget s'il manque ;
    - installe l'app dans `%LOCALAPPDATA%\RobloxDevHub` ;
-   - crée le raccourci **Roblox Dev Hub** sur le Bureau et dans le menu Démarrer ;
+   - crée le raccourci **Rovex Hub** (avec son logo) sur le Bureau et dans le menu Démarrer ;
    - ouvre l'app sur http://localhost:4747.
 
 Pour mettre à jour, relance l'installateur : ta base et tes fichiers sont conservés. Pour désinstaller, lance `Desinstaller.bat` dans le dossier d'installation.
@@ -46,18 +49,18 @@ Le site est en **anglais** par défaut. Chaque visiteur choisit sa langue (Engli
 
 L'app récupère ce fichier toutes les 30 minutes (**Réglages → Source cloud**), même si ton PC était éteint pendant que l'algo cherchait.
 
-- Lancer à la main : onglet **Actions** du dépôt → « Roblox Dev Hub — exploration continue » → **Run workflow**.
+- Lancer à la main : onglet **Actions** du dépôt → « Roblox Dev Hub — exploration continue » (nom du workflow) → **Run workflow**.
 - Optionnel : un secret `YOUTUBE_API_KEY` (Settings → Secrets → Actions) pour la recherche de vidéos YouTube.
 - GitHub désactive les tâches planifiées d'un dépôt public après 60 jours sans activité : les commits de l'algo comptent comme activité, mais s'il s'arrête, réactive-le dans l'onglet Actions.
 
 ## Relier en MCP
 
-L'app expose un serveur MCP, à brancher dans le client de ton choix (Claude Desktop, Cursor, VS Code, LM Studio…). La page **Serveur MCP** de l'app affiche les adresses exactes, prêtes à copier.
+L'app expose un serveur MCP (`rovex-hub`), à brancher dans Claude ou tout autre client MCP. La page **Connexion Claude** affiche la config exacte, prête à copier, et la commande Claude Code : `claude mcp add --transport http rovex-hub http://localhost:4747/mcp`.
 
 - **Mode HTTP** (l'app doit être ouverte) : `http://localhost:4747/mcp` — libre depuis ton PC ; depuis un autre appareil, ajoute l'en-tête `Authorization: Bearer <ID ou clé admin>`.
 - **Mode stdio** (marche même app fermée) : `node "%LOCALAPPDATA%\RobloxDevHub\mcp.js"`
 
-Outils exposés : `search_resources`, `get_resource`, `list_categories`, `add_resource`, `import_url`, `update_notes`, `explore_internet`, `explore_status`, `list_channels`, `sync_channels`.
+Outils exposés (activables dans **Connexion Claude**) : `search_resources`, `list_examples`, `get_example`, `get_resource`, `list_categories`, `add_resource`, `import_url`, `update_notes`, `explore_internet`, `explore_status`, `list_channels`, `sync_channels`.
 
 ## Où sont mes données ?
 

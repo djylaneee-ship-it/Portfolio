@@ -1,6 +1,6 @@
 // Algo d'exploration « cloud » : tourne sur GitHub Actions toutes les heures, sans jamais s'arrêter.
 // Chaque passage reprend là où le précédent s'est arrêté et enregistre ses trouvailles dans
-// cloud/library.json, que l'app Roblox Dev Hub récupère ensuite (Réglages → Source cloud).
+// cloud/library.json, que l'app Rovex Hub récupère ensuite (Réglages → Source cloud).
 //
 // Usage local : node cloud-crawl.js [minutes]
 const fs = require('fs');

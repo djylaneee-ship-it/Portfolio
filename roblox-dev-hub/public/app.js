@@ -1,20 +1,14 @@
-// Interface de Roblox Dev Hub (aucun framework). Textes : voir i18n.js.
+// Interface de Rovex Hub (aucun framework). Textes : voir i18n.js.
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const view = $('#view');
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-const ICONS = {
-  scripting: 'M8.6 16.6L4 12l4.6-4.6L7.2 6 1.2 12l6 6zm6.8 0L20 12l-4.6-4.6L16.8 6l6 6-6 6z',
-  vfx: 'M12 2l2.4 6.3L21 9l-5 4.4L17.5 20 12 16.6 6.5 20 8 13.4 3 9l6.6-.7z',
-  animation: 'M13.5 5.5a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3A7.3 7.3 0 0 0 19 13v-2a5 5 0 0 1-4.3-2.4l-1-1.6A2 2 0 0 0 12 6c-.3 0-.5 0-.8.2L6 8.3V13h2V9.6z',
-  gui: 'M3 3h18v18H3zm2 2v4h14V5zm0 6v8h6v-8zm8 0v3h6v-3zm0 5v3h6v-3z',
-  gfx: 'M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 13.5l2.5 3 3.5-4.5 4.5 6H5z',
-  modeling: 'M12 1l10 5.5v11L12 23 2 17.5v-11zm0 2.3L5 7.2l7 3.9 7-3.9zM4 8.9v7.4l7 3.9v-7.4zm16 0l-7 3.9v7.4l7-3.9z',
-  building: 'M3 21V10l5-3v3l5-3v3l5-3v14zm4-3h2v-3H7zm4 0h2v-3h-2zm4 0h2v-3h-2zM2 21h20v2H2z',
-  audio: 'M12 3v10.6A4 4 0 1 0 14 17V7h4V3z',
-  design: 'M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 4a6 6 0 1 1-6 6 6 6 0 0 1 6-6zm0 3a3 3 0 1 0 3 3 3 3 0 0 0-3-3z',
-  gameplay: 'M21 7H3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zm-11 6H8v2H6v-2H4v-2h2V9h2v2h2zm5.5 1a1.5 1.5 0 1 1 1.5-1.5 1.5 1.5 0 0 1-1.5 1.5zm3-3a1.5 1.5 0 1 1 1.5-1.5 1.5 1.5 0 0 1-1.5 1.5z',
-  tools: 'M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z',
+// Badges et couleurs des catégories (style Rovex).
+const CAT_STYLE = {
+  scripting: ['</>', '#A78BFA'], vfx: ['FX', '#F0ABFC'], animation: ['AN', '#FCD34D'], gui: ['UI', '#6EE7B7'], gfx: ['GX', '#C4B5FD'],
+  modeling: ['3D', '#FDBA74'], building: ['MP', '#7DD3FC'], audio: ['♪', '#FDE68A'], design: ['GD', '#F9A8D4'], gameplay: ['GP', '#FCA5A5'], tools: ['TL', '#CBD5E1'],
 };
 const TYPE_ICONS = {
   opensource: 'M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.3-3.4-1.3-.4-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.3 1.1 2.9.8.1-.6.3-1.1.6-1.3-2.2-.3-4.6-1.1-4.6-5a3.9 3.9 0 0 1 1-2.7 3.6 3.6 0 0 1 .1-2.7s.8-.3 2.8 1a9.5 9.5 0 0 1 5 0c2-1.3 2.8-1 2.8-1a3.6 3.6 0 0 1 .1 2.7 3.9 3.9 0 0 1 1 2.7c0 3.9-2.4 4.7-4.6 5 .4.3.7.9.7 1.9V21c0 .3.2.6.7.5A10 10 0 0 0 12 2z',
@@ -24,42 +18,46 @@ const TYPE_ICONS = {
   video: 'M8 5v14l11-7z',
   chaine: 'M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4zm0 2c-2.7 0-8 1.3-8 4v2h16v-2c0-2.7-5.3-4-8-4z',
   fichier: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zm-1 7V3.5L18.5 9z',
+  article: 'M4 4h16v2H4zm0 4h16v2H4zm0 4h10v2H4zm0 4h16v2H4z',
+  outil: 'M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z',
+  image: 'M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 13.5l2.5 3 3.5-4.5 4.5 6H5z',
 };
-const typeLabel = (k) => t('type.' + k);
+const STAR = '<svg class="fill" viewBox="0 0 24 24"><path d="M12 3l2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/></svg>';
+const PLAY = '<svg class="fill" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+const PLUS = '<svg class="line" viewBox="0 0 24 24" style="stroke-width:2.6"><path d="M12 5v14M5 12h14"/></svg>';
+const BOLT = '<svg class="line" viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg>';
+const ARROW = '<svg class="line" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
 const LEVELS = ['debutant', 'intermediaire', 'avance'];
-const levelLabel = (k) => t('lvl.' + k);
-const STAR = '<svg viewBox="0 0 24 24"><path d="M12 3l2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/></svg>';
-const PLAY = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
 
 let META = { categories: [], types: [] };
 let STATS = {};
-const cat = (id) => {
-  const c = META.categories.find((x) => x.id === id) || { id, color: '#888' };
-  return { ...c, label: t('cat.' + id), desc: t('catDesc.' + id) };
-};
+let SESSION = null;
+let MCP = { connected: false, log: [] };
+
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const typeLabel = (k) => t('type.' + k);
+const levelLabel = (k) => t('lvl.' + k);
+const isAdmin = () => SESSION && SESSION.role === 'admin';
 const num = (n) => Number(n || 0).toLocaleString(locale());
 const date = (d) => new Date(d).toLocaleDateString(locale());
 const dateTime = (d) => new Date(d).toLocaleString(locale());
-const icon = (id, size) => `<svg viewBox="0 0 24 24"${size ? ` style="width:${size}px;height:${size}px"` : ''}><path d="${ICONS[id] || ICONS.tools}"/></svg>`;
-const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-
+const cat = (id) => {
+  const [badge, color] = CAT_STYLE[id] || ['··', '#9890AD'];
+  return { id, badge, color, label: t('cat.' + id), desc: t('catDesc.' + id) };
+};
 const catOptions = (sel) => META.categories.map((c) => `<option value="${c.id}" ${c.id === sel ? 'selected' : ''}>${esc(t('cat.' + c.id))}</option>`).join('');
+const svgPath = (d) => `<svg class="fill" viewBox="0 0 24 24"><path d="${d}"/></svg>`;
 
-// Sélecteur de langue (barre latérale, connexion, réglages).
-function langSelect(id, cls = 'select') {
-  return `<select class="${cls} lang-select" id="${id}" aria-label="Language">${LANGS.map(([k, l]) => `<option value="${k}" ${k === LANG ? 'selected' : ''}>${l}</option>`).join('')}</select>`;
-}
-function bindLangSelect(id) {
-  const el = $('#' + id);
-  if (el) el.onchange = (e) => setLang(e.target.value);
-}
-function setLang(l) {
-  LANG = l;
-  try { localStorage.setItem('rdh-lang', l); } catch {}
-  applyStatic();
-  if (SESSION && SESSION.loggedIn) { renderSession(); refreshStats(); route(); if (isAdmin()) watchJob(); }
+function ago(d) {
+  const s = Math.max(1, (Date.now() - Date.parse(d)) / 1000);
+  const rtf = new Intl.RelativeTimeFormat(locale(), { numeric: 'auto' });
+  if (s < 60) return rtf.format(-Math.round(s), 'second');
+  if (s < 3600) return rtf.format(-Math.round(s / 60), 'minute');
+  if (s < 86400) return rtf.format(-Math.round(s / 3600), 'hour');
+  return rtf.format(-Math.round(s / 86400), 'day');
 }
 
+// ---------- API ----------
 async function api(path, opts = {}) {
   const res = await fetch('/api' + path, {
     ...opts,
@@ -67,15 +65,88 @@ async function api(path, opts = {}) {
     body: opts.body && !(opts.body instanceof Blob) ? JSON.stringify(opts.body) : opts.body,
   });
   const data = await res.json();
-  if (res.status === 401 && path !== '/login') { showLogin(); }
+  if (res.status === 401 && path !== '/login') showLogin();
   if (!res.ok) throw new Error(data.key && has('err.' + data.key) ? t('err.' + data.key, data.vars) : data.error || t('err.generic'));
   return data;
 }
 
-// ---------- Connexion ----------
-let SESSION = null;
-const isAdmin = () => SESSION && SESSION.role === 'admin';
+// ---------- Animations ----------
+// Onde au clic sur les boutons et puces.
+document.addEventListener('pointerdown', (e) => {
+  const el = e.target.closest('.btn, .chip, .int, .tabs button');
+  if (!el || reduced) return;
+  const r = el.getBoundingClientRect();
+  const s = Math.max(r.width, r.height);
+  const w = document.createElement('span');
+  w.className = 'ripple';
+  w.style.cssText = `width:${s}px;height:${s}px;left:${e.clientX - r.left - s / 2}px;top:${e.clientY - r.top - s / 2}px`;
+  if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
+  el.style.overflow = 'hidden';
+  el.append(w);
+  setTimeout(() => w.remove(), 650);
+});
 
+// Halo lumineux qui suit la souris sur les cartes.
+document.addEventListener('pointermove', (e) => {
+  const el = e.target.closest('[data-spot], .card, .cat-tile, .stat');
+  if (!el) return;
+  const r = el.getBoundingClientRect();
+  el.style.setProperty('--mx', `${e.clientX - r.left}px`);
+  el.style.setProperty('--my', `${e.clientY - r.top}px`);
+});
+
+// Compteurs qui défilent jusqu'à leur valeur.
+function countUp(root = document) {
+  for (const el of $$('[data-count]', root)) {
+    const end = Number(el.dataset.count) || 0;
+    if (reduced || end < 2) { el.textContent = num(end); continue; }
+    const t0 = performance.now();
+    const step = (now) => {
+      const p = Math.min(1, (now - t0) / 1100);
+      el.textContent = num(Math.round(end * (1 - Math.pow(1 - p, 4))));
+      if (p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+}
+
+// Numérote les enfants pour les apparitions en cascade.
+function stagger(root) {
+  [...root.children].forEach((c, i) => c.style.setProperty('--i', Math.min(i, 14)));
+}
+
+// Pastille du menu qui glisse vers l'onglet actif.
+function movePill() {
+  const pill = $('#nav-pill');
+  const a = $('#nav a.active');
+  if (!a || a.offsetParent === null) { pill.style.opacity = 0; return; }
+  pill.style.opacity = 1;
+  pill.style.height = a.offsetHeight + 'px';
+  pill.style.transform = `translateY(${a.offsetTop}px)`;
+}
+
+// Change de page avec une animation de sortie puis d'entrée.
+let renderSeq = 0;
+async function transition(render) {
+  const seq = ++renderSeq;
+  if (!reduced && view.childElementCount) {
+    view.classList.add('leaving');
+    await sleep(170);
+  }
+  if (seq !== renderSeq) return;
+  view.classList.remove('entering');
+  await render();
+  if (seq !== renderSeq) return;
+  stagger(view);
+  for (const g of $$('.grid, .cat-grid, .stats, .ch-grid, .ex-list, .codes', view)) { g.classList.add('stagger'); stagger(g); }
+  view.classList.remove('leaving');
+  void view.offsetWidth;
+  view.classList.add('entering');
+  countUp(view);
+  window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
+}
+
+// ---------- Connexion ----------
 function showLogin(msg = '') {
   document.body.classList.add('locked');
   $('#login').hidden = false;
@@ -89,31 +160,49 @@ $('#login-lang').onchange = (e) => setLang(e.target.value);
 $('#login-form').onsubmit = async (e) => {
   e.preventDefault();
   const btn = e.submitter; btn.disabled = true;
-  $('#login-err').textContent = '';
+  const err = $('#login-err');
+  err.textContent = ''; err.classList.remove('shake');
   try {
     await api('/login', { method: 'POST', body: { code: $('#login-code').value } });
+    $('.login-card').style.animation = 'modalIn .4s reverse forwards';
+    await sleep(300);
     location.reload();
-  } catch (err) { $('#login-err').textContent = err.message; btn.disabled = false; }
+  } catch (ex) {
+    err.textContent = ex.message; void err.offsetWidth; err.classList.add('shake');
+    btn.disabled = false;
+  }
 };
+
+function langSelect(id) {
+  return `<select class="select" id="${id}" aria-label="Language">${LANGS.map(([k, l]) => `<option value="${k}" ${k === LANG ? 'selected' : ''}>${l}</option>`).join('')}</select>`;
+}
+function setLang(l) {
+  LANG = l;
+  try { localStorage.setItem('rdh-lang', l); } catch {}
+  applyStatic();
+  if (SESSION && SESSION.loggedIn) { renderSession(); refreshStats(); refreshMcp(); route(); }
+}
 
 function renderSession() {
   document.body.classList.toggle('role-user', !isAdmin());
-  const exp = new Date(SESSION.expiresAt);
-  const who = SESSION.label && SESSION.label !== 'Admin' ? esc(SESSION.label) + ' · ' : '';
-  $('#side-user').innerHTML = `<div class="who"><span class="role ${SESSION.role}">${isAdmin() ? t('session.admin') : t('session.member')}</span>
-    <small>${who}${SESSION.permanent ? t('session.permanent') : t('session.until', { date: date(exp) })}</small></div>
-    ${langSelect('side-lang')}
-    <button class="btn small" id="logout">${t('session.logout')}</button>`;
-  bindLangSelect('side-lang');
+  const name = SESSION.label && SESSION.label !== 'Admin' ? SESSION.label : isAdmin() ? t('session.admin') : t('session.member');
+  const initials = name.replace(/[^\p{L}\p{N} ]/gu, '').split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase() || 'RH';
+  $('#side-user').innerHTML = `
+    <div class="who"><span class="avatar">${esc(initials)}</span>
+      <span class="meta"><b>${esc(name)}</b><small>${isAdmin() ? t('session.admin') + ' · ' : ''}${SESSION.permanent ? t('session.permanent') : t('session.until', { date: date(SESSION.expiresAt) })}</small></span>
+      <a class="icon-btn admin-only" href="#/settings" aria-label="${t('nav.settings')}" title="${t('nav.settings')}"><svg class="line" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg></a>
+    </div>
+    <div class="row">${langSelect('side-lang')}<button class="icon-btn" id="logout" title="${t('session.logout')}" aria-label="${t('session.logout')}"><svg class="line" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg></button></div>`;
+  $('#side-lang').onchange = (e) => setLang(e.target.value);
   $('#logout').onclick = async () => { await api('/logout', { method: 'POST' }); location.reload(); };
 }
 
 function toast(msg, err) {
-  const t = document.createElement('div');
-  t.className = 'toast' + (err ? ' err' : '');
-  t.textContent = msg;
-  $('#toasts').append(t);
-  setTimeout(() => t.remove(), 3800);
+  const el = document.createElement('div');
+  el.className = 'toast' + (err ? ' err' : '');
+  el.textContent = msg;
+  $('#toasts').append(el);
+  setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 350); }, 3600);
 }
 
 function ytId(url) {
@@ -124,10 +213,10 @@ function ytId(url) {
 // ---------- Cartes ----------
 function card(r) {
   const c = cat(r.category);
-  const fb = `<span class="fb">${TYPE_ICONS[r.type] ? `<svg viewBox="0 0 24 24"><path d="${TYPE_ICONS[r.type]}"/></svg>` : icon(r.category)}</span>`;
+  const fb = `<span class="fb">${svgPath(TYPE_ICONS[r.type] || TYPE_ICONS.article)}</span>`;
   const play = r.type === 'video' ? `<span class="play">${PLAY}</span>` : '';
   const thumb = r.thumbnail
-    ? `<div class="thumb"><img src="${esc(r.thumbnail)}" alt="" loading="lazy" onerror="this.parentNode.classList.add('ph');this.remove()">${fb}${play}`
+    ? `<div class="thumb"><img src="${esc(r.thumbnail)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.classList.add('ph');this.remove()">${fb}${play}`
     : r.file && r.type === 'video'
       ? `<div class="thumb"><video src="/media/${esc(r.file)}#t=1" muted preload="metadata"></video>${play}`
       : `<div class="thumb ph">${fb}`;
@@ -137,7 +226,7 @@ function card(r) {
     <div class="card-body">
       <div class="card-cat"><span class="dot" style="background:${c.color}"></span>${esc(c.label)}</div>
       <h3>${esc(r.title)}</h3>
-      ${r.tags.length ? `<div class="tags">${r.tags.slice(0, 3).map((t) => `<span class="tag">#${esc(t)}</span>`).join('')}</div>` : ''}
+      ${r.tags.length ? `<div class="tags">${r.tags.slice(0, 3).map((x) => `<span class="tag">#${esc(x)}</span>`).join('')}</div>` : ''}
       <div class="meta">${r.level ? `<span class="lvl ${r.level}">${levelLabel(r.level)}</span>` : ''}<span>${esc(r.author || '')}</span></div>
     </div></article>`;
 }
@@ -152,6 +241,7 @@ function bindCards(root, list) {
       const r = LIST.find((x) => x.id === star.dataset.star);
       r.favorite = !r.favorite;
       star.classList.toggle('on', r.favorite);
+      star.animate([{ transform: 'scale(1.6) rotate(-20deg)' }, { transform: 'scale(1)' }], { duration: 450, easing: 'cubic-bezier(.34,1.56,.64,1)' });
       await api('/resources/' + r.id, { method: 'PUT', body: { favorite: r.favorite } });
       toast(r.favorite ? t('toast.favAdded') : t('toast.favRemoved'));
       return;
@@ -170,39 +260,110 @@ function grid(list, emptyMsg = '') {
   return `<div class="grid">${list.map(card).join('')}</div>`;
 }
 
-// ---------- Vues ----------
-async function renderHome() {
-  const recent = (await api('/resources?limit=8')).items;
-  view.innerHTML = `
-    <div class="hero">
-      <h1>${t('home.title1')}<br><span>${t('home.title2')}</span></h1>
-      <p>${t('home.lead')}</p>
-      <div class="row">
-        <button class="btn primary admin-only" onclick="openAdd()"><svg viewBox="0 0 24 24"><path d="M11 4h2v7h7v2h-7v7h-2v-7H4v-2h7z"/></svg>${t('add')}</button>
-        <a class="btn admin-only" href="#/explore">⚡ ${t('nav.explore')}</a>
-        <a class="btn" href="#/channels">${t('nav.channels')}</a>
-        <a class="btn admin-only" href="#/mcp">${t('nav.mcp')}</a>
-      </div>
-      <div class="stats">
-        <div class="stat"><b>${num(STATS.total)}</b><span>${t('stat.resources')}</span></div>
-        <div class="stat"><b>${num((STATS.byType || {}).video)}</b><span>${t('stat.videos')}</span></div>
-        <div class="stat"><b>${num((STATS.byType || {}).opensource)}</b><span>${t('stat.opensource')}</span></div>
-        <div class="stat"><b>${num(((STATS.byType || {}).image || 0) + ((STATS.byType || {}).fichier || 0))}</b><span>${t('stat.files')}</span></div>
-        <div class="stat"><b>${num(STATS.channels)}</b><span>${t('stat.channels')}</span></div>
-      </div>
-    </div>
-    <div class="section-head"><h2>${t('home.byCategory')}</h2></div>
-    <div class="cat-grid">${META.categories.map((x) => cat(x.id)).map((c) => `
-      <a class="cat-tile" style="--c:${c.color}" href="#/library?cat=${c.id}">
-        <span class="count">${STATS.byCategory[c.id] || 0}</span>
-        <span class="ico">${icon(c.id)}</span>
-        <h3>${esc(c.label)}</h3><p>${esc(c.desc)}</p>
-      </a>`).join('')}</div>
-    <div class="section-head"><h2>${t('home.recent')}</h2><a class="link" href="#/library">${t('home.seeAll')} →</a></div>
-    <div id="recent">${grid(recent)}</div>`;
-  bindCards($('#recent'), recent);
+function pageHead(eyebrow, title, sub, actions = '') {
+  return `<div class="page-head"><div><p class="eyebrow">${eyebrow}</p><h1 class="h1">${title}</h1>${sub ? `<p class="sub">${sub}</p>` : ''}</div>${actions ? `<div class="row">${actions}</div>` : ''}</div>`;
 }
 
+// ---------- Accueil ----------
+async function renderHome() {
+  const [recent, mcp] = await Promise.all([api('/resources?limit=8'), api('/mcp').catch(() => ({ log: [] }))]);
+  const s = STATS.byType || {};
+  view.innerHTML = `
+    <section class="hero" data-spot>
+      <div>
+        <p class="eyebrow">${t('home.eyebrow')}</p>
+        <h1>${t('home.title1')}<span>${t('home.title2')}</span></h1>
+        <p>${t('home.lead')}</p>
+        <div class="row">
+          <a class="btn primary admin-only" href="#/connect">${t('home.connect')} ${ARROW}</a>
+          <a class="btn admin-only" href="#/examples">${t('home.addExamples')}</a>
+          <a class="btn admin-only" href="#/explore">${BOLT}${t('nav.explore')}</a>
+          <a class="btn role-only-user" href="#/examples">${t('nav.examples')} ${ARROW}</a>
+        </div>
+      </div>
+      <div class="terminal"><div class="term-bar"><i></i><i></i><i></i><span>claude ↔ rovex-hub</span></div><div class="term-body" id="term"></div></div>
+    </section>
+    <div class="stats">
+      <div class="stat"><b data-count="${STATS.total}">0</b><span>${t('stat.resources')}</span></div>
+      <div class="stat"><b data-count="${s.video || 0}">0</b><span>${t('stat.videos')}</span></div>
+      <div class="stat"><b data-count="${s.opensource || 0}">0</b><span>${t('stat.opensource')}</span></div>
+      <div class="stat"><b data-count="${STATS.channels}">0</b><span>${t('stat.channels')}</span></div>
+      <div class="stat"><b data-count="${STATS.examples || 0}">0</b><span>${t('stat.examples')}</span></div>
+    </div>
+    <div class="home-grid">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="section-head"><h2>${t('home.byCategory')}</h2><a class="link" href="#/library">${t('home.seeAll')}</a></div>
+        <div class="cat-grid">${META.categories.map((x) => cat(x.id)).map((c) => `
+          <a class="cat-tile" style="--c:${c.color}" href="#/library?cat=${c.id}" data-spot>
+            <span class="top"><span class="badge-ico">${esc(c.badge)}</span><span class="count">${num(STATS.byCategory[c.id])}</span></span>
+            <h3>${esc(c.label)}</h3><p>${esc(c.desc)}</p>
+          </a>`).join('')}</div>
+      </div>
+      <aside class="panel activity" data-spot>
+        <div class="section-head" style="margin-bottom:8px"><h2 style="font-size:19px">${t('act.title')}</h2><span class="live"><span class="pulse"></span>${t('act.live')}</span></div>
+        <div id="act-list">${activityList(mcp.log || [])}</div>
+        <a class="link admin-only" href="#/connect">${t('act.journal')}</a>
+      </aside>
+    </div>
+    <div class="section-head"><h2>${t('home.recent')}</h2><a class="link" href="#/library">${t('home.seeAll')}</a></div>
+    <div id="recent">${grid(recent.items)}</div>`;
+  $$('.role-only-user', view).forEach((el) => { el.hidden = isAdmin(); });
+  bindCards($('#recent'), recent.items);
+  runTerminal();
+}
+
+function activityList(log) {
+  if (!log.length) return `<p class="sub" style="font-size:13.5px;padding:14px 0">${t('act.none')}</p>`;
+  return log.slice(0, 6).map((l, i) => {
+    const c = l.category ? cat(l.category).label : '';
+    return `<div class="act" style="--i:${i}"><span class="avatar">${esc(l.tool[0].toUpperCase())}</span><div>
+      <b>${esc(l.tool)}${l.q ? ` · « ${esc(l.q)} »` : ''}</b>
+      <small>${[c, typeof l.count === 'number' ? t('act.results', { n: l.count }) : '', ago(l.t)].filter(Boolean).join(' · ')}</small></div></div>`;
+  }).join('');
+}
+
+// Petit terminal animé : Claude interroge Rovex Hub.
+let termTimer;
+async function runTerminal() {
+  clearTimeout(termTimer);
+  const el = $('#term');
+  if (!el) return;
+  const q = t('term.query');
+  let results = [];
+  try {
+    const r = await api('/mcp/test', { method: 'POST', body: { query: 'tween' } });
+    results = [...(r.examples || []).map((e) => [t('term.example'), e.file || e.title, t('term.validated')]), ...(r.results || []).map((x) => [typeLabel(x.type).toLowerCase(), x.title, x.author || ''])].slice(0, 3);
+  } catch {}
+  if (!results.length) results = [[t('term.example'), 'ShopToggle.client.lua', t('term.validated')], ['video', 'Tween UI', 'YouTube'], ['doc', 'TweenService', 'Creator Docs']];
+  const lines = [
+    `<div class="c">› ${t('term.asks')}</div>`,
+    `<div>rovex.<span class="k">search</span>(<span class="s">"${esc(q)}"</span>, cat=<span class="s">"GUI / UI"</span>)</div>`,
+    `<div class="c" style="margin-top:8px">‹ ${t('term.answers')}</div>`,
+    `<div class="term-res">${results.map(([a, b, c], i) => `<div style="animation-delay:${i * 120}ms"><span><span class="k">${esc(a)}</span> · ${esc(String(b).slice(0, 34))}</span><span class="${c === t('term.validated') ? 'g' : 'c'}">${esc(String(c).slice(0, 16))}</span></div>`).join('')}</div>`,
+  ];
+  el.innerHTML = '';
+  if (reduced) {
+    el.innerHTML = lines.join('') + `<div style="margin-top:10px"><span class="k">● ${t('term.writes')}</span></div>`;
+    return;
+  }
+  for (const l of lines) {
+    if (!document.body.contains(el)) return;
+    el.insertAdjacentHTML('beforeend', l);
+    el.lastElementChild.animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: 350, easing: 'ease-out' });
+    await sleep(650);
+  }
+  // Dernière ligne tapée lettre par lettre.
+  el.insertAdjacentHTML('beforeend', `<div style="margin-top:10px"><span class="k">●</span> <span class="k" id="typed"></span><span class="caret"></span></div>`);
+  const txt = t('term.writes');
+  for (let i = 1; i <= txt.length; i++) {
+    if (!document.body.contains(el)) return;
+    $('#typed').textContent = txt.slice(0, i);
+    await sleep(35);
+  }
+  termTimer = setTimeout(runTerminal, 7000);
+}
+
+// ---------- Bibliothèque ----------
 const filters = { type: '', level: '' };
 async function renderLibrary(params, favorites = false) {
   const q = params.get('q') || '';
@@ -212,8 +373,8 @@ async function renderLibrary(params, favorites = false) {
   const { total, items: list } = await api('/resources?' + qs);
   const cc = c && cat(c);
   view.innerHTML = `
-    <h1 class="h1">${favorites ? t('nav.favorites') : cc ? esc(cc.label) : q ? t('lib.results', { q: esc(q) }) : t('nav.library')}</h1>
-    <p class="sub">${cc && !favorites ? esc(cc.desc) + ' · ' : ''}${t('lib.count', { n: total, num: num(total) })}</p>
+    ${pageHead(cc ? t('lib.category') : t('lib.eyebrow'), favorites ? t('nav.favorites') : cc ? esc(cc.label) : q ? t('lib.results', { q: esc(q) }) : t('nav.library'),
+      `${cc && !favorites ? esc(cc.desc) + ' · ' : ''}${t('lib.count', { n: total, num: num(total) })}`)}
     <div class="toolbar">
       <button class="chip ${!filters.type ? 'on' : ''}" data-type="">${t('lib.all')}</button>
       ${META.types.map((ty) => `<button class="chip ${filters.type === ty ? 'on' : ''}" data-type="${ty}">${typeLabel(ty)}</button>`).join('')}
@@ -230,36 +391,163 @@ async function renderLibrary(params, favorites = false) {
     qs.set('offset', list.length);
     const page = await api('/resources?' + qs);
     list.push(...page.items);
-    $('#list .grid').insertAdjacentHTML('beforeend', page.items.map(card).join(''));
+    const g = $('#list .grid');
+    const start = g.children.length;
+    g.insertAdjacentHTML('beforeend', page.items.map(card).join(''));
+    [...g.children].slice(start).forEach((el, i) => { el.style.setProperty('--i', Math.min(i, 14)); });
     btn.disabled = false;
     $('#more-row').hidden = list.length >= total;
   };
 }
 
+// ---------- Exemples d'apprentissage ----------
+let EX_FILTER = '';
+let EX_SEL = null;
+const statusLabel = (s) => t('exs.' + s);
+
+function highlight(code) {
+  const re = /(--\[\[[\s\S]*?\]\]|--[^\n]*)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|\b(local|function|end|if|then|else|elseif|return|for|in|do|while|repeat|until|not|and|or|true|false|nil|break|continue)\b|\b(\d+(?:\.\d+)?)\b/g;
+  let out = '';
+  let last = 0;
+  for (const m of code.matchAll(re)) {
+    out += esc(code.slice(last, m.index));
+    const cls = m[1] ? 'com' : m[2] ? 'str' : m[3] ? 'kw' : 'num';
+    out += `<span class="${cls}">${esc(m[0])}</span>`;
+    last = m.index + m[0].length;
+  }
+  return out + esc(code.slice(last));
+}
+
+async function renderExamples() {
+  const all = await api('/examples');
+  const cats = [...new Set(all.map((e) => e.category))];
+  const list = all.filter((e) => !EX_FILTER || e.category === EX_FILTER);
+  if (!list.some((e) => e.id === EX_SEL)) EX_SEL = list[0] ? list[0].id : null;
+  view.innerHTML = `
+    ${pageHead(t('ex2.eyebrow'), t('nav.examples'), t('ex2.sub'),
+      `<label class="btn admin-only">${t('ex2.import')}<input type="file" accept=".lua,.luau,.txt" hidden id="ex-import"></label>
+       <button class="btn primary admin-only" id="ex-new">${PLUS}${t('ex2.new')}</button>`)}
+    <div class="toolbar">
+      <button class="chip solid ${!EX_FILTER ? 'on' : ''}" data-exf="">${t('lib.all')}</button>
+      ${cats.map((c) => `<button class="chip solid ${EX_FILTER === c ? 'on' : ''}" data-exf="${c}">${esc(cat(c).label)}</button>`).join('')}
+    </div>
+    ${list.length ? `<div class="ex-layout">
+      <div class="ex-list">${list.map((e) => `
+        <button class="ex-item ${e.id === EX_SEL ? 'on' : ''}" data-ex="${e.id}">
+          <span class="ex-top"><span><span class="dot" style="background:${cat(e.category).color}"></span>${esc(cat(e.category).label)}</span><span class="st ${e.status}">${statusLabel(e.status)}</span></span>
+          <h4>${esc(e.title)}</h4><p>« ${esc(e.prompt)} »</p>
+        </button>`).join('')}</div>
+      <div class="panel ex-detail" id="ex-detail" data-spot></div>
+    </div>` : `<div class="empty"><b>${t('ex2.none')}</b>${t('ex2.noneText')}</div>`}`;
+  $$('[data-exf]').forEach((b) => b.onclick = () => { EX_FILTER = b.dataset.exf; transition(renderExamples); });
+  $$('[data-ex]').forEach((b) => b.onclick = () => {
+    EX_SEL = b.dataset.ex;
+    $$('.ex-item').forEach((x) => x.classList.toggle('on', x === b));
+    showExample(all.find((e) => e.id === EX_SEL), true);
+  });
+  if (isAdmin()) {
+    $('#ex-new').onclick = () => editExample({});
+    $('#ex-import').onchange = async (e) => {
+      const f = e.target.files[0];
+      if (!f) return;
+      editExample({ filename: f.name, code: await f.text(), title: f.name.replace(/\.[^.]+$/, '') });
+    };
+  }
+  if (EX_SEL) showExample(all.find((e) => e.id === EX_SEL));
+}
+
+function showExample(e, animate) {
+  const box = $('#ex-detail');
+  if (!box || !e) return;
+  const c = cat(e.category);
+  box.innerHTML = `
+    <div class="ex-top"><span><span class="dot" style="background:${c.color}"></span>${esc(c.label)} · <span class="mono">${esc(e.filename)}</span></span><span class="st ${e.status}">${statusLabel(e.status)}</span></div>
+    <h2>${esc(e.title)}</h2>
+    <p class="label">${t('ex2.request')}</p>
+    <div class="prompt">${esc(e.prompt)}</div>
+    <p class="label">${t('ex2.answer')}</p>
+    <div class="code"><div class="code-head"><span>${esc(e.filename)}</span><span class="row" style="gap:12px">${esc(e.language || 'Luau')}<button class="btn small ghost" data-copy="${esc(e.code)}">${t('copy')}</button></span></div><pre>${highlight(e.code)}</pre></div>
+    ${e.why.length ? `<p class="label">${t('ex2.why')}</p><ul class="why">${e.why.map((w, i) => `<li style="--i:${i}">${esc(w)}</li>`).join('')}</ul>` : ''}
+    <div class="ex-foot"><span>${e.sources ? t('ex2.source') + ' ' + esc(e.sources) : ''}</span>
+      <span class="row admin-only"><button class="btn" id="ex-edit">${t('ex2.edit')}</button>
+      ${e.status === 'validated' ? `<button class="btn" data-st="draft">${t('ex2.unvalidate')}</button>` : `<button class="btn primary" data-st="validated">${t('ex2.validate')}</button>`}</span></div>`;
+  if (animate && !reduced) box.animate([{ opacity: 0, transform: 'translateX(18px)' }, { opacity: 1, transform: 'none' }], { duration: 420, easing: 'cubic-bezier(.16,1,.3,1)' });
+  bindCopy(box);
+  if (!isAdmin()) return;
+  $('#ex-edit').onclick = () => editExample(e);
+  $$('[data-st]', box).forEach((b) => b.onclick = async () => {
+    await api('/examples/' + e.id, { method: 'PUT', body: { status: b.dataset.st } });
+    toast(b.dataset.st === 'validated' ? t('ex2.validated') : t('toast.saved'));
+    refreshStats();
+    transition(renderExamples);
+  });
+}
+
+function editExample(e) {
+  const isNew = !e.id;
+  openModal(`
+    <h2 class="detail-title">${isNew ? t('ex2.new') : t('ex2.edit')}</h2>
+    <form id="ex-form">
+      <div class="field"><label>${t('f.title')}</label><input name="title" required value="${esc(e.title || '')}"></div>
+      <div class="two">
+        <div class="field"><label>${t('f.category')}</label><select name="category">${catOptions(e.category || 'scripting')}</select></div>
+        <div class="field"><label>${t('ex2.status')}</label><select name="status">${['draft', 'review', 'validated'].map((s) => `<option value="${s}" ${s === (e.status || 'draft') ? 'selected' : ''}>${statusLabel(s)}</option>`).join('')}</select></div>
+      </div>
+      <div class="field"><label>${t('ex2.request')}</label><input name="prompt" required value="${esc(e.prompt || '')}" placeholder="${t('ex2.requestPh')}"></div>
+      <div class="field"><label>${t('ex2.file')}</label><input name="filename" value="${esc(e.filename || 'Script.lua')}"></div>
+      <div class="field"><label>${t('ex2.answer')}</label><textarea name="code" style="min-height:240px" spellcheck="false">${esc(e.code || '')}</textarea></div>
+      <div class="field"><label>${t('ex2.whyLines')}</label><textarea name="why">${esc((e.why || []).join('\n'))}</textarea></div>
+      <div class="field"><label>${t('ex2.sources')}</label><input name="sources" value="${esc(e.sources || '')}"></div>
+      <div class="row"><button class="btn primary">${t('save')}</button>${isNew ? '' : `<button class="btn danger" type="button" id="ex-del">${t('delete')}</button>`}</div>
+    </form>`);
+  $('#ex-form textarea[name=code]').onkeydown = (ev) => {
+    if (ev.key !== 'Tab') return;
+    ev.preventDefault();
+    const ta = ev.target;
+    ta.setRangeText('\t', ta.selectionStart, ta.selectionEnd, 'end');
+  };
+  $('#ex-form').onsubmit = async (ev) => {
+    ev.preventDefault();
+    const d = Object.fromEntries(new FormData(ev.target));
+    d.why = d.why.split('\n');
+    const saved = await api(isNew ? '/examples' : '/examples/' + e.id, { method: isNew ? 'POST' : 'PUT', body: d });
+    EX_SEL = saved.id;
+    toast(t('toast.saved')); closeModal(); refreshStats(); transition(renderExamples);
+  };
+  if (!isNew) $('#ex-del').onclick = async () => {
+    if (!confirm(t('detail.confirmDelete', { title: e.title }))) return;
+    await api('/examples/' + e.id, { method: 'DELETE' });
+    toast(t('toast.deleted')); closeModal(); refreshStats(); transition(renderExamples);
+  };
+}
+
+// ---------- YouTube ----------
 async function renderYoutube(params) {
   const q = params.get('q') || '';
   view.innerHTML = `
-    <h1 class="h1">${t('nav.youtube')}</h1>
-    <p class="sub">${t('yt.sub')}</p>
+    ${pageHead('YOUTUBE', t('nav.youtube'), t('yt.sub'))}
     <form class="toolbar" id="yt-form">
       <input class="input" id="yt-q" style="flex:1;min-width:220px" placeholder="${t('yt.ph')}" value="${esc(q)}">
       <button class="btn primary">${t('search')}</button>
     </form>
-    <div class="row" style="margin-bottom:20px">${['roblox vfx tutorial', 'roblox scripting tutorial', 'moon animator 2', 'roblox ui design', 'roblox gfx blender', 'roblox combat system', 'roblox datastore', 'roblox building tips'].map((x) => `<button class="chip" data-s="${x}">${x}</button>`).join('')}</div>
+    <div class="row">${['roblox vfx tutorial', 'roblox scripting tutorial', 'moon animator 2', 'roblox ui design', 'roblox gfx blender', 'roblox combat system', 'roblox datastore', 'roblox building tips'].map((x) => `<button class="chip" data-s="${x}">${x}</button>`).join('')}</div>
     <div id="yt-res"></div>`;
   $('#yt-form').onsubmit = (e) => { e.preventDefault(); location.hash = '#/youtube?q=' + encodeURIComponent($('#yt-q').value); };
   $$('[data-s]').forEach((b) => b.onclick = () => { location.hash = '#/youtube?q=' + encodeURIComponent(b.dataset.s); });
-  if (!q) return;
+  if (q) loadYoutube(q);
+}
+
+async function loadYoutube(q) {
   const out = $('#yt-res');
-  out.innerHTML = `<div class="row"><span class="spinner"></span> ${t('searching')}</div>`;
+  out.innerHTML = `<div class="grid">${'<div class="skel"></div>'.repeat(8)}</div>`;
   try {
     const res = await api('/youtube?q=' + encodeURIComponent(q));
     if (!res.length) { out.innerHTML = `<div class="empty"><b>${t('yt.none')}</b>${t('yt.noneText')}</div>`; return; }
-    out.innerHTML = `<div class="row admin-only" style="margin-bottom:16px"><button class="btn primary" id="add-all">+ ${t('yt.addAll', { n: res.length })}</button></div><div class="grid">${res.map((v, i) => `
-      <article class="card" style="--c:#ff3d6e">
+    out.innerHTML = `<div class="row admin-only" style="margin-bottom:16px"><button class="btn primary" id="add-all">${PLUS}${t('yt.addAll', { n: res.length })}</button></div><div class="grid stagger">${res.map((v, i) => `
+      <article class="card" style="--c:#A78BFA;--i:${Math.min(i, 14)}">
         <div class="thumb"><img src="${esc(v.thumbnail)}" alt="" loading="lazy"><span class="badge">${esc(v.duration || typeLabel('video'))}</span></div>
         <div class="card-body"><h3>${esc(v.title)}</h3><div class="meta">${esc(v.author)}${v.views ? ' · ' + esc(v.views) : ''}</div>
-        <div class="row"><button class="btn small primary admin-only" data-add="${i}">+ ${t('add')}</button><a class="btn small" href="${esc(v.url)}" target="_blank">${t('view')}</a></div></div>
+        <div class="row"><button class="btn small primary admin-only" data-add="${i}">${t('add')}</button><a class="btn small" href="${esc(v.url)}" target="_blank">${t('view')}</a></div></div>
       </article>`).join('')}</div>`;
     const addOne = async (b) => {
       if (b.disabled) return;
@@ -269,7 +557,7 @@ async function renderYoutube(params) {
       b.textContent = '✓ ' + t('added');
     };
     $$('[data-add]').forEach((b) => b.onclick = async () => { await addOne(b); refreshStats(); });
-    $('#add-all').onclick = async (e) => {
+    if ($('#add-all')) $('#add-all').onclick = async (e) => {
       e.currentTarget.disabled = true;
       for (const b of $$('[data-add]')) await addOne(b);
       toast(t('yt.addedN', { n: res.length })); refreshStats();
@@ -277,39 +565,37 @@ async function renderYoutube(params) {
   } catch (e) { out.innerHTML = `<div class="panel"><h3>${t('err.generic')}</h3><p>${esc(e.message)}</p></div>`; }
 }
 
-function guess(t) {
+function guess(s) {
   const rules = [['vfx', /vfx|particle|beam|trail|slash|aura|explosion/i], ['animation', /anim|moon|rig|r6|r15/i], ['gui', /\bui\b|gui|hud|menu|shop/i], ['gfx', /gfx|thumbnail|icon|render/i], ['modeling', /blender|model|mesh|texture/i], ['building', /build|map|terrain|light/i], ['audio', /sound|audio|music/i], ['design', /design|monetiz|popular/i]];
-  for (const [c, re] of rules) if (re.test(t)) return c;
+  for (const [c, re] of rules) if (re.test(s)) return c;
   return 'scripting';
 }
 
+// ---------- Chaînes ----------
 async function renderChannels(params) {
   const q = params.get('q') || '';
   const { total, followed, items } = await api('/channels?' + new URLSearchParams({ q, limit: 120 }));
   view.innerHTML = `
-    <h1 class="h1">${t('ch.title')}</h1>
-    <p class="sub">${t('ch.sub', { n: followed, num: num(followed) })}</p>
+    ${pageHead('YOUTUBE', t('ch.title'), t('ch.sub', { n: followed, num: num(followed) }))}
     <div class="explore-cards admin-only">
-      <div class="panel big-action">
+      <div class="panel" data-spot>
         <h3>🔎 ${t('ch.findTitle')}</h3>
         <p>${t('ch.findText')}</p>
         <div class="row"><button class="btn primary" data-crawl='{"mode":"channels","scope":"all","intensity":"normal","syncAfter":true}'>${t('ch.findGo')}</button>
         <button class="btn" data-crawl='{"mode":"channels","scope":"dev","intensity":"normal","syncAfter":true}'>${t('ch.devOnly')}</button></div>
       </div>
-      <div class="panel big-action">
+      <div class="panel" data-spot>
         <h3>🔄 ${t('ch.syncTitle')}</h3>
         <p>${t('ch.syncText')}</p>
         <div class="row"><button class="btn primary" data-crawl='{"mode":"sync"}'>${t('ch.syncGo')}</button></div>
       </div>
     </div>
     <div id="job"></div>
-    <div class="panel admin-only" style="margin-top:16px">
-      <form class="row" id="ch-form">
-        <input class="input" id="ch-h" style="flex:2;min-width:200px" placeholder="${t('ch.addPh')}">
-        <select class="input" id="ch-c" style="flex:1;min-width:150px"><option value="">${t('autoCategory')}</option>${catOptions()}</select>
-        <button class="btn primary">${t('ch.link')}</button>
-      </form>
-    </div>
+    <form class="row admin-only" id="ch-form">
+      <input class="input" id="ch-h" style="flex:2;min-width:200px" placeholder="${t('ch.addPh')}">
+      <select class="select" id="ch-c" style="flex:1;min-width:150px;padding:11px 14px"><option value="">${t('autoCategory')}</option>${catOptions()}</select>
+      <button class="btn primary">${t('ch.link')}</button>
+    </form>
     <div class="section-head"><h2>${t('ch.count', { n: total, num: num(total) })}</h2>
       <input class="input" id="ch-q" style="max-width:260px" placeholder="${t('ch.filter')}" value="${esc(q)}"></div>
     <div class="ch-grid" id="ch-grid">${items.map(chCard).join('') || `<div class="empty" style="grid-column:1/-1"><b>${t('ch.none')}</b>${t('ch.noneText')}</div>`}</div>
@@ -321,17 +607,19 @@ async function renderChannels(params) {
     try { await api('/channels', { method: 'POST', body: { handle: $('#ch-h').value, category: $('#ch-c').value } }); toast(t('ch.linked')); refreshStats(); route(); }
     catch (err) { toast(err.message, true); btn.disabled = false; }
   };
-  let t;
-  $('#ch-q').oninput = (e) => { clearTimeout(t); t = setTimeout(() => { location.hash = '#/channels' + (e.target.value ? '?q=' + encodeURIComponent(e.target.value) : ''); }, 300); };
-  if (q) { const i = $('#ch-q'); i.focus(); i.setSelectionRange(q.length, q.length); }
+  let tm;
+  $('#ch-q').oninput = (e) => { clearTimeout(tm); tm = setTimeout(() => { location.hash = '#/channels' + (e.target.value ? '?q=' + encodeURIComponent(e.target.value) : ''); }, 300); };
+  if (q) { const i = $('#ch-q'); setTimeout(() => { i.focus(); i.setSelectionRange(q.length, q.length); }, 250); }
   $('#ch-grid').onclick = async (e) => {
     const del = e.target.closest('[data-del]');
     if (!del) return;
     e.preventDefault();
     await api('/channels/' + del.dataset.del, { method: 'DELETE' });
-    del.closest('.chc').remove(); refreshStats();
+    const el = del.closest('.chc');
+    el.animate([{ opacity: 1, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(.6)' }], { duration: 300 }).onfinish = () => el.remove();
+    refreshStats();
   };
-  $('#more').onclick = async (e) => {
+  $('#more').onclick = async () => {
     const page = await api('/channels?' + new URLSearchParams({ q, limit: 120, offset: $$('#ch-grid .chc').length }));
     $('#ch-grid').insertAdjacentHTML('beforeend', page.items.map(chCard).join(''));
     $('#more-row').hidden = $$('#ch-grid .chc').length >= total;
@@ -348,43 +636,162 @@ function chCard(c) {
 }
 
 // ---------- Exploration ----------
+const SOURCES = [['youtube', 'YouTube'], ['devforum', 'DevForum Roblox'], ['reddit', 'Reddit'], ['github', 'GitHub'], ['store', 'Creator Store']];
 async function renderExplore() {
   const cats = META.categories.filter((c) => c.id !== 'gameplay').map((c) => cat(c.id));
   view.innerHTML = `
-    <h1 class="h1">⚡ ${t('ex.title')}</h1>
-    <p class="sub">${t('ex.sub')}</p>
-    <div class="panel">
-      <h3>${t('ex.cats')}</h3>
-      <div class="row" id="ex-cats">${cats.map((c) => `<label class="chip on" style="--c:${c.color}"><input type="checkbox" value="${c.id}" checked hidden>${esc(c.label)}</label>`).join('')}</div>
-      <h3 style="margin-top:18px">${t('ex.sources')}</h3>
-      <div class="row" id="ex-src">${[['youtube', 'YouTube'], ['devforum', 'DevForum Roblox'], ['reddit', 'Reddit']].map(([v, l]) => `<label class="chip on"><input type="checkbox" value="${v}" checked hidden>${l}</label>`).join('')}</div>
-      <h3 style="margin-top:18px">${t('ex.intensity')}</h3>
-      <div class="row" id="ex-int">
-        <label class="chip"><input type="radio" name="int" value="rapide" hidden>${t('ex.fast')}</label>
-        <label class="chip on"><input type="radio" name="int" value="normal" checked hidden>${t('ex.normal')}</label>
-        <label class="chip"><input type="radio" name="int" value="massif" hidden>${t('ex.massive')}</label>
+    ${pageHead(t('ex.eyebrow'), t('ex.title'), t('ex.sub'))}
+    <div class="explore-grid">
+      <div class="panel" data-spot>
+        <h3>${t('ex.cats')}</h3>
+        <div class="row" id="ex-cats">${cats.map((c) => `<label class="chip on"><input type="checkbox" value="${c.id}" checked hidden><span class="dot" style="background:${c.color}"></span>${esc(c.label)}</label>`).join('')}</div>
+        <h3 style="margin-top:22px">${t('ex.sources')}</h3>
+        <div class="row" id="ex-src">${SOURCES.slice(0, 3).map(([v, l]) => `<label class="chip on"><input type="checkbox" value="${v}" checked hidden>${l}</label>`).join('')}</div>
+        <h3 style="margin-top:22px">${t('ex.intensity')}</h3>
+        <div class="int-grid" id="ex-int">
+          ${[['rapide', 'fast'], ['normal', 'normal'], ['massif', 'massive']].map(([v, k]) => `<label class="int ${v === 'normal' ? 'on' : ''}"><input type="radio" name="int" value="${v}" ${v === 'normal' ? 'checked' : ''} hidden><b>${t('ex.' + k + 'T')}</b><small>${t('ex.' + k + 'D')}</small></label>`).join('')}
+        </div>
+        <div class="row" style="margin-top:24px;padding-top:20px;border-top:1px solid var(--line)"><button class="btn primary" id="ex-go">${BOLT}${t('ex.go')}</button>
+        <a class="btn" href="#/channels">${t('ch.findTitle')}</a></div>
       </div>
-      <div class="row" style="margin-top:20px"><button class="btn primary" id="ex-go">${t('ex.go')}</button>
-      <a class="btn" href="#/channels">${t('ch.findTitle')} →</a></div>
+      <div id="job"><div class="panel"><h3>${t('ex.idle')}</h3><p>${t('ex.idleText')}</p></div></div>
     </div>
-    <div class="panel big-action" style="margin-top:16px">
-      <h3>📦 ${t('os.title')}</h3>
-      <p>${t('os.text')}</p>
-      <div class="row" id="os-src">${[['github', 'GitHub'], ['devforum', t('os.forum')], ['store', 'Creator Store']].map(([v, l]) => `<label class="chip on"><input type="checkbox" value="${v}" checked hidden>${l}</label>`).join('')}</div>
-      <div class="row" style="margin-top:16px"><button class="btn primary" id="os-go">${t('os.go')}</button></div>
-    </div>
-    <div id="job"></div>`;
-  $$('#os-src label').forEach((l) => l.onclick = (e) => { e.preventDefault(); const i = $('input', l); i.checked = !i.checked; l.classList.toggle('on', i.checked); });
-  $('#os-go').onclick = () => startCrawl({ mode: 'opensource', sources: $$('#os-src input:checked').map((i) => i.value), intensity: $('#ex-int input:checked').value });
-  $$('#ex-cats label, #ex-src label').forEach((l) => l.onclick = (e) => { e.preventDefault(); const i = $('input', l); i.checked = !i.checked; l.classList.toggle('on', i.checked); });
-  $$('#ex-int label').forEach((l) => l.onclick = (e) => { e.preventDefault(); $$('#ex-int label').forEach((x) => { x.classList.remove('on'); $('input', x).checked = false; }); l.classList.add('on'); $('input', l).checked = true; });
+    <div class="panel" data-spot>
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <div style="flex:1;min-width:260px"><h3>📦 ${t('os.title')}</h3><p style="margin:0">${t('os.text')}</p></div>
+        <div class="row" id="os-src">${[['github', 'GitHub'], ['devforum', t('os.forum')], ['store', 'Creator Store']].map(([v, l]) => `<label class="chip on"><input type="checkbox" value="${v}" checked hidden>${l}</label>`).join('')}
+        <button class="btn primary" id="os-go">${t('os.go')}</button></div>
+      </div>
+    </div>`;
+  const toggle = (l) => l.onclick = (e) => {
+    e.preventDefault();
+    const i = $('input', l); i.checked = !i.checked;
+    l.classList.toggle('on', i.checked);
+  };
+  $$('#ex-cats label, #ex-src label, #os-src label').forEach(toggle);
+  $$('#ex-int label').forEach((l) => l.onclick = (e) => {
+    e.preventDefault();
+    $$('#ex-int label').forEach((x) => { x.classList.remove('on'); $('input', x).checked = false; });
+    l.classList.add('on'); $('input', l).checked = true;
+  });
   $('#ex-go').onclick = () => startCrawl({
     mode: 'explore',
     categories: $$('#ex-cats input:checked').map((i) => i.value),
     sources: $$('#ex-src input:checked').map((i) => i.value),
     intensity: $('#ex-int input:checked').value,
   });
+  $('#os-go').onclick = () => startCrawl({ mode: 'opensource', sources: $$('#os-src input:checked').map((i) => i.value), intensity: $('#ex-int input:checked').value });
   watchJob();
+}
+
+function bindCrawlButtons() {
+  $$('[data-crawl]').forEach((b) => b.onclick = () => startCrawl(JSON.parse(b.dataset.crawl)));
+}
+
+async function startCrawl(opts) {
+  try { await api('/crawl', { method: 'POST', body: opts }); toast(t('job.started')); watchJob(); }
+  catch (e) { toast(e.message, true); }
+}
+
+const modeLabel = (m) => t('mode.' + m);
+const logLine = (l) => (l.k && has('log.' + l.k) ? t('log.' + l.k, l.p) : l.msg);
+const current = (c) => (!c ? '' : typeof c === 'string' ? c : t('cur.' + c.k, c.p));
+let jobTimer;
+async function watchJob() {
+  clearTimeout(jobTimer);
+  if (!isAdmin()) return;
+  let st;
+  try { st = await api('/crawl'); } catch { return; }
+  const side = $('#side-job');
+  side.hidden = !st.running;
+  const pct = Math.round((st.step / Math.max(st.steps, 1)) * 100);
+  if (st.running) side.innerHTML = `<a href="#/explore"><span class="spinner"></span><span>${esc(modeLabel(st.mode))}<small>${t('job.side', { added: num(st.added), channels: num(st.channels) })}</small></span></a><div class="bar" style="margin-top:10px"><i style="width:${pct}%"></i></div>`;
+  const box = $('#job');
+  if (box && (st.running || st.finishedAt)) {
+    const prog = Object.entries(st.progress || {});
+    const fresh = !box.querySelector('.job');
+    box.innerHTML = `<div class="panel job" data-spot>
+      <div class="section-head"><h3 style="margin:0">${st.running ? '' : '✅ '}${esc(modeLabel(st.mode))}</h3><span class="live">${st.running ? `<span class="pulse"></span>${t('job.running')}` : t('job.finished')}</span></div>
+      ${(prog.length ? prog : [['all', { done: st.step, total: st.steps }]]).map(([src, p]) => {
+        const v = st.running ? Math.round((p.done / Math.max(p.total, 1)) * 100) : 100;
+        return `<div class="prog"><div class="top">${esc((SOURCES.find((s) => s[0] === src) || [0, t('job.steps')])[1])}<span>${v}%</span></div><div class="bar"><i style="width:${v}%"></i></div></div>`;
+      }).join('')}
+      <div class="job-stats">
+        <div><b>${num(st.added)}</b><span>${t('job.added')}</span></div>
+        <div><b>${num(st.channels)}</b><span>${t('job.channels')}</span></div>
+        <div><b>${st.errors}</b><span>${t('job.errors')}</span></div>
+      </div>
+      ${st.current ? `<p style="margin:14px 0 0;font-size:13px">${t('job.current')} ${esc(current(st.current))}</p>` : ''}
+      <div class="log">${(st.log || []).slice(0, 25).map((l) => `<div class="${l.err ? 'err' : ''}">${esc(logLine(l))}</div>`).join('')}</div>
+      ${st.running ? `<div class="row" style="margin-top:16px"><button class="btn danger" id="job-stop">${t('job.stop')}</button></div>` : ''}
+    </div>`;
+    if (fresh && !reduced) box.firstElementChild.animate([{ opacity: 0, transform: 'translateY(16px) scale(.97)' }, { opacity: 1, transform: 'none' }], { duration: 500, easing: 'cubic-bezier(.34,1.56,.64,1)' });
+    if ($('#job-stop')) $('#job-stop').onclick = () => api('/crawl/stop', { method: 'POST' });
+  }
+  if (st.running) jobTimer = setTimeout(() => { watchJob(); refreshStats(); }, 1500);
+  else if (box && box.dataset.wasRunning) refreshStats();
+  if (box) box.dataset.wasRunning = st.running ? '1' : '';
+}
+
+// ---------- Connexion Claude ----------
+async function refreshMcp() {
+  try { MCP = await api('/mcp'); } catch { return; }
+  const pill = $('#mcp-pill');
+  pill.classList.toggle('off', !MCP.connected);
+  $('#mcp-pill-text').textContent = MCP.connected ? t('cn.pillOn') : t('cn.pillOff');
+}
+
+async function renderConnect() {
+  await refreshMcp();
+  const m = MCP;
+  const cfg = JSON.stringify({ mcpServers: { 'rovex-hub': { type: 'http', url: m.url } } }, null, 2);
+  const stdio = JSON.stringify({ mcpServers: { 'rovex-hub': { command: 'node', args: [m.mcpPath] } } }, null, 2);
+  view.innerHTML = `
+    ${pageHead(t('cn.eyebrow'), t('nav.connect'), t('cn.sub'), `
+      <div class="server-card ${m.connected ? '' : 'off'}"><span class="pulse"></span><div><b>${m.connected ? t('cn.statusOn') : t('cn.statusOff')}</b><small>${esc(m.url.replace('http://', ''))}${m.lastCall ? ' · ' + ago(m.lastCall) : ''}</small></div>
+      <button class="btn small" data-copy="${esc(m.url)}">${t('copy')}</button></div>`)}
+    <div class="steps">
+      <div class="panel" data-spot><span class="num">1</span><h3>${t('cn.s1')}</h3><p>${t('cn.s1t')}</p></div>
+      <div class="panel" data-spot><span class="num">2</span><h3>${t('cn.s2')}</h3><p>${t('cn.s2t')}</p>
+        <div class="codebox"><code>${esc(cfg)}</code></div>
+        <div class="row" style="margin-top:12px"><button class="btn" data-copy="${esc(cfg)}">${t('cn.copyCfg')}</button><button class="btn" data-copy="claude mcp add --transport http rovex-hub ${esc(m.url)}">${t('cn.copyCmd')}</button></div></div>
+      <div class="panel" data-spot><span class="num">3</span><h3>${t('cn.s3')}</h3><p>${t('cn.s3t')}</p>
+        <div class="field"><label>${t('cn.testLabel')}</label><input id="cn-q" value="${esc(t('cn.testQ'))}"></div>
+        <button class="btn primary" id="cn-test">${t('cn.testGo')}</button><div class="test-out" id="cn-out"></div></div>
+    </div>
+    <div class="two-col">
+      <div class="panel" data-spot><h3>${t('cn.tools')}</h3><p>${t('cn.toolsT')}</p>
+        ${m.tools.map((x) => `<div class="tool"><div><b>${esc(x.name)}</b><small>${esc(t('tool.' + x.name))}</small></div>
+          <label class="switch"><input type="checkbox" data-tool="${x.name}" ${x.enabled ? 'checked' : ''}><span></span></label></div>`).join('')}
+      </div>
+      <div class="panel" data-spot><h3>${t('cn.instr')}</h3><p>${t('cn.instrT')}</p>
+        <textarea class="input big" id="cn-instr" spellcheck="false">${esc(m.instructions)}</textarea>
+        <div class="row" style="margin-top:14px"><button class="btn primary" id="cn-save">${t('save')}</button><button class="btn" id="cn-default">${t('cn.default')}</button></div>
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="panel" data-spot><div class="section-head"><h3 style="margin:0">${t('act.title')}</h3><span class="live"><span class="pulse"></span>${t('act.live')}</span></div><div id="cn-log">${activityList(m.log)}</div></div>
+      <div class="panel" data-spot><h3>${t('cn.stdio')}</h3><p>${t('cn.stdioT')}</p><div class="codebox"><code>${esc(stdio)}</code></div><div class="row" style="margin-top:12px"><button class="btn" data-copy="${esc(stdio)}">${t('copy')}</button></div></div>
+    </div>`;
+  bindCopy(view);
+  $$('[data-tool]').forEach((i) => i.onchange = async () => {
+    await api('/mcp', { method: 'PUT', body: { tools: { [i.dataset.tool]: i.checked } } });
+    toast(t('toast.saved'));
+  });
+  $('#cn-save').onclick = async () => { await api('/mcp', { method: 'PUT', body: { instructions: $('#cn-instr').value } }); toast(t('toast.saved')); };
+  $('#cn-default').onclick = () => {
+    $('#cn-instr').value = m.defaultInstructions;
+    $('#cn-instr').animate([{ background: 'rgba(124,58,237,.25)' }, { background: 'transparent' }], { duration: 700 });
+  };
+  $('#cn-test').onclick = async (e) => {
+    const b = e.currentTarget; b.disabled = true;
+    try {
+      const r = await api('/mcp/test', { method: 'POST', body: { query: $('#cn-q').value } });
+      const rows = [...r.examples.map((x) => [t('term.example') + ' · ' + statusLabel(x.status), x.title]), ...r.results.map((x) => [typeLabel(x.type), x.title])];
+      $('#cn-out').innerHTML = rows.length ? rows.map(([a, b2], i) => `<div style="--i:${i}"><b style="font-weight:600">${esc(b2)}</b><span>${esc(a)}</span></div>`).join('') : `<p class="sub">${t('yt.none')}</p>`;
+    } catch (err) { toast(err.message, true); }
+    b.disabled = false;
+  };
 }
 
 // ---------- Admin ----------
@@ -392,13 +799,12 @@ async function renderAdmin() {
   const [codes, info] = await Promise.all([api('/admin/codes'), api('/admin/info')]);
   const actives = codes.filter((c) => c.status === 'active').length;
   view.innerHTML = `
-    <h1 class="h1">🛡️ ${t('admin.title')}</h1>
-    <p class="sub">${t('admin.sub')}</p>
-    <div class="panel big-action">
+    ${pageHead('ADMIN', t('admin.title'), t('admin.sub'))}
+    <div class="panel" data-spot>
       <h3>${t('admin.create')}</h3>
       <form class="row" id="code-form">
         <input class="input" name="label" style="flex:2;min-width:200px" placeholder="${t('admin.forWho')}">
-        <select class="input" name="days" style="flex:1;min-width:150px">
+        <select class="select" name="days" style="flex:1;min-width:150px;padding:11px 14px">
           ${[[1, 'd1'], [7, 'd7'], [30, 'd30'], [90, 'd90'], [365, 'd365'], [0, 'forever']].map(([v, k]) => `<option value="${v}" ${v === 30 ? 'selected' : ''}>${t('admin.' + k)}</option>`).join('')}
         </select>
         <label class="chip" id="admin-toggle"><input type="checkbox" name="admin" hidden>👑 ${t('admin.rights')}</label>
@@ -419,18 +825,20 @@ async function renderAdmin() {
           <button class="btn small danger" data-remove="${c.id}">${t('delete')}</button>
         </div>
       </div>`).join('') || `<div class="empty"><b>${t('admin.none')}</b>${t('admin.noneText')}</div>`}</div>
-    <div class="panel" style="margin-top:22px">
-      <h3>🔑 ${t('admin.keyTitle')}</h3>
-      <p>${t('admin.keyText')}</p>
-      ${codeBox(info.keyFile)}
-      <div class="row" style="margin-top:14px"><button class="btn danger" id="reset-key">${t('admin.resetKey')}</button></div>
-    </div>
-    <div class="panel">
-      <h3>🌐 ${t('admin.shareTitle')}</h3>
-      ${info.shared ? `<p>${t('admin.sharedOn')}</p>${info.addresses.map(codeBox).join('')}` : `<p>${t('admin.sharedOff')}</p>`}
-      <p style="margin-top:14px">${t('admin.internet', { port: info.port })}</p>
+    <div class="two-col">
+      <div class="panel" data-spot>
+        <h3>🔑 ${t('admin.keyTitle')}</h3>
+        <p>${t('admin.keyText')}</p>
+        ${codeBox(info.keyFile)}
+        <div class="row" style="margin-top:14px"><button class="btn danger" id="reset-key">${t('admin.resetKey')}</button></div>
+      </div>
+      <div class="panel" data-spot>
+        <h3>🌐 ${t('admin.shareTitle')}</h3>
+        ${info.shared ? `<p>${t('admin.sharedOn')}</p>${info.addresses.map((a) => codeBox(a)).join('')}` : `<p>${t('admin.sharedOff')}</p>`}
+        <p style="margin-top:14px">${t('admin.internet', { port: info.port })}</p>
+      </div>
     </div>`;
-  bindCopy();
+  bindCopy(view);
   $('#admin-toggle').onclick = (e) => {
     e.preventDefault();
     const i = $('input', e.currentTarget); i.checked = !i.checked;
@@ -445,7 +853,7 @@ async function renderAdmin() {
     await renderAdmin();
     $('#new-code').innerHTML = `<div class="new-code"><span>${c.label ? t('admin.newFor', { name: esc(c.label) }) : t('admin.newId')}</span><strong>${esc(c.code)}</strong>
       <div class="row"><button class="btn small primary" data-copy="${esc(c.code)}">${t('admin.copyId')}</button><button class="btn small" data-copy="${esc(msg)}">${t('admin.copyMsg')}</button></div></div>`;
-    bindCopy();
+    bindCopy($('#new-code'));
   };
   $$('[data-extend]').forEach((b) => b.onclick = async () => { await api('/admin/codes/' + b.dataset.extend, { method: 'PUT', body: { addDays: 30 } }); toast(t('admin.extended')); renderAdmin(); });
   $$('[data-forever]').forEach((b) => b.onclick = async () => { await api('/admin/codes/' + b.dataset.forever, { method: 'PUT', body: { permanent: true } }); toast(t('admin.nowForever')); renderAdmin(); });
@@ -459,162 +867,84 @@ async function renderAdmin() {
   };
 }
 
-function bindCrawlButtons() {
-  $$('[data-crawl]').forEach((b) => b.onclick = () => startCrawl(JSON.parse(b.dataset.crawl)));
-}
-
-async function startCrawl(opts) {
-  try { await api('/crawl', { method: 'POST', body: opts }); toast(t('job.started')); watchJob(); }
-  catch (e) { toast(e.message, true); }
-}
-
-const modeLabel = (m) => t('mode.' + m);
-const logLine = (l) => (l.k && has('log.' + l.k) ? t('log.' + l.k, l.p) : l.msg);
-const current = (c) => (!c ? '' : typeof c === 'string' ? c : t('cur.' + c.k, c.p));
-let jobTimer;
-async function watchJob() {
-  clearTimeout(jobTimer);
-  let st;
-  try { st = await api('/crawl'); } catch { return; }
-  const side = $('#side-job');
-  side.hidden = !st.running;
-  if (st.running) side.innerHTML = `<a href="#/explore"><span class="spinner"></span><span>${esc(modeLabel(st.mode))}<small>${t('job.side', { added: num(st.added), channels: num(st.channels) })}</small></span></a><div class="bar"><i style="width:${Math.round((st.step / Math.max(st.steps, 1)) * 100)}%"></i></div>`;
-  const box = $('#job');
-  if (box && (st.running || st.finishedAt)) {
-    const pct = Math.round((st.step / Math.max(st.steps, 1)) * 100);
-    box.innerHTML = `<div class="panel job">
-      <div class="row" style="justify-content:space-between"><h3>${st.running ? '<span class="spinner"></span> ' : '✅ '}${esc(modeLabel(st.mode))}${st.running ? '' : ' — ' + t('job.finished')}</h3>
-      ${st.running ? `<button class="btn small danger" id="job-stop">${t('job.stop')}</button>` : ''}</div>
-      <div class="bar big"><i style="width:${st.running ? pct : 100}%"></i></div>
-      <div class="job-stats">
-        <div><b>${num(st.added)}</b><span>${t('job.added')}</span></div>
-        <div><b>${num(st.channels)}</b><span>${t('job.channels')}</span></div>
-        <div><b>${num(st.found)}</b><span>${t('job.found')}</span></div>
-        <div><b>${st.step}/${st.steps}</b><span>${t('job.steps')}</span></div>
-        <div><b>${st.errors}</b><span>${t('job.errors')}</span></div>
-      </div>
-      ${st.current ? `<p style="margin:12px 0 0">${t('job.current')} ${esc(current(st.current))}</p>` : ''}
-      <div class="log">${(st.log || []).slice(0, 25).map((l) => `<div class="${l.err ? 'err' : ''}">${esc(logLine(l))}</div>`).join('')}</div>
-    </div>`;
-    if ($('#job-stop')) $('#job-stop').onclick = () => api('/crawl/stop', { method: 'POST' });
-  }
-  if (st.running) jobTimer = setTimeout(() => { watchJob(); refreshStats(); }, 1500);
-  else if (box && box.dataset.wasRunning) { refreshStats(); }
-  if (box) box.dataset.wasRunning = st.running ? '1' : '';
-}
-
-async function renderMcp() {
-  const info = await api('/info');
-  const http = `http://localhost:${info.port}/mcp`;
-  const stdio = JSON.stringify({ mcpServers: { 'roblox-dev-hub': { command: 'node', args: [info.mcpPath] } } }, null, 2);
-  const httpCfg = JSON.stringify({ mcpServers: { 'roblox-dev-hub': { type: 'http', url: http } } }, null, 2);
-  view.innerHTML = `
-    <h1 class="h1">${t('nav.mcp')}</h1>
-    <p class="sub">${t('mcp.sub')}</p>
-    <div class="panel">
-      <h3>${t('mcp.httpTitle')}</h3>
-      <p>${t('mcp.httpText')}</p>
-      ${codeBox(http)}
-      <p style="margin-top:14px">${t('mcp.example')}</p>
-      ${jsonBox(httpCfg)}
-    </div>
-    <div class="panel">
-      <h3>${t('mcp.stdioTitle')}</h3>
-      <p>${t('mcp.stdioText')}</p>
-      ${codeBox(`node "${info.mcpPath}"`)}
-      <p style="margin-top:14px">${t('mcp.example')}</p>
-      ${jsonBox(stdio)}
-    </div>
-    <div class="panel">
-      <h3>${t('mcp.tools')}</h3>
-      <div class="tags" style="gap:8px">${['search_resources', 'get_resource', 'list_categories', 'add_resource', 'import_url', 'update_notes', 'explore_internet', 'explore_status', 'list_channels', 'sync_channels'].map((x) => `<span class="tag" style="font-size:13px;padding:5px 10px">${x}</span>`).join('')}</div>
-    </div>`;
-  bindCopy();
-}
-
-function jsonBox(text) {
-  return `<div class="code" style="align-items:start"><code style="white-space:pre">${esc(text)}</code><button class="btn small" data-copy="${esc(text)}">${t('copy')}</button></div>`;
-}
-
 function codeBox(text) {
-  return `<div class="code"><code>${esc(text)}</code><button class="btn small" data-copy="${esc(text)}">${t('copy')}</button></div>`;
+  return `<div class="codebox"><code>${esc(text)}</code><button class="btn small" data-copy="${esc(text)}">${t('copy')}</button></div>`;
 }
-function bindCopy() {
-  $$('[data-copy]').forEach((b) => b.onclick = async () => {
-    try { await navigator.clipboard.writeText(b.dataset.copy); b.textContent = '✓ ' + t('copied'); setTimeout(() => (b.textContent = t('copy')), 1500); }
-    catch { toast(t('toast.copyFail'), true); }
+function bindCopy(root = document) {
+  $$('[data-copy]', root).forEach((b) => b.onclick = async (e) => {
+    e.preventDefault();
+    try {
+      await navigator.clipboard.writeText(b.dataset.copy);
+      const old = b.textContent;
+      b.textContent = '✓ ' + t('copied');
+      setTimeout(() => (b.textContent = old), 1400);
+    } catch { toast(t('toast.copyFail'), true); }
   });
 }
 
+// ---------- Réglages ----------
 async function renderSettings() {
   const s = await api('/settings');
   view.innerHTML = `
-    <h1 class="h1">${t('nav.settings')}</h1>
-    <p class="sub">${t('set.sub')}</p>
-    <div class="panel">
-      <h3>${t('set.langTitle')}</h3>
-      <p>${t('set.langText')}</p>
-      ${langSelect('set-lang', 'input')}
+    ${pageHead('ROVEX HUB', t('nav.settings'), t('set.sub'))}
+    <div class="two-col">
+      <div class="panel" data-spot><h3>${t('set.langTitle')}</h3><p>${t('set.langText')}</p>${langSelect('set-lang')}</div>
+      <div class="panel" data-spot><h3>${t('set.autoTitle')}</h3>
+        <p>${t('set.autoText')}${s.lastAutoSync ? ' ' + t('set.autoLast', { date: dateTime(s.lastAutoSync) }) : ''}</p>
+        <select class="select" id="auto">${[0, 1, 6, 12, 24].map((v) => `<option value="${v}" ${Number(s.autoSyncHours) === v ? 'selected' : ''}>${t('set.auto' + v)}</option>`).join('')}</select></div>
     </div>
-    <div class="panel">
-      <h3>${t('set.ytTitle')}</h3>
-      <p>${t('set.ytText')}</p>
-      <form class="row" id="key-form">
-        <input class="input" id="key" style="flex:1;min-width:220px" placeholder="${s.hasKey ? t('set.keySaved') + ' ' + esc(s.youtubeApiKey) : t('set.pasteKey')}">
-        <button class="btn primary">${t('save')}</button>
-        ${s.hasKey ? `<button class="btn danger" type="button" id="key-del">${t('delete')}</button>` : ''}
-      </form>
-    </div>
-    <div class="panel">
+    <div class="panel" data-spot>
       <h3>☁️ ${t('set.cloudTitle')}</h3>
-      <p>${t('set.cloudText')}
-      ${s.lastCloudSync ? t('set.cloudLast', { date: dateTime(s.lastCloudSync), n: num(s.lastCloudAdded) }) + (s.cloudUpdatedAt ? ' ' + t('set.cloudFile', { date: dateTime(s.cloudUpdatedAt) }) : '') : t('set.cloudNever')}</p>
+      <p>${t('set.cloudText')} ${s.lastCloudSync ? t('set.cloudLast', { date: dateTime(s.lastCloudSync), n: num(s.lastCloudAdded) }) + (s.cloudUpdatedAt ? ' ' + t('set.cloudFile', { date: dateTime(s.cloudUpdatedAt) }) : '') : t('set.cloudNever')}</p>
       <form class="row" id="cloud-form">
         <input class="input" id="cloud-url" style="flex:1;min-width:260px" value="${esc(s.cloudUrl)}" placeholder="${t('set.cloudPh')}">
         <button class="btn">${t('save')}</button>
         <button class="btn primary" type="button" id="cloud-sync">${t('set.syncNow')}</button>
       </form>
     </div>
-    <div class="panel">
-      <h3>${t('set.ghTitle')}</h3>
-      <p>${t('set.ghText')}</p>
-      <form class="row" id="gh-form">
-        <input class="input" id="gh" style="flex:1;min-width:220px" placeholder="${s.hasGithub ? t('set.tokenSaved') : t('set.pasteToken')}">
-        <button class="btn primary">${t('save')}</button>
-      </form>
+    <div class="two-col">
+      <div class="panel" data-spot>
+        <h3>${t('set.ytTitle')}</h3><p>${t('set.ytText')}</p>
+        <form class="row" id="key-form">
+          <input class="input" id="key" style="flex:1;min-width:200px" placeholder="${s.hasKey ? t('set.keySaved') + ' ' + esc(s.youtubeApiKey) : t('set.pasteKey')}">
+          <button class="btn primary">${t('save')}</button>
+          ${s.hasKey ? `<button class="btn danger" type="button" id="key-del">${t('delete')}</button>` : ''}
+        </form>
+      </div>
+      <div class="panel" data-spot>
+        <h3>${t('set.ghTitle')}</h3><p>${t('set.ghText')}</p>
+        <form class="row" id="gh-form">
+          <input class="input" id="gh" style="flex:1;min-width:200px" placeholder="${s.hasGithub ? t('set.tokenSaved') : t('set.pasteToken')}">
+          <button class="btn primary">${t('save')}</button>
+        </form>
+      </div>
     </div>
-    <div class="panel">
-      <h3>${t('set.autoTitle')}</h3>
-      <p>${t('set.autoText')}${s.lastAutoSync ? ' ' + t('set.autoLast', { date: dateTime(s.lastAutoSync) }) : ''}</p>
-      <select class="input" id="auto" style="max-width:280px">${[0, 1, 6, 12, 24].map((v) => `<option value="${v}" ${Number(s.autoSyncHours) === v ? 'selected' : ''}>${t('set.auto' + v)}</option>`).join('')}</select>
-    </div>
-    <div class="panel">
-      <h3>${t('set.backupTitle')}</h3>
-      <p>${t('set.backupText')}</p>
-      <a class="btn" href="/api/export" download="roblox-dev-hub.json">${t('set.export')}</a>
+    <div class="panel" data-spot>
+      <h3>${t('set.backupTitle')}</h3><p>${t('set.backupText')}</p>
+      <a class="btn" href="/api/export" download="rovex-hub.json">${t('set.export')}</a>
     </div>`;
-  $('#key-form').onsubmit = async (e) => { e.preventDefault(); await api('/settings', { method: 'PUT', body: { youtubeApiKey: $('#key').value } }); toast(t('toast.saved')); renderSettings(); };
-  bindLangSelect('set-lang');
+  $('#set-lang').onchange = (e) => setLang(e.target.value);
+  $('#key-form').onsubmit = async (e) => { e.preventDefault(); await api('/settings', { method: 'PUT', body: { youtubeApiKey: $('#key').value } }); toast(t('toast.saved')); route(); };
   $('#cloud-form').onsubmit = async (e) => { e.preventDefault(); await api('/settings', { method: 'PUT', body: { cloudUrl: $('#cloud-url').value } }); toast(t('toast.saved')); };
   $('#cloud-sync').onclick = async (e) => {
     const b = e.currentTarget; b.disabled = true; b.innerHTML = `<span class="spinner"></span>${t('set.syncing')}`;
-    try { const r = await api('/cloud/sync', { method: 'POST' }); toast(t('set.cloudDone', { n: num(r.added), c: num(r.channels) })); refreshStats(); renderSettings(); }
+    try { const r = await api('/cloud/sync', { method: 'POST' }); toast(t('set.cloudDone', { n: num(r.added), c: num(r.channels) })); refreshStats(); route(); }
     catch (err) { toast(err.message, true); b.disabled = false; b.textContent = t('set.syncNow'); }
   };
-  $('#gh-form').onsubmit = async (e) => { e.preventDefault(); await api('/settings', { method: 'PUT', body: { githubToken: $('#gh').value } }); toast(t('toast.saved')); renderSettings(); };
+  $('#gh-form').onsubmit = async (e) => { e.preventDefault(); await api('/settings', { method: 'PUT', body: { githubToken: $('#gh').value } }); toast(t('toast.saved')); route(); };
   $('#auto').onchange = async (e) => { await api('/settings', { method: 'PUT', body: { autoSyncHours: Number(e.target.value) } }); toast(t('toast.saved')); };
-  if ($('#key-del')) $('#key-del').onclick = async () => { await api('/settings', { method: 'PUT', body: { youtubeApiKey: '' } }); toast(t('toast.deleted')); renderSettings(); };
+  if ($('#key-del')) $('#key-del').onclick = async () => { await api('/settings', { method: 'PUT', body: { youtubeApiKey: '' } }); toast(t('toast.deleted')); route(); };
 }
 
-// ---------- Détail ----------
+// ---------- Détail d'une ressource ----------
 function mediaFor(r) {
   const id = ytId(r.url);
   if (id) return `<div class="media"><iframe src="https://www.youtube-nocookie.com/embed/${id}" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen></iframe></div>`;
   if (r.file && r.type === 'video') return `<div class="media"><video src="/media/${esc(r.file)}" controls></video></div>`;
   if (r.type === 'image') return `<div class="media"><img src="${esc(r.file ? '/media/' + r.file : r.url)}" alt=""></div>`;
-  if (r.thumbnail) return `<div class="media"><img src="${esc(r.thumbnail)}" alt=""></div>`;
+  if (r.thumbnail) return `<div class="media"><img src="${esc(r.thumbnail)}" alt="" referrerpolicy="no-referrer"></div>`;
   const c = cat(r.category);
-  return `<div class="media ph thumb" style="--c:${c.color};aspect-ratio:21/6">${icon(r.category, 60)}</div>`;
+  return `<div class="media thumb ph" style="--c:${c.color};aspect-ratio:21/6"><span class="fb" style="display:grid">${svgPath(TYPE_ICONS[r.type] || TYPE_ICONS.article)}</span></div>`;
 }
 
 function openDetail(r) {
@@ -622,11 +952,11 @@ function openDetail(r) {
   const link = r.url || (r.file ? '/media/' + r.file : '');
   openModal(`
     ${mediaFor(r)}
-    <div class="card-cat" style="--c:${c.color}"><span class="dot" style="background:${c.color}"></span>${esc(c.label)} · ${typeLabel(r.type)}</div>
-    <h2 class="detail-title">${esc(r.title)}</h2>
-    <p class="sub">${esc(r.author || '')}${r.description ? (r.author ? ' — ' : '') + esc(r.description) : ''}</p>
+    <div class="card-cat"><span class="dot" style="background:${c.color}"></span>${esc(c.label)} · ${typeLabel(r.type)}</div>
+    <h2 class="detail-title" style="margin-top:8px">${esc(r.title)}</h2>
+    <p class="sub" style="margin-bottom:20px">${esc(r.author || '')}${r.description ? (r.author ? ' — ' : '') + esc(r.description) : ''}</p>
     <div class="row" style="margin-bottom:22px">
-      ${link ? `<a class="btn primary" href="${esc(link)}" target="_blank" ${r.file ? 'download' : ''}>${r.file ? t('detail.download') : t('detail.open')}</a>` : ''}
+      ${link ? `<a class="btn primary" href="${esc(link)}" target="_blank" ${r.file ? 'download' : ''}>${r.file ? t('detail.download') : t('detail.open')} ${ARROW}</a>` : ''}
       <span class="admin-only row"><button class="btn" id="d-fav">${STAR}${r.favorite ? t('detail.unfav') : t('card.favorite')}</button>
       <button class="btn danger" id="d-del">${t('delete')}</button></span>
     </div>
@@ -643,8 +973,7 @@ function openDetail(r) {
     </form>`);
   $('#d-form').onsubmit = async (e) => {
     e.preventDefault();
-    const data = Object.fromEntries(new FormData(e.target));
-    await api('/resources/' + r.id, { method: 'PUT', body: data });
+    await api('/resources/' + r.id, { method: 'PUT', body: Object.fromEntries(new FormData(e.target)) });
     toast(t('toast.saved')); closeModal(); refreshStats(); route();
   };
   $('#d-fav').onclick = async () => { await api('/resources/' + r.id, { method: 'PUT', body: { favorite: !r.favorite } }); closeModal(); refreshStats(); route(); };
@@ -662,7 +991,7 @@ function openAdd(tab = 'link') {
     <h2 class="detail-title">${t('addm.title')}</h2>
     <div class="tabs"><button data-tab="link">${t('addm.tabLink')}</button><button data-tab="file">${t('addm.tabFile')}</button><button data-tab="manual">${t('addm.tabNote')}</button></div>
     <div data-pane="link">
-      <p class="sub">${t('addm.linkText')}</p>
+      <p class="sub" style="margin-bottom:16px">${t('addm.linkText')}</p>
       <form id="f-link">
         <div class="field"><label>${t('f.link')}</label><input name="url" required placeholder="https://www.youtube.com/watch?v=…"></div>
         <div id="f-prev"></div>
@@ -672,7 +1001,7 @@ function openAdd(tab = 'link') {
       </form>
     </div>
     <div data-pane="file">
-      <p class="sub">${t('addm.fileText')}</p>
+      <p class="sub" style="margin-bottom:16px">${t('addm.fileText')}</p>
       <div class="field"><label>${t('f.category')}</label><select id="f-cat">${catOpts}</select></div>
       <label class="drop" id="f-drop"><b>${t('addm.drop')}</b>${t('addm.dropOr')}<input type="file" multiple hidden id="f-files"></label>
       <div id="f-prog" style="margin-top:12px"></div>
@@ -687,7 +1016,13 @@ function openAdd(tab = 'link') {
         <button class="btn primary">${t('add')}</button>
       </form>
     </div>`);
-  const show = (t) => { $$('[data-tab]').forEach((b) => b.classList.toggle('on', b.dataset.tab === t)); $$('[data-pane]').forEach((p) => (p.hidden = p.dataset.pane !== t)); };
+  const show = (k) => {
+    $$('[data-tab]').forEach((b) => b.classList.toggle('on', b.dataset.tab === k));
+    $$('[data-pane]').forEach((p) => {
+      p.hidden = p.dataset.pane !== k;
+      if (!p.hidden && !reduced) p.animate([{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], { duration: 300, easing: 'ease-out' });
+    });
+  };
   $$('[data-tab]').forEach((b) => b.onclick = () => show(b.dataset.tab));
   show(tab);
 
@@ -700,7 +1035,7 @@ function openAdd(tab = 'link') {
       $('#f-prev').innerHTML = `<div class="preview"><span class="spinner"></span> ${t('addm.reading')}</div>`;
       try {
         const p = await api('/preview', { method: 'POST', body: { url: urlIn.value } });
-        $('#f-prev').innerHTML = `<div class="preview">${p.thumbnail ? `<img src="${esc(p.thumbnail)}" alt="">` : ''}<div><b>${esc(p.title)}</b><div class="sub" style="margin:0">${esc(p.author || '')} · ${typeLabel(p.type)} · ${esc(cat(p.category).label)}</div></div></div>`;
+        $('#f-prev').innerHTML = `<div class="preview">${p.thumbnail ? `<img src="${esc(p.thumbnail)}" alt="">` : ''}<div><b>${esc(p.title)}</b><div class="sub" style="font-size:13px">${esc(p.author || '')} · ${typeLabel(p.type)} · ${esc(cat(p.category).label)}</div></div></div>`;
       } catch { $('#f-prev').innerHTML = ''; }
     }, 500);
   };
@@ -708,8 +1043,7 @@ function openAdd(tab = 'link') {
     e.preventDefault();
     const btn = e.submitter; btn.disabled = true; btn.innerHTML = `<span class="spinner"></span>${t('addm.importing')}`;
     try {
-      const d = Object.fromEntries(new FormData(e.target));
-      const r = await api('/import', { method: 'POST', body: d });
+      const r = await api('/import', { method: 'POST', body: Object.fromEntries(new FormData(e.target)) });
       toast(t('toast.addedTitle', { title: r.title })); closeModal(); refreshStats(); route();
     } catch (err) { toast(err.message, true); btn.disabled = false; btn.textContent = t('addm.import'); }
   };
@@ -748,8 +1082,13 @@ function openModal(html) {
   $('#modal-body').innerHTML = html;
   $('#modal').hidden = false;
   document.body.style.overflow = 'hidden';
+  bindCopy($('#modal-body'));
 }
-function closeModal() {
+async function closeModal() {
+  const card = $('.modal-card');
+  if (!reduced && !$('#modal').hidden) {
+    await card.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(20px) scale(.95)' }], { duration: 180, easing: 'ease-in' }).finished;
+  }
   $('#modal').hidden = true;
   $('#modal-body').innerHTML = '';
   document.body.style.overflow = '';
@@ -764,27 +1103,28 @@ async function refreshStats() {
     <a href="#/library?cat=${c.id}" class="${active === c.id ? 'active' : ''}"><span class="dot" style="background:${c.color}"></span>${esc(c.label)}<span class="n">${num(STATS.byCategory[c.id])}</span></a>`).join('');
 }
 
+const ADMIN_PAGES = ['explore', 'connect', 'settings', 'admin', 'favorites'];
 async function route() {
   const [p, qs] = location.hash.slice(1).split('?');
-  const path = (p || '/').replace(/^\//, '') || 'home';
+  let path = (p || '/').replace(/^\//, '') || 'home';
+  if (path === 'mcp') path = 'connect';
   const params = new URLSearchParams(qs || '');
   const name = path === 'library' && params.get('cat') ? '' : path;
   $$('#nav a').forEach((a) => a.classList.toggle('active', a.dataset.route === name));
   $$('#side-cats a').forEach((a) => a.classList.toggle('active', a.getAttribute('href') === '#/library?cat=' + params.get('cat')));
+  movePill();
   document.body.classList.remove('menu');
   if (!SESSION || !SESSION.loggedIn) return;
-  if (!isAdmin() && ['explore', 'mcp', 'settings', 'admin'].includes(path)) { location.hash = '#/'; return; }
+  if (!isAdmin() && ADMIN_PAGES.includes(path)) { location.hash = '#/'; return; }
+  const pages = {
+    library: () => renderLibrary(params), favorites: () => renderLibrary(params, true), examples: renderExamples,
+    youtube: () => renderYoutube(params), channels: () => renderChannels(params), explore: renderExplore,
+    connect: renderConnect, admin: renderAdmin, settings: renderSettings,
+  };
   try {
-    if (path === 'library') await renderLibrary(params);
-    else if (path === 'favorites') await renderLibrary(params, true);
-    else if (path === 'youtube') await renderYoutube(params);
-    else if (path === 'channels') await renderChannels(params);
-    else if (path === 'explore') await renderExplore();
-    else if (path === 'admin' && isAdmin()) await renderAdmin();
-    else if (path === 'mcp') await renderMcp();
-    else if (path === 'settings') await renderSettings();
-    else await renderHome();
+    await transition(pages[path] || renderHome);
   } catch (e) {
+    view.classList.remove('leaving');
     view.innerHTML = `<div class="empty"><b>${t('err.oops')}</b>${esc(e.message)}<br>${t('err.server')}</div>`;
   }
 }
@@ -797,7 +1137,7 @@ $('#search').addEventListener('input', (e) => {
     const c = location.hash.startsWith('#/library') ? cur.get('cat') : '';
     const qs = new URLSearchParams({ ...(e.target.value && { q: e.target.value }), ...(c && { cat: c }) });
     location.hash = '#/library' + (qs.toString() ? '?' + qs : '');
-  }, 250);
+  }, 300);
 });
 document.addEventListener('keydown', (e) => {
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); $('#search').focus(); $('#search').select(); }
@@ -805,6 +1145,7 @@ document.addEventListener('keydown', (e) => {
 });
 $('#add-btn').onclick = () => openAdd();
 $('#menu-btn').onclick = () => document.body.classList.toggle('menu');
+window.addEventListener('resize', movePill);
 
 // Glisser-déposer des fichiers n'importe où sur la page.
 let dragDepth = 0;
@@ -820,6 +1161,7 @@ window.addEventListener('drop', (e) => {
 window.addEventListener('hashchange', route);
 (async () => {
   applyStatic();
+  $('#login-lang').value = LANG;
   try { SESSION = await api('/session'); }
   catch {
     view.innerHTML = `<div class="empty"><b>${t('err.oldTitle')}</b>${t('err.oldText')}</div>`;
@@ -828,7 +1170,12 @@ window.addEventListener('hashchange', route);
   if (!SESSION.loggedIn) return showLogin();
   renderSession();
   META = await api('/meta');
-  await refreshStats();
+  await Promise.all([refreshStats(), refreshMcp()]);
   route();
   if (isAdmin()) watchJob();
+  setInterval(async () => {
+    await refreshMcp();
+    const list = $('#act-list') || $('#cn-log');
+    if (list) list.innerHTML = activityList(MCP.log || []);
+  }, 20000);
 })();

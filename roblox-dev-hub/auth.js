@@ -43,7 +43,7 @@ class Auth {
       if (fs.existsSync(KEY_FILE)) this.key = clean(fs.readFileSync(KEY_FILE, 'utf8').split('\n').find((l) => l.startsWith('ADMIN-')) || '');
       if (!this.key) {
         this.key = randomCode('ADMIN', 5);
-        fs.writeFileSync(KEY_FILE, `${this.key}\n\nRoblox Dev Hub permanent admin key: never expires, opens the admin panel. Do not share it.\nClé admin permanente de Roblox Dev Hub : n'expire jamais, ouvre le panneau admin. Ne la partage pas.\n`);
+        fs.writeFileSync(KEY_FILE, `${this.key}\n\nRovex Hub permanent admin key: never expires, opens the admin panel. Do not share it.\nClé admin permanente de Rovex Hub : n'expire jamais, ouvre le panneau admin. Ne la partage pas.\n`);
       }
     }
     return this.key;

@@ -1,4 +1,4 @@
-// Serveur local de Roblox Dev Hub : interface web + API. Lancer avec `node server.js`.
+// Serveur local de Rovex Hub : interface web + API. Lancer avec `node server.js`.
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
@@ -28,6 +28,8 @@ let state = db.load();
 state.settings = state.settings || { youtubeApiKey: '' };
 
 const auth = new Auth({ getState: () => state, persist: () => persist() });
+// En mode HTTP, le serveur MCP travaille sur la même base en mémoire que l'app.
+mcp.useStore({ load: () => state, save: () => persist() });
 
 const crawler = new Crawler({
   getState: () => state,
@@ -98,7 +100,7 @@ function refresh() {
 const routes = [
   ['GET', /^\/api\/meta$/, () => ({ categories: db.CATEGORIES, types: db.TYPES })],
   ['GET', /^\/api\/info$/, () => ({ mcpPath: path.join(__dirname, 'mcp.js'), node: process.execPath, port: PORT })],
-  ['GET', /^\/api\/stats$/, () => db.stats(state)],
+  ['GET', /^\/api\/stats$/, () => ({ ...db.stats(state), examples: (state.examples || []).filter((e) => e.status === 'validated').length })],
   ['GET', /^\/api\/resources$/, (req, m, url) => {
     const p = url.searchParams;
     const all = db.search(state, {
@@ -196,6 +198,53 @@ const routes = [
   }],
   ['GET', /^\/api\/export$/, () => ({ ...state, auth: undefined })],
   ['POST', /^\/api\/cloud\/sync$/, () => cloudSync()],
+  // Exemples d'apprentissage : les membres voient les exemples validés, l'admin voit tout.
+  ['GET', /^\/api\/examples$/, (req, m, url, session) => (state.examples || []).filter((e) => session.role === 'admin' || e.status === 'validated')],
+  ['POST', /^\/api\/examples$/, async (req) => {
+    const e = db.normalizeExample(await json(req));
+    state.examples = state.examples || [];
+    state.examples.unshift(e);
+    persist();
+    return e;
+  }],
+  ['PUT', /^\/api\/examples\/(\w+)$/, async (req, m) => {
+    const i = (state.examples || []).findIndex((x) => x.id === m[1]);
+    if (i < 0) throw Object.assign(new Error('Not found'), { code: 404, key: 'notFound' });
+    state.examples[i] = db.normalizeExample({ ...state.examples[i], ...(await json(req)), id: m[1], createdAt: state.examples[i].createdAt });
+    persist();
+    return state.examples[i];
+  }],
+  ['DELETE', /^\/api\/examples\/(\w+)$/, (req, m) => {
+    state.examples = (state.examples || []).filter((x) => x.id !== m[1]);
+    persist();
+    return { ok: true };
+  }],
+  // Connexion Claude : état, outils activés, consignes, journal et test.
+  ['GET', /^\/api\/mcp$/, (req, m, url, session) => {
+    const log = state.mcpLog || [];
+    const last = log[0] ? Date.parse(log[0].t) : 0;
+    const base = { connected: Date.now() - last < 15 * 60e3, lastCall: log[0] ? log[0].t : null, log: log.slice(0, 30), url: `http://localhost:${PORT}/mcp` };
+    if (session.role !== 'admin') return base;
+    const off = state.settings.mcpTools || {};
+    return {
+      ...base,
+      tools: mcp.TOOLS.map((x) => ({ name: x.name, description: x.description, enabled: off[x.name] !== false })),
+      instructions: state.settings.mcpInstructions || mcp.DEFAULT_INSTRUCTIONS,
+      defaultInstructions: mcp.DEFAULT_INSTRUCTIONS,
+      mcpPath: path.join(__dirname, 'mcp.js'),
+    };
+  }],
+  ['PUT', /^\/api\/mcp$/, async (req) => {
+    const b = await json(req);
+    if (b.tools && typeof b.tools === 'object') state.settings.mcpTools = { ...(state.settings.mcpTools || {}), ...b.tools };
+    if (typeof b.instructions === 'string') state.settings.mcpInstructions = b.instructions.trim() === mcp.DEFAULT_INSTRUCTIONS.trim() ? '' : b.instructions;
+    persist();
+    return { ok: true };
+  }],
+  ['POST', /^\/api\/mcp\/test$/, async (req) => {
+    const q = String((await json(req)).query || '').slice(0, 200);
+    return mcp.call('search_resources', { query: q, limit: 8 });
+  }],
   ['GET', /^\/api\/admin\/codes$/, () => auth.list()],
   ['POST', /^\/api\/admin\/codes$/, async (req) => auth.create(await json(req))],
   ['PUT', /^\/api\/admin\/codes\/(\w+)$/, async (req, m) => auth.update(m[1], await json(req))],
@@ -209,7 +258,7 @@ const routes = [
 ];
 
 // Routes accessibles à un ID d'accès simple (lecture seule). Tout le reste est réservé à l'admin.
-const USER_ROUTES = [/^\/api\/meta$/, /^\/api\/stats$/, /^\/api\/resources$/, /^\/api\/channels$/, /^\/api\/youtube$/, /^\/api\/crawl$/];
+const USER_ROUTES = [/^\/api\/meta$/, /^\/api\/stats$/, /^\/api\/resources$/, /^\/api\/channels$/, /^\/api\/youtube$/, /^\/api\/crawl$/, /^\/api\/examples$/, /^\/api\/mcp$/];
 
 const cookies = (req) => Object.fromEntries(String(req.headers.cookie || '').split(';').map((c) => c.trim().split('=')).filter((p) => p[0]).map(([k, ...v]) => [k, decodeURIComponent(v.join('='))]));
 const clientIp = (req) => req.socket.remoteAddress || '';
@@ -313,7 +362,7 @@ const server = http.createServer(async (req, res) => {
     for (const [method, re, fn] of routes) {
       const m = url.pathname.match(re);
       if (m && method === req.method) {
-        try { return send(res, 200, await fn(req, m, url)); }
+        try { return send(res, 200, await fn(req, m, url, session)); }
         catch (e) { return send(res, e.code || 400, { error: e.message, key: e.key, vars: e.vars }); }
       }
     }
@@ -330,14 +379,14 @@ const server = http.createServer(async (req, res) => {
 
 server.on('error', (e) => {
   if (e.code === 'EADDRINUSE') {
-    console.log(`\n  Roblox Dev Hub is already running  →  http://localhost:${PORT}\n`);
+    console.log(`\n  Rovex Hub is already running  →  http://localhost:${PORT}\n`);
     process.exit(0);
   }
   throw e;
 });
 
 server.listen(PORT, HOST, () => {
-  console.log(`\n  Roblox Dev Hub ready  →  http://localhost:${PORT}`);
+  console.log(`\n  Rovex Hub ready  →  http://localhost:${PORT}`);
   if (HOST !== '127.0.0.1') {
     for (const i of Object.values(os.networkInterfaces()).flat()) if (i && i.family === 'IPv4' && !i.internal) console.log(`  Shared mode          →  http://${i.address}:${PORT}`);
   }
