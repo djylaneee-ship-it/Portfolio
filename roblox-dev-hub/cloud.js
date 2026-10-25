@@ -1,8 +1,8 @@
 // Base en ligne de Rovex Hub (Supabase) : IDs d'accès partagés entre tous les PC, et contenu
 // publié par les admins (exemples, skills, prompts). L'app n'appelle que les fonctions rovex_*,
 // les tables elles-mêmes ne sont pas lisibles avec la clé publique.
-const URL_ = process.env.ROVEX_SUPABASE_URL || 'https://qsgqgtowxaadtlwnwrvc.supabase.co';
-const KEY = process.env.ROVEX_SUPABASE_KEY || 'sb_publishable_JdGyPh6YtCAmxlrICg5tSA_tMXI3S5A';
+const URL_ = process.env.ROVEX_SUPABASE_URL || 'https://owupuxmgxtjmslhhawaf.supabase.co';
+const KEY = process.env.ROVEX_SUPABASE_KEY || 'sb_publishable__eVSL4bz7tZOZmjkOlMy8Q_rmyr55sN';
 const enabled = !process.env.ROVEX_LOCAL_AUTH;
 
 async function rpc(fn, args = {}) {

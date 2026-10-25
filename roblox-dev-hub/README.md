@@ -35,7 +35,7 @@ Les données (base, exemples, clé admin) sont dans `%APPDATA%\Rovex Hub` : elle
 
 ## Accès par ID et panneau admin
 
-L'app demande un **ID d'accès** pour entrer. Les IDs sont gardés **en ligne** (base Supabase du projet `rovex-hub`) : un ID créé sur ton PC marche sur n'importe quel PC qui a Rovex Hub et internet.
+L'app demande un **ID d'accès** pour entrer. Les IDs sont gardés **en ligne** (base Supabase du projet `rovex-hub`, créée avec `supabase/rovex.sql`) : un ID créé sur ton PC marche sur n'importe quel PC qui a Rovex Hub et internet.
 
 - **Clé admin permanente** : créée au premier lancement et enregistrée dans `%APPDATA%\Rovex Hub\data\CLE-ADMIN.txt`. Le premier PC admin qui se connecte avec sa clé l'enregistre en ligne comme clé principale (et envoie en ligne les IDs créés avant). Elle n'expire jamais et ouvre le **panneau Admin**. Ne la partage pas.
 - **IDs d'accès** (`RDH-XXXX-XXXX-XXXX`) : crée-les dans **Admin**, puis envoie le message tout prêt (ID + lien de téléchargement). Ils donnent accès en lecture seule et se bloquent tout seuls après leur durée (1 jour, 7 jours, 1 mois, 3 mois, 1 an) ou sont **permanents** (∞). Tu peux les prolonger, les rendre permanents, les bloquer ou les supprimer ; un ID bloqué est déconnecté en moins de 10 minutes.

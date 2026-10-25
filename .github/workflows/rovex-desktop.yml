@@ -31,6 +31,14 @@ jobs:
         with:
           node-version: 22
 
+      # Vérifie que la base en ligne des IDs répond (ne bloque pas la construction).
+      - name: Base des IDs en ligne
+        continue-on-error: true
+        shell: bash
+        run: |
+          curl -s -X POST "https://owupuxmgxtjmslhhawaf.supabase.co/rest/v1/rpc/rovex_status" \
+            -H "apikey: sb_publishable__eVSL4bz7tZOZmjkOlMy8Q_rmyr55sN" -H "Content-Type: application/json" -d '{}'
+
       - name: Dépendances
         run: npm install --no-audit --no-fund
 
