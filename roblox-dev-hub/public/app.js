@@ -914,16 +914,22 @@ async function loadClaudeApps() {
   const d = st.desktop;
   const c = st.code;
   const state = (on, txt) => `<span class="state ${on ? 'on' : ''}"><span class="pulse"></span>${txt}</span>`;
+  // « Ajouté » = la config contient Rovex ; « Actif » = Claude a vraiment lancé Rovex (poignée de main MCP).
+  const seen = (cl) => (cl ? ' · ' + t('cl.lastSeen', { when: ago(cl.lastSeen) }) : '');
+  const dOn = d.linked && d.client && d.client.alive;
+  const cOn = c.linked && c.client && c.client.alive;
   box.innerHTML = `
     <div class="panel app-card" data-spot><span class="ico">🖥️</span><div style="flex:1">
       <h3>Claude Desktop</h3>
-      ${!d.installed ? state(false, t('cl.notFound')) : d.linked ? state(true, t('cl.linked')) : state(false, t('cl.notLinked'))}
-      <p>${!d.installed ? t('cl.desktopMissing') : d.linked ? t('cl.restart') : t('cl.desktopFound')}</p>
-      <div class="row">${d.installed ? (d.linked ? `<button class="btn" id="cl-unlink">${t('cl.unlink')}</button>` : `<button class="btn primary" id="cl-link">${t('cl.link')}</button>`) : '<a class="btn" href="https://claude.ai/download" target="_blank">' + t('cl.download') + '</a>'}</div>
+      ${!d.installed ? state(false, t('cl.notFound')) : dOn ? state(true, t('cl.active') + seen(d.client)) : d.linked ? `<span class="state warn"><span class="pulse"></span>${t('cl.added')}</span>` : state(false, t('cl.notLinked'))}
+      <p>${!d.installed ? t('cl.desktopMissing') : dOn ? t('cl.activeText') : d.linked ? t('cl.restart') : t('cl.desktopFound')}</p>
+      <div class="row">${d.installed ? (d.linked ? `<button class="btn" id="cl-unlink">${t('cl.unlink')}</button>` : `<button class="btn primary" id="cl-link">${t('cl.link')}</button>`) : '<a class="btn" href="https://claude.ai/download" target="_blank">' + t('cl.download') + '</a>'}
+        ${d.linked && !dOn ? `<button class="btn" id="cl-recheck">${t('cl.recheck')}</button>` : ''}</div>
+      ${d.linked && !dOn ? `<p style="margin:12px 0 0;font-size:12.5px">${t('cl.logs')}</p>` : ''}
     </div></div>
     <div class="panel app-card" data-spot><span class="ico">⌨️</span><div style="flex:1">
       <h3>Claude Code</h3>
-      ${!c.installed ? state(false, t('cl.notFound')) : c.linked ? state(true, t('cl.linked')) : state(false, t('cl.notLinked'))}
+      ${!c.installed ? state(false, t('cl.notFound')) : cOn ? state(true, t('cl.active') + seen(c.client)) : c.linked ? `<span class="state warn"><span class="pulse"></span>${t('cl.addedCode')}</span>` : state(false, t('cl.notLinked'))}
       <p>${!c.installed ? t('cl.codeMissing') : c.linked ? t('cl.codeOk') : t('cl.codeFound')}</p>
       <div class="row">${c.installed && !c.linked ? `<button class="btn primary" id="cl-code">${t('cl.link')}</button>` : ''}</div>
     </div></div>`;
@@ -932,6 +938,7 @@ async function loadClaudeApps() {
   act('cl-link', () => api('/claude/desktop', { method: 'POST' }));
   act('cl-unlink', () => api('/claude/desktop', { method: 'DELETE' }));
   act('cl-code', () => api('/claude/code', { method: 'POST' }));
+  if ($('#cl-recheck')) $('#cl-recheck').onclick = () => { loadClaudeApps(); refreshMcp(); };
 }
 
 // ---------- Admin ----------

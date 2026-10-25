@@ -501,3 +501,6 @@ body.locked .app { filter: blur(10px) saturate(.6); pointer-events: none; transf
 .app-card .state.on .pulse { animation: pulse 2s infinite; }
 
 @media (max-width: 1100px) { .lv-hero, .claude-apps { grid-template-columns: 1fr; } .ring { margin: auto; } }
+
+.app-card .state.warn { color: var(--warn); }
+.app-card .state.warn .pulse { background: var(--warn); }

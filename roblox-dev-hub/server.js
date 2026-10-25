@@ -225,7 +225,8 @@ const routes = [
   ['GET', /^\/api\/mcp$/, (req, m, url, session) => {
     const log = state.mcpLog || [];
     const last = log[0] ? Date.parse(log[0].t) : 0;
-    const base = { connected: Date.now() - last < 15 * 60e3, lastCall: log[0] ? log[0].t : null, log: log.slice(0, 30), url: `http://localhost:${PORT}/mcp` };
+    const clients = mcp.clients();
+    const base = { connected: clients.some((c) => c.alive) || Date.now() - last < 15 * 60e3, clients, lastCall: log[0] ? log[0].t : null, log: log.slice(0, 30), url: `http://localhost:${PORT}/mcp` };
     if (session.role !== 'admin') return base;
     const off = state.settings.mcpTools || {};
     return {
@@ -250,7 +251,15 @@ const routes = [
     return { ...lv, history: state.levelHistory || [] };
   }],
   // Claude Desktop / Claude Code : détection et branchement.
-  ['GET', /^\/api\/claude$/, async () => ({ desktop: claude.desktopStatus(), code: await claude.codeStatus(), auto: state.settings.autoConnectClaude !== false })],
+  ['GET', /^\/api\/claude$/, async () => {
+    const cl = mcp.clients();
+    const pick = (re) => cl.filter((c) => re.test(c.name)).sort((a, b) => b.lastSeen.localeCompare(a.lastSeen))[0] || null;
+    return {
+      desktop: { ...claude.desktopStatus(), client: pick(/claude-ai|claude desktop|^claude$/i) },
+      code: { ...(await claude.codeStatus()), client: pick(/claude-code|claude code/i) },
+      auto: state.settings.autoConnectClaude !== false,
+    };
+  }],
   ['POST', /^\/api\/claude\/desktop$/, () => { state.settings.autoConnectClaude = true; persist(); return claude.linkDesktop(); }],
   ['DELETE', /^\/api\/claude\/desktop$/, () => { state.settings.autoConnectClaude = false; persist(); return claude.unlinkDesktop(); }],
   ['POST', /^\/api\/claude\/code$/, () => claude.linkCode(`http://localhost:${PORT}/mcp`)],

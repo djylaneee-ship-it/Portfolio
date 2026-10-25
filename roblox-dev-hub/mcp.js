@@ -2,6 +2,8 @@
 // Serveur MCP de Rovex Hub : donne à Claude (ou tout client MCP) l'accès à ta bibliothèque.
 // Deux modes : stdio (`node mcp.js`) ou HTTP via l'app (http://localhost:4747/mcp, voir server.js).
 const readline = require('readline');
+const fs = require('fs');
+const path = require('path');
 const db = require('./db');
 const web = require('./web');
 
@@ -10,6 +12,27 @@ const CAT_IDS = db.CATEGORIES.map((c) => c.id);
 // Accès aux données : fichier en mode stdio, mémoire du serveur en mode HTTP (voir useStore).
 let store = { load: db.load, save: db.save };
 const useStore = (s) => { store = s; };
+
+// Clients MCP vus récemment (Claude Desktop, Claude Code…), pour savoir s'ils sont vraiment branchés.
+// Fichier à part pour ne pas réécrire toute la base à chaque battement.
+const CLIENTS_FILE = path.join(db.DATA_DIR, 'clients.json');
+let MODE = 'http';
+let CLIENT = null;
+function readClients() {
+  try { return JSON.parse(fs.readFileSync(CLIENTS_FILE, 'utf8')); } catch { return {}; }
+}
+function seen() {
+  if (!CLIENT) return;
+  const all = readClients();
+  const key = `${CLIENT.name}|${MODE}`;
+  const now = new Date().toISOString();
+  all[key] = { ...all[key], ...CLIENT, mode: MODE, lastSeen: now, firstSeen: (all[key] && all[key].firstSeen) || now };
+  try { fs.mkdirSync(db.DATA_DIR, { recursive: true }); fs.writeFileSync(CLIENTS_FILE, JSON.stringify(all, null, 2)); } catch {}
+}
+// Un client stdio envoie un battement par minute tant qu'il tourne ; un client HTTP compte 15 min après son dernier appel.
+function clients() {
+  return Object.values(readClients()).map((c) => ({ ...c, alive: Date.now() - Date.parse(c.lastSeen) < (c.mode === 'stdio' ? 3 : 15) * 60e3 }));
+}
 
 const DEFAULT_INSTRUCTIONS = `Before writing any Luau, search Rovex Hub.
 1. Start with the validated examples for the category (list_examples / get_example).
@@ -263,6 +286,8 @@ async function handle(msg) {
   if (id === undefined) return null;
   try {
     if (method === 'initialize') {
+      CLIENT = { name: String((params.clientInfo && params.clientInfo.name) || 'unknown').slice(0, 60), version: String((params.clientInfo && params.clientInfo.version) || '').slice(0, 30) };
+      seen();
       return ok({
         protocolVersion: params.protocolVersion || '2025-06-18',
         capabilities: { tools: {} },
@@ -277,6 +302,7 @@ async function handle(msg) {
         if (!enabledTools().some((x) => x.name === params.name)) throw new Error('Tool disabled in Rovex Hub: ' + params.name);
         const out = await call(params.name, params.arguments);
         logCall(params.name, params.arguments || {}, out);
+        seen();
         return ok({ content: [{ type: 'text', text: JSON.stringify(out, null, 2) }] });
       } catch (e) {
         return ok({ content: [{ type: 'text', text: 'Error: ' + e.message }], isError: true });
@@ -288,11 +314,14 @@ async function handle(msg) {
   }
 }
 
-module.exports = { handle, call, useStore, TOOLS, DEFAULT_INSTRUCTIONS };
+module.exports = { handle, call, useStore, clients, TOOLS, DEFAULT_INSTRUCTIONS };
 
 // Mode stdio : `node mcp.js` (le client MCP lance ce fichier lui-même).
 if (require.main === module) {
+  MODE = 'stdio';
+  setInterval(seen, 60e3);
   const rl = readline.createInterface({ input: process.stdin });
+  rl.on('close', () => process.exit(0));
   rl.on('line', async (line) => {
     if (!line.trim()) return;
     let msg;
