@@ -51,10 +51,23 @@ jobs:
             git tag "$V" && git push origin "$V"
           fi
 
-      - name: Construire et publier l'installeur
+      - name: Construire l'installeur
+        run: npx electron-builder --win nsis --publish never
+
+      # Une seule release par version, avec l'installeur, son .blockmap et latest.yml (lu par les mises à jour
+      # automatiques). On supprime d'abord les releases en double de ce tag et celles qui n'ont qu'un .blockmap.
+      - name: Publier la release
+        shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npx electron-builder --win nsis --publish always
+          REPO: ${{ github.repository }}
+        run: |
+          V="v$(node -p "require('./package.json').version")"
+          gh api "repos/$REPO/releases?per_page=100" \
+            --jq ".[] | select(.tag_name == \"$V\" or ((.assets | length) > 0 and ([.assets[].name] | all(endswith(\".blockmap\"))))) | .id" |
+            while read -r id; do gh api -X DELETE "repos/$REPO/releases/$id"; done
+          gh release create "$V" dist/*.exe dist/*.blockmap dist/latest.yml --repo "$REPO" \
+            --title "Rovex Hub ${V#v}" --notes "Rovex Hub ${V#v} pour Windows : télécharge Rovex-Hub-Setup-${V#v}.exe et double-clique dessus." --latest
 
       - uses: actions/upload-artifact@v4
         if: always()
