@@ -5,7 +5,7 @@ const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
 
 async function get(url, accept = 'text/html') {
   const res = await fetch(url, {
-    headers: { 'User-Agent': UA, Accept: accept, 'Accept-Language': 'fr,en;q=0.8' },
+    headers: { 'User-Agent': UA, Accept: accept, 'Accept-Language': 'fr,en;q=0.8', ...(/youtube\.com/.test(url) && { Cookie: 'CONSENT=YES+cb; SOCS=CAI' }) },
     signal: AbortSignal.timeout(15000),
   });
   if (!res.ok) throw new Error(`HTTP ${res.status} sur ${url}`);

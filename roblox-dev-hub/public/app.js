@@ -13,16 +13,19 @@ const ICONS = {
   building: 'M3 21V10l5-3v3l5-3v3l5-3v14zm4-3h2v-3H7zm4 0h2v-3h-2zm4 0h2v-3h-2zM2 21h20v2H2z',
   audio: 'M12 3v10.6A4 4 0 1 0 14 17V7h4V3z',
   design: 'M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 4a6 6 0 1 1-6 6 6 6 0 0 1 6-6zm0 3a3 3 0 1 0 3 3 3 3 0 0 0-3-3z',
+  gameplay: 'M21 7H3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zm-11 6H8v2H6v-2H4v-2h2V9h2v2h2zm5.5 1a1.5 1.5 0 1 1 1.5-1.5 1.5 1.5 0 0 1-1.5 1.5zm3-3a1.5 1.5 0 1 1 1.5-1.5 1.5 1.5 0 0 1-1.5 1.5z',
   tools: 'M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z',
 };
 const TYPE_ICONS = {
+  opensource: 'M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.3-3.4-1.3-.4-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.3 1.1 2.9.8.1-.6.3-1.1.6-1.3-2.2-.3-4.6-1.1-4.6-5a3.9 3.9 0 0 1 1-2.7 3.6 3.6 0 0 1 .1-2.7s.8-.3 2.8 1a9.5 9.5 0 0 1 5 0c2-1.3 2.8-1 2.8-1a3.6 3.6 0 0 1 .1 2.7 3.9 3.9 0 0 1 1 2.7c0 3.9-2.4 4.7-4.6 5 .4.3.7.9.7 1.9V21c0 .3.2.6.7.5A10 10 0 0 0 12 2z',
+  asset: 'M20 6h-2.2A3 3 0 0 0 12 3.8 3 3 0 0 0 6.2 6H4a2 2 0 0 0-2 2v3h20V8a2 2 0 0 0-2-2zM9 4a1 1 0 0 1 1 1v1H8V5a1 1 0 0 1 1-1zm6 0a1 1 0 0 1 1 1v1h-2V5a1 1 0 0 1 1-1zM3 13v7a1 1 0 0 0 1 1h7v-8zm10 0v8h7a1 1 0 0 0 1-1v-7z',
   doc: 'M6 2h9l5 5v15H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm8 1.5V8h4.5zM8 12v2h8v-2zm0 4v2h8v-2z',
   recherche: 'M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.5 2.5 0 0 0 2.4 7.2 26 26 0 0 0 2 12a26 26 0 0 0 .4 4.8 2.5 2.5 0 0 0 1.8 1.8c1.6.4 7.8.4 7.8.4s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8A26 26 0 0 0 22 12a26 26 0 0 0-.4-4.8zM10 15V9l5.2 3z',
   video: 'M8 5v14l11-7z',
   chaine: 'M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4zm0 2c-2.7 0-8 1.3-8 4v2h16v-2c0-2.7-5.3-4-8-4z',
   fichier: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zm-1 7V3.5L18.5 9z',
 };
-const TYPE_LABEL = { video: 'Vidéo', chaine: 'Chaîne', doc: 'Doc', article: 'Article', outil: 'Outil', image: 'Image', fichier: 'Fichier', recherche: 'Recherche' };
+const TYPE_LABEL = { video: 'Vidéo', chaine: 'Chaîne', opensource: 'Open source', asset: 'Gratuit', doc: 'Doc', article: 'Article', outil: 'Outil', image: 'Image', fichier: 'Fichier', recherche: 'Recherche' };
 const LEVEL_LABEL = { debutant: 'Débutant', intermediaire: 'Intermédiaire', avance: 'Avancé' };
 const STAR = '<svg viewBox="0 0 24 24"><path d="M12 3l2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/></svg>';
 const PLAY = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
@@ -108,14 +111,15 @@ function grid(list, emptyMsg = '') {
 
 // ---------- Vues ----------
 async function renderHome() {
-  const recent = (await api('/resources')).slice(0, 8);
+  const recent = (await api('/resources?limit=8')).items;
   view.innerHTML = `
     <div class="hero">
       <h1>Ta base de dev<br><span>Roblox ultime</span></h1>
       <p>Tutos vidéo, docs, VFX, scripts, animations, GUI, GFX… tout au même endroit, consultable par toi <b>et par tes outils IA</b> via MCP.</p>
       <div class="row">
         <button class="btn primary" onclick="openAdd()"><svg viewBox="0 0 24 24"><path d="M11 4h2v7h7v2h-7v7h-2v-7H4v-2h7z"/></svg>Ajouter</button>
-        <a class="btn" href="#/youtube">Chercher sur YouTube</a>
+        <a class="btn" href="#/explore">⚡ Exploration auto</a>
+        <a class="btn" href="#/channels">Chaînes Roblox</a>
         <a class="btn" href="#/mcp">Serveur MCP</a>
       </div>
       <div class="stats">
@@ -143,27 +147,36 @@ async function renderLibrary(params, favorites = false) {
   const q = params.get('q') || '';
   const c = params.get('cat') || '';
   $('#search').value = q;
-  const qs = new URLSearchParams({ q, category: c, type: filters.type, level: filters.level, favorite: favorites ? '1' : '' });
-  const list = await api('/resources?' + qs);
+  const qs = new URLSearchParams({ q, category: c, type: filters.type, level: filters.level, favorite: favorites ? '1' : '', limit: 60 });
+  const { total, items: list } = await api('/resources?' + qs);
   const cc = c && cat(c);
   view.innerHTML = `
     <h1 class="h1">${favorites ? 'Favoris' : cc ? esc(cc.label) : q ? `Résultats pour « ${esc(q)} »` : 'Bibliothèque'}</h1>
-    <p class="sub">${cc && !favorites ? esc(cc.desc) + ' · ' : ''}${list.length} ressource${list.length > 1 ? 's' : ''}</p>
+    <p class="sub">${cc && !favorites ? esc(cc.desc) + ' · ' : ''}${total.toLocaleString('fr-FR')} ressource${total > 1 ? 's' : ''}</p>
     <div class="toolbar">
       <button class="chip ${!filters.type ? 'on' : ''}" data-type="">Tout</button>
       ${META.types.map((t) => `<button class="chip ${filters.type === t ? 'on' : ''}" data-type="${t}">${TYPE_LABEL[t]}</button>`).join('')}
       <span class="spacer"></span>
       <select class="select" id="lvl"><option value="">Tous niveaux</option>${Object.entries(LEVEL_LABEL).map(([k, v]) => `<option value="${k}" ${filters.level === k ? 'selected' : ''}>${v}</option>`).join('')}</select>
     </div>
-    <div id="list">${grid(list, favorites ? 'Clique sur l\'étoile d\'une ressource pour l\'ajouter ici.' : '')}</div>`;
+    <div id="list">${grid(list, favorites ? 'Clique sur l\'étoile d\'une ressource pour l\'ajouter ici.' : '')}</div>
+    <div class="row more-row" id="more-row" ${list.length < total ? '' : 'hidden'}><button class="btn" id="more">Voir plus</button></div>`;
   $$('[data-type]').forEach((b) => b.onclick = () => { filters.type = b.dataset.type; route(); });
   $('#lvl').onchange = (e) => { filters.level = e.target.value; route(); };
   bindCards($('#list'), list);
+  $('#more').onclick = async (e) => {
+    const btn = e.currentTarget; btn.disabled = true;
+    qs.set('offset', list.length);
+    const page = await api('/resources?' + qs);
+    list.push(...page.items);
+    $('#list .grid').insertAdjacentHTML('beforeend', page.items.map(card).join(''));
+    btn.disabled = false;
+    $('#more-row').hidden = list.length >= total;
+  };
 }
 
 async function renderYoutube(params) {
   const q = params.get('q') || '';
-  const settings = await api('/settings');
   view.innerHTML = `
     <h1 class="h1">Chercher sur YouTube</h1>
     <p class="sub">Trouve des tutos et ajoute-les à ta base en un clic.</p>
@@ -171,38 +184,35 @@ async function renderYoutube(params) {
       <input class="input" id="yt-q" style="flex:1;min-width:220px" placeholder="ex. roblox slash vfx, moon animator, simulator ui…" value="${esc(q)}">
       <button class="btn primary">Chercher</button>
     </form>
-    <div class="row" style="margin-bottom:20px">${['roblox vfx tutorial', 'roblox scripting tutorial', 'moon animator 2', 'roblox ui design', 'roblox gfx blender', 'roblox combat system', 'roblox datastore', 'roblox building tips'].map((s) => `<button class="chip" data-s="${s}">${s}</button>`).join('')}</div>
+    <div class="row" style="margin-bottom:20px">${['roblox vfx tutorial', 'roblox scripting tutorial', 'moon animator 2', 'roblox ui design', 'roblox gfx blender', 'roblox combat system', 'roblox datastore', 'roblox building tips'].map((x) => `<button class="chip" data-s="${x}">${x}</button>`).join('')}</div>
     <div id="yt-res"></div>`;
   $('#yt-form').onsubmit = (e) => { e.preventDefault(); location.hash = '#/youtube?q=' + encodeURIComponent($('#yt-q').value); };
   $$('[data-s]').forEach((b) => b.onclick = () => { location.hash = '#/youtube?q=' + encodeURIComponent(b.dataset.s); });
   if (!q) return;
   const out = $('#yt-res');
-  if (!settings.hasKey) {
-    out.innerHTML = `<div class="panel"><h3>Recherche intégrée désactivée</h3>
-      <p>Pour chercher directement dans l'app, ajoute une clé YouTube gratuite dans <a class="link" href="#/settings">Réglages</a>. En attendant, ouvre la recherche sur YouTube et colle les liens qui te plaisent avec le bouton « Ajouter ».</p>
-      <div class="row"><a class="btn primary" target="_blank" href="https://www.youtube.com/results?search_query=${encodeURIComponent(q)}">Ouvrir « ${esc(q)} » sur YouTube</a>
-      <button class="btn" id="save-search">Enregistrer cette recherche</button></div></div>`;
-    $('#save-search').onclick = async () => {
-      await api('/resources', { method: 'POST', body: { title: 'YouTube : ' + q, url: 'https://www.youtube.com/results?search_query=' + encodeURIComponent(q), type: 'recherche', category: guess(q), author: 'YouTube' } });
-      toast('Recherche enregistrée'); refreshStats();
-    };
-    return;
-  }
   out.innerHTML = '<div class="row"><span class="spinner"></span> Recherche…</div>';
   try {
     const res = await api('/youtube?q=' + encodeURIComponent(q));
-    out.innerHTML = `<div class="grid">${res.map((v, i) => `
+    if (!res.length) { out.innerHTML = '<div class="empty"><b>Aucun résultat</b>Essaie d\'autres mots-clés.</div>'; return; }
+    out.innerHTML = `<div class="row" style="margin-bottom:16px"><button class="btn primary" id="add-all">+ Tout ajouter (${res.length})</button></div><div class="grid">${res.map((v, i) => `
       <article class="card" style="--c:#ff3d6e">
-        <div class="thumb"><img src="${esc(v.thumbnail)}" alt="" loading="lazy"><span class="badge">Vidéo</span></div>
-        <div class="card-body"><h3>${esc(v.title)}</h3><div class="meta">${esc(v.author)}</div>
+        <div class="thumb"><img src="${esc(v.thumbnail)}" alt="" loading="lazy"><span class="badge">${esc(v.duration || 'Vidéo')}</span></div>
+        <div class="card-body"><h3>${esc(v.title)}</h3><div class="meta">${esc(v.author)}${v.views ? ' · ' + esc(v.views) : ''}</div>
         <div class="row"><button class="btn small primary" data-add="${i}">+ Ajouter</button><a class="btn small" href="${esc(v.url)}" target="_blank">Voir</a></div></div>
       </article>`).join('')}</div>`;
-    $$('[data-add]').forEach((b) => b.onclick = async () => {
+    const addOne = async (b) => {
+      if (b.disabled) return;
       b.disabled = true;
       const v = res[b.dataset.add];
       await api('/resources', { method: 'POST', body: { ...v, type: 'video', category: guess(v.title + ' ' + q) } });
-      b.textContent = '✓ Ajouté'; refreshStats();
-    });
+      b.textContent = '✓ Ajouté';
+    };
+    $$('[data-add]').forEach((b) => b.onclick = async () => { await addOne(b); refreshStats(); });
+    $('#add-all').onclick = async (e) => {
+      e.currentTarget.disabled = true;
+      for (const b of $$('[data-add]')) await addOne(b);
+      toast(`${res.length} vidéos ajoutées`); refreshStats();
+    };
   } catch (e) { out.innerHTML = `<div class="panel"><h3>Erreur</h3><p>${esc(e.message)}</p></div>`; }
 }
 
@@ -212,42 +222,150 @@ function guess(t) {
   return 'scripting';
 }
 
-async function renderChannels() {
-  const chans = await api('/channels');
+async function renderChannels(params) {
+  const q = params.get('q') || '';
+  const { total, followed, items } = await api('/channels?' + new URLSearchParams({ q, limit: 120 }));
   view.innerHTML = `
-    <h1 class="h1">Veille chaînes YouTube</h1>
-    <p class="sub">Suis tes créateurs préférés : leurs nouvelles vidéos arrivent dans ta base automatiquement (aucune clé requise).</p>
-    <div class="panel">
+    <h1 class="h1">Chaînes YouTube Roblox</h1>
+    <p class="sub">${followed.toLocaleString('fr-FR')} chaîne${followed > 1 ? 's' : ''} reliée${followed > 1 ? 's' : ''} au site. Leurs nouvelles vidéos arrivent dans ta base automatiquement.</p>
+    <div class="explore-cards">
+      <div class="panel big-action">
+        <h3>🔎 Trouver toutes les chaînes Roblox</h3>
+        <p>Fouille YouTube (dev, VFX, scripting, gameplay, YouTubeurs FR/EN/ES…) et relie automatiquement chaque chaîne trouvée.</p>
+        <div class="row"><button class="btn primary" data-crawl='{"mode":"channels","scope":"all","intensity":"normal","syncAfter":true}'>Lancer la découverte</button>
+        <button class="btn" data-crawl='{"mode":"channels","scope":"dev","intensity":"normal","syncAfter":true}'>Dev uniquement</button></div>
+      </div>
+      <div class="panel big-action">
+        <h3>🔄 Récupérer les nouvelles vidéos</h3>
+        <p>Va chercher les dernières vidéos de toutes les chaînes reliées.</p>
+        <div class="row"><button class="btn primary" data-crawl='{"mode":"sync"}'>Mettre à jour</button></div>
+      </div>
+    </div>
+    <div id="job"></div>
+    <div class="panel" style="margin-top:16px">
       <form class="row" id="ch-form">
-        <input class="input" id="ch-h" style="flex:2;min-width:200px" placeholder="@pseudo ou lien de la chaîne">
+        <input class="input" id="ch-h" style="flex:2;min-width:200px" placeholder="Ajouter une chaîne à la main : @pseudo ou lien">
         <select class="input" id="ch-c" style="flex:1;min-width:150px"><option value="">Catégorie auto</option>${META.categories.map((c) => `<option value="${c.id}">${esc(c.label)}</option>`).join('')}</select>
-        <button class="btn primary">Suivre</button>
+        <button class="btn primary">Relier</button>
       </form>
     </div>
-    <div class="section-head"><h2>${chans.length} chaîne${chans.length > 1 ? 's' : ''} suivie${chans.length > 1 ? 's' : ''}</h2>
-      <button class="btn primary" id="sync"><svg viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6a6 6 0 0 1 5.7 7.9l1.5 1.5A8 8 0 0 0 12 4zm0 14a6 6 0 0 1-5.7-7.9L4.8 8.6A8 8 0 0 0 12 20v3l4-4-4-4z"/></svg>Récupérer les nouvelles vidéos</button></div>
-    <div id="sync-out"></div>
-    <div class="ch-list">${chans.map((c) => `
-      <div class="ch">${c.avatar ? `<img src="${esc(c.avatar)}" alt="">` : `<span class="av">${esc((c.name || c.handle).replace('@', '')[0] || '?')}</span>`}
-        <div class="info"><b>${esc(c.name || c.handle)}</b><small>${esc(c.handle)} · ${c.category ? esc(cat(c.category).label) : 'catégorie auto'} · ${c.lastFetch ? 'màj ' + new Date(c.lastFetch).toLocaleString('fr-FR') : 'jamais synchronisée'}</small></div>
-        <button class="btn small danger" data-del="${c.id}">Retirer</button></div>`).join('') || '<div class="empty"><b>Aucune chaîne</b>Ajoute un @pseudo YouTube ci-dessus.</div>'}</div>`;
+    <div class="section-head"><h2>${total.toLocaleString('fr-FR')} chaîne${total > 1 ? 's' : ''}</h2>
+      <input class="input" id="ch-q" style="max-width:260px" placeholder="Filtrer par nom…" value="${esc(q)}"></div>
+    <div class="ch-grid" id="ch-grid">${items.map(chCard).join('') || '<div class="empty" style="grid-column:1/-1"><b>Aucune chaîne</b>Lance la découverte automatique ci-dessus.</div>'}</div>
+    <div class="row more-row" id="more-row" ${items.length < total ? '' : 'hidden'}><button class="btn" id="more">Voir plus</button></div>`;
+  bindCrawlButtons();
   $('#ch-form').onsubmit = async (e) => {
     e.preventDefault();
     const btn = e.submitter; btn.disabled = true;
-    try { await api('/channels', { method: 'POST', body: { handle: $('#ch-h').value, category: $('#ch-c').value } }); toast('Chaîne ajoutée'); refreshStats(); renderChannels(); }
+    try { await api('/channels', { method: 'POST', body: { handle: $('#ch-h').value, category: $('#ch-c').value } }); toast('Chaîne reliée'); refreshStats(); route(); }
     catch (err) { toast(err.message, true); btn.disabled = false; }
   };
-  $('#sync').onclick = async (e) => {
-    const b = e.currentTarget; b.disabled = true; b.innerHTML = '<span class="spinner"></span>Synchronisation…';
-    try {
-      const rep = await api('/channels/sync', { method: 'POST' });
-      const total = rep.reduce((a, r) => a + (r.added || 0), 0);
-      toast(`${total} nouvelle${total > 1 ? 's' : ''} vidéo${total > 1 ? 's' : ''} ajoutée${total > 1 ? 's' : ''}`);
-      refreshStats(); await renderChannels();
-      $('#sync-out').innerHTML = `<div class="panel" style="margin-bottom:16px">${rep.map((r) => `<div>${r.error ? '⚠️' : '✅'} <b>${esc(r.name)}</b> — ${r.error ? esc(r.error) : `${r.added} ajoutée(s)`}</div>`).join('')}</div>`;
-    } catch (err) { toast(err.message, true); b.disabled = false; }
+  let t;
+  $('#ch-q').oninput = (e) => { clearTimeout(t); t = setTimeout(() => { location.hash = '#/channels' + (e.target.value ? '?q=' + encodeURIComponent(e.target.value) : ''); }, 300); };
+  if (q) { const i = $('#ch-q'); i.focus(); i.setSelectionRange(q.length, q.length); }
+  $('#ch-grid').onclick = async (e) => {
+    const del = e.target.closest('[data-del]');
+    if (!del) return;
+    e.preventDefault();
+    await api('/channels/' + del.dataset.del, { method: 'DELETE' });
+    del.closest('.chc').remove(); refreshStats();
   };
-  $$('[data-del]').forEach((b) => b.onclick = async () => { await api('/channels/' + b.dataset.del, { method: 'DELETE' }); refreshStats(); renderChannels(); });
+  $('#more').onclick = async (e) => {
+    const page = await api('/channels?' + new URLSearchParams({ q, limit: 120, offset: $$('#ch-grid .chc').length }));
+    $('#ch-grid').insertAdjacentHTML('beforeend', page.items.map(chCard).join(''));
+    $('#more-row').hidden = $$('#ch-grid .chc').length >= total;
+  };
+  watchJob();
+}
+
+function chCard(c) {
+  const name = c.name || c.handle;
+  return `<a class="chc" href="https://www.youtube.com/channel/${esc(c.channelId)}" target="_blank" title="${esc(name)}">
+    ${c.avatar ? `<img src="${esc(c.avatar)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.visibility='hidden'">` : `<span class="av">${esc(name.replace('@', '')[0] || '?')}</span>`}
+    <b>${esc(name)}</b><small>${esc(c.subscribers || (c.category ? cat(c.category).label : ''))}</small>
+    <button class="del" data-del="${c.id}" title="Délier">✕</button></a>`;
+}
+
+// ---------- Exploration ----------
+async function renderExplore() {
+  const cats = META.categories.filter((c) => c.id !== 'gameplay');
+  view.innerHTML = `
+    <h1 class="h1">⚡ Exploration automatique</h1>
+    <p class="sub">L'app fouille YouTube, le DevForum Roblox, Reddit, GitHub et le Creator Store, et range des milliers de vidéos, tutos et images dans ta base. Seuls les liens et miniatures sont enregistrés.</p>
+    <div class="panel">
+      <h3>Catégories à explorer</h3>
+      <div class="row" id="ex-cats">${cats.map((c) => `<label class="chip on" style="--c:${c.color}"><input type="checkbox" value="${c.id}" checked hidden>${esc(c.label)}</label>`).join('')}</div>
+      <h3 style="margin-top:18px">Sources</h3>
+      <div class="row" id="ex-src">${[['youtube', 'YouTube'], ['devforum', 'DevForum Roblox'], ['reddit', 'Reddit']].map(([v, l]) => `<label class="chip on"><input type="checkbox" value="${v}" checked hidden>${l}</label>`).join('')}</div>
+      <h3 style="margin-top:18px">Intensité</h3>
+      <div class="row" id="ex-int">
+        <label class="chip"><input type="radio" name="int" value="rapide" hidden>Rapide · ~5 min</label>
+        <label class="chip on"><input type="radio" name="int" value="normal" checked hidden>Normal · ~20 min</label>
+        <label class="chip"><input type="radio" name="int" value="massif" hidden>Massif · 1 h+ · des milliers</label>
+      </div>
+      <div class="row" style="margin-top:20px"><button class="btn primary" id="ex-go">Lancer l'exploration</button>
+      <a class="btn" href="#/channels">Trouver les chaînes Roblox →</a></div>
+    </div>
+    <div class="panel big-action" style="margin-top:16px">
+      <h3>📦 Open source & systèmes gratuits</h3>
+      <p>Récupère les dépôts GitHub Roblox (frameworks, modules, jeux open source), les ressources communautaires du DevForum, et les modèles et plugins gratuits du Creator Store.</p>
+      <div class="row" id="os-src">${[['github', 'GitHub'], ['devforum', 'DevForum ressources'], ['store', 'Creator Store']].map(([v, l]) => `<label class="chip on"><input type="checkbox" value="${v}" checked hidden>${l}</label>`).join('')}</div>
+      <div class="row" style="margin-top:16px"><button class="btn primary" id="os-go">Récupérer l'open source</button></div>
+    </div>
+    <div id="job"></div>`;
+  $$('#os-src label').forEach((l) => l.onclick = (e) => { e.preventDefault(); const i = $('input', l); i.checked = !i.checked; l.classList.toggle('on', i.checked); });
+  $('#os-go').onclick = () => startCrawl({ mode: 'opensource', sources: $$('#os-src input:checked').map((i) => i.value), intensity: $('#ex-int input:checked').value });
+  $$('#ex-cats label, #ex-src label').forEach((l) => l.onclick = (e) => { e.preventDefault(); const i = $('input', l); i.checked = !i.checked; l.classList.toggle('on', i.checked); });
+  $$('#ex-int label').forEach((l) => l.onclick = (e) => { e.preventDefault(); $$('#ex-int label').forEach((x) => { x.classList.remove('on'); $('input', x).checked = false; }); l.classList.add('on'); $('input', l).checked = true; });
+  $('#ex-go').onclick = () => startCrawl({
+    mode: 'explore',
+    categories: $$('#ex-cats input:checked').map((i) => i.value),
+    sources: $$('#ex-src input:checked').map((i) => i.value),
+    intensity: $('#ex-int input:checked').value,
+  });
+  watchJob();
+}
+
+function bindCrawlButtons() {
+  $$('[data-crawl]').forEach((b) => b.onclick = () => startCrawl(JSON.parse(b.dataset.crawl)));
+}
+
+async function startCrawl(opts) {
+  try { await api('/crawl', { method: 'POST', body: opts }); toast('C\'est parti ! Tu peux continuer à utiliser l\'app.'); watchJob(); }
+  catch (e) { toast(e.message, true); }
+}
+
+const MODE_LABEL = { opensource: 'Récupération de l\'open source', explore: 'Exploration d\'internet', channels: 'Découverte des chaînes Roblox', sync: 'Mise à jour des vidéos des chaînes' };
+let jobTimer;
+async function watchJob() {
+  clearTimeout(jobTimer);
+  let st;
+  try { st = await api('/crawl'); } catch { return; }
+  const side = $('#side-job');
+  side.hidden = !st.running;
+  if (st.running) side.innerHTML = `<a href="#/explore"><span class="spinner"></span><span>${esc(MODE_LABEL[st.mode])}<small>+${st.added} ressources · +${st.channels} chaînes</small></span></a><div class="bar"><i style="width:${Math.round((st.step / Math.max(st.steps, 1)) * 100)}%"></i></div>`;
+  const box = $('#job');
+  if (box && (st.running || st.finishedAt)) {
+    const pct = Math.round((st.step / Math.max(st.steps, 1)) * 100);
+    box.innerHTML = `<div class="panel job">
+      <div class="row" style="justify-content:space-between"><h3>${st.running ? '<span class="spinner"></span> ' : '✅ '}${esc(MODE_LABEL[st.mode])}${st.running ? '' : ' — terminé'}</h3>
+      ${st.running ? '<button class="btn small danger" id="job-stop">Arrêter</button>' : ''}</div>
+      <div class="bar big"><i style="width:${st.running ? pct : 100}%"></i></div>
+      <div class="job-stats">
+        <div><b>${st.added.toLocaleString('fr-FR')}</b><span>nouvelles ressources</span></div>
+        <div><b>${(st.channels || 0).toLocaleString('fr-FR')}</b><span>chaînes reliées</span></div>
+        <div><b>${st.found.toLocaleString('fr-FR')}</b><span>trouvées</span></div>
+        <div><b>${st.step}/${st.steps}</b><span>étapes</span></div>
+        <div><b>${st.errors}</b><span>erreurs</span></div>
+      </div>
+      ${st.current ? `<p style="margin:12px 0 0">En cours : ${esc(st.current)}</p>` : ''}
+      <div class="log">${(st.log || []).slice(0, 25).map((l) => `<div class="${l.err ? 'err' : ''}">${esc(l.msg)}</div>`).join('')}</div>
+    </div>`;
+    if ($('#job-stop')) $('#job-stop').onclick = () => api('/crawl/stop', { method: 'POST' });
+  }
+  if (st.running) jobTimer = setTimeout(() => { watchJob(); refreshStats(); }, 1500);
+  else if (box && box.dataset.wasRunning) { refreshStats(); }
+  if (box) box.dataset.wasRunning = st.running ? '1' : '';
 }
 
 async function renderMcp() {
@@ -300,7 +418,7 @@ async function renderSettings() {
     <p class="sub">Tout est stocké sur ton PC, dans le dossier <b>data</b> de l'application.</p>
     <div class="panel">
       <h3>Clé YouTube Data API (optionnelle)</h3>
-      <p>Active la recherche YouTube directement dans l'app. Gratuite : console.cloud.google.com → créer un projet → activer « YouTube Data API v3 » → Identifiants → Créer une clé API.</p>
+      <p>Facultative : la recherche marche sans clé. Une clé officielle donne des résultats plus stables. Gratuite : console.cloud.google.com → créer un projet → activer « YouTube Data API v3 » → Identifiants → Créer une clé API.</p>
       <form class="row" id="key-form">
         <input class="input" id="key" style="flex:1;min-width:220px" placeholder="${s.hasKey ? 'Clé enregistrée ' + esc(s.youtubeApiKey) : 'Colle ta clé ici'}">
         <button class="btn primary">Enregistrer</button>
@@ -308,11 +426,26 @@ async function renderSettings() {
       </form>
     </div>
     <div class="panel">
+      <h3>Jeton GitHub (optionnel)</h3>
+      <p>Accélère la récupération de l'open source (30 recherches/min au lieu de 10). github.com → Settings → Developer settings → Personal access tokens → Fine-grained, sans aucune permission.</p>
+      <form class="row" id="gh-form">
+        <input class="input" id="gh" style="flex:1;min-width:220px" placeholder="${s.hasGithub ? 'Jeton enregistré' : 'Colle ton jeton ici'}">
+        <button class="btn primary">Enregistrer</button>
+      </form>
+    </div>
+    <div class="panel">
+      <h3>Mise à jour automatique des chaînes</h3>
+      <p>Tant que l'app est ouverte, elle récupère les nouvelles vidéos de toutes les chaînes reliées.${s.lastAutoSync ? ' Dernière : ' + new Date(s.lastAutoSync).toLocaleString('fr-FR') + '.' : ''}</p>
+      <select class="input" id="auto" style="max-width:280px">${[[0, 'Désactivée'], [1, 'Toutes les heures'], [6, 'Toutes les 6 heures'], [12, 'Toutes les 12 heures'], [24, 'Une fois par jour']].map(([v, l]) => `<option value="${v}" ${Number(s.autoSyncHours) === v ? 'selected' : ''}>${l}</option>`).join('')}</select>
+    </div>
+    <div class="panel">
       <h3>Sauvegarde</h3>
       <p>Télécharge toute ta base (sans les fichiers du dossier media) au format JSON.</p>
       <a class="btn" href="/api/export" download="roblox-dev-hub.json">Exporter la base</a>
     </div>`;
   $('#key-form').onsubmit = async (e) => { e.preventDefault(); await api('/settings', { method: 'PUT', body: { youtubeApiKey: $('#key').value } }); toast('Clé enregistrée'); renderSettings(); };
+  $('#gh-form').onsubmit = async (e) => { e.preventDefault(); await api('/settings', { method: 'PUT', body: { githubToken: $('#gh').value } }); toast('Jeton enregistré'); renderSettings(); };
+  $('#auto').onchange = async (e) => { await api('/settings', { method: 'PUT', body: { autoSyncHours: Number(e.target.value) } }); toast('Réglage enregistré'); };
   if ($('#key-del')) $('#key-del').onclick = async () => { await api('/settings', { method: 'PUT', body: { youtubeApiKey: '' } }); toast('Clé supprimée'); renderSettings(); };
 }
 
@@ -486,7 +619,8 @@ async function route() {
     if (path === 'library') await renderLibrary(params);
     else if (path === 'favorites') await renderLibrary(params, true);
     else if (path === 'youtube') await renderYoutube(params);
-    else if (path === 'channels') await renderChannels();
+    else if (path === 'channels') await renderChannels(params);
+    else if (path === 'explore') await renderExplore();
     else if (path === 'mcp') await renderMcp();
     else if (path === 'settings') await renderSettings();
     else await renderHome();
@@ -528,4 +662,5 @@ window.addEventListener('hashchange', route);
   META = await api('/meta');
   await refreshStats();
   route();
+  watchJob();
 })();

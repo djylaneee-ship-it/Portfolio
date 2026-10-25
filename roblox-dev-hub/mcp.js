@@ -62,11 +62,46 @@ const TOOLS = [
     inputSchema: { type: 'object', properties: { id: { type: 'string' }, notes: { type: 'string' } }, required: ['id', 'notes'] },
   },
   {
+    name: 'explore_internet',
+    description: 'Lance l\'exploration automatique d\'internet (YouTube, DevForum Roblox, Reddit, GitHub, Creator Store) : vidéos, chaînes Roblox, open source et systèmes gratuits. Nécessite que l\'app soit ouverte. Tourne en arrière-plan : suivre avec explore_status.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        mode: { type: 'string', enum: ['explore', 'channels', 'opensource', 'sync'], description: 'explore = vidéos/tutos/images, channels = trouver et suivre les chaînes Roblox, opensource = dépôts GitHub, ressources DevForum, modèles et plugins gratuits, sync = nouvelles vidéos des chaînes suivies' },
+        intensity: { type: 'string', enum: ['rapide', 'normal', 'massif'] },
+        categories: { type: 'array', items: { type: 'string', enum: CAT_IDS } },
+      },
+    },
+  },
+  {
+    name: 'explore_status',
+    description: 'Progression de l\'exploration en cours (ou de la dernière).',
+    inputSchema: { type: 'object', properties: {} },
+  },
+  {
+    name: 'list_channels',
+    description: 'Liste les chaînes YouTube suivies (filtre optionnel par nom).',
+    inputSchema: { type: 'object', properties: { query: { type: 'string' }, limit: { type: 'number' } } },
+  },
+  {
     name: 'sync_channels',
     description: 'Récupère les dernières vidéos des chaînes YouTube suivies et les ajoute à la bibliothèque.',
     inputSchema: { type: 'object', properties: {} },
   },
 ];
+
+// Appelle l'API de l'app (l'exploration tourne dans le serveur de l'app).
+async function app(pathname, body) {
+  try {
+    const res = await fetch('http://localhost:4747' + pathname, body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : {});
+    const j = await res.json();
+    if (!res.ok) throw new Error(j.error || 'Erreur');
+    return j;
+  } catch (e) {
+    if (e.cause && e.cause.code === 'ECONNREFUSED') throw new Error('Ouvre l\'app Roblox Dev Hub (raccourci du Bureau) puis réessaie.');
+    throw e;
+  }
+}
 
 function brief(r) {
   return {
@@ -110,6 +145,17 @@ async function call(name, a = {}) {
       r.notes = String(a.notes);
       db.save(state);
       return { ok: true };
+    }
+    case 'explore_internet':
+      return app('/api/crawl', { mode: a.mode || 'explore', intensity: a.intensity || 'normal', categories: a.categories, syncAfter: true });
+    case 'explore_status': {
+      const st = await app('/api/crawl');
+      return { ...st, log: (st.log || []).slice(0, 15) };
+    }
+    case 'list_channels': {
+      const q = String(a.query || '').toLowerCase();
+      const list = state.channels.filter((c) => !q || `${c.name} ${c.handle}`.toLowerCase().includes(q));
+      return { total: list.length, channels: list.slice(0, a.limit || 50).map((c) => ({ name: c.name, url: `https://www.youtube.com/channel/${c.channelId}`, category: c.category, subscribers: c.subscribers || undefined })) };
     }
     case 'sync_channels': {
       const report = [];

@@ -226,6 +226,38 @@ kbd { font: 600 11px Inter, sans-serif; color: var(--muted); border: 1px solid v
 .ch .info b { display: block; }
 .ch .info small { color: var(--muted); }
 
+/* ---------- Exploration ---------- */
+.explore-cards { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
+.explore-cards .panel + .panel { margin-top: 0; }
+.big-action { background: linear-gradient(150deg, rgba(255, 61, 110, .14), var(--panel) 60%); }
+.job { margin-top: 16px; border-color: #3a2f55; }
+.job h3 { display: flex; align-items: center; gap: 10px; margin: 0; }
+.bar { height: 6px; background: var(--panel2); border-radius: 99px; overflow: hidden; margin-top: 8px; }
+.bar.big { height: 10px; margin: 16px 0; }
+.bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 99px; transition: width .4s; }
+.job-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
+.job-stats div { background: var(--bg2); border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; }
+.job-stats b { display: block; font-family: var(--display); font-weight: 400; font-size: 24px; }
+.job-stats span { font-size: 12px; color: var(--muted); font-weight: 600; }
+.log { margin-top: 14px; max-height: 220px; overflow-y: auto; background: #07080d; border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; font: 12.5px/1.7 'Cascadia Code', Consolas, monospace; color: #b9c0d6; }
+.log .err { color: #ff8a9b; }
+.side-job { margin: 14px 4px 0; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+.side-job a { display: flex; gap: 10px; align-items: center; font-size: 13px; font-weight: 700; }
+.side-job small { display: block; font-weight: 600; color: var(--muted); }
+.more-row { justify-content: center; margin-top: 22px; }
+.more-row[hidden] { display: none; }
+
+.ch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.chc { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 4px; padding: 16px 10px 14px; background: var(--panel); border: 1px solid var(--line); border-radius: 16px; transition: .15s; min-width: 0; }
+.chc:hover { transform: translateY(-3px); border-color: #3a4260; }
+.chc img, .chc .av { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; background: var(--panel2); margin-bottom: 6px; }
+.chc .av { display: grid; place-items: center; font-family: var(--display); font-size: 26px; color: var(--accent); }
+.chc b { font-size: 14px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chc small { color: var(--muted); font-size: 12px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chc .del { position: absolute; top: 6px; right: 6px; width: 26px; height: 26px; border-radius: 8px; border: 0; background: var(--panel2); color: var(--muted); cursor: pointer; opacity: 0; }
+.chc:hover .del { opacity: 1; }
+.chc .del:hover { color: #ff6b7f; }
+
 /* ---------- Fenêtre ---------- */
 .modal { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 20px; }
 .modal[hidden] { display: none; }
@@ -272,6 +304,6 @@ kbd { font: 600 11px Inter, sans-serif; color: var(--muted); border: 1px solid v
   .icon-btn.menu-btn { display: grid; }
   .topbar, .view { padding-left: 16px; padding-right: 16px; }
   .topbar kbd, .topbar .btn span { display: none; }
-  .two { grid-template-columns: 1fr; }
+  .two, .explore-cards { grid-template-columns: 1fr; }
   .hero { padding: 24px; }
 }

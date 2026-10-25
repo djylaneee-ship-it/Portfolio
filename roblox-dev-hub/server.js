@@ -5,6 +5,7 @@ const path = require('path');
 const db = require('./db');
 const web = require('./web');
 const mcp = require('./mcp');
+const { Crawler, youtubeSearch } = require('./crawler');
 
 const PORT = Number(process.env.PORT) || 4747;
 const PUBLIC = path.join(__dirname, 'public');
@@ -20,6 +21,13 @@ const MIME = {
 
 let state = db.load();
 state.settings = state.settings || { youtubeApiKey: '' };
+
+const crawler = new Crawler({
+  getState: () => state,
+  persist: () => persist(),
+  upsert: (d) => db.upsert(state, d, { fresh: true }),
+  newId: db.newId,
+});
 
 function send(res, code, body, type = 'application/json') {
   res.writeHead(code, { 'Content-Type': type, 'Cache-Control': 'no-store' });
@@ -73,30 +81,11 @@ function persist() { db.save(state); mtime = fs.statSync(DB_FILE).mtimeMs; }
 
 // Claude (via mcp.js) peut écrire dans la base pendant que l'app tourne : on relit le fichier s'il a changé.
 function refresh() {
+  if (crawler.status.running) return; // pendant une exploration, la version en mémoire fait foi
   try {
     const m = fs.statSync(DB_FILE).mtimeMs;
     if (m !== mtime) { const settings = state.settings; state = db.load(); state.settings = state.settings || settings; mtime = m; }
   } catch {}
-}
-
-async function syncChannel(ch) {
-  if (!ch.channelId) {
-    const info = await web.resolveChannel(ch.handle);
-    Object.assign(ch, { channelId: info.channelId, name: ch.name || info.name, avatar: info.avatar });
-  }
-  const vids = await web.channelVideos(ch.channelId);
-  let added = 0;
-  for (const v of vids) {
-    if (state.resources.some((r) => r.url === v.url)) continue;
-    db.upsert(state, {
-      ...v, type: 'video', source: 'veille',
-      category: ch.category || web.guessCategory(v.title),
-      tags: [ch.name || ch.handle].filter(Boolean),
-    });
-    added++;
-  }
-  ch.lastFetch = new Date().toISOString();
-  return { added, videos: vids.length };
 }
 
 const routes = [
@@ -105,10 +94,13 @@ const routes = [
   ['GET', /^\/api\/stats$/, () => db.stats(state)],
   ['GET', /^\/api\/resources$/, (req, m, url) => {
     const p = url.searchParams;
-    return db.search(state, {
+    const all = db.search(state, {
       q: p.get('q') || '', category: p.get('category') || '', type: p.get('type') || '',
       level: p.get('level') || '', favorite: p.get('favorite') === '1',
     });
+    const offset = Number(p.get('offset')) || 0;
+    const limit = Math.min(Number(p.get('limit')) || 60, 500);
+    return { total: all.length, items: all.slice(offset, offset + limit) };
   }],
   ['POST', /^\/api\/resources$/, async (req) => {
     const r = db.upsert(state, { ...(await json(req)), source: 'manuel' });
@@ -156,7 +148,13 @@ const routes = [
     persist();
     return r.resource;
   }],
-  ['GET', /^\/api\/channels$/, () => state.channels],
+  ['GET', /^\/api\/channels$/, (req, m, url) => {
+    const p = url.searchParams;
+    const q = (p.get('q') || '').toLowerCase();
+    const all = state.channels.filter((c) => !q || `${c.name} ${c.handle}`.toLowerCase().includes(q));
+    const offset = Number(p.get('offset')) || 0;
+    return { total: all.length, followed: state.channels.length, items: all.slice(offset, offset + (Number(p.get('limit')) || 120)) };
+  }],
   ['POST', /^\/api\/channels$/, async (req) => {
     const body = await json(req);
     const handle = String(body.handle || '').trim();
@@ -174,20 +172,17 @@ const routes = [
     persist();
     return { ok: true };
   }],
-  ['POST', /^\/api\/channels\/sync$/, async () => {
-    const report = [];
-    for (const ch of state.channels) {
-      try { report.push({ name: ch.name || ch.handle, ...(await syncChannel(ch)) }); }
-      catch (e) { report.push({ name: ch.name || ch.handle, error: e.message }); }
-    }
-    persist();
-    return report;
-  }],
-  ['GET', /^\/api\/youtube$/, (req, m, url) => web.youtubeSearch(url.searchParams.get('q') || 'roblox studio', state.settings.youtubeApiKey)],
-  ['GET', /^\/api\/settings$/, () => ({ youtubeApiKey: state.settings.youtubeApiKey ? '••••' + state.settings.youtubeApiKey.slice(-4) : '', hasKey: Boolean(state.settings.youtubeApiKey) })],
+  ['POST', /^\/api\/channels\/sync$/, () => crawler.start({ mode: 'sync' })],
+  ['GET', /^\/api\/crawl$/, () => crawler.status],
+  ['POST', /^\/api\/crawl$/, async (req) => crawler.start({ ...(await json(req)), apiKey: state.settings.youtubeApiKey, githubToken: state.settings.githubToken })],
+  ['POST', /^\/api\/crawl\/stop$/, () => { crawler.stop(); return crawler.status; }],
+  ['GET', /^\/api\/youtube$/, (req, m, url) => youtubeSearch(url.searchParams.get('q') || 'roblox studio', 2, state.settings.youtubeApiKey)],
+  ['GET', /^\/api\/settings$/, () => ({ youtubeApiKey: state.settings.youtubeApiKey ? '••••' + state.settings.youtubeApiKey.slice(-4) : '', hasKey: Boolean(state.settings.youtubeApiKey), hasGithub: Boolean(state.settings.githubToken), autoSyncHours: state.settings.autoSyncHours || 0, lastAutoSync: state.settings.lastAutoSync || null })],
   ['PUT', /^\/api\/settings$/, async (req) => {
     const b = await json(req);
     if (typeof b.youtubeApiKey === 'string') state.settings.youtubeApiKey = b.youtubeApiKey.trim();
+    if (typeof b.githubToken === 'string') state.settings.githubToken = b.githubToken.trim();
+    if (b.autoSyncHours !== undefined) state.settings.autoSyncHours = Math.max(0, Number(b.autoSyncHours) || 0);
     persist();
     return { ok: true };
   }],
@@ -242,3 +237,13 @@ server.listen(PORT, '127.0.0.1', () => {
   console.log(`\n  Roblox Dev Hub prêt  →  http://localhost:${PORT}\n  (Ctrl+C pour arrêter)\n`);
 });
 
+
+// Mise à jour automatique : récupère les nouvelles vidéos des chaînes suivies à intervalle régulier.
+setInterval(() => {
+  const h = state.settings.autoSyncHours;
+  if (!h || crawler.status.running || !state.channels.length) return;
+  const last = state.settings.lastAutoSync ? Date.parse(state.settings.lastAutoSync) : 0;
+  if (Date.now() - last < h * 3600e3) return;
+  state.settings.lastAutoSync = new Date().toISOString();
+  crawler.start({ mode: 'sync' });
+}, 60e3);

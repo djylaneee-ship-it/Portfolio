@@ -19,10 +19,11 @@ const CATEGORIES = [
   { id: 'building', label: 'Build / Maps', color: '#3ad1ff', desc: 'Terrain, éclairage, level design' },
   { id: 'audio', label: 'Audio', color: '#f5e642', desc: 'Sons, musiques, SoundService' },
   { id: 'design', label: 'Game design', color: '#ff8fa3', desc: 'Boucles de jeu, rétention, monétisation' },
+  { id: 'gameplay', label: 'Gameplay & YouTubeurs', color: '#ff9f43', desc: 'Chaînes et vidéos de jeux Roblox, actus, inspiration' },
   { id: 'tools', label: 'Outils & plugins', color: '#9aa4b8', desc: 'Plugins Studio, Rojo, logiciels' },
 ];
 
-const TYPES = ['video', 'chaine', 'doc', 'article', 'outil', 'image', 'fichier', 'recherche'];
+const TYPES = ['video', 'chaine', 'opensource', 'asset', 'doc', 'article', 'outil', 'image', 'fichier', 'recherche'];
 
 function ensureDirs() {
   for (const d of [DATA_DIR, MEDIA_DIR]) fs.mkdirSync(d, { recursive: true });
@@ -142,8 +143,9 @@ function stats(db) {
 }
 
 // Ajoute ou met à jour sans créer de doublon d'URL.
-function upsert(db, data) {
-  const existing = data.url && db.resources.find((r) => r.url && r.url === data.url);
+// `fresh: true` : l'appelant a déjà vérifié que l'URL est nouvelle (évite un parcours complet).
+function upsert(db, data, { fresh = false } = {}) {
+  const existing = !fresh && data.url && db.resources.find((r) => r.url && r.url === data.url);
   if (existing) {
     Object.assign(existing, normalize({ ...existing, ...data, id: existing.id, createdAt: existing.createdAt }));
     return { resource: existing, created: false };

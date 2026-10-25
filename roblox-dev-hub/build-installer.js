@@ -6,7 +6,7 @@ const path = require('path');
 const ROOT = __dirname;
 const OUT = path.join(ROOT, '..', 'Installer Roblox Dev Hub.bat');
 const FILES = [
-  'db.js', 'mcp.js', 'server.js', 'web.js', 'seed.json', 'package.json', 'README.md',
+  'db.js', 'mcp.js', 'server.js', 'web.js', 'crawler.js', 'seed.json', 'package.json', 'README.md',
   'public/index.html', 'public/style.css', 'public/app.js',
   'Lancer Roblox Dev Hub.bat',
 ];

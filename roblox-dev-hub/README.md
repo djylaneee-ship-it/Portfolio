@@ -3,10 +3,12 @@
 Ta bibliothèque perso de ressources de dev Roblox : scripting, VFX, animation, GUI, GFX, modélisation, build, audio, game design et outils. Elle tourne sur ton PC et s'expose en serveur MCP.
 
 - **Près de 70 ressources de départ** : docs officielles Roblox, outils (Blender, Rojo, Mixamo…) et recherches YouTube par thème.
+- **Exploration automatique** : fouille YouTube, le DevForum Roblox et Reddit (r/robloxgamedev) pour référencer des milliers de vidéos, tutos et images, rangés par catégorie.
+- **Toutes les chaînes Roblox** : découvre et relie automatiquement les chaînes YouTube Roblox (dev, VFX, gameplay, YouTubeurs FR/EN/ES…), puis récupère leurs nouvelles vidéos. La mise à jour peut être automatique (Réglages).
+- **Open source et systèmes gratuits** : dépôts GitHub Roblox (frameworks, modules, jeux open source), ressources communautaires du DevForum, modèles et plugins gratuits du Creator Store.
 - **Import en un clic** : colle un lien YouTube, une chaîne, une page du DevForum ou une doc. Le titre, l'auteur et la miniature sont récupérés tout seuls.
 - **Tes fichiers** : glisse des images, vidéos, scripts `.lua`, modèles `.rbxm` / `.fbx` / `.blend` sur la page.
-- **Veille YouTube** : suis des chaînes, leurs nouvelles vidéos arrivent dans ta base (sans clé).
-- **Recherche YouTube intégrée** : avec une clé YouTube Data API gratuite (optionnelle).
+- **Recherche YouTube intégrée**, sans clé (une clé YouTube Data API reste possible dans Réglages). Un jeton GitHub optionnel accélère la récupération de l'open source.
 - **Favoris, niveaux, tags et notes**.
 - **Serveur MCP** : n'importe quel client MCP peut chercher dans ta base, ajouter des tutos et écrire des notes.
 
@@ -32,7 +34,7 @@ L'app expose un serveur MCP, à brancher dans le client de ton choix (Claude Des
 - **Mode HTTP** (l'app doit être ouverte) : `http://localhost:4747/mcp`
 - **Mode stdio** (marche même app fermée) : `node "%LOCALAPPDATA%\RobloxDevHub\mcp.js"`
 
-Outils exposés : `search_resources`, `get_resource`, `list_categories`, `add_resource`, `import_url`, `update_notes`, `sync_channels`.
+Outils exposés : `search_resources`, `get_resource`, `list_categories`, `add_resource`, `import_url`, `update_notes`, `explore_internet`, `explore_status`, `list_channels`, `sync_channels`.
 
 ## Où sont mes données ?
 
