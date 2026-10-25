@@ -522,6 +522,7 @@ async function openSkill(id) {
       <label class="switch"><input type="checkbox" id="sk-on" ${sk.enabled ? 'checked' : ''}><span></span></label><span>${t('sk.enabled')}</span>
     </div>
     <div class="field"><label>${t('sk.instr')}</label><textarea id="sk-instr" style="min-height:220px" spellcheck="false" ${isAdmin() ? '' : 'readonly'}>${esc(sk.instructions)}</textarea></div>
+    <div class="field"><label>${t(id === 'audio' ? 'sk.artSound' : 'sk.art')}</label><textarea id="sk-art" style="min-height:80px" spellcheck="false" ${isAdmin() ? '' : 'readonly'}>${esc(sk.art || '')}</textarea></div>
     <div class="row admin-only" style="margin-bottom:22px">
       <button class="btn primary" id="sk-save">${t('save')}</button>
       <button class="btn" id="sk-reset">${t('cn.default')}</button>
@@ -538,9 +539,10 @@ async function openSkill(id) {
     <div class="code"><pre>${esc(sk.skillMd)}</pre></div>`);
   if (!isAdmin()) return;
   $('#sk-on').onchange = async (e) => { await api('/skills/' + id, { method: 'PUT', body: { enabled: e.target.checked } }); toast(t('toast.saved')); };
-  $('#sk-save').onclick = async () => { await api('/skills/' + id, { method: 'PUT', body: { instructions: $('#sk-instr').value } }); toast(t('toast.saved')); closeModal(); transition(renderSkills); };
+  $('#sk-save').onclick = async () => { await api('/skills/' + id, { method: 'PUT', body: { instructions: $('#sk-instr').value, art: $('#sk-art').value } }); toast(t('toast.saved')); closeModal(); transition(renderSkills); };
   $('#sk-reset').onclick = () => {
     $('#sk-instr').value = sk.defaultInstructions;
+    $('#sk-art').value = sk.defaultArt || '';
     $('#sk-instr').animate([{ background: 'rgba(124,58,237,.25)' }, { background: 'transparent' }], { duration: 700 });
   };
 }
@@ -687,6 +689,102 @@ function newPrompt() {
       transition(renderPrompts);
     } catch (e) { toast(e.message, true); }
   };
+}
+
+// ---------- Studio IA : Claude génère des images et des sons avec les clés API de l'utilisateur ----------
+const GEN_LINKS = { openai: 'https://platform.openai.com/api-keys', gemini: 'https://aistudio.google.com/apikey', elevenlabs: 'https://elevenlabs.io/app/settings/api-keys' };
+let GEN_TAB = 'image';
+
+function genCard(r) {
+  const c = cat(r.category);
+  const kind = (r.tags || []).find((x) => ['icon', 'ui', 'thumbnail', 'texture', 'vfx', 'art', 'sfx', 'music', 'voice'].includes(x)) || '';
+  const media = r.type === 'image'
+    ? `<div class="gen-media checker"><img src="/media/${esc(r.file)}" alt="" loading="lazy"></div>`
+    : `<div class="gen-media audio"><span>🔊</span><audio src="/media/${esc(r.file)}" controls preload="none"></audio></div>`;
+  return `<div class="gen-card" data-spot>
+    ${media}
+    <div class="gen-meta"><span class="card-cat"><span class="dot" style="background:${c.color}"></span>${esc(c.label)}${kind ? ' · ' + esc(t('st.k.' + kind)) : ''}</span>
+      <b title="${esc(r.description)}">${esc(r.title)}</b>
+      <div class="row"><a class="btn small" href="/media/${esc(r.file)}" download="${esc(r.file)}">⬇ ${t('st.download')}</a><button class="btn small danger" data-gendel="${r.id}">${t('delete')}</button></div>
+    </div>
+  </div>`;
+}
+
+async function renderStudio() {
+  const g = await api('/gen');
+  const keyField = (id, label, has, link) => `<div class="field"><label>${label} ${has ? `<span class="st validated">${t('st.saved')}</span>` : ''}</label>
+    <div class="row"><input class="input" id="${id}" type="password" autocomplete="off" style="flex:1;min-width:200px" placeholder="${has ? '••••••••' : t('st.paste')}"><a class="btn small" href="${link}" target="_blank" rel="noopener">${t('st.getKey')}</a></div></div>`;
+  view.innerHTML = `
+    ${pageHead(t('st.eyebrow'), t('st.title'), t('st.sub'))}
+    <div class="flow">
+      ${[['💬', 'st.f1'], ['📚', 'st.f2'], ['🎨', 'st.f3'], ['📥', 'st.f4']].map(([ico, k], i) => `<div class="flow-step" style="--i:${i}"><span>${ico}</span><b>${t(k + 't')}</b><small>${t(k)}</small></div>`).join('<i class="flow-arrow">→</i>')}
+    </div>
+    <div class="two-col">
+      <div class="panel" data-spot>
+        <h3>🎨 ${t('st.imgTitle')} <span class="st ${g.image.ready ? 'validated' : 'draft'}">${t(g.image.ready ? 'st.ready' : 'st.noKey')}</span></h3>
+        <p>${t('st.imgText')}</p>
+        <div class="field"><label>${t('st.provider')}</label><select class="select" id="gen-provider">
+          <option value="openai" ${g.image.provider === 'openai' ? 'selected' : ''}>OpenAI (${esc(g.models.openai || g.defaults.openai)})</option>
+          <option value="gemini" ${g.image.provider === 'gemini' ? 'selected' : ''}>Google Gemini (${esc(g.models.gemini || g.defaults.gemini)})</option></select></div>
+        ${keyField('gen-openai', 'OpenAI', g.keys.openai, GEN_LINKS.openai)}
+        ${keyField('gen-gemini', 'Google Gemini', g.keys.gemini, GEN_LINKS.gemini)}
+      </div>
+      <div class="panel" data-spot>
+        <h3>🔊 ${t('st.sndTitle')} <span class="st ${g.sound.ready ? 'validated' : 'draft'}">${t(g.sound.ready ? 'st.ready' : 'st.noKey')}</span></h3>
+        <p>${t('st.sndText')}</p>
+        ${keyField('gen-eleven', 'ElevenLabs', g.keys.elevenlabs, GEN_LINKS.elevenlabs)}
+        <p class="sub" style="font-size:13px">${t('st.keysNote')}</p>
+        <button class="btn primary" id="gen-save">${t('save')}</button>
+      </div>
+    </div>
+    <div class="panel" data-spot>
+      <div class="tabs"><button data-gtab="image" class="${GEN_TAB === 'image' ? 'on' : ''}">🎨 ${t('st.tabImg')}</button><button data-gtab="sound" class="${GEN_TAB === 'sound' ? 'on' : ''}">🔊 ${t('st.tabSnd')}</button></div>
+      <form id="gen-form" class="gen-form">
+        <input class="input" id="gen-prompt" required placeholder="${t(GEN_TAB === 'image' ? 'st.phImg' : 'st.phSnd')}">
+        ${GEN_TAB === 'image'
+          ? `<select class="select" id="gen-kind">${g.kinds.map((k) => `<option value="${k}">${t('st.k.' + k)}</option>`).join('')}</select>
+             <select class="select" id="gen-cat"><option value="">${t('st.autoCat')}</option>${catOptions('')}</select>
+             <select class="select" id="gen-count">${[1, 2, 3, 4].map((n) => `<option value="${n}">×${n}</option>`).join('')}</select>`
+          : `<select class="select" id="gen-kind">${['sfx', 'music', 'voice'].map((k) => `<option value="${k}">${t('st.k.' + k)}</option>`).join('')}</select>
+             <input class="input" id="gen-seconds" type="number" min="0.5" max="300" step="0.5" placeholder="${t('st.seconds')}" style="width:130px">`}
+        <button class="btn primary" id="gen-go">✨ ${t('st.generate')}</button>
+      </form>
+      <p class="sub" style="font-size:13px;margin:10px 0 0">${t('st.tryNote')}</p>
+    </div>
+    <div class="section-head"><h2>${t('st.gallery', { n: g.items.length })}</h2></div>
+    <div class="gen-grid" id="gen-grid">${g.items.length ? g.items.map(genCard).join('') : `<div class="empty"><b>${t('st.none')}</b>${t('st.noneText')}</div>`}</div>`;
+  $$('[data-gtab]').forEach((b) => b.onclick = () => { GEN_TAB = b.dataset.gtab; transition(renderStudio); });
+  $('#gen-save').onclick = async () => {
+    const body = { imageProvider: $('#gen-provider').value };
+    for (const [id, k] of [['gen-openai', 'openaiKey'], ['gen-gemini', 'geminiKey'], ['gen-eleven', 'elevenKey']]) if ($('#' + id).value.trim()) body[k] = $('#' + id).value.trim();
+    await api('/gen/settings', { method: 'PUT', body });
+    toast(t('toast.saved'));
+    transition(renderStudio);
+  };
+  $('#gen-provider').onchange = () => api('/gen/settings', { method: 'PUT', body: { imageProvider: $('#gen-provider').value } });
+  $('#gen-form').onsubmit = async (e) => {
+    e.preventDefault();
+    const btn = $('#gen-go');
+    btn.disabled = true;
+    btn.textContent = '⏳ ' + t('st.working');
+    try {
+      const body = { prompt: $('#gen-prompt').value, kind: $('#gen-kind').value };
+      if (GEN_TAB === 'image') Object.assign(body, { category: $('#gen-cat').value || undefined, count: Number($('#gen-count').value) });
+      else if ($('#gen-seconds').value) body.seconds = Number($('#gen-seconds').value);
+      const out = await api('/gen/' + GEN_TAB, { method: 'POST', body });
+      toast(t('st.done', { n: out.items.length }));
+      transition(renderStudio);
+    } catch (err) {
+      toast(err.message, true);
+      btn.disabled = false;
+      btn.textContent = '✨ ' + t('st.generate');
+    }
+  };
+  $$('[data-gendel]').forEach((b) => b.onclick = async () => {
+    if (!confirm(t('st.confirmDel'))) return;
+    await api('/gen/' + b.dataset.gendel, { method: 'DELETE' });
+    b.closest('.gen-card').remove();
+  });
 }
 
 // ---------- Exemples d'apprentissage ----------
@@ -1598,7 +1696,7 @@ async function route() {
   const pages = {
     library: () => renderLibrary(params), favorites: () => renderLibrary(params, true), examples: renderExamples,
     youtube: () => renderYoutube(params), channels: () => renderChannels(params), explore: renderExplore,
-    connect: renderConnect, admin: renderAdmin, settings: renderSettings, level: renderLevel, opensource: renderOpenSource, skills: renderSkills, prompts: renderPrompts,
+    connect: renderConnect, admin: renderAdmin, settings: renderSettings, level: renderLevel, opensource: renderOpenSource, skills: renderSkills, prompts: renderPrompts, studio: renderStudio,
   };
   try {
     await transition(pages[path] || renderHome);

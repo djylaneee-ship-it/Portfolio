@@ -13,6 +13,7 @@ const level = require('./level');
 const quality = require('./quality');
 const skills = require('./skills');
 const cloud = require('./cloud');
+const gen = require('./gen');
 const APP_VERSION = require('./package.json').version;
 
 const PORT = Number(process.env.PORT) || 4747;
@@ -215,6 +216,36 @@ const routes = [
     persist();
     return { ok: true };
   }],
+  // Studio IA : images et sons générés avec les clés API de l'utilisateur (ouvert aux membres).
+  ['GET', /^\/api\/gen$/, () => ({ ...gen.status(state), kinds: Object.keys(gen.IMAGE_KINDS), items: gen.items(state) })],
+  ['PUT', /^\/api\/gen\/settings$/, async (req) => {
+    const b = await json(req);
+    const g = gen.settings(state);
+    for (const k of ['openaiKey', 'geminiKey', 'elevenKey']) if (typeof b[k] === 'string') g[k] = b[k].trim();
+    for (const k of ['openaiModel', 'geminiModel', 'elevenVoice']) if (typeof b[k] === 'string') g[k] = b[k].trim().slice(0, 80);
+    if (['openai', 'gemini'].includes(b.imageProvider)) g.imageProvider = b.imageProvider;
+    persist();
+    return gen.status(state);
+  }],
+  ['POST', /^\/api\/gen\/image$/, async (req) => {
+    const out = await gen.generateImage(state, await json(req));
+    delete out.images;
+    persist();
+    return out;
+  }],
+  ['POST', /^\/api\/gen\/sound$/, async (req) => {
+    const out = await gen.generateSound(state, await json(req));
+    persist();
+    return out;
+  }],
+  ['DELETE', /^\/api\/gen\/(\w+)$/, (req, m) => {
+    const r = state.resources.find((x) => x.id === m[1] && x.source === 'ai');
+    if (!r) throw Object.assign(new Error('Not found'), { code: 404, key: 'notFound' });
+    try { if (r.file) fs.rmSync(path.join(db.MEDIA_DIR, r.file), { force: true }); } catch {}
+    state.resources = state.resources.filter((x) => x !== r);
+    persist();
+    return { ok: true };
+  }],
   // Version de l'app et mises à jour (app de bureau).
   ['GET', /^\/api\/version$/, () => ({ version: APP_VERSION, desktop: Boolean(process.versions.electron), online: auth.online, update: global.rovexUpdate || null })],
   ['POST', /^\/api\/update\/check$/, () => { if (global.rovexCheckUpdates) global.rovexCheckUpdates(); return { ok: Boolean(global.rovexCheckUpdates) }; }],
@@ -228,7 +259,7 @@ const routes = [
   })],
   ['GET', /^\/api\/skills\/(\w+)$/, (req, m) => {
     if (!skills.SKILL_CATS.includes(m[1])) throw Object.assign(new Error('Not found'), { code: 404, key: 'notFound' });
-    return { ...skills.getSkill(state, m[1]), defaultInstructions: skills.DEFAULTS[m[1]], context: skills.context(state, m[1]), skillMd: skills.skillMd(state, m[1]) };
+    return { ...skills.getSkill(state, m[1]), defaultInstructions: skills.DEFAULTS[m[1]], defaultArt: skills.ART[m[1]] || '', context: skills.context(state, m[1]), skillMd: skills.skillMd(state, m[1]) };
   }],
   ['PUT', /^\/api\/skills\/(\w+)$/, async (req, m, url, session) => {
     if (!skills.SKILL_CATS.includes(m[1])) throw Object.assign(new Error('Not found'), { code: 404, key: 'notFound' });
@@ -238,6 +269,7 @@ const routes = [
     if (b.reset) delete cur.instructions;
     if (typeof b.instructions === 'string') cur.instructions = b.instructions.trim() === skills.DEFAULTS[m[1]].trim() ? undefined : b.instructions;
     if (typeof b.enabled === 'boolean') cur.enabled = b.enabled;
+    if (typeof b.art === 'string') cur.art = b.art.trim() === (skills.ART[m[1]] || '').trim() ? undefined : b.art;
     cur.updatedAt = new Date().toISOString();
     state.skills[m[1]] = cur;
     persist();
@@ -456,7 +488,8 @@ const server = http.createServer(async (req, res) => {
     const session = auth.check(cookies(req).rdh_session) || auth.checkCode(bearer);
     if (session && url.pathname === '/api/admin/reset-key' && session.codeId) return send(res, 403, { error: 'Only the main admin key can do this', key: 'masterOnly' });
     if (!session) return send(res, 401, { error: 'Sign in with your access ID', key: 'loginRequired' });
-    if (session.role !== 'admin' && !(req.method === 'GET' && USER_ROUTES.some((re) => re.test(url.pathname)))) {
+    const genRoute = url.pathname === '/api/gen' || url.pathname.startsWith('/api/gen/');
+    if (session.role !== 'admin' && !genRoute && !(req.method === 'GET' && USER_ROUTES.some((re) => re.test(url.pathname)))) {
       return send(res, 403, { error: 'Admin only', key: 'adminOnly' });
     }
     const zipM = url.pathname.match(/^\/api\/skills\/(\w+)\/zip$/);

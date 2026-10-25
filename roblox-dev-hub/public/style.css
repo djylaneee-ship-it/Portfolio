@@ -563,3 +563,20 @@ body.desktop .sidebar { padding-top: 44px; }
 body.desktop .modal, body.desktop .login { padding-top: 40px; }
 .side-user .ver { font: 11px var(--mono); color: var(--muted); letter-spacing: .04em; }
 .warn-panel { border-color: #5B4517; background: linear-gradient(180deg, #1C160A, var(--panel)); }
+
+/* ---------- Studio IA ---------- */
+.gen-form { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.gen-form #gen-prompt { flex: 1 1 320px; min-width: 0; }
+.gen-form .select { padding: 11px 14px; }
+.gen-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+.gen-card { border-radius: 18px; border: 1px solid var(--line); background: var(--panel); overflow: hidden; display: flex; flex-direction: column; transition: transform .45s var(--spring), border-color .3s; }
+.gen-card:hover { transform: translateY(-5px); border-color: #3B2D5C; }
+.gen-media { aspect-ratio: 1; display: grid; place-items: center; border-bottom: 1px solid var(--line); }
+.gen-media img { width: 100%; height: 100%; object-fit: contain; }
+.gen-media.checker { background: repeating-conic-gradient(#1A1428 0 25%, #120E1D 0 50%) 0 0 / 22px 22px; }
+.gen-media.audio { aspect-ratio: auto; padding: 22px 14px; gap: 12px; background: linear-gradient(180deg, var(--accent-bg), var(--panel)); }
+.gen-media.audio span { font-size: 34px; }
+.gen-media.audio audio { width: 100%; }
+.gen-meta { padding: 14px; display: grid; gap: 8px; }
+.gen-meta b { font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.panel h3 .st { margin-left: 8px; vertical-align: middle; }

@@ -7,6 +7,7 @@ const path = require('path');
 const db = require('./db');
 const web = require('./web');
 const skills = require('./skills');
+const gen = require('./gen');
 const vm = require('vm');
 
 // Les modèles de prompts de la page « Prompts » (public/prompts.js), aussi proposés dans le menu + de Claude.
@@ -49,7 +50,9 @@ function clients() {
 // Toujours ajouté aux consignes : passer par le skill de la catégorie avant toute tâche Roblox.
 const SKILL_RULE = `
 
-Skills: for every Roblox task, first identify its category (scripting, vfx, animation, gui, gfx, modeling, building, audio, design, tools) and call load_skill with that category and the task keywords. Read all of it before working.`;
+Skills: for every Roblox task, first identify its category (scripting, vfx, animation, gui, gfx, modeling, building, audio, design, tools) and call load_skill with that category and the task keywords. Read all of it before working.
+
+Assets: you cannot draw or make sounds yourself, but Rovex can. When the user asks for an icon, an image, a UI element, a thumbnail, a texture, a sound effect, music or a voice line, load the skill of the category, then call generate_image or generate_sound. Describe only the subject: Rovex applies the skill's style and the user's reference images, and saves the file in the library. Give the user the file path, and remind them to upload it to Roblox (Creator Hub or Asset Manager) to get its rbxassetid.`;
 
 const DEFAULT_INSTRUCTIONS = `Before writing any Luau, search Rovex Hub.
 1. Start with the validated examples for the category (list_examples / get_example).
@@ -88,6 +91,39 @@ const TOOLS = [
     name: 'list_skills',
     description: 'Lists the Rovex skills (one per Roblox category) with how much knowledge each contains.',
     inputSchema: { type: 'object', properties: {} },
+  },
+  {
+    name: 'generate_image',
+    description: 'Generate images for a Roblox game (icons, UI elements, thumbnails/GFX, textures, VFX sprites, concept art) with the user\'s image AI. Rovex adds the art style of the category skill and the user\'s reference images from the library, saves the PNG in the library and returns its file path and a preview. Load the skill of the category first. Describe only the subject in prompt (e.g. "a golden crown with red gems"); Rovex adds the style.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        prompt: { type: 'string', description: 'What to draw (subject, colors, details).' },
+        kind: { type: 'string', enum: ['icon', 'ui', 'thumbnail', 'texture', 'vfx', 'art'], description: 'Default: icon.' },
+        category: { type: 'string', enum: CAT_IDS.filter((c) => c !== 'gameplay'), description: 'Skill whose style to apply. Default depends on kind (icon/ui → gui, thumbnail → gfx…).' },
+        count: { type: 'number', description: 'Number of variants, 1 to 4. Default 1.' },
+        transparent: { type: 'boolean', description: 'Transparent background. Default: true for icon, ui and vfx.' },
+        size: { type: 'string', enum: ['1024x1024', '1536x1024', '1024x1536'] },
+        reference_ids: { type: 'array', items: { type: 'string' }, description: 'Library image ids to use as style references. Default: the user\'s images of the category.' },
+        title: { type: 'string', description: 'Name to save it under in the library.' },
+      },
+      required: ['prompt'],
+    },
+  },
+  {
+    name: 'generate_sound',
+    description: 'Generate a sound for a Roblox game with the user\'s ElevenLabs key: a sound effect (sfx, e.g. "coin pickup", "sword slash"), background music (music) or an NPC voice line (voice, prompt = the text to say). Saves the MP3 in the library and returns its file path.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        prompt: { type: 'string', description: 'Sound description, music description, or the line to say for voice.' },
+        kind: { type: 'string', enum: ['sfx', 'music', 'voice'], description: 'Default: sfx.' },
+        seconds: { type: 'number', description: 'Length: 0.5–22 s for sfx, 10–300 s for music.' },
+        voice_id: { type: 'string', description: 'ElevenLabs voice id (voice only).' },
+        title: { type: 'string' },
+      },
+      required: ['prompt'],
+    },
   },
   {
     name: 'search_opensource',
@@ -222,6 +258,16 @@ async function call(name, a = {}) {
       const res = db.search(state, { q: a.query || '', category: a.category || '', type: a.type || '', favorite: Boolean(a.favorites_only), limit: a.limit || 15 });
       const examples = matchExamples(state, { query: a.query, category: a.category }).slice(0, 5).map(briefExample);
       return { count: res.length, examples, results: res.map(brief) };
+    }
+    case 'generate_image': {
+      const out = await gen.generateImage(state, a);
+      store.save(state);
+      return out;
+    }
+    case 'generate_sound': {
+      const out = await gen.generateSound(state, a);
+      store.save(state);
+      return out;
     }
     case 'load_skill':
       return skills.load(state, a.category, { query: a.query || '' });
@@ -394,9 +440,13 @@ async function handle(msg) {
       try {
         if (!enabledTools().some((x) => x.name === params.name)) throw new Error('Tool disabled in Rovex Hub: ' + params.name);
         const out = await call(params.name, params.arguments);
+        // Images générées : aperçu envoyé à Claude (s'il n'est pas trop lourd), jamais gardé dans le journal.
+        const images = (out && out.images) || [];
+        if (out && out.images) delete out.images;
         logCall(params.name, params.arguments || {}, out);
         seen();
-        return ok({ content: [{ type: 'text', text: JSON.stringify(out, null, 2) }] });
+        const previews = images.filter((b) => b.length < 900 * 1024).map((b) => ({ type: 'image', data: b.toString('base64'), mimeType: 'image/png' }));
+        return ok({ content: [{ type: 'text', text: JSON.stringify(out, null, 2) }, ...previews] });
       } catch (e) {
         return ok({ content: [{ type: 'text', text: 'Error: ' + e.message }], isError: true });
       }
