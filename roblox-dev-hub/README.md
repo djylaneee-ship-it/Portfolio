@@ -44,6 +44,19 @@ L'app demande un **ID d'accès** pour entrer. Les IDs sont gardés **en ligne** 
 - **Contenu partagé** : les exemples d'apprentissage, les skills et les prompts créés par les admins sont publiés en ligne et arrivent chez tous les membres (toutes les 15 minutes et à chaque connexion). La bibliothèque, elle, vient de l'algo cloud GitHub.
 - **Sans internet** : la clé admin de ce PC marche encore (mode hors ligne), mais la gestion des IDs demande internet.
 
+## Génération partagée (tes clés IA pour tous les membres)
+
+Sans clé perso, les membres peuvent générer images et sons avec **tes** clés OpenAI / ElevenLabs. Les clés restent cachées sur ton Supabase (jamais dans l'app) ; chaque ID a une limite par jour (20 images et 20 sons par défaut, réglable dans **Studio IA**), les admins n'ont pas de limite.
+
+Installation, une fois, dans ton projet Supabase :
+
+1. **SQL Editor** → colle `supabase/rovex-gen.sql` → **Run**.
+2. **Edge Functions** → **Deploy a new function** → **Via Editor** → nom `rovex-gen` → colle `supabase/functions/rovex-gen/index.ts` → **Deploy**.
+3. Dans la fonction `rovex-gen` → **Details** : désactive **Verify JWT** (l'app envoie l'ID d'accès, la fonction le vérifie elle-même) → **Save**.
+4. **Edge Functions** → **Secrets** : ajoute `OPENAI_API_KEY` (et `ELEVENLABS_API_KEY` pour les sons). Facultatif : `OPENAI_IMAGE_MODEL` pour changer de modèle.
+
+Conseil : fixe un plafond de dépense mensuel dans OpenAI (Settings → Limits), puisque toutes les générations des membres sont facturées sur ton compte.
+
 ## Langues
 
 Le site est en **anglais** par défaut. Chaque visiteur choisit sa langue (English, Français, Español, Português) sur l'écran de connexion, dans la barre latérale ou dans Réglages ; le choix est gardé dans son navigateur. Les textes sont dans `public/i18n.js`.

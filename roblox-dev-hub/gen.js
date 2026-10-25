@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const db = require('./db');
 const skills = require('./skills');
+const cloud = require('./cloud');
 
 const IMAGE_PROVIDERS = ['openai', 'gemini'];
 const DEFAULT_MODELS = { openai: 'gpt-image-1', gemini: 'gemini-2.5-flash-image' };
@@ -28,12 +29,67 @@ function settings(state) {
   return (state.settings.gen = state.settings.gen || {});
 }
 
+// ---------- Génération partagée : la fonction Supabase « rovex-gen » utilise les clés de l'admin ----------
+// pour tous les membres (avec une limite par ID et par jour). Sert quand la personne n'a pas sa propre clé.
+const SHARED_URL = () => `${cloud.URL}/functions/v1/rovex-gen`;
+let shared = { at: 0, info: null };
+async function refreshShared(force = false) {
+  if (!cloud.enabled) return null;
+  if (!force && Date.now() - shared.at < 10 * 60e3) return shared.info;
+  try {
+    const r = await fetch(SHARED_URL(), { headers: { apikey: cloud.KEY }, signal: AbortSignal.timeout(8000) });
+    shared = { at: Date.now(), info: r.ok ? await r.json() : null };
+  } catch {
+    shared = { at: Date.now(), info: null };
+  }
+  return shared.info;
+}
+const credOf = (state) => (state.auth && state.auth.lastCred && state.auth.lastCred.code) || '';
+
+async function callShared(body) {
+  let res;
+  try {
+    res = await fetch(SHARED_URL(), {
+      method: 'POST', headers: { apikey: cloud.KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body), signal: AbortSignal.timeout(280e3),
+    });
+  } catch {
+    throw err('cloudDown', 'Cannot reach the Rovex server');
+  }
+  const j = await res.json().catch(() => ({}));
+  if (!res.ok) throw Object.assign(err(j.key || 'genFailed', j.error || `HTTP ${res.status}`, j.vars || { msg: j.error || `HTTP ${res.status}` }), { code: res.status === 429 ? 429 : 400 });
+  return j;
+}
+
+// Ce qu'il reste aujourd'hui à cet ID sur la génération partagée.
+async function quota(state) {
+  const code = credOf(state);
+  if (!code || !cloud.enabled) return null;
+  try { return await cloud.rpc('rovex_gen_status', { p_code: code }); } catch { return null; }
+}
+
+// Réduit une image de référence avant de l'envoyer (dans l'app de bureau uniquement).
+function shrink(buf) {
+  try {
+    const { nativeImage } = require('electron');
+    if (!nativeImage) return buf;
+    const img = nativeImage.createFromBuffer(buf);
+    return img.getSize().width > 768 ? img.resize({ width: 768 }).toPNG() : buf;
+  } catch {
+    return buf;
+  }
+}
+
 function status(state) {
   const g = settings(state);
   const provider = IMAGE_PROVIDERS.includes(g.imageProvider) ? g.imageProvider : (g.openaiKey ? 'openai' : g.geminiKey ? 'gemini' : 'openai');
+  const ownImage = Boolean(provider === 'openai' ? g.openaiKey : g.geminiKey);
+  const sh = shared.info || {};
+  const canShare = Boolean(credOf(state));
   return {
-    image: { provider, ready: Boolean(provider === 'openai' ? g.openaiKey : g.geminiKey), model: g[provider + 'Model'] || DEFAULT_MODELS[provider] },
-    sound: { provider: 'elevenlabs', ready: Boolean(g.elevenKey) },
+    image: { provider, ready: ownImage || Boolean(sh.image && canShare), mode: ownImage ? 'own' : sh.image && canShare ? 'shared' : 'none', model: g[provider + 'Model'] || DEFAULT_MODELS[provider] },
+    sound: { provider: 'elevenlabs', ready: Boolean(g.elevenKey) || Boolean(sh.sound && canShare), mode: g.elevenKey ? 'own' : sh.sound && canShare ? 'shared' : 'none' },
+    shared: { image: Boolean(sh.image), sound: Boolean(sh.sound) },
     keys: { openai: Boolean(g.openaiKey), gemini: Boolean(g.geminiKey), elevenlabs: Boolean(g.elevenKey) },
     models: { openai: g.openaiModel || '', gemini: g.geminiModel || '' },
     defaults: DEFAULT_MODELS,
@@ -152,18 +208,31 @@ async function generateImage(state, a = {}) {
   const provider = IMAGE_PROVIDERS.includes(a.provider) ? a.provider : st.image.provider;
   const key = provider === 'openai' ? g.openaiKey : g.geminiKey;
   const label = provider === 'openai' ? 'OpenAI' : 'Google Gemini';
-  if (!key) throw err('genNoKey', `Add your ${label} API key in Rovex Hub → AI Studio`, { provider: label });
-  const model = g[provider + 'Model'] || DEFAULT_MODELS[provider];
-  const refs = a.use_references === false ? [] : references(state, { category, ids: Array.isArray(a.reference_ids) ? a.reference_ids : [] });
-  const finalPrompt = imagePrompt(state, { prompt, kind, category, transparent, refs, provider });
-  const images = provider === 'openai'
-    ? await openaiImages({ key, model, prompt: finalPrompt, refs, size, transparent, n })
-    : await geminiImages({ key, model, prompt: finalPrompt, refs, n });
+  // Pas de clé perso : génération partagée (clé de l'admin), si elle est installée.
+  const useShared = !key && (await refreshShared()) && shared.info.image && credOf(state);
+  if (!key && !useShared) throw err('genNoKey', `Add your ${label} API key in Rovex Hub → AI Studio`, { provider: label });
+  let model = g[provider + 'Model'] || DEFAULT_MODELS[provider];
+  let refs = a.use_references === false ? [] : references(state, { category, ids: Array.isArray(a.reference_ids) ? a.reference_ids : [] });
+  if (useShared) refs = refs.map((r) => ({ ...r, data: shrink(r.data), mime: 'image/png' })).filter((r) => r.data.length < 1.5 * 1024 * 1024).slice(0, 2);
+  const finalPrompt = imagePrompt(state, { prompt, kind, category, transparent, refs, provider: useShared ? 'openai' : provider });
+  let images;
+  let usage = null;
+  if (useShared) {
+    const j = await callShared({ type: 'image', code: credOf(state), prompt: finalPrompt, n, size, transparent, refs: refs.map((r) => ({ b64: r.data.toString('base64'), mime: r.mime, name: r.title.replace(/[^\w.-]+/g, '_') + '.png' })) });
+    images = (j.images || []).map((b) => Buffer.from(b, 'base64'));
+    model = j.model || model;
+    usage = j.quota || null;
+  } else {
+    images = provider === 'openai'
+      ? await openaiImages({ key, model, prompt: finalPrompt, refs, size, transparent, n })
+      : await geminiImages({ key, model, prompt: finalPrompt, refs, n });
+  }
   if (!images.length) throw err('genEmpty', `${provider}: no image returned`);
   const title = a.title ? String(a.title).slice(0, 80) : titleOf(prompt);
-  const items = images.map((buf, i) => save(state, buf, 'png', { title: images.length > 1 ? `${title} (${i + 1})` : title, category, kind, provider, prompt }));
+  const via = useShared ? 'rovex' : provider;
+  const items = images.map((buf, i) => save(state, buf, 'png', { title: images.length > 1 ? `${title} (${i + 1})` : title, category, kind, provider: via, prompt }));
   return {
-    kind: 'image', category, provider, model, size, transparent,
+    kind: 'image', category, provider: via, model, size, transparent, quota: usage || undefined,
     prompt: finalPrompt, references: refs.map((r) => r.title), items,
     images, // tampons bruts, retirés avant la réponse MCP (aperçu pour Claude)
   };
@@ -174,9 +243,17 @@ async function generateSound(state, a = {}) {
   if (!prompt) throw err('genPrompt', 'Describe what to generate');
   const kind = SOUND_KINDS.includes(a.kind) ? a.kind : 'sfx';
   const g = settings(state);
-  if (!g.elevenKey) throw err('genNoKey', 'Add your ElevenLabs API key in Rovex Hub → AI Studio', { provider: 'ElevenLabs' });
-  const headers = { 'xi-api-key': g.elevenKey, 'Content-Type': 'application/json', Accept: 'audio/mpeg' };
   const art = skills.getSkill(state, 'audio').art;
+  const title = a.title ? String(a.title).slice(0, 80) : titleOf(prompt);
+  if (!g.elevenKey) {
+    // Pas de clé perso : génération partagée (clé ElevenLabs de l'admin), si elle est installée.
+    if (!((await refreshShared()) && shared.info.sound && credOf(state))) throw err('genNoKey', 'Add your ElevenLabs API key in Rovex Hub → AI Studio', { provider: 'ElevenLabs' });
+    const text = kind === 'sfx' ? `${prompt}. ${art}` : kind === 'music' ? `${prompt}. Video game background music for a Roblox game, loopable.` : prompt;
+    const j = await callShared({ type: 'sound', code: credOf(state), kind, prompt: text, seconds: a.seconds, voice_id: a.voice_id });
+    const item = save(state, Buffer.from(j.audio || '', 'base64'), 'mp3', { title, category: 'audio', kind, provider: 'rovex', prompt });
+    return { kind, category: 'audio', provider: 'rovex', prompt, items: [item], quota: j.quota, note: 'MP3 file. Upload it to Roblox (Creator Hub or Studio Asset Manager) to get its rbxassetid.' };
+  }
+  const headers = { 'xi-api-key': g.elevenKey, 'Content-Type': 'application/json', Accept: 'audio/mpeg' };
   let res;
   if (kind === 'sfx') {
     const seconds = Number(a.seconds) ? Math.max(0.5, Math.min(22, Number(a.seconds))) : undefined;
@@ -202,7 +279,6 @@ async function generateSound(state, a = {}) {
   }
   if (!res.ok) throw await readError(res, 'ElevenLabs');
   const buf = Buffer.from(await res.arrayBuffer());
-  const title = a.title ? String(a.title).slice(0, 80) : titleOf(prompt);
   const item = save(state, buf, 'mp3', { title, category: 'audio', kind, provider: 'elevenlabs', prompt });
   return { kind, category: 'audio', provider: 'elevenlabs', prompt, items: [item], note: 'MP3 file. Upload it to Roblox (Creator Hub or Studio Asset Manager) to get its rbxassetid.' };
 }
@@ -212,4 +288,4 @@ function items(state, limit = 60) {
   return state.resources.filter((r) => r.source === 'ai').slice(0, limit);
 }
 
-module.exports = { status, settings, generateImage, generateSound, items, IMAGE_KINDS, SOUND_KINDS, DEFAULT_MODELS, SIZES };
+module.exports = { status, settings, refreshShared, quota, generateImage, generateSound, items, IMAGE_KINDS, SOUND_KINDS, DEFAULT_MODELS, SIZES };

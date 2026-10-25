@@ -217,7 +217,17 @@ const routes = [
     return { ok: true };
   }],
   // Studio IA : images et sons générés avec les clés API de l'utilisateur (ouvert aux membres).
-  ['GET', /^\/api\/gen$/, () => ({ ...gen.status(state), kinds: Object.keys(gen.IMAGE_KINDS), items: gen.items(state) })],
+  ['GET', /^\/api\/gen$/, async () => {
+    await gen.refreshShared();
+    return { ...gen.status(state), quota: await gen.quota(state), kinds: Object.keys(gen.IMAGE_KINDS), items: gen.items(state) };
+  }],
+  // Limites par jour de la génération partagée (admins).
+  ['PUT', /^\/api\/gen\/limits$/, async (req, m, url, session) => {
+    if (session.role !== 'admin') throw Object.assign(new Error('Admin only'), { code: 403, key: 'adminOnly' });
+    const b = await json(req);
+    cloud.must(await cloud.rpc('rovex_gen_set_limits', { p_key: session.cred, p_images: Number(b.images), p_sounds: Number(b.sounds) }));
+    return { ok: true };
+  }],
   ['PUT', /^\/api\/gen\/settings$/, async (req) => {
     const b = await json(req);
     const g = gen.settings(state);

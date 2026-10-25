@@ -710,8 +710,18 @@ function genCard(r) {
   </div>`;
 }
 
+// Badge d'état d'un service : sa propre clé, la génération partagée de Rovex, ou rien.
+function genBadge(x) {
+  return x.mode === 'own' ? `<span class="st validated">${t('st.ready')}</span>` : x.mode === 'shared' ? `<span class="st review">${t('st.sharedOn')}</span>` : `<span class="st draft">${t('st.noKey')}</span>`;
+}
+function quotaText(q) {
+  if (!q || !q.ok) return '';
+  return q.unlimited ? t('st.unlimited') : t('st.left', { n: Math.max(0, q.limit - q.used), limit: q.limit });
+}
+
 async function renderStudio() {
   const g = await api('/gen');
+  const q = g.quota || {};
   const keyField = (id, label, has, link) => `<div class="field"><label>${label} ${has ? `<span class="st validated">${t('st.saved')}</span>` : ''}</label>
     <div class="row"><input class="input" id="${id}" type="password" autocomplete="off" style="flex:1;min-width:200px" placeholder="${has ? '••••••••' : t('st.paste')}"><a class="btn small" href="${link}" target="_blank" rel="noopener">${t('st.getKey')}</a></div></div>`;
   view.innerHTML = `
@@ -721,8 +731,9 @@ async function renderStudio() {
     </div>
     <div class="two-col">
       <div class="panel" data-spot>
-        <h3>🎨 ${t('st.imgTitle')} <span class="st ${g.image.ready ? 'validated' : 'draft'}">${t(g.image.ready ? 'st.ready' : 'st.noKey')}</span></h3>
+        <h3>🎨 ${t('st.imgTitle')} ${genBadge(g.image)}</h3>
         <p>${t('st.imgText')}</p>
+        ${g.shared.image ? `<div class="callout-mini">✨ ${t('st.sharedText')} <b>${quotaText(q.image)}</b></div>` : ''}
         <div class="field"><label>${t('st.provider')}</label><select class="select" id="gen-provider">
           <option value="openai" ${g.image.provider === 'openai' ? 'selected' : ''}>OpenAI (${esc(g.models.openai || g.defaults.openai)})</option>
           <option value="gemini" ${g.image.provider === 'gemini' ? 'selected' : ''}>Google Gemini (${esc(g.models.gemini || g.defaults.gemini)})</option></select></div>
@@ -730,13 +741,23 @@ async function renderStudio() {
         ${keyField('gen-gemini', 'Google Gemini', g.keys.gemini, GEN_LINKS.gemini)}
       </div>
       <div class="panel" data-spot>
-        <h3>🔊 ${t('st.sndTitle')} <span class="st ${g.sound.ready ? 'validated' : 'draft'}">${t(g.sound.ready ? 'st.ready' : 'st.noKey')}</span></h3>
+        <h3>🔊 ${t('st.sndTitle')} ${genBadge(g.sound)}</h3>
         <p>${t('st.sndText')}</p>
+        ${g.shared.sound ? `<div class="callout-mini">✨ ${t('st.sharedText')} <b>${quotaText(q.sound)}</b></div>` : ''}
         ${keyField('gen-eleven', 'ElevenLabs', g.keys.elevenlabs, GEN_LINKS.elevenlabs)}
-        <p class="sub" style="font-size:13px">${t('st.keysNote')}</p>
+        <p class="sub" style="font-size:13px">${t(g.shared.image || g.shared.sound ? 'st.keysOptional' : 'st.keysNote')}</p>
         <button class="btn primary" id="gen-save">${t('save')}</button>
       </div>
     </div>
+    ${isAdmin() ? `<div class="panel" data-spot>
+      <h3>👑 ${t('st.limTitle')}</h3>
+      ${g.shared.image || g.shared.sound
+        ? `<p>${t('st.limText')}</p><div class="row">
+            <label class="lim">${t('st.limImg')} <input class="input" id="lim-img" type="number" min="0" max="1000" value="${q.image && q.image.limit != null ? q.image.limit : 20}"></label>
+            <label class="lim">${t('st.limSnd')} <input class="input" id="lim-snd" type="number" min="0" max="1000" value="${q.sound && q.sound.limit != null ? q.sound.limit : 20}"></label>
+            <button class="btn primary" id="lim-save">${t('save')}</button></div>`
+        : `<p>${t('st.limSetup')}</p>`}
+    </div>` : ''}
     <div class="panel" data-spot>
       <div class="tabs"><button data-gtab="image" class="${GEN_TAB === 'image' ? 'on' : ''}">🎨 ${t('st.tabImg')}</button><button data-gtab="sound" class="${GEN_TAB === 'sound' ? 'on' : ''}">🔊 ${t('st.tabSnd')}</button></div>
       <form id="gen-form" class="gen-form">
@@ -760,6 +781,11 @@ async function renderStudio() {
     await api('/gen/settings', { method: 'PUT', body });
     toast(t('toast.saved'));
     transition(renderStudio);
+  };
+  const ls = $('#lim-save');
+  if (ls) ls.onclick = async () => {
+    try { await api('/gen/limits', { method: 'PUT', body: { images: $('#lim-img').value, sounds: $('#lim-snd').value } }); toast(t('toast.saved')); }
+    catch (e) { toast(e.message, true); }
   };
   $('#gen-provider').onchange = () => api('/gen/settings', { method: 'PUT', body: { imageProvider: $('#gen-provider').value } });
   $('#gen-form').onsubmit = async (e) => {

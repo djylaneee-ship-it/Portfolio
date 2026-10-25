@@ -580,3 +580,7 @@ body.desktop .modal, body.desktop .login { padding-top: 40px; }
 .gen-meta { padding: 14px; display: grid; gap: 8px; }
 .gen-meta b { font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .panel h3 .st { margin-left: 8px; vertical-align: middle; }
+.callout-mini { margin: 0 0 14px; padding: 10px 14px; border-radius: 12px; background: var(--accent-bg); border: 1px solid #3B2D5C; font-size: 13.5px; color: var(--muted2); }
+.callout-mini b { color: var(--text); }
+.lim { display: flex; align-items: center; gap: 10px; color: var(--muted2); font-size: 14px; }
+.lim .input { width: 110px; }

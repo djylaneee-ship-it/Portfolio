@@ -82,4 +82,4 @@ async function push(state, cred) {
   must(await rpc('rovex_put_shared', { p_key: cred, p_name: 'skills', p_data: state.skills || {} }));
 }
 
-module.exports = { enabled, rpc, must, pull, push, mergeList };
+module.exports = { enabled, rpc, must, pull, push, mergeList, URL: URL_, KEY };
