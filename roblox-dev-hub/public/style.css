@@ -554,3 +554,10 @@ a.stat { display: block; }
 .pr-tail { color: var(--muted2); }
 @media (max-width: 860px) { .pr-compose { grid-template-columns: 1fr; } }
 @media (max-width: 700px) { .flow-arrow { display: none; } .flow-step { flex-basis: 100%; } }
+
+/* ---------- App de bureau (Windows) : barre de titre intégrée ---------- */
+body.desktop::before { content: ''; position: fixed; top: 0; left: 0; right: 0; height: 34px; z-index: 1000; -webkit-app-region: drag; }
+body.desktop .main { padding-top: 46px; }
+body.desktop .topbar { margin-top: -46px; padding-top: 46px; }
+body.desktop .sidebar { padding-top: 44px; }
+body.desktop .modal, body.desktop .login { padding-top: 40px; }

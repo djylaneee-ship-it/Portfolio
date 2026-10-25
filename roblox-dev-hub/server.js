@@ -12,6 +12,7 @@ const claude = require('./claude');
 const level = require('./level');
 const quality = require('./quality');
 const skills = require('./skills');
+const cloud = require('./cloud');
 
 const PORT = Number(process.env.PORT) || 4747;
 // HOST=0.0.0.0 rend le site accessible aux autres appareils (mode partagé).
@@ -224,7 +225,7 @@ const routes = [
     if (!skills.SKILL_CATS.includes(m[1])) throw Object.assign(new Error('Not found'), { code: 404, key: 'notFound' });
     return { ...skills.getSkill(state, m[1]), defaultInstructions: skills.DEFAULTS[m[1]], context: skills.context(state, m[1]), skillMd: skills.skillMd(state, m[1]) };
   }],
-  ['PUT', /^\/api\/skills\/(\w+)$/, async (req, m) => {
+  ['PUT', /^\/api\/skills\/(\w+)$/, async (req, m, url, session) => {
     if (!skills.SKILL_CATS.includes(m[1])) throw Object.assign(new Error('Not found'), { code: 404, key: 'notFound' });
     const b = await json(req);
     state.skills = state.skills || {};
@@ -236,36 +237,42 @@ const routes = [
     state.skills[m[1]] = cur;
     persist();
     syncCodeSkills();
+    sharedPush(session);
     return skills.getSkill(state, m[1]);
   }],
   ['POST', /^\/api\/skills\/install-code$/, () => skills.installForClaudeCode(state)],
   ['POST', /^\/api\/clean$/, () => { const r = quality.purge(state); persist(); return r; }],
   // Exemples d'apprentissage : les membres voient les exemples validés, l'admin voit tout.
   ['GET', /^\/api\/examples$/, (req, m, url, session) => (state.examples || []).filter((e) => session.role === 'admin' || e.status === 'validated')],
-  ['POST', /^\/api\/examples$/, async (req) => {
+  ['POST', /^\/api\/examples$/, async (req, m, url, session) => {
     const e = db.normalizeExample(await json(req));
     state.examples = state.examples || [];
     state.examples.unshift(e);
     persist();
     syncCodeSkills();
+    sharedPush(session);
     return e;
   }],
-  ['PUT', /^\/api\/examples\/(\w+)$/, async (req, m) => {
+  ['PUT', /^\/api\/examples\/(\w+)$/, async (req, m, url, session) => {
     const i = (state.examples || []).findIndex((x) => x.id === m[1]);
     if (i < 0) throw Object.assign(new Error('Not found'), { code: 404, key: 'notFound' });
     state.examples[i] = db.normalizeExample({ ...state.examples[i], ...(await json(req)), id: m[1], createdAt: state.examples[i].createdAt });
     persist();
     syncCodeSkills();
+    sharedPush(session);
     return state.examples[i];
   }],
-  ['DELETE', /^\/api\/examples\/(\w+)$/, (req, m) => {
+  ['DELETE', /^\/api\/examples\/(\w+)$/, (req, m, url, session) => {
     state.examples = (state.examples || []).filter((x) => x.id !== m[1]);
+    tombstone('examples', m[1]);
     persist();
+    syncCodeSkills();
+    sharedPush(session);
     return { ok: true };
   }],
   // Modèles de prompts perso (les modèles de base sont dans public/prompts.js).
   ['GET', /^\/api\/prompts$/, () => state.prompts || []],
-  ['POST', /^\/api\/prompts$/, async (req) => {
+  ['POST', /^\/api\/prompts$/, async (req, m, url, session) => {
     const b = await json(req);
     const title = String(b.title || '').trim().slice(0, 120);
     const text = String(b.text || '').trim().slice(0, 8000);
@@ -274,11 +281,14 @@ const routes = [
     const p = { id: db.newId(), title, text, cat, kind: 'custom', createdAt: new Date().toISOString() };
     state.prompts = [p, ...(state.prompts || [])];
     persist();
+    sharedPush(session);
     return p;
   }],
-  ['DELETE', /^\/api\/prompts\/(\w+)$/, (req, m) => {
+  ['DELETE', /^\/api\/prompts\/(\w+)$/, (req, m, url, session) => {
     state.prompts = (state.prompts || []).filter((x) => x.id !== m[1]);
+    tombstone('prompts', m[1]);
     persist();
+    sharedPush(session);
     return { ok: true };
   }],
   // Connexion Claude : état, outils activés, consignes, journal et test.
@@ -327,16 +337,16 @@ const routes = [
     const q = String((await json(req)).query || '').slice(0, 200);
     return mcp.call('search_resources', { query: q, limit: 8 });
   }],
-  ['GET', /^\/api\/admin\/codes$/, () => auth.list()],
-  ['POST', /^\/api\/admin\/codes$/, async (req) => auth.create(await json(req))],
-  ['PUT', /^\/api\/admin\/codes\/(\w+)$/, async (req, m) => auth.update(m[1], await json(req))],
-  ['DELETE', /^\/api\/admin\/codes\/(\w+)$/, (req, m) => { auth.remove(m[1]); return { ok: true }; }],
-  ['GET', /^\/api\/admin\/info$/, () => ({
-    host: HOST, port: PORT, shared: HOST !== '127.0.0.1',
+  ['GET', /^\/api\/admin\/codes$/, (req, m, url, session) => auth.list(session)],
+  ['POST', /^\/api\/admin\/codes$/, async (req, m, url, session) => auth.create(await json(req), session)],
+  ['PUT', /^\/api\/admin\/codes\/(\w+)$/, async (req, m, url, session) => auth.update(m[1], await json(req), session)],
+  ['DELETE', /^\/api\/admin\/codes\/(\w+)$/, async (req, m, url, session) => { await auth.remove(m[1], session); return { ok: true }; }],
+  ['GET', /^\/api\/admin\/info$/, (req, m, url, session) => ({
+    host: HOST, port: PORT, shared: HOST !== '127.0.0.1', online: auth.online, offline: Boolean(session.offline), master: Boolean(session.master),
     addresses: Object.values(os.networkInterfaces()).flat().filter((i) => i && i.family === 'IPv4' && !i.internal).map((i) => `http://${i.address}:${PORT}`),
-    keyFile: KEY_FILE,
+    keyFile: KEY_FILE, download: DOWNLOAD_URL, lastShared: state.settings.lastSharedSync || null,
   })],
-  ['POST', /^\/api\/admin\/reset-key$/, () => ({ key: auth.resetMasterKey() })],
+  ['POST', /^\/api\/admin\/reset-key$/, async (req, m, url, session) => ({ key: await auth.resetMasterKey(session) })],
 ];
 
 // Routes accessibles à un ID d'accès simple (lecture seule). Tout le reste est réservé à l'admin.
@@ -354,8 +364,9 @@ function setSession(res, token, expiresAt) {
 async function authRoutes(req, res, url) {
   if (url.pathname === '/api/login' && req.method === 'POST') {
     try {
-      const s = auth.login((await json(req)).code, clientIp(req));
+      const s = await auth.login((await json(req)).code, clientIp(req));
       setSession(res, s.token, s.expiresAt);
+      sharedPull().catch(() => {});
       return send(res, 200, { role: s.role, label: s.label, expiresAt: s.expiresAt });
     } catch (e) { return send(res, e.code || 400, { error: e.message, key: e.key }); }
   }
@@ -366,7 +377,7 @@ async function authRoutes(req, res, url) {
   }
   if (url.pathname === '/api/session') {
     const s = auth.check(cookies(req).rdh_session);
-    return send(res, 200, s ? { loggedIn: true, role: s.role, label: s.label, expiresAt: s.expiresAt, permanent: Boolean(s.permanent || !s.codeId) } : { loggedIn: false });
+    return send(res, 200, s ? { loggedIn: true, role: s.role, label: s.label, expiresAt: s.expiresAt, permanent: Boolean(s.permanent || !s.codeId), master: Boolean(s.master), offline: Boolean(s.offline) } : { loggedIn: false });
   }
   return false;
 }
@@ -467,12 +478,19 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.on('error', (e) => {
-  if (e.code === 'EADDRINUSE') {
+  if (e.code === 'EADDRINUSE' && !process.versions.electron) {
     console.log(`\n  Rovex Hub is already running  →  http://localhost:${PORT}\n`);
     process.exit(0);
   }
+  if (process.versions.electron) return readyFail(e);
   throw e;
 });
+
+// L'app de bureau attend que le serveur écoute avant d'ouvrir sa fenêtre.
+let readyOk, readyFail;
+module.exports.ready = new Promise((res, rej) => { readyOk = res; readyFail = rej; });
+module.exports.ready.catch(() => {});
+module.exports.PORT = PORT;
 
 server.listen(PORT, HOST, () => {
   console.log(`\n  Rovex Hub ready  →  http://localhost:${PORT}`);
@@ -481,8 +499,37 @@ server.listen(PORT, HOST, () => {
   }
   console.log(`\n  Admin key (permanent) / Clé admin : ${auth.masterKey()}`);
   console.log(`  (saved in ${KEY_FILE})\n  Ctrl+C to stop\n`);
+  readyOk(PORT);
   autoConnectClaude();
+  sharedPull().catch(() => {});
 });
+
+// ---------- Contenu partagé en ligne : exemples, skills et prompts des admins ----------
+// Les membres reçoivent ce que les admins publient ; les deux admins restent synchronisés.
+const DOWNLOAD_URL = 'https://github.com/djylaneee-ship-it/Portfolio/releases/latest';
+function tombstone(kind, id) {
+  state.sharedDeleted = state.sharedDeleted || { examples: {}, prompts: {} };
+  state.sharedDeleted[kind] = state.sharedDeleted[kind] || {};
+  state.sharedDeleted[kind][id] = Date.now();
+}
+async function sharedPull() {
+  const c = auth.online && state.auth && state.auth.lastCred;
+  if (!c) return false;
+  const changed = await cloud.pull(state, c.code);
+  state.settings.lastSharedSync = new Date().toISOString();
+  persist();
+  if (changed) syncCodeSkills();
+  return changed;
+}
+let pushTimer = null;
+function sharedPush(session) {
+  if (!auth.online || !session || session.role !== 'admin' || !session.cred) return;
+  clearTimeout(pushTimer);
+  pushTimer = setTimeout(() => {
+    cloud.push(state, session.cred).then(() => { state.settings.lastSharedSync = new Date().toISOString(); persist(); }).catch(() => {});
+  }, 3000);
+}
+setInterval(() => sharedPull().catch(() => {}), 15 * 60e3);
 
 // Les skills installés dans Claude Code sont réécrits quand un skill ou un exemple change.
 function syncCodeSkills() {
@@ -495,7 +542,7 @@ async function autoConnectClaude() {
   if (state.settings.autoConnectClaude === false || process.env.ROVEX_NO_AUTOCONNECT) return;
   try {
     const st = claude.desktopStatus();
-    if (st.installed && !st.linked) {
+    if (st.installed && (!st.linked || st.outdated)) {
       claude.linkDesktop();
       console.log('  Claude Desktop detected: Rovex Hub added. Restart Claude Desktop to use it.');
     } else if (st.linked) {

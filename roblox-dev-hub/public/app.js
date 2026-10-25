@@ -1269,14 +1269,16 @@ async function renderAdmin() {
     <div class="two-col">
       <div class="panel" data-spot>
         <h3>🔑 ${t('admin.keyTitle')}</h3>
-        <p>${t('admin.keyText')}</p>
+        <p>${t('admin.keyFile')}</p>
         ${codeBox(info.keyFile)}
-        <div class="row" style="margin-top:14px"><button class="btn danger" id="reset-key">${t('admin.resetKey')}</button></div>
+        ${info.master ? `<div class="row" style="margin-top:14px"><button class="btn danger" id="reset-key">${t('admin.resetKey')}</button></div>` : `<p class="sub" style="margin-top:14px;font-size:13px">${t('admin.masterOnly')}</p>`}
       </div>
       <div class="panel" data-spot>
-        <h3>🌐 ${t('admin.shareTitle')}</h3>
-        ${info.shared ? `<p>${t('admin.sharedOn')}</p>${info.addresses.map((a) => codeBox(a)).join('')}` : `<p>${t('admin.sharedOff')}</p>`}
-        <p style="margin-top:14px">${t('admin.internet', { port: info.port })}</p>
+        <h3>🌐 ${t('admin.onlineTitle')}</h3>
+        <p><span class="status ${info.online && !info.offline ? 'active' : 'expired'}">${t(info.online ? (info.offline ? 'admin.offline' : 'admin.online') : 'admin.local')}</span></p>
+        <p>${t('admin.onlineText')}</p>
+        ${codeBox(info.download)}
+        ${info.lastShared ? `<p class="sub" style="margin-top:12px;font-size:13px">${t('admin.lastShared', { date: dateTime(info.lastShared) })}</p>` : ''}
       </div>
     </div>`;
   bindCopy(view);
@@ -1290,7 +1292,8 @@ async function renderAdmin() {
     const d = Object.fromEntries(new FormData(e.target));
     d.admin = $('#code-form [name=admin]').checked;
     const c = await api('/admin/codes', { method: 'POST', body: d });
-    const msg = t(c.admin ? 'admin.msgAdmin' : 'admin.msg', { code: c.code }) + '\n' + (c.expiresAt ? t('admin.msgUntil', { date: date(c.expiresAt) }) : t('admin.msgForever'));
+    const msg = t(c.admin ? 'admin.msgAdmin' : 'admin.msg', { code: c.code }) + '\n' + (c.expiresAt ? t('admin.msgUntil', { date: date(c.expiresAt) }) : t('admin.msgForever'))
+      + '\n\n' + t('admin.msgDownload', { url: info.download });
     await renderAdmin();
     $('#new-code').innerHTML = `<div class="new-code"><span>${c.label ? t('admin.newFor', { name: esc(c.label) }) : t('admin.newId')}</span><strong>${esc(c.code)}</strong>
       <div class="row"><button class="btn small primary" data-copy="${esc(c.code)}">${t('admin.copyId')}</button><button class="btn small" data-copy="${esc(msg)}">${t('admin.copyMsg')}</button></div></div>`;
@@ -1300,7 +1303,7 @@ async function renderAdmin() {
   $$('[data-forever]').forEach((b) => b.onclick = async () => { await api('/admin/codes/' + b.dataset.forever, { method: 'PUT', body: { permanent: true } }); toast(t('admin.nowForever')); renderAdmin(); });
   $$('[data-block]').forEach((b) => b.onclick = async () => { await api('/admin/codes/' + b.dataset.block, { method: 'PUT', body: { revoked: b.dataset.v === 'true' } }); renderAdmin(); });
   $$('[data-remove]').forEach((b) => b.onclick = async () => { if (!confirm(t('admin.confirmDelete'))) return; await api('/admin/codes/' + b.dataset.remove, { method: 'DELETE' }); renderAdmin(); });
-  $('#reset-key').onclick = async () => {
+  if ($('#reset-key')) $('#reset-key').onclick = async () => {
     if (!confirm(t('admin.confirmReset'))) return;
     const r = await api('/admin/reset-key', { method: 'POST' });
     prompt(t('admin.newKey'), r.key);
@@ -1601,6 +1604,7 @@ window.addEventListener('drop', (e) => {
 
 window.addEventListener('hashchange', route);
 (async () => {
+  if (/Electron/.test(navigator.userAgent)) document.body.classList.add('desktop');
   applyStatic();
   $('#login-lang').value = LANG;
   try { SESSION = await api('/session'); }

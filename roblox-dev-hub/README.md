@@ -1,6 +1,6 @@
 # Rovex Hub
 
-Le cerveau Roblox de ton Claude : une bibliothèque de ressources de dev Roblox (scripting, VFX, animation, GUI, GFX, modélisation, build, audio, game design, outils) et d'**exemples d'apprentissage** que Claude suit avant de coder. Elle tourne sur ton PC et s'expose en serveur MCP.
+Le cerveau Roblox de ton Claude : une bibliothèque de ressources de dev Roblox (scripting, VFX, animation, GUI, GFX, modélisation, build, audio, game design, outils) et d'**exemples d'apprentissage** que Claude suit avant de coder. C'est une application Windows qui tourne sur ton PC et s'expose en serveur MCP.
 
 - **Exemples d'apprentissage** : une demande, le bon code Luau et pourquoi il est bon. Les exemples validés sont servis en priorité à Claude (`list_examples`, `get_example`).
 - **Connexion Claude** : config prête à copier, outils activables un par un, consignes envoyées à Claude, test d'une question et journal de son activité en direct.
@@ -20,33 +20,33 @@ Le cerveau Roblox de ton Claude : une bibliothèque de ressources de dev Roblox 
 - **Favoris, niveaux, tags et notes**.
 - **Serveur MCP** : n'importe quel client MCP peut chercher dans ta base, ajouter des tutos et écrire des notes.
 
-## Installation (Windows) : un seul fichier
+## Installation (Windows) : une vraie application
 
-1. Télécharge **`Installer Rovex Hub.bat`** (à la racine du dépôt).
-2. Double-clique dessus. L'installateur :
-   - vérifie Node.js et l'installe avec winget s'il manque ;
-   - installe l'app dans `%LOCALAPPDATA%\RobloxDevHub` ;
-   - crée le raccourci **Rovex Hub** (avec son logo) sur le Bureau et dans le menu Démarrer ;
-   - ouvre l'app sur http://localhost:4747.
+1. Télécharge **`Rovex-Hub-Setup-x.y.z.exe`** dans les [releases du dépôt](https://github.com/djylaneee-ship-it/Portfolio/releases/latest).
+2. Double-clique dessus : l'app s'installe toute seule (comme Discord), crée l'icône **Rovex Hub** sur le Bureau et dans le menu Démarrer, puis s'ouvre. Pas de navigateur, pas de terminal, pas besoin de Node.js.
+   - Windows peut afficher « Windows a protégé votre ordinateur » (l'app n'est pas signée) : clique **Informations complémentaires** → **Exécuter quand même**.
+3. Les mises à jour se téléchargent et s'installent toutes seules.
 
-Pour mettre à jour, relance l'installateur : ta base et tes fichiers sont conservés. Pour désinstaller, lance `Desinstaller.bat` dans le dossier d'installation.
+Fermer la fenêtre garde Rovex Hub dans la zone de notification (à côté de l'heure), pour que Claude reste connecté. Clic droit sur l'icône : ouvrir, lancer au démarrage de Windows, chercher une mise à jour, quitter.
 
-Laisse la petite fenêtre noire ouverte tant que tu utilises l'app.
+Les données (base, exemples, clé admin) sont dans `%APPDATA%\Rovex Hub` : elles sont gardées lors des mises à jour. Au premier lancement, l'app reprend la base de l'ancienne version (`%LOCALAPPDATA%\RobloxDevHub`).
 
-Après une modification du code, régénère l'installateur avec `node build-installer.js`.
+**Sortir une nouvelle version** : augmente `version` dans `package.json` et pousse. Le workflow `.github/workflows/rovex-desktop.yml` construit l'installeur sur Windows et le publie dans les releases ; les apps installées se mettent à jour d'elles-mêmes. En développement : `npm install` puis `npm run app` (ou `npm start` pour le serveur seul).
 
 ## Accès par ID et panneau admin
 
-Le site demande un **ID d'accès** pour entrer.
+L'app demande un **ID d'accès** pour entrer. Les IDs sont gardés **en ligne** (base Supabase du projet `rovex-hub`) : un ID créé sur ton PC marche sur n'importe quel PC qui a Rovex Hub et internet.
 
-- **Clé admin permanente** : créée au premier lancement, affichée dans la fenêtre noire et enregistrée dans `data/CLE-ADMIN.txt`. Elle n'expire jamais et ouvre le **panneau Admin**. Ne la partage pas.
-- **IDs d'accès** (`RDH-XXXX-XXXX-XXXX`) : crée-les dans **Admin**, envoie-les. Ils donnent accès au site en lecture seule et se bloquent tout seuls après leur durée (1 jour, 7 jours, 1 mois, 3 mois, 1 an) ou sont **permanents** (∞). Tu peux les prolonger, les rendre permanents, les bloquer ou les supprimer.
-- **Co-admin** : coche « 👑 Droits admin » en créant un ID pour lui donner le panneau Admin (choisis « ∞ Permanent » pour qu'il n'expire pas). Seule la clé principale peut être régénérée.
+- **Clé admin permanente** : créée au premier lancement et enregistrée dans `%APPDATA%\Rovex Hub\data\CLE-ADMIN.txt`. Le premier PC admin qui se connecte avec sa clé l'enregistre en ligne comme clé principale (et envoie en ligne les IDs créés avant). Elle n'expire jamais et ouvre le **panneau Admin**. Ne la partage pas.
+- **IDs d'accès** (`RDH-XXXX-XXXX-XXXX`) : crée-les dans **Admin**, puis envoie le message tout prêt (ID + lien de téléchargement). Ils donnent accès en lecture seule et se bloquent tout seuls après leur durée (1 jour, 7 jours, 1 mois, 3 mois, 1 an) ou sont **permanents** (∞). Tu peux les prolonger, les rendre permanents, les bloquer ou les supprimer ; un ID bloqué est déconnecté en moins de 10 minutes.
+- **Co-admin** : coche « 👑 Droits admin » en créant un ID pour lui donner le panneau Admin (choisis « ∞ Permanent »). Seule la clé principale peut être régénérée.
+- **Contenu partagé** : les exemples d'apprentissage, les skills et les prompts créés par les admins sont publiés en ligne et arrivent chez tous les membres (toutes les 15 minutes et à chaque connexion). La bibliothèque, elle, vient de l'algo cloud GitHub.
+- **Sans internet** : la clé admin de ce PC marche encore (mode hors ligne), mais la gestion des IDs demande internet.
 
 ## Langues
 
 Le site est en **anglais** par défaut. Chaque visiteur choisit sa langue (English, Français, Español, Português) sur l'écran de connexion, dans la barre latérale ou dans Réglages ; le choix est gardé dans son navigateur. Les textes sont dans `public/i18n.js`.
-- **Partager le site** : `Lancer en mode partage.bat` l'ouvre aux appareils de ton Wi-Fi. Pour internet, il faut un tunnel (ex. `cloudflared tunnel --url http://localhost:4747`) ou un hébergement.
+- **Partager l'app** : envoie le lien de téléchargement et un ID ; chacun installe Rovex Hub sur son PC.
 
 ## Algo cloud (GitHub Actions)
 
@@ -63,7 +63,7 @@ L'app récupère ce fichier toutes les 30 minutes (**Réglages → Source cloud*
 L'app expose un serveur MCP (`rovex-hub`), à brancher dans Claude ou tout autre client MCP. La page **Connexion Claude** affiche la config exacte, prête à copier, et la commande Claude Code : `claude mcp add --transport http rovex-hub http://localhost:4747/mcp`.
 
 - **Mode HTTP** (l'app doit être ouverte) : `http://localhost:4747/mcp` — libre depuis ton PC ; depuis un autre appareil, ajoute l'en-tête `Authorization: Bearer <ID ou clé admin>`.
-- **Mode stdio** (marche même app fermée) : `node "%LOCALAPPDATA%\RobloxDevHub\mcp.js"`
+- **Mode stdio** (marche même app fermée) : Claude Desktop lance `Rovex Hub.exe` en mode Node sur `resources\app\mcp.js` (variable `ELECTRON_RUN_AS_NODE=1`). L'app écrit cette config toute seule.
 
 Outils exposés (activables dans **Connexion Claude**) : `load_skill`, `list_skills`, `search_opensource`, `search_resources`, `list_examples`, `get_example`, `get_resource`, `list_categories`, `add_resource`, `import_url`, `update_notes`, `explore_internet`, `explore_status`, `list_channels`, `sync_channels`.
 

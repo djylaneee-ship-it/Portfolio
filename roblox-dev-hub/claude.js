@@ -39,16 +39,24 @@ function readConfig(file) {
   return txt ? JSON.parse(txt) : {};
 }
 
-const entry = () => ({ command: process.execPath, args: [MCP_PATH] });
+// Dans l'app de bureau, Claude lance Rovex Hub.exe en mode Node (pas de fenêtre) sur mcp.js.
+const entry = () => (process.versions.electron
+  ? { command: process.execPath, args: [MCP_PATH], env: { ELECTRON_RUN_AS_NODE: '1', ROVEX_DATA: process.env.ROVEX_DATA || '' } }
+  : { command: process.execPath, args: [MCP_PATH] });
 
 function desktopStatus() {
   const configs = configPaths().map((file) => {
     let linked = false;
+    let outdated = false;
     let error = '';
-    try { linked = Boolean((readConfig(file).mcpServers || {})[NAME]); } catch (e) { error = e.message; }
-    return { file, exists: fs.existsSync(file), dir: fs.existsSync(path.dirname(file)), linked, error };
+    try {
+      const cur = (readConfig(file).mcpServers || {})[NAME];
+      linked = Boolean(cur);
+      outdated = linked && JSON.stringify(cur) !== JSON.stringify(entry());
+    } catch (e) { error = e.message; }
+    return { file, exists: fs.existsSync(file), dir: fs.existsSync(path.dirname(file)), linked, outdated, error };
   });
-  return { installed: desktopInstalled(), linked: configs.some((c) => c.linked), configs };
+  return { installed: desktopInstalled(), linked: configs.some((c) => c.linked), outdated: configs.some((c) => c.outdated), configs };
 }
 
 // Ajoute Rovex Hub aux serveurs MCP de Claude Desktop, sans toucher aux autres serveurs.

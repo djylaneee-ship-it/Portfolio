@@ -4,8 +4,10 @@ const path = require('path');
 const crypto = require('crypto');
 
 const ROOT = __dirname;
-const DATA_DIR = path.join(ROOT, 'data');
-const MEDIA_DIR = path.join(ROOT, 'media');
+// L'app de bureau range les données dans %APPDATA%\Rovex Hub (ROVEX_DATA) pour qu'une mise à jour ne les efface pas.
+const BASE = process.env.ROVEX_DATA || ROOT;
+const DATA_DIR = path.join(BASE, 'data');
+const MEDIA_DIR = path.join(BASE, 'media');
 const DB_FILE = path.join(DATA_DIR, 'library.json');
 const SEED_FILE = path.join(ROOT, 'seed.json');
 

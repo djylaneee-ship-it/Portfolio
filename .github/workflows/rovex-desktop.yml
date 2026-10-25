@@ -1,0 +1,46 @@
+# Construit l'application Windows Rovex Hub (Rovex-Hub-Setup-x.y.z.exe) et la publie dans les
+# releases GitHub. Les apps déjà installées se mettent à jour toutes seules depuis ces releases.
+# Pour sortir une nouvelle version : augmenter "version" dans roblox-dev-hub/package.json.
+name: Rovex Hub — application Windows
+
+on:
+  push:
+    paths:
+      - 'roblox-dev-hub/package.json'
+      - '.github/workflows/rovex-desktop.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rovex-desktop
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: roblox-dev-hub
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Dépendances
+        run: npm install --no-audit --no-fund
+
+      - name: Construire et publier l'installeur
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx electron-builder --win nsis --publish always
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Rovex-Hub-Setup
+          path: roblox-dev-hub/dist/*.exe
+          retention-days: 14

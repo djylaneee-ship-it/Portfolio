@@ -1,12 +1,50 @@
 {
-  "name": "roblox-dev-hub",
-  "version": "1.0.0",
-  "description": "Bibliothèque locale de ressources de dev Roblox (vidéos, docs, VFX, scripts, animations, GUI, GFX) reliée à Claude via MCP.",
-  "main": "server.js",
+  "name": "rovex-hub",
+  "productName": "Rovex Hub",
+  "version": "2.0.0",
+  "description": "Rovex Hub: Roblox dev knowledge base (videos, docs, VFX, scripts, animations, GUI, GFX) connected to Claude via MCP.",
+  "author": "Rovex",
+  "main": "electron.js",
   "scripts": {
+    "app": "electron .",
     "start": "node server.js",
-    "mcp": "node mcp.js"
+    "mcp": "node mcp.js",
+    "dist": "electron-builder --win nsis --publish never"
   },
   "engines": { "node": ">=18" },
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "electron-updater": "6.8.10"
+  },
+  "devDependencies": {
+    "electron": "44.7.0",
+    "electron-builder": "26.17.0"
+  },
+  "build": {
+    "appId": "com.rovexhub.app",
+    "productName": "Rovex Hub",
+    "asar": false,
+    "directories": { "output": "dist" },
+    "files": [
+      "*.js", "seed.json", "rovex.ico", "public/**",
+      "!build-installer.js", "!cloud-crawl.js"
+    ],
+    "win": {
+      "target": [{ "target": "nsis", "arch": ["x64"] }],
+      "icon": "rovex.ico",
+      "artifactName": "Rovex-Hub-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "createDesktopShortcut": "always",
+      "createStartMenuShortcut": true,
+      "shortcutName": "Rovex Hub",
+      "runAfterFinish": true,
+      "installerIcon": "rovex.ico",
+      "uninstallerIcon": "rovex.ico",
+      "deleteAppDataOnUninstall": false
+    },
+    "publish": [{ "provider": "github", "owner": "djylaneee-ship-it", "repo": "Portfolio", "releaseType": "release" }]
+  }
 }

@@ -29,6 +29,13 @@ jobs:
         with:
           node-version: 22
 
+      # Garde la base en ligne des IDs éveillée (un projet Supabase gratuit s'endort après 7 jours sans activité).
+      - name: Réveil de la base des IDs
+        continue-on-error: true
+        run: |
+          curl -s -X POST "https://qsgqgtowxaadtlwnwrvc.supabase.co/rest/v1/rpc/rovex_ping" \
+            -H "apikey: sb_publishable_JdGyPh6YtCAmxlrICg5tSA_tMXI3S5A" -H "Content-Type: application/json" -d '{}'
+
       - name: Exploration
         working-directory: roblox-dev-hub
         env:
