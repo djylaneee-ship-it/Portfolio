@@ -56,6 +56,19 @@ const TOOLS = [
     },
   },
   {
+    name: 'search_opensource',
+    description: 'Search free & open source Roblox code: GitHub repos (sorted by stars), DevForum community resources, free Creator Store models and plugins. Use it when the user wants a ready-made system or module.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        query: { type: 'string' },
+        source: { type: 'string', enum: ['github', 'devforum', 'creator-store'] },
+        category: { type: 'string', enum: CAT_IDS },
+        limit: { type: 'number' },
+      },
+    },
+  },
+  {
     name: 'list_examples',
     description: 'List the learning examples (a request, the right code, and why it is right). Validated examples are references to follow before writing code.',
     inputSchema: {
@@ -175,6 +188,10 @@ async function call(name, a = {}) {
       const res = db.search(state, { q: a.query || '', category: a.category || '', type: a.type || '', favorite: Boolean(a.favorites_only), limit: a.limit || 15 });
       const examples = matchExamples(state, { query: a.query, category: a.category }).slice(0, 5).map(briefExample);
       return { count: res.length, examples, results: res.map(brief) };
+    }
+    case 'search_opensource': {
+      const res = db.search(state, { q: a.query || '', category: a.category || '', types: ['opensource', 'asset'], tag: a.source || '', sort: 'stars', limit: a.limit || 15 });
+      return { count: res.length, results: res.map((r) => ({ ...brief(r), stars: r.stars || undefined })) };
     }
     case 'list_examples': {
       const list = matchExamples(state, { query: a.query, category: a.category, drafts: a.include_drafts });

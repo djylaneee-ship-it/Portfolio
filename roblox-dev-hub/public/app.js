@@ -286,7 +286,7 @@ async function renderHome() {
     <div class="stats">
       <div class="stat"><b data-count="${STATS.total}">0</b><span>${t('stat.resources')}</span></div>
       <div class="stat"><b data-count="${s.video || 0}">0</b><span>${t('stat.videos')}</span></div>
-      <div class="stat"><b data-count="${s.opensource || 0}">0</b><span>${t('stat.opensource')}</span></div>
+      <a class="stat" href="#/opensource"><b data-count="${STATS.opensource || 0}">0</b><span>${t('stat.opensource')}</span></a>
       <div class="stat"><b data-count="${STATS.channels}">0</b><span>${t('stat.channels')}</span></div>
       <div class="stat"><b data-count="${STATS.examples || 0}">0</b><span>${t('stat.examples')}</span></div>
     </div>
@@ -295,7 +295,7 @@ async function renderHome() {
         <div class="section-head"><h2>${t('home.byCategory')}</h2><a class="link" href="#/library">${t('home.seeAll')}</a></div>
         <div class="cat-grid">${META.categories.map((x) => cat(x.id)).map((c) => `
           <a class="cat-tile" style="--c:${c.color}" href="#/library?cat=${c.id}" data-spot>
-            <span class="top"><span class="badge-ico">${esc(c.badge)}</span><span class="count">${num(STATS.byCategory[c.id])}</span></span>
+            <span class="top"><span class="badge-ico">${esc(c.badge)}</span><span class="count">${num((STATS.learnByCategory || STATS.byCategory)[c.id])}</span></span>
             <h3>${esc(c.label)}</h3><p>${esc(c.desc)}</p>
           </a>`).join('')}</div>
       </div>
@@ -372,7 +372,7 @@ async function renderLibrary(params, favorites = false) {
   const q = params.get('q') || '';
   const c = params.get('cat') || '';
   $('#search').value = q;
-  const qs = new URLSearchParams({ q, category: c, type: filters.type, level: filters.level, favorite: favorites ? '1' : '', limit: 60 });
+  const qs = new URLSearchParams({ q, category: c, type: filters.type, level: filters.level, favorite: favorites ? '1' : '', exclude: favorites ? '' : OS_TYPES.join(','), limit: 60 });
   const { total, items: list } = await api('/resources?' + qs);
   const cc = c && cat(c);
   view.innerHTML = `
@@ -380,7 +380,7 @@ async function renderLibrary(params, favorites = false) {
       `${cc && !favorites ? esc(cc.desc) + ' · ' : ''}${t('lib.count', { n: total, num: num(total) })}`)}
     <div class="toolbar">
       <button class="chip ${!filters.type ? 'on' : ''}" data-type="">${t('lib.all')}</button>
-      ${META.types.map((ty) => `<button class="chip ${filters.type === ty ? 'on' : ''}" data-type="${ty}">${typeLabel(ty)}</button>`).join('')}
+      ${META.types.filter((ty) => favorites || !OS_TYPES.includes(ty)).map((ty) => `<button class="chip ${filters.type === ty ? 'on' : ''}" data-type="${ty}">${typeLabel(ty)}</button>`).join('')}
       <span class="spacer"></span>
       <select class="select" id="lvl"><option value="">${t('lib.allLevels')}</option>${LEVELS.map((k) => `<option value="${k}" ${filters.level === k ? 'selected' : ''}>${levelLabel(k)}</option>`).join('')}</select>
     </div>
@@ -401,6 +401,76 @@ async function renderLibrary(params, favorites = false) {
     btn.disabled = false;
     $('#more-row').hidden = list.length >= total;
   };
+}
+
+// ---------- Open source & systèmes gratuits (séparé de la bibliothèque d'apprentissage) ----------
+const OS_TYPES = ['opensource', 'asset'];
+const OS_TABS = [['', 'os2.all'], ['github', 'GitHub'], ['devforum', 'DevForum'], ['modele', 'os2.models'], ['plugin', 'os2.plugins']];
+const osF = { tab: '', q: '', cat: '', sort: 'stars' };
+const shortNum = (n) => (n >= 1000 ? (n / 1000).toFixed(n >= 10000 ? 0 : 1).replace('.0', '') + 'k' : String(n));
+
+function osCard(r) {
+  const c = cat(r.category);
+  const parts = String(r.description || '').split(' · ');
+  const desc = parts.filter((x) => !/^★|^(Luau|Lua|TypeScript|MIT|Apache|GPL|MPL|BSD|Plugin|Modèle gratuit|Free model)\b|^👍/i.test(x)).join(' · ');
+  const meta = parts.filter((x) => /^(Luau|Lua|TypeScript|MIT|Apache-2.0|GPL|MPL-2.0|BSD)/.test(x));
+  const src = (r.tags || []).includes('github') ? 'GitHub' : (r.tags || []).includes('devforum') ? 'DevForum' : (r.tags || []).includes('plugin') ? t('os2.plugin') : r.type === 'asset' ? t('os2.model') : typeLabel(r.type);
+  const fb = `<span class="fb">${svgPath(TYPE_ICONS[r.type] || TYPE_ICONS.opensource)}</span>`;
+  return `<article class="card" style="--c:${c.color}" data-id="${r.id}">
+    ${r.thumbnail ? `<div class="thumb"><img src="${esc(r.thumbnail)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.classList.add('ph');this.remove()">${fb}` : `<div class="thumb ph">${fb}`}
+    <span class="badge">${esc(src)}</span>${r.stars ? `<span class="stars">★ ${shortNum(r.stars)}</span>` : ''}</div>
+    <div class="card-body">
+      <div class="card-cat"><span class="dot" style="background:${c.color}"></span>${esc(c.label)}</div>
+      <h3>${esc(r.title)}</h3>
+      ${desc ? `<p class="os-desc">${esc(desc)}</p>` : ''}
+      <div class="meta">${meta.map((x) => `<span class="tag">${esc(x)}</span>`).join('')}<span>${esc(r.author || '')}</span></div>
+    </div></article>`;
+}
+
+async function renderOpenSource() {
+  const qs = new URLSearchParams({ types: OS_TYPES.join(','), q: osF.q, category: osF.cat, tag: osF.tab, sort: osF.sort === 'stars' ? 'stars' : '', limit: 60 });
+  const { total, items } = await api('/resources?' + qs);
+  view.innerHTML = `
+    ${pageHead(t('os2.eyebrow'), t('os2.title'), t('os2.sub'), `<a class="btn primary admin-only" href="#/explore">${BOLT}${t('os.go')}</a>`)}
+    <div class="toolbar">
+      ${OS_TABS.map(([v, k]) => `<button class="chip solid ${osF.tab === v ? 'on' : ''}" data-ostab="${v}">${k.includes('.') ? t(k) : k}</button>`).join('')}
+    </div>
+    <div class="toolbar">
+      <input class="input" id="os-q" style="flex:1;min-width:220px" placeholder="${t('os2.searchPh')}" value="${esc(osF.q)}">
+      <select class="select" id="os-cat" style="padding:11px 14px"><option value="">${t('os2.allCats')}</option>${catOptions(osF.cat)}</select>
+      <select class="select" id="os-sort" style="padding:11px 14px"><option value="stars" ${osF.sort === 'stars' ? 'selected' : ''}>${t('os2.byStars')}</option><option value="recent" ${osF.sort === 'recent' ? 'selected' : ''}>${t('os2.byRecent')}</option></select>
+    </div>
+    <p class="sub">${t('lib.count', { n: total, num: num(total) })}</p>
+    <div id="os-list">${items.length ? `<div class="grid">${items.map(osCard).join('')}</div>` : `<div class="empty"><b>${t('os2.none')}</b>${t('os2.noneText')}</div>`}</div>
+    <div class="row more-row" id="more-row" ${items.length < total ? '' : 'hidden'}><button class="btn" id="more">${t('more')}</button></div>`;
+  $$('[data-ostab]').forEach((b) => b.onclick = () => { osF.tab = b.dataset.ostab; transition(renderOpenSource); });
+  let tm;
+  $('#os-q').oninput = (e) => { clearTimeout(tm); tm = setTimeout(() => { osF.q = e.target.value; refreshOs(); }, 300); };
+  $('#os-cat').onchange = (e) => { osF.cat = e.target.value; refreshOs(); };
+  $('#os-sort').onchange = (e) => { osF.sort = e.target.value; refreshOs(); };
+  bindCards($('#os-list'), items);
+  $('#more').onclick = async (e) => {
+    const btn = e.currentTarget; btn.disabled = true;
+    qs.set('offset', items.length);
+    const page = await api('/resources?' + qs);
+    items.push(...page.items);
+    $('#os-list .grid').insertAdjacentHTML('beforeend', page.items.map(osCard).join(''));
+    btn.disabled = false;
+    $('#more-row').hidden = items.length >= total;
+  };
+}
+
+// Rafraîchit la liste sans rejouer toute l'animation de page (garde le focus de la recherche).
+async function refreshOs() {
+  const qs = new URLSearchParams({ types: OS_TYPES.join(','), q: osF.q, category: osF.cat, tag: osF.tab, sort: osF.sort === 'stars' ? 'stars' : '', limit: 60 });
+  const { total, items } = await api('/resources?' + qs);
+  const box = $('#os-list');
+  if (!box) return;
+  box.innerHTML = items.length ? `<div class="grid stagger">${items.map(osCard).join('')}</div>` : `<div class="empty"><b>${t('os2.none')}</b>${t('os2.noneText')}</div>`;
+  if (box.firstElementChild) stagger(box.firstElementChild);
+  $('#os-list').previousElementSibling.textContent = t('lib.count', { n: total, num: num(total) });
+  bindCards(box, items);
+  $('#more-row').hidden = items.length >= total;
 }
 
 // ---------- Exemples d'apprentissage ----------
@@ -584,8 +654,7 @@ async function renderChannels(params) {
       <div class="panel" data-spot>
         <h3>🔎 ${t('ch.findTitle')}</h3>
         <p>${t('ch.findText')}</p>
-        <div class="row"><button class="btn primary" data-crawl='{"mode":"channels","scope":"all","intensity":"normal","syncAfter":true}'>${t('ch.findGo')}</button>
-        <button class="btn" data-crawl='{"mode":"channels","scope":"dev","intensity":"normal","syncAfter":true}'>${t('ch.devOnly')}</button></div>
+        <div class="row"><button class="btn primary" data-crawl='{"mode":"channels","scope":"dev","intensity":"normal","syncAfter":true}'>${t('ch.findGo')}</button></div>
       </div>
       <div class="panel" data-spot>
         <h3>🔄 ${t('ch.syncTitle')}</h3>
@@ -657,13 +726,16 @@ async function renderExplore() {
         <div class="row" style="margin-top:24px;padding-top:20px;border-top:1px solid var(--line)"><button class="btn primary" id="ex-go">${BOLT}${t('ex.go')}</button>
         <a class="btn" href="#/channels">${t('ch.findTitle')}</a></div>
       </div>
-      <div id="job"><div class="panel"><h3>${t('ex.idle')}</h3><p>${t('ex.idleText')}</p></div></div>
+      <div style="display:flex;flex-direction:column;gap:24px;min-width:0">
+        <div id="job"><div class="panel"><h3>${t('ex.idle')}</h3><p>${t('ex.idleText')}</p></div></div>
+        <div class="panel" data-spot><h3>🛡️ ${t('qf.title')}</h3><p>${t('qf.text')}</p><button class="btn" id="qf-clean">${t('qf.clean')}</button></div>
+      </div>
     </div>
     <div class="panel" data-spot>
       <div class="row" style="justify-content:space-between;align-items:center">
         <div style="flex:1;min-width:260px"><h3>📦 ${t('os.title')}</h3><p style="margin:0">${t('os.text')}</p></div>
         <div class="row" id="os-src">${[['github', 'GitHub'], ['devforum', t('os.forum')], ['store', 'Creator Store']].map(([v, l]) => `<label class="chip on"><input type="checkbox" value="${v}" checked hidden>${l}</label>`).join('')}
-        <button class="btn primary" id="os-go">${t('os.go')}</button></div>
+        <button class="btn primary" id="os-go">${t('os.go')}</button><a class="btn" href="#/opensource">${t('os2.see')}</a></div>
       </div>
     </div>`;
   const toggle = (l) => l.onclick = (e) => {
@@ -683,6 +755,13 @@ async function renderExplore() {
     sources: $$('#ex-src input:checked').map((i) => i.value),
     intensity: $('#ex-int input:checked').value,
   });
+  $('#qf-clean').onclick = async (e) => {
+    e.currentTarget.disabled = true;
+    const r = await api('/clean', { method: 'POST' });
+    toast(t('qf.done', { n: r.resources, c: r.channels }));
+    refreshStats();
+    e.currentTarget.disabled = false;
+  };
   $('#os-go').onclick = () => startCrawl({ mode: 'opensource', sources: $$('#os-src input:checked').map((i) => i.value), intensity: $('#ex-int input:checked').value });
   watchJob();
 }
@@ -722,6 +801,7 @@ async function watchJob() {
       <div class="job-stats">
         <div><b>${num(st.added)}</b><span>${t('job.added')}</span></div>
         <div><b>${num(st.channels)}</b><span>${t('job.channels')}</span></div>
+        <div><b>${num(st.rejected)}</b><span>${t('job.rejected')}</span></div>
         <div><b>${st.errors}</b><span>${t('job.errors')}</span></div>
       </div>
       ${st.current ? `<p style="margin:14px 0 0;font-size:13px">${t('job.current')} ${esc(current(st.current))}</p>` : ''}
@@ -1247,7 +1327,7 @@ async function refreshStats() {
   STATS = await api('/stats');
   const active = new URLSearchParams(location.hash.split('?')[1] || '').get('cat');
   $('#side-cats').innerHTML = META.categories.map((x) => cat(x.id)).map((c) => `
-    <a href="#/library?cat=${c.id}" class="${active === c.id ? 'active' : ''}"><span class="dot" style="background:${c.color}"></span>${esc(c.label)}<span class="n">${num(STATS.byCategory[c.id])}</span></a>`).join('');
+    <a href="#/library?cat=${c.id}" class="${active === c.id ? 'active' : ''}"><span class="dot" style="background:${c.color}"></span>${esc(c.label)}<span class="n">${num((STATS.learnByCategory || STATS.byCategory)[c.id])}</span></a>`).join('');
 }
 
 const ADMIN_PAGES = ['explore', 'connect', 'settings', 'admin', 'favorites'];
@@ -1266,7 +1346,7 @@ async function route() {
   const pages = {
     library: () => renderLibrary(params), favorites: () => renderLibrary(params, true), examples: renderExamples,
     youtube: () => renderYoutube(params), channels: () => renderChannels(params), explore: renderExplore,
-    connect: renderConnect, admin: renderAdmin, settings: renderSettings, level: renderLevel,
+    connect: renderConnect, admin: renderAdmin, settings: renderSettings, level: renderLevel, opensource: renderOpenSource,
   };
   try {
     await transition(pages[path] || renderHome);

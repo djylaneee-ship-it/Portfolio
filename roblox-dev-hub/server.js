@@ -10,6 +10,7 @@ const { Auth, KEY_FILE } = require('./auth');
 const os = require('os');
 const claude = require('./claude');
 const level = require('./level');
+const quality = require('./quality');
 
 const PORT = Number(process.env.PORT) || 4747;
 // HOST=0.0.0.0 rend le site accessible aux autres appareils (mode partagé).
@@ -30,6 +31,14 @@ let state = db.load();
 state.settings = state.settings || { youtubeApiKey: '' };
 
 const auth = new Auth({ getState: () => state, persist: () => persist() });
+
+// Nettoyage unique des bases créées avant le filtre qualité.
+if (!state.settings.cleanedV1) {
+  const r = quality.purge(state);
+  state.settings.cleanedV1 = true;
+  db.save(state);
+  if (r.resources || r.channels) console.log(`  Quality filter: removed ${r.resources} off-topic items and ${r.channels} gameplay channels.`);
+}
 // En mode HTTP, le serveur MCP travaille sur la même base en mémoire que l'app.
 mcp.useStore({ load: () => state, save: () => persist() });
 
@@ -102,11 +111,15 @@ function refresh() {
 const routes = [
   ['GET', /^\/api\/meta$/, () => ({ categories: db.CATEGORIES, types: db.TYPES })],
   ['GET', /^\/api\/info$/, () => ({ mcpPath: path.join(__dirname, 'mcp.js'), node: process.execPath, port: PORT })],
-  ['GET', /^\/api\/stats$/, () => ({ ...db.stats(state), examples: (state.examples || []).filter((e) => e.status === 'validated').length })],
+  ['GET', /^\/api\/stats$/, () => ({ ...db.stats(state), opensource: state.resources.filter((r) => r.type === 'opensource' || r.type === 'asset').length,
+    // Compteurs de la bibliothèque d'apprentissage (sans l'open source, qui a sa page).
+    learnByCategory: state.resources.reduce((acc, r) => { if (r.type !== 'opensource' && r.type !== 'asset') acc[r.category] = (acc[r.category] || 0) + 1; return acc; }, {}), examples: (state.examples || []).filter((e) => e.status === 'validated').length })],
   ['GET', /^\/api\/resources$/, (req, m, url) => {
     const p = url.searchParams;
+    const list = (k) => (p.get(k) || '').split(',').filter(Boolean);
     const all = db.search(state, {
       q: p.get('q') || '', category: p.get('category') || '', type: p.get('type') || '',
+      types: list('types'), exclude: list('exclude'), tag: p.get('tag') || '', sort: p.get('sort') || '',
       level: p.get('level') || '', favorite: p.get('favorite') === '1',
     });
     const offset = Number(p.get('offset')) || 0;
@@ -200,6 +213,7 @@ const routes = [
   }],
   ['GET', /^\/api\/export$/, () => ({ ...state, auth: undefined })],
   ['POST', /^\/api\/cloud\/sync$/, () => cloudSync()],
+  ['POST', /^\/api\/clean$/, () => { const r = quality.purge(state); persist(); return r; }],
   // Exemples d'apprentissage : les membres voient les exemples validés, l'admin voit tout.
   ['GET', /^\/api\/examples$/, (req, m, url, session) => (state.examples || []).filter((e) => session.role === 'admin' || e.status === 'validated')],
   ['POST', /^\/api\/examples$/, async (req) => {
@@ -329,6 +343,8 @@ async function cloudSync() {
     let added = 0;
     for (const r of cloud.resources || []) {
       if (!r.url || urls.has(r.url)) continue;
+      const social = r.type === 'video' || (r.tags || []).some((x) => x === 'youtube' || x === 'reddit');
+      if (social ? !quality.check(r).ok : quality.isBanned(r)) continue;
       urls.add(r.url);
       state.resources.push(db.normalize({ ...r, id: undefined, source: 'cloud', favorite: false }));
       added++;
@@ -336,7 +352,7 @@ async function cloudSync() {
     const ids = new Set(state.channels.map((c) => c.channelId).filter(Boolean));
     let chans = 0;
     for (const c of cloud.channels || []) {
-      if (!c.channelId || ids.has(c.channelId)) continue;
+      if (!c.channelId || ids.has(c.channelId) || c.category === 'gameplay') continue;
       ids.add(c.channelId);
       state.channels.push({ ...c, id: db.newId() });
       chans++;

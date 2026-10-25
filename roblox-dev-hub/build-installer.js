@@ -8,7 +8,7 @@ const OUT = path.join(ROOT, '..', 'Installer Rovex Hub.bat');
 const FILES = [
   'db.js', 'mcp.js', 'server.js', 'web.js', 'crawler.js', 'seed.json', 'package.json', 'README.md',
   'public/index.html', 'public/style.css', 'public/app.js', 'public/i18n.js',
-  'Lancer Rovex Hub.bat', 'Lancer en mode partage.bat', 'auth.js', 'claude.js', 'level.js', 'rovex.ico', 'public/logo.png', 'public/icon.png',
+  'Lancer Rovex Hub.bat', 'Lancer en mode partage.bat', 'auth.js', 'claude.js', 'level.js', 'quality.js', 'rovex.ico', 'public/logo.png', 'public/icon.png',
 ];
 
 const crlf = (s) => s.replace(/\r?\n/g, '\r\n');

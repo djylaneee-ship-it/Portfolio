@@ -10,7 +10,8 @@ Le cerveau Roblox de ton Claude : une bibliothèque de ressources de dev Roblox 
 - **Près de 70 ressources de départ** : docs officielles Roblox, outils (Blender, Rojo, Mixamo…) et recherches YouTube par thème.
 - **Exploration automatique** : fouille YouTube, le DevForum Roblox et Reddit (r/robloxgamedev) pour référencer des milliers de vidéos, tutos et images, rangés par catégorie.
 - **Toutes les chaînes Roblox** : découvre et relie automatiquement les chaînes YouTube Roblox (dev, VFX, gameplay, YouTubeurs FR/EN/ES…), puis récupère leurs nouvelles vidéos. La mise à jour peut être automatique (Réglages).
-- **Open source et systèmes gratuits** : dépôts GitHub Roblox (frameworks, modules, jeux open source), ressources communautaires du DevForum, modèles et plugins gratuits du Creator Store.
+- **Open source et systèmes gratuits** (page à part, séparée de la bibliothèque d'apprentissage) : dépôts GitHub Roblox triés par étoiles, ressources communautaires du DevForum, modèles et plugins gratuits du Creator Store. Outil MCP `search_opensource`.
+- **Filtre qualité** : avant d'ajouter une vidéo ou un post, Rovex vérifie qu'il parle vraiment de développement Roblox (mots-clés FR/EN/ES/PT). Le troll, le gameplay, les mèmes, les histoires et la triche (exploits, « robux gratuits ») sont écartés. Les bases existantes sont nettoyées une fois au démarrage (favoris et notes jamais touchés), et l'algo cloud nettoie son fichier à chaque passage.
 - **Import en un clic** : colle un lien YouTube, une chaîne, une page du DevForum ou une doc. Le titre, l'auteur et la miniature sont récupérés tout seuls.
 - **Tes fichiers** : glisse des images, vidéos, scripts `.lua`, modèles `.rbxm` / `.fbx` / `.blend` sur la page.
 - **Recherche YouTube intégrée**, sans clé (une clé YouTube Data API reste possible dans Réglages). Un jeton GitHub optionnel accélère la récupération de l'open source.

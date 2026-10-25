@@ -101,6 +101,8 @@ function normalize(r) {
     file: r.file || '',
     level: ['debutant', 'intermediaire', 'avance'].includes(r.level) ? r.level : '',
     favorite: Boolean(r.favorite),
+    // Étoiles GitHub (open source) : champ dédié, ou relu dans la description « ★ 123 ».
+    stars: Number(r.stars) || Number((String(r.description || '').match(/★\s*(\d+)/) || [])[1]) || 0,
     notes: String(r.notes || ''),
     source: r.source || 'manuel',
     createdAt: r.createdAt || new Date().toISOString(),
@@ -123,12 +125,17 @@ function strip(s) {
 }
 
 // Recherche plein texte avec score : titre > tags > auteur > description > notes.
-function search(db, { q = '', category = '', type = '', favorite = false, level = '', limit = 0 } = {}) {
+// `types` : liste de types acceptés ; `exclude` : types à écarter ; `tag` : tag requis ;
+// `sort: 'stars'` trie l'open source par étoiles GitHub.
+function search(db, { q = '', category = '', type = '', types = [], exclude = [], tag = '', sort = '', favorite = false, level = '', limit = 0 } = {}) {
   const terms = strip(q).split(/\s+/).filter(Boolean);
   let out = [];
   for (const r of db.resources) {
     if (category && r.category !== category) continue;
     if (type && r.type !== type) continue;
+    if (types.length && !types.includes(r.type)) continue;
+    if (exclude.length && exclude.includes(r.type)) continue;
+    if (tag && !(r.tags || []).includes(tag)) continue;
     if (level && r.level !== level) continue;
     if (favorite && !r.favorite) continue;
     let score = 0;
@@ -149,7 +156,8 @@ function search(db, { q = '', category = '', type = '', favorite = false, level 
     }
     out.push({ r, score });
   }
-  out.sort((a, b) => b.score - a.score || (b.r.favorite - a.r.favorite) || b.r.createdAt.localeCompare(a.r.createdAt));
+  if (sort === 'stars') out.sort((a, b) => b.score - a.score || (b.r.stars || 0) - (a.r.stars || 0));
+  else out.sort((a, b) => b.score - a.score || (b.r.favorite - a.r.favorite) || b.r.createdAt.localeCompare(a.r.createdAt));
   out = out.map((x) => x.r);
   return limit ? out.slice(0, limit) : out;
 }

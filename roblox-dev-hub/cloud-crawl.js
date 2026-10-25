@@ -8,13 +8,14 @@ const path = require('path');
 const crypto = require('crypto');
 const db = require('./db');
 const { Crawler } = require('./crawler');
+const quality = require('./quality');
 
 const OUT = path.join(__dirname, 'cloud', 'library.json');
 const BUDGET_MIN = Number(process.argv[2] || process.env.CRAWL_MINUTES || 45);
 // Tâches enchaînées en boucle, d'un passage à l'autre.
 const CYCLE = [
   { mode: 'sync' },
-  { mode: 'channels', scope: 'all', intensity: 'normal' },
+  { mode: 'channels', scope: 'dev', intensity: 'normal' },
   { mode: 'explore', intensity: 'normal', sources: ['youtube', 'devforum'] }, // Reddit bloque les serveurs GitHub
   { mode: 'sync' },
   { mode: 'opensource', intensity: 'normal' },
@@ -42,6 +43,8 @@ function save(state) {
 (async () => {
   const state = load();
   state.runs++;
+  const cleaned = quality.purge(state);
+  if (cleaned.resources || cleaned.channels) console.log(`Nettoyage : ${cleaned.resources} ressources hors sujet et ${cleaned.channels} chaînes gameplay retirées`);
   const deadline = Date.now() + BUDGET_MIN * 60e3;
   const crawler = new Crawler({
     getState: () => state,

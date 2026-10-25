@@ -1,6 +1,7 @@
 // Moteur d'exploration : parcourt YouTube, le DevForum Roblox et Reddit pour référencer
 // des milliers de vidéos, tutos et images. On ne stocke que des liens, titres et miniatures.
 const { guessCategory, resolveChannel } = require('./web');
+const quality = require('./quality');
 
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126 Safari/537.36';
 // Cookies de consentement : sans eux, YouTube redirige les visiteurs européens vers une page d'accord.
@@ -237,7 +238,7 @@ function githubRepo(r) {
   return {
     title: r.full_name, url: r.html_url,
     thumbnail: `https://opengraph.githubassets.com/1/${r.full_name}`,
-    author: r.owner?.login || '', type: 'opensource',
+    author: r.owner?.login || '', type: 'opensource', stars: r.stargazers_count || 0,
     description: [r.description, r.stargazers_count != null && `★ ${r.stargazers_count}`, r.language, r.license?.spdx_id].filter(Boolean).join(' · ').slice(0, 400),
     tags: (r.topics || []).slice(0, 6),
   };
@@ -293,7 +294,7 @@ async function storeSearch(keyword, kind, pages) {
 }
 
 const LOG_EN = {
-  stopping: 'Stopping…', error: 'Error: {msg}', done: 'Done: {added} new resources, {channels} new channels.',
+  stopping: 'Stopping…', error: 'Error: {msg}', done: 'Done: {added} new resources, {channels} new channels, {rejected} off-topic rejected.',
   chanQuery: '"{q}": {found} channels found, +{n} linked', query: '"{q}": +{n}', forumRes: 'DevForum resources page {page}: +{n}',
   storeModels: 'Store models "{q}": +{n}', storePlugins: 'Store plugins "{q}": +{n}', syncStart: 'Fetching videos from {n} channels…',
   chanVideos: '{name}: +{n} videos', fail: '{label}: {msg}', expandStart: 'Exploring {n} discovered Roblox channels…',
@@ -320,10 +321,13 @@ class Crawler {
       if (!it.title || !it.url) continue;
       this.status.found++;
       if (this.urls.has(it.url)) continue;
+      // Filtre qualité : YouTube et Reddit doivent parler de dev Roblox ; ailleurs on écarte la triche.
+      const social = source === 'youtube' || source === 'reddit';
+      if (social ? !quality.check(it).ok : quality.isBanned(it)) { this.status.rejected++; continue; }
       this.urls.add(it.url);
       const cat = category || guessCategory(it.title);
       this.upsert({
-        title: it.title, url: it.url, thumbnail: it.thumbnail, author: it.author, category: cat,
+        title: it.title, url: it.url, thumbnail: it.thumbnail, author: it.author, category: cat, stars: it.stars,
         type: it.type || type, description: [it.description, it.duration && `Durée ${it.duration}`, it.views, it.published].filter(Boolean).join(' · '),
         tags: [...tags, ...(it.tags || []), source], source: 'exploration',
       });
@@ -374,12 +378,12 @@ class Crawler {
     const level = INTENSITY[opts.intensity] || INTENSITY.normal;
     this.status = {
       running: true, cancel: false, mode, startedAt: new Date().toISOString(), finishedAt: null,
-      intensity: opts.intensity || 'normal', step: 0, steps: 1, current: null, found: 0, added: 0, channels: 0, errors: 0, log: [], progress: {},
+      intensity: opts.intensity || 'normal', step: 0, steps: 1, current: null, found: 0, added: 0, channels: 0, rejected: 0, errors: 0, log: [], progress: {},
     };
     this.urls = new Set(this.getState().resources.map((r) => r.url).filter(Boolean));
     let job;
     if (mode === 'channels') {
-      const queries = CHANNEL_QUERIES.dev.concat(opts.scope === 'dev' ? [] : CHANNEL_QUERIES.all);
+      const queries = CHANNEL_QUERIES.dev.concat(opts.scope === 'all' ? CHANNEL_QUERIES.all : []);
       this.status.steps = queries.length + (opts.syncAfter ? 1 : 0);
       this.plan('youtube', queries.length);
       job = this.discover(queries, level, opts);
@@ -409,7 +413,7 @@ class Crawler {
       this.status.finishedAt = new Date().toISOString();
       this.status.current = null;
       this.persist();
-      this.log('done', { added: this.status.added, channels: this.status.channels });
+      this.log('done', { added: this.status.added, channels: this.status.channels, rejected: this.status.rejected });
     });
     return this.status;
   }
@@ -430,6 +434,7 @@ class Crawler {
         this.status.found += found.length;
         let n = 0;
         for (const c of keep) {
+          if (quality.check({ title: c.name, description: c.description }, { minScore: -2 }).score <= -3) { this.status.rejected++; continue; }
           const cat = gameplay ? 'gameplay' : guessCategory(`${c.name} ${c.description} ${q}`);
           if (this.follow(c, cat)) n++;
         }
