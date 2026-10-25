@@ -77,7 +77,6 @@ const ART = {
   gfx: 'Polished Roblox GFX render: vibrant colors, cinematic rim lighting, soft depth of field, Blender-render look, characters with Roblox proportions.',
   modeling: 'Low poly stylized asset, clean flat shading with subtle gradients, Roblox-friendly proportions, bright palette.',
   building: 'Stylized Roblox environment art, bright and clean, soft global illumination, readable shapes, stud-like details where it fits.',
-  audio: 'Clean, punchy game sound, no background noise, short tail, mixed for a Roblox game.',
   design: 'Clear game design diagram or mockup, simple flat shapes, readable labels.',
   tools: 'Clean flat app icon style, simple shapes, Roblox Studio color palette.',
 };
@@ -119,7 +118,7 @@ function load(state, cat, opts) {
     skill: s.name, category: cat,
     instructions: s.instructions,
     howToUse: 'Follow the instructions. Reuse the structure of the validated examples first, cite the resources you rely on, and propose an open source module when one fits instead of rewriting it.',
-    assets: { style: s.art, how: cat === 'audio' ? 'Need a sound? Call generate_sound: Rovex applies this style and saves the MP3 in the library.' : 'Need an image (icon, UI, thumbnail, texture, VFX sprite)? Call generate_image with this category: Rovex applies this style and the user\'s reference images, then saves the PNG in the library.' },
+    assets: cat === 'audio' ? undefined : { style: s.art, how: 'Need an image (icon, UI, thumbnail, texture, VFX sprite)? Call generate_image with this category: Rovex applies this style and the user\'s reference images, then saves the PNG in the library.' },
     ...c,
   };
 }
@@ -146,13 +145,13 @@ Before starting a Roblox ${c.label.toLowerCase()} task:
 ## Instructions
 
 ${s.instructions}
+${cat === 'audio' ? '' : `
+## Image generation
 
-## Asset generation
-
-When the task needs an image or a sound, call \`${cat === 'audio' ? 'generate_sound' : 'generate_image'}\` (category \`${cat}\`). Rovex adds this style and the user's reference images:
+When the task needs an image, call \`generate_image\` (category \`${cat}\`). Rovex adds this style and the user's reference images:
 
 ${s.art}
-`;
+`}`;
 }
 
 function examplesMd(state, cat) {

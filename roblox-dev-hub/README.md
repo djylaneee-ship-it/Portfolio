@@ -14,7 +14,7 @@ Le cerveau Roblox de ton Claude : une bibliothèque de ressources de dev Roblox 
 - **Filtre qualité** : avant d'ajouter une vidéo ou un post, Rovex vérifie qu'il parle vraiment de développement Roblox (mots-clés FR/EN/ES/PT). Le troll, le gameplay, les mèmes, les histoires et la triche (exploits, « robux gratuits ») sont écartés. Les bases existantes sont nettoyées une fois au démarrage (favoris et notes jamais touchés), et l'algo cloud nettoie son fichier à chaque passage.
 - **Skills Claude** (page **Skills**) : un skill par catégorie (Scripting, VFX, Animation, GUI…). Avant une tâche, Claude identifie la catégorie, appelle `load_skill` et lit les règles du skill, les exemples validés avec leur code, les meilleures ressources (avec tes notes) et l'open source de la catégorie, puis fait la tâche. Les règles se modifient depuis la page.
 - **Prompts** (page **Prompts**) : 21 modèles prêts à l'emploi (« En utilisant Rovex Hub, fais-moi… ») pour créer un système, un VFX, une interface, corriger ou optimiser un script, apprendre une notion, trouver des tutos ou de l'open source. Tu remplis les trous, l'aperçu se met à jour en direct, et tu copies le prompt pour le coller dans Claude. Le prompt rappelle à Claude de charger le bon skill. L'admin peut créer ses propres modèles avec des champs `[[nom]]`. Les modèles sont aussi proposés dans Claude Desktop (menu **+** → Rovex Hub), dans la langue choisie par l'admin.
-- **Studio IA** (page **Studio IA**) : Claude ne sait pas dessiner ni faire de son, Rovex le fait pour lui. Quand tu demandes « fais-moi un icône de couronne », Claude charge le skill, puis appelle `generate_image` : Rovex ajoute le style d'images du skill (modifiable dans Skills) et tes images de référence de la catégorie (favoris d'abord), génère avec ta clé **OpenAI** ou **Google Gemini**, range le PNG dans la bibliothèque (tag `ai`) et renvoie le chemin du fichier et un aperçu. `generate_sound` fait pareil avec **ElevenLabs** : bruitages, musiques, voix de PNJ (MP3). Les clés restent sur le PC ; chaque génération est facturée par le service sur le compte de la personne.
+- **Studio IA** (page **Studio IA**) : Claude ne sait pas dessiner, Rovex le fait pour lui. Quand tu demandes « fais-moi un icône de couronne », Claude charge le skill, puis appelle `generate_image` : Rovex ajoute le style d'images du skill (modifiable dans Skills) et tes images de référence de la catégorie (favoris d'abord), génère l'image avec la clé OpenAI de l'admin (fonction Supabase `rovex-gen`, voir plus bas), range le PNG dans la bibliothèque (tag `ai`) et renvoie le chemin du fichier et un aperçu. Personne n'a de clé à fournir.
 - **Import en un clic** : colle un lien YouTube, une chaîne, une page du DevForum ou une doc. Le titre, l'auteur et la miniature sont récupérés tout seuls.
 - **Tes fichiers** : glisse des images, vidéos, scripts `.lua`, modèles `.rbxm` / `.fbx` / `.blend` sur la page.
 - **Recherche YouTube intégrée**, sans clé (une clé YouTube Data API reste possible dans Réglages). Un jeton GitHub optionnel accélère la récupération de l'open source.
@@ -44,16 +44,16 @@ L'app demande un **ID d'accès** pour entrer. Les IDs sont gardés **en ligne** 
 - **Contenu partagé** : les exemples d'apprentissage, les skills et les prompts créés par les admins sont publiés en ligne et arrivent chez tous les membres (toutes les 15 minutes et à chaque connexion). La bibliothèque, elle, vient de l'algo cloud GitHub.
 - **Sans internet** : la clé admin de ce PC marche encore (mode hors ligne), mais la gestion des IDs demande internet.
 
-## Génération partagée (tes clés IA pour tous les membres)
+## Génération d'images (ta clé OpenAI pour tous les membres)
 
-Sans clé perso, les membres peuvent générer images et sons avec **tes** clés OpenAI / ElevenLabs. Les clés restent cachées sur ton Supabase (jamais dans l'app) ; chaque ID a une limite par jour (20 images et 20 sons par défaut, réglable dans **Studio IA**), les admins n'ont pas de limite.
+Tous les membres génèrent des images avec **ta** clé OpenAI. Elle reste cachée sur ton Supabase (jamais dans l'app) ; chaque ID a une limite par jour (20 images par défaut, réglable dans **Studio IA**), les admins n'ont pas de limite.
 
 Installation, une fois, dans ton projet Supabase :
 
 1. **SQL Editor** → colle `supabase/rovex-gen.sql` → **Run**.
 2. **Edge Functions** → **Deploy a new function** → **Via Editor** → nom `rovex-gen` → colle `supabase/functions/rovex-gen/index.ts` → **Deploy**.
 3. Dans la fonction `rovex-gen` → **Details** : désactive **Verify JWT** (l'app envoie l'ID d'accès, la fonction le vérifie elle-même) → **Save**.
-4. **Edge Functions** → **Secrets** : ajoute `OPENAI_API_KEY` (et `ELEVENLABS_API_KEY` pour les sons). Facultatif : `OPENAI_IMAGE_MODEL` pour changer de modèle.
+4. **Edge Functions** → **Secrets** : ajoute `OPENAI_API_KEY`. Facultatif : `OPENAI_IMAGE_MODEL` pour changer de modèle.
 
 Conseil : fixe un plafond de dépense mensuel dans OpenAI (Settings → Limits), puisque toutes les générations des membres sont facturées sur ton compte.
 
@@ -79,7 +79,7 @@ L'app expose un serveur MCP (`rovex-hub`), à brancher dans Claude ou tout autre
 - **Mode HTTP** (l'app doit être ouverte) : `http://localhost:4747/mcp` — libre depuis ton PC ; depuis un autre appareil, ajoute l'en-tête `Authorization: Bearer <ID ou clé admin>`.
 - **Mode stdio** (marche même app fermée) : Claude Desktop lance `Rovex Hub.exe` en mode Node sur `resources\app\mcp.js` (variable `ELECTRON_RUN_AS_NODE=1`). L'app écrit cette config toute seule.
 
-Outils exposés (activables dans **Connexion Claude**) : `load_skill`, `list_skills`, `generate_image`, `generate_sound`, `search_opensource`, `search_resources`, `list_examples`, `get_example`, `get_resource`, `list_categories`, `add_resource`, `import_url`, `update_notes`, `explore_internet`, `explore_status`, `list_channels`, `sync_channels`.
+Outils exposés (activables dans **Connexion Claude**) : `load_skill`, `list_skills`, `generate_image`, `search_opensource`, `search_resources`, `list_examples`, `get_example`, `get_resource`, `list_categories`, `add_resource`, `import_url`, `update_notes`, `explore_internet`, `explore_status`, `list_channels`, `sync_channels`.
 
 ### Skills
 

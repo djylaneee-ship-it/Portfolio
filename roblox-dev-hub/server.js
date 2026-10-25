@@ -221,30 +221,16 @@ const routes = [
     await gen.refreshShared();
     return { ...gen.status(state), quota: await gen.quota(state), kinds: Object.keys(gen.IMAGE_KINDS), items: gen.items(state) };
   }],
-  // Limites par jour de la génération partagée (admins).
+  // Limite d'images par jour et par ID (admins).
   ['PUT', /^\/api\/gen\/limits$/, async (req, m, url, session) => {
     if (session.role !== 'admin') throw Object.assign(new Error('Admin only'), { code: 403, key: 'adminOnly' });
     const b = await json(req);
-    cloud.must(await cloud.rpc('rovex_gen_set_limits', { p_key: session.cred, p_images: Number(b.images), p_sounds: Number(b.sounds) }));
+    cloud.must(await cloud.rpc('rovex_gen_set_limits', { p_key: session.cred, p_images: Number(b.images), p_sounds: null }));
     return { ok: true };
-  }],
-  ['PUT', /^\/api\/gen\/settings$/, async (req) => {
-    const b = await json(req);
-    const g = gen.settings(state);
-    for (const k of ['openaiKey', 'geminiKey', 'elevenKey']) if (typeof b[k] === 'string') g[k] = b[k].trim();
-    for (const k of ['openaiModel', 'geminiModel', 'elevenVoice']) if (typeof b[k] === 'string') g[k] = b[k].trim().slice(0, 80);
-    if (['openai', 'gemini'].includes(b.imageProvider)) g.imageProvider = b.imageProvider;
-    persist();
-    return gen.status(state);
   }],
   ['POST', /^\/api\/gen\/image$/, async (req) => {
     const out = await gen.generateImage(state, await json(req));
     delete out.images;
-    persist();
-    return out;
-  }],
-  ['POST', /^\/api\/gen\/sound$/, async (req) => {
-    const out = await gen.generateSound(state, await json(req));
     persist();
     return out;
   }],

@@ -522,7 +522,7 @@ async function openSkill(id) {
       <label class="switch"><input type="checkbox" id="sk-on" ${sk.enabled ? 'checked' : ''}><span></span></label><span>${t('sk.enabled')}</span>
     </div>
     <div class="field"><label>${t('sk.instr')}</label><textarea id="sk-instr" style="min-height:220px" spellcheck="false" ${isAdmin() ? '' : 'readonly'}>${esc(sk.instructions)}</textarea></div>
-    <div class="field"><label>${t(id === 'audio' ? 'sk.artSound' : 'sk.art')}</label><textarea id="sk-art" style="min-height:80px" spellcheck="false" ${isAdmin() ? '' : 'readonly'}>${esc(sk.art || '')}</textarea></div>
+    <div class="field" ${id === 'audio' ? 'hidden' : ''}><label>${t('sk.art')}</label><textarea id="sk-art" style="min-height:80px" spellcheck="false" ${isAdmin() ? '' : 'readonly'}>${esc(sk.art || '')}</textarea></div>
     <div class="row admin-only" style="margin-bottom:22px">
       <button class="btn primary" id="sk-save">${t('save')}</button>
       <button class="btn" id="sk-reset">${t('cn.default')}</button>
@@ -691,18 +691,12 @@ function newPrompt() {
   };
 }
 
-// ---------- Studio IA : Claude génère des images et des sons avec les clés API de l'utilisateur ----------
-const GEN_LINKS = { openai: 'https://platform.openai.com/api-keys', gemini: 'https://aistudio.google.com/apikey', elevenlabs: 'https://elevenlabs.io/app/settings/api-keys' };
-let GEN_TAB = 'image';
-
+// ---------- Studio IA : Claude génère des images via Rovex (clé de l'admin, limite par ID et par jour) ----------
 function genCard(r) {
   const c = cat(r.category);
-  const kind = (r.tags || []).find((x) => ['icon', 'ui', 'thumbnail', 'texture', 'vfx', 'art', 'sfx', 'music', 'voice'].includes(x)) || '';
-  const media = r.type === 'image'
-    ? `<div class="gen-media checker"><img src="/media/${esc(r.file)}" alt="" loading="lazy"></div>`
-    : `<div class="gen-media audio"><span>🔊</span><audio src="/media/${esc(r.file)}" controls preload="none"></audio></div>`;
+  const kind = (r.tags || []).find((x) => ['icon', 'ui', 'thumbnail', 'texture', 'vfx', 'art'].includes(x)) || '';
   return `<div class="gen-card" data-spot>
-    ${media}
+    <div class="gen-media checker"><img src="/media/${esc(r.file)}" alt="" loading="lazy"></div>
     <div class="gen-meta"><span class="card-cat"><span class="dot" style="background:${c.color}"></span>${esc(c.label)}${kind ? ' · ' + esc(t('st.k.' + kind)) : ''}</span>
       <b title="${esc(r.description)}">${esc(r.title)}</b>
       <div class="row"><a class="btn small" href="/media/${esc(r.file)}" download="${esc(r.file)}">⬇ ${t('st.download')}</a><button class="btn small danger" data-gendel="${r.id}">${t('delete')}</button></div>
@@ -710,10 +704,6 @@ function genCard(r) {
   </div>`;
 }
 
-// Badge d'état d'un service : sa propre clé, la génération partagée de Rovex, ou rien.
-function genBadge(x) {
-  return x.mode === 'own' ? `<span class="st validated">${t('st.ready')}</span>` : x.mode === 'shared' ? `<span class="st review">${t('st.sharedOn')}</span>` : `<span class="st draft">${t('st.noKey')}</span>`;
-}
 function quotaText(q) {
   if (!q || !q.ok) return '';
   return q.unlimited ? t('st.unlimited') : t('st.left', { n: Math.max(0, q.limit - q.used), limit: q.limit });
@@ -721,83 +711,47 @@ function quotaText(q) {
 
 async function renderStudio() {
   const g = await api('/gen');
-  const q = g.quota || {};
-  const keyField = (id, label, has, link) => `<div class="field"><label>${label} ${has ? `<span class="st validated">${t('st.saved')}</span>` : ''}</label>
-    <div class="row"><input class="input" id="${id}" type="password" autocomplete="off" style="flex:1;min-width:200px" placeholder="${has ? '••••••••' : t('st.paste')}"><a class="btn small" href="${link}" target="_blank" rel="noopener">${t('st.getKey')}</a></div></div>`;
+  const q = g.quota;
   view.innerHTML = `
     ${pageHead(t('st.eyebrow'), t('st.title'), t('st.sub'))}
     <div class="flow">
       ${[['💬', 'st.f1'], ['📚', 'st.f2'], ['🎨', 'st.f3'], ['📥', 'st.f4']].map(([ico, k], i) => `<div class="flow-step" style="--i:${i}"><span>${ico}</span><b>${t(k + 't')}</b><small>${t(k)}</small></div>`).join('<i class="flow-arrow">→</i>')}
     </div>
-    <div class="two-col">
-      <div class="panel" data-spot>
-        <h3>🎨 ${t('st.imgTitle')} ${genBadge(g.image)}</h3>
-        <p>${t('st.imgText')}</p>
-        ${g.shared.image ? `<div class="callout-mini">✨ ${t('st.sharedText')} <b>${quotaText(q.image)}</b></div>` : ''}
-        <div class="field"><label>${t('st.provider')}</label><select class="select" id="gen-provider">
-          <option value="openai" ${g.image.provider === 'openai' ? 'selected' : ''}>OpenAI (${esc(g.models.openai || g.defaults.openai)})</option>
-          <option value="gemini" ${g.image.provider === 'gemini' ? 'selected' : ''}>Google Gemini (${esc(g.models.gemini || g.defaults.gemini)})</option></select></div>
-        ${keyField('gen-openai', 'OpenAI', g.keys.openai, GEN_LINKS.openai)}
-        ${keyField('gen-gemini', 'Google Gemini', g.keys.gemini, GEN_LINKS.gemini)}
-      </div>
-      <div class="panel" data-spot>
-        <h3>🔊 ${t('st.sndTitle')} ${genBadge(g.sound)}</h3>
-        <p>${t('st.sndText')}</p>
-        ${g.shared.sound ? `<div class="callout-mini">✨ ${t('st.sharedText')} <b>${quotaText(q.sound)}</b></div>` : ''}
-        ${keyField('gen-eleven', 'ElevenLabs', g.keys.elevenlabs, GEN_LINKS.elevenlabs)}
-        <p class="sub" style="font-size:13px">${t(g.shared.image || g.shared.sound ? 'st.keysOptional' : 'st.keysNote')}</p>
-        <button class="btn primary" id="gen-save">${t('save')}</button>
-      </div>
-    </div>
-    ${isAdmin() ? `<div class="panel" data-spot>
-      <h3>👑 ${t('st.limTitle')}</h3>
-      ${g.shared.image || g.shared.sound
-        ? `<p>${t('st.limText')}</p><div class="row">
-            <label class="lim">${t('st.limImg')} <input class="input" id="lim-img" type="number" min="0" max="1000" value="${q.image && q.image.limit != null ? q.image.limit : 20}"></label>
-            <label class="lim">${t('st.limSnd')} <input class="input" id="lim-snd" type="number" min="0" max="1000" value="${q.sound && q.sound.limit != null ? q.sound.limit : 20}"></label>
-            <button class="btn primary" id="lim-save">${t('save')}</button></div>`
-        : `<p>${t('st.limSetup')}</p>`}
-    </div>` : ''}
     <div class="panel" data-spot>
-      <div class="tabs"><button data-gtab="image" class="${GEN_TAB === 'image' ? 'on' : ''}">🎨 ${t('st.tabImg')}</button><button data-gtab="sound" class="${GEN_TAB === 'sound' ? 'on' : ''}">🔊 ${t('st.tabSnd')}</button></div>
-      <form id="gen-form" class="gen-form">
-        <input class="input" id="gen-prompt" required placeholder="${t(GEN_TAB === 'image' ? 'st.phImg' : 'st.phSnd')}">
-        ${GEN_TAB === 'image'
-          ? `<select class="select" id="gen-kind">${g.kinds.map((k) => `<option value="${k}">${t('st.k.' + k)}</option>`).join('')}</select>
-             <select class="select" id="gen-cat"><option value="">${t('st.autoCat')}</option>${catOptions('')}</select>
-             <select class="select" id="gen-count">${[1, 2, 3, 4].map((n) => `<option value="${n}">×${n}</option>`).join('')}</select>`
-          : `<select class="select" id="gen-kind">${['sfx', 'music', 'voice'].map((k) => `<option value="${k}">${t('st.k.' + k)}</option>`).join('')}</select>
-             <input class="input" id="gen-seconds" type="number" min="0.5" max="300" step="0.5" placeholder="${t('st.seconds')}" style="width:130px">`}
-        <button class="btn primary" id="gen-go">✨ ${t('st.generate')}</button>
-      </form>
-      <p class="sub" style="font-size:13px;margin:10px 0 0">${t('st.tryNote')}</p>
+      <h3>🎨 ${t('st.imgTitle')} ${g.available ? `<span class="st validated">${t('st.ready')}</span>` : `<span class="st draft">${t('st.off')}</span>`}
+        ${g.available && q ? `<span class="st review">${esc(quotaText(q))}</span>` : ''}</h3>
+      ${g.available
+        ? `<form id="gen-form" class="gen-form">
+            <input class="input" id="gen-prompt" required placeholder="${t('st.phImg')}">
+            <select class="select" id="gen-kind">${g.kinds.map((k) => `<option value="${k}">${t('st.k.' + k)}</option>`).join('')}</select>
+            <select class="select" id="gen-cat"><option value="">${t('st.autoCat')}</option>${catOptions('')}</select>
+            <select class="select" id="gen-count">${[1, 2, 3, 4].map((n) => `<option value="${n}">×${n}</option>`).join('')}</select>
+            <button class="btn primary" id="gen-go">✨ ${t('st.generate')}</button>
+          </form>
+          <p class="sub" style="font-size:13px;margin:10px 0 0">${t('st.tryNote')}</p>`
+        : `<p>${t(isAdmin() ? 'st.limSetup' : 'st.soon')}</p>`}
     </div>
+    ${isAdmin() && g.available ? `<div class="panel" data-spot>
+      <h3>👑 ${t('st.limTitle')}</h3>
+      <p>${t('st.limText')}</p>
+      <div class="row"><label class="lim">${t('st.limImg')} <input class="input" id="lim-img" type="number" min="0" max="1000" value="${q && q.limit != null ? q.limit : 20}"></label>
+        <button class="btn primary" id="lim-save">${t('save')}</button></div>
+    </div>` : ''}
     <div class="section-head"><h2>${t('st.gallery', { n: g.items.length })}</h2></div>
     <div class="gen-grid" id="gen-grid">${g.items.length ? g.items.map(genCard).join('') : `<div class="empty"><b>${t('st.none')}</b>${t('st.noneText')}</div>`}</div>`;
-  $$('[data-gtab]').forEach((b) => b.onclick = () => { GEN_TAB = b.dataset.gtab; transition(renderStudio); });
-  $('#gen-save').onclick = async () => {
-    const body = { imageProvider: $('#gen-provider').value };
-    for (const [id, k] of [['gen-openai', 'openaiKey'], ['gen-gemini', 'geminiKey'], ['gen-eleven', 'elevenKey']]) if ($('#' + id).value.trim()) body[k] = $('#' + id).value.trim();
-    await api('/gen/settings', { method: 'PUT', body });
-    toast(t('toast.saved'));
-    transition(renderStudio);
-  };
   const ls = $('#lim-save');
   if (ls) ls.onclick = async () => {
-    try { await api('/gen/limits', { method: 'PUT', body: { images: $('#lim-img').value, sounds: $('#lim-snd').value } }); toast(t('toast.saved')); }
+    try { await api('/gen/limits', { method: 'PUT', body: { images: $('#lim-img').value } }); toast(t('toast.saved')); }
     catch (e) { toast(e.message, true); }
   };
-  $('#gen-provider').onchange = () => api('/gen/settings', { method: 'PUT', body: { imageProvider: $('#gen-provider').value } });
-  $('#gen-form').onsubmit = async (e) => {
+  const form = $('#gen-form');
+  if (form) form.onsubmit = async (e) => {
     e.preventDefault();
     const btn = $('#gen-go');
     btn.disabled = true;
     btn.textContent = '⏳ ' + t('st.working');
     try {
-      const body = { prompt: $('#gen-prompt').value, kind: $('#gen-kind').value };
-      if (GEN_TAB === 'image') Object.assign(body, { category: $('#gen-cat').value || undefined, count: Number($('#gen-count').value) });
-      else if ($('#gen-seconds').value) body.seconds = Number($('#gen-seconds').value);
-      const out = await api('/gen/' + GEN_TAB, { method: 'POST', body });
+      const out = await api('/gen/image', { method: 'POST', body: { prompt: $('#gen-prompt').value, kind: $('#gen-kind').value, category: $('#gen-cat').value || undefined, count: Number($('#gen-count').value) } });
       toast(t('st.done', { n: out.items.length }));
       transition(renderStudio);
     } catch (err) {
