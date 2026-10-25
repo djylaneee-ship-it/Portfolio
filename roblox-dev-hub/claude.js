@@ -113,4 +113,4 @@ async function linkCode(url) {
   return codeStatus();
 }
 
-module.exports = { desktopStatus, linkDesktop, unlinkDesktop, codeStatus, linkCode };
+module.exports = { desktopStatus, linkDesktop, unlinkDesktop, codeStatus, linkCode, entry };

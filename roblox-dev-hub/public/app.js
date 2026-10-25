@@ -1121,8 +1121,8 @@ async function refreshMcp() {
 async function renderConnect() {
   await refreshMcp();
   const m = MCP;
-  const cfg = JSON.stringify({ mcpServers: { 'rovex-hub': { type: 'http', url: m.url } } }, null, 2);
-  const stdio = JSON.stringify({ mcpServers: { 'rovex-hub': { command: 'node', args: [m.mcpPath] } } }, null, 2);
+  // Claude Desktop n'accepte que des serveurs lancés par une commande (pas d'adresse http dans son fichier).
+  const cfg = JSON.stringify({ mcpServers: { 'rovex-hub': m.desktopEntry || { command: 'node', args: [m.mcpPath] } } }, null, 2);
   view.innerHTML = `
     ${pageHead(t('cn.eyebrow'), t('nav.connect'), t('cn.sub'), `
       <div class="server-card ${m.connected ? '' : 'off'}"><span class="pulse"></span><div><b>${m.connected ? t('cn.statusOn') : t('cn.statusOff')}</b><small>${esc(m.url.replace('http://', ''))}${m.lastCall ? ' · ' + ago(m.lastCall) : ''}</small></div>
@@ -1148,9 +1148,8 @@ async function renderConnect() {
       </div>
     </div>
     <div class="two-col">
-      <div class="panel" data-spot><div class="section-head"><h3 style="margin:0">${t('act.title')}</h3><span class="live"><span class="pulse"></span>${t('act.live')}</span></div><div id="cn-log">${activityList(m.log)}</div></div>
-      <div class="panel" data-spot><h3>${t('cn.stdio')}</h3><p>${t('cn.stdioT')}</p><div class="codebox"><code>${esc(stdio)}</code></div><div class="row" style="margin-top:12px"><button class="btn" data-copy="${esc(stdio)}">${t('copy')}</button></div></div>
-    </div>`;
+    </div>
+    <div class="panel" data-spot><div class="section-head"><h3 style="margin:0">${t('act.title')}</h3><span class="live"><span class="pulse"></span>${t('act.live')}</span></div><div id="cn-log">${activityList(m.log)}</div></div>`;
   bindCopy(view);
   loadClaudeApps();
   $$('[data-tool]').forEach((i) => i.onchange = async () => {
@@ -1295,10 +1294,10 @@ async function loadClaudeApps() {
   box.innerHTML = `
     <div class="panel app-card" data-spot><span class="ico">🖥️</span><div style="flex:1">
       <h3>Claude Desktop</h3>
-      ${!d.installed ? state(false, t('cl.notFound')) : dOn ? state(true, t('cl.active') + seen(d.client)) : d.linked ? `<span class="state warn"><span class="pulse"></span>${t('cl.added')}</span>` : state(false, t('cl.notLinked'))}
-      <p>${!d.installed ? t('cl.desktopMissing') : dOn ? t('cl.activeText') : d.linked ? t('cl.restart') : t('cl.desktopFound')}</p>
+      ${!d.installed ? state(false, t('cl.notFound')) : d.outdated ? `<span class="state warn"><span class="pulse"></span>${t('cl.broken')}</span>` : dOn ? state(true, t('cl.active') + seen(d.client)) : d.linked ? `<span class="state warn"><span class="pulse"></span>${t('cl.added')}</span>` : state(false, t('cl.notLinked'))}
+      <p>${!d.installed ? t('cl.desktopMissing') : d.outdated ? t('cl.brokenText') : dOn ? t('cl.activeText') : d.linked ? t('cl.restart') : t('cl.desktopFound')}</p>
       <div class="row">${d.installed ? (d.linked ? `<button class="btn" id="cl-unlink">${t('cl.unlink')}</button>` : `<button class="btn primary" id="cl-link">${t('cl.link')}</button>`) : '<a class="btn" href="https://claude.ai/download" target="_blank">' + t('cl.download') + '</a>'}
-        ${d.linked && !dOn ? `<button class="btn" id="cl-recheck">${t('cl.recheck')}</button>` : ''}</div>
+        ${d.linked && (!dOn || d.outdated) ? `<button class="btn ${d.outdated ? 'primary' : ''}" id="cl-repair">${t('cl.repair')}</button><button class="btn" id="cl-recheck">${t('cl.recheck')}</button>` : ''}</div>
       ${d.linked && !dOn ? `<p style="margin:12px 0 0;font-size:12.5px">${t('cl.logs')}</p>` : ''}
     </div></div>
     <div class="panel app-card" data-spot><span class="ico">⌨️</span><div style="flex:1">
@@ -1311,6 +1310,7 @@ async function loadClaudeApps() {
   const act = (id, fn) => { const b = $('#' + id); if (b) b.onclick = async () => { b.disabled = true; try { await fn(); toast(t('toast.saved')); } catch (e) { toast(e.message, true); } loadClaudeApps(); }; };
   act('cl-link', () => api('/claude/desktop', { method: 'POST' }));
   act('cl-unlink', () => api('/claude/desktop', { method: 'DELETE' }));
+  act('cl-repair', () => api('/claude/desktop', { method: 'POST' }));
   act('cl-code', () => api('/claude/code', { method: 'POST' }));
   if ($('#cl-recheck')) $('#cl-recheck').onclick = () => { loadClaudeApps(); refreshMcp(); };
 }

@@ -338,6 +338,7 @@ const routes = [
       instructions: state.settings.mcpInstructions || mcp.DEFAULT_INSTRUCTIONS,
       defaultInstructions: mcp.DEFAULT_INSTRUCTIONS,
       mcpPath: path.join(__dirname, 'mcp.js'),
+      desktopEntry: claude.entry(),
     };
   }],
   ['PUT', /^\/api\/mcp$/, async (req) => {

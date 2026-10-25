@@ -157,7 +157,6 @@ const I18N = {
     'cn.s1': 'Server is running',
     'cn.s1t': 'Rovex Hub opens a local MCP server as soon as the app starts. Your library stays on your machine: only the requested excerpts are sent to Claude.',
     'cn.s2': 'Add it to Claude',
-    'cn.s2t': 'Paste this config in Claude’s connectors (desktop or Claude Code).',
     'cn.copyCfg': 'Copy config',
     'cn.copyCmd': 'Copy Claude Code command',
     'cn.s3': 'Test a question',
@@ -419,7 +418,11 @@ const I18N = {
     "st.f3t": "The AI generates",
     "st.f4": "In the library, ready to upload to Roblox",
     "st.f4t": "Saved for you",
-    "st.limSetup": "Not set up yet. To let every member generate images, install the “rovex-gen” function and the OPENAI_API_KEY secret on your Supabase (see the README).",
+    "st.limSetup": "Not set up yet. To let every member generate images, install the “rovex-gen” function and the OPENAI_API_KEY secret on your Supabase (see the README).",    "cn.s2t": "Claude Desktop: Rovex adds itself (button above). By hand: paste this block into claude_desktop_config.json. Claude Code: copy the command.",
+    "cl.broken": "Config to repair",
+    "cl.brokenText": "The Rovex Hub entry in Claude Desktop’s config is not valid (Claude ignores it). Click Repair: Rovex rewrites it correctly, then fully quit and reopen Claude Desktop.",
+    "cl.repair": "Repair",
+
   },
 
   fr: {
@@ -575,7 +578,6 @@ const I18N = {
     'cn.s1': 'Le serveur tourne',
     'cn.s1t': 'Rovex Hub ouvre un serveur MCP local dès que l’app démarre. Ta base reste sur ta machine : seuls les extraits demandés sont envoyés à Claude.',
     'cn.s2': 'Ajoute-le à Claude',
-    'cn.s2t': 'Colle cette config dans les connecteurs de Claude (desktop ou Claude Code).',
     'cn.copyCfg': 'Copier la config',
     'cn.copyCmd': 'Copier la commande Claude Code',
     'cn.s3': 'Teste une question',
@@ -837,7 +839,11 @@ const I18N = {
     "st.f3t": "L’IA génère",
     "st.f4": "Dans la bibliothèque, prêt à mettre sur Roblox",
     "st.f4t": "C’est rangé pour toi",
-    "st.limSetup": "Pas encore installée. Pour que tous tes membres génèrent des images, installe la fonction « rovex-gen » et le secret OPENAI_API_KEY sur ton Supabase (voir le README).",
+    "st.limSetup": "Pas encore installée. Pour que tous tes membres génèrent des images, installe la fonction « rovex-gen » et le secret OPENAI_API_KEY sur ton Supabase (voir le README).",    "cn.s2t": "Claude Desktop : Rovex s’ajoute tout seul (bouton ci-dessus). À la main : colle ce bloc dans claude_desktop_config.json. Claude Code : copie la commande.",
+    "cl.broken": "Config à réparer",
+    "cl.brokenText": "L’entrée Rovex Hub dans la config de Claude Desktop n’est pas valide (Claude l’ignore). Clique sur Réparer : Rovex la réécrit correctement, puis quitte complètement Claude Desktop et rouvre-le.",
+    "cl.repair": "Réparer",
+
   },
 
   es: {
@@ -993,7 +999,6 @@ const I18N = {
     'cn.s1': 'El servidor está en marcha',
     'cn.s1t': 'Rovex Hub abre un servidor MCP local en cuanto arranca la app. Tu biblioteca se queda en tu equipo: solo se envían a Claude los fragmentos pedidos.',
     'cn.s2': 'Añádelo a Claude',
-    'cn.s2t': 'Pega esta configuración en los conectores de Claude (escritorio o Claude Code).',
     'cn.copyCfg': 'Copiar la config',
     'cn.copyCmd': 'Copiar el comando de Claude Code',
     'cn.s3': 'Prueba una pregunta',
@@ -1255,7 +1260,11 @@ const I18N = {
     "st.f3t": "La IA genera",
     "st.f4": "En la biblioteca, listo para subir a Roblox",
     "st.f4t": "Guardado para ti",
-    "st.limSetup": "Aún no está instalada. Para que todos tus miembros generen imágenes, instala la función «rovex-gen» y el secreto OPENAI_API_KEY en tu Supabase (ver el README).",
+    "st.limSetup": "Aún no está instalada. Para que todos tus miembros generen imágenes, instala la función «rovex-gen» y el secreto OPENAI_API_KEY en tu Supabase (ver el README).",    "cn.s2t": "Claude Desktop: Rovex se añade solo (botón de arriba). A mano: pega este bloque en claude_desktop_config.json. Claude Code: copia el comando.",
+    "cl.broken": "Configuración a reparar",
+    "cl.brokenText": "La entrada de Rovex Hub en la configuración de Claude Desktop no es válida (Claude la ignora). Pulsa Reparar: Rovex la reescribe bien; luego cierra del todo Claude Desktop y vuelve a abrirlo.",
+    "cl.repair": "Reparar",
+
   },
 
   pt: {
@@ -1411,7 +1420,6 @@ const I18N = {
     'cn.s1': 'O servidor está rodando',
     'cn.s1t': 'O Rovex Hub abre um servidor MCP local assim que o app inicia. Sua biblioteca fica na sua máquina: só os trechos pedidos são enviados ao Claude.',
     'cn.s2': 'Adicione ao Claude',
-    'cn.s2t': 'Cole esta configuração nos conectores do Claude (desktop ou Claude Code).',
     'cn.copyCfg': 'Copiar config',
     'cn.copyCmd': 'Copiar comando do Claude Code',
     'cn.s3': 'Teste uma pergunta',
@@ -1673,7 +1681,11 @@ const I18N = {
     "st.f3t": "A IA gera",
     "st.f4": "Na biblioteca, pronto para enviar ao Roblox",
     "st.f4t": "Guardado para você",
-    "st.limSetup": "Ainda não instalada. Para todos os membros gerarem imagens, instale a função “rovex-gen” e o segredo OPENAI_API_KEY no seu Supabase (veja o README).",
+    "st.limSetup": "Ainda não instalada. Para todos os membros gerarem imagens, instale a função “rovex-gen” e o segredo OPENAI_API_KEY no seu Supabase (veja o README).",    "cn.s2t": "Claude Desktop: o Rovex se adiciona sozinho (botão acima). À mão: cole este bloco em claude_desktop_config.json. Claude Code: copie o comando.",
+    "cl.broken": "Configuração a reparar",
+    "cl.brokenText": "A entrada do Rovex Hub na configuração do Claude Desktop não é válida (o Claude a ignora). Clique em Reparar: o Rovex a reescreve corretamente; depois feche totalmente o Claude Desktop e abra de novo.",
+    "cl.repair": "Reparar",
+
   },
 };
 
