@@ -218,6 +218,14 @@ const server = http.createServer(async (req, res) => {
   return f ? serveFile(req, res, f) : send(res, 403, { error: 'Interdit' });
 });
 
+server.on('error', (e) => {
+  if (e.code === 'EADDRINUSE') {
+    console.log(`\n  Roblox Dev Hub tourne déjà  →  http://localhost:${PORT}\n`);
+    process.exit(0);
+  }
+  throw e;
+});
+
 server.listen(PORT, '127.0.0.1', () => {
   console.log(`\n  Roblox Dev Hub prêt  →  http://localhost:${PORT}\n  (Ctrl+C pour arrêter)\n`);
 });

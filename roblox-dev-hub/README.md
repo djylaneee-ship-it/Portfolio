@@ -10,17 +10,25 @@ Ta bibliothèque perso de ressources de dev Roblox : scripting, VFX, animation, 
 - **Favoris, niveaux, tags et notes** : Claude peut lire tes notes.
 - **Relié à Claude** (serveur MCP) : Claude cherche dans ta base, ajoute des tutos et résume des vidéos dans tes notes.
 
-## Installation (Windows)
+## Installation (Windows) : un seul fichier
 
-1. Installe **Node.js 18 ou plus récent** : https://nodejs.org (version LTS).
-2. Télécharge ce dossier `roblox-dev-hub` sur ton PC (par exemple dans `Documents`).
-3. Double-clique sur **`Lancer Roblox Dev Hub.bat`**. L'app s'ouvre sur http://localhost:4747.
+1. Télécharge **`Installer Roblox Dev Hub.bat`** (à la racine du dépôt).
+2. Double-clique dessus. L'installateur :
+   - vérifie Node.js et l'installe avec winget s'il manque ;
+   - installe l'app dans `%LOCALAPPDATA%\RobloxDevHub` ;
+   - crée le raccourci **Roblox Dev Hub** sur le Bureau et dans le menu Démarrer ;
+   - relie l'app à Claude Code si `claude` est installé ;
+   - ouvre l'app sur http://localhost:4747.
 
-Laisse la fenêtre noire ouverte tant que tu utilises l'app. Aucun `npm install` n'est nécessaire : l'app n'a aucune dépendance.
+Pour mettre à jour, relance l'installateur : ta base et tes fichiers sont conservés. Pour désinstaller, lance `Desinstaller.bat` dans le dossier d'installation.
+
+Laisse la petite fenêtre noire ouverte tant que tu utilises l'app.
+
+Après une modification du code, régénère l'installateur avec `node build-installer.js`.
 
 ## Relier à Claude
 
-Double-clique sur **`Relier a Claude.bat`**, ou tape dans un terminal :
+L'installateur le fait tout seul. Sinon, double-clique sur **`Relier a Claude.bat`** dans le dossier d'installation, ou tape dans un terminal :
 
 ```
 claude mcp add --scope user roblox-dev-hub -- node "C:\chemin\vers\roblox-dev-hub\mcp.js"
