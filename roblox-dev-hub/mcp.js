@@ -92,8 +92,10 @@ const TOOLS = [
 
 // Appelle l'API de l'app (l'exploration tourne dans le serveur de l'app).
 async function app(pathname, body) {
+  const { Auth } = require('./auth');
+  const headers = { Authorization: 'Bearer ' + new Auth({ getState: () => ({}), persist() {} }).masterKey() };
   try {
-    const res = await fetch('http://localhost:4747' + pathname, body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : {});
+    const res = await fetch('http://localhost:4747' + pathname, body ? { method: 'POST', headers: { ...headers, 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : { headers });
     const j = await res.json();
     if (!res.ok) throw new Error(j.error || 'Erreur');
     return j;

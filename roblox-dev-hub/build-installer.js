@@ -8,7 +8,7 @@ const OUT = path.join(ROOT, '..', 'Installer Roblox Dev Hub.bat');
 const FILES = [
   'db.js', 'mcp.js', 'server.js', 'web.js', 'crawler.js', 'seed.json', 'package.json', 'README.md',
   'public/index.html', 'public/style.css', 'public/app.js',
-  'Lancer Roblox Dev Hub.bat',
+  'Lancer Roblox Dev Hub.bat', 'Lancer en mode partage.bat', 'auth.js',
 ];
 
 const crlf = (s) => s.replace(/\r?\n/g, '\r\n');

@@ -6,8 +6,13 @@ const db = require('./db');
 const web = require('./web');
 const mcp = require('./mcp');
 const { Crawler, youtubeSearch } = require('./crawler');
+const { Auth, KEY_FILE } = require('./auth');
+const os = require('os');
 
 const PORT = Number(process.env.PORT) || 4747;
+// HOST=0.0.0.0 rend le site accessible aux autres appareils (mode partagé).
+const HOST = process.env.HOST || '127.0.0.1';
+const CLOUD_DEFAULT = 'https://raw.githubusercontent.com/djylaneee-ship-it/Portfolio/refs/heads/claude/quirky-wright-c5ff4e/roblox-dev-hub/cloud/library.json';
 const PUBLIC = path.join(__dirname, 'public');
 const DB_FILE = path.join(db.DATA_DIR, 'library.json');
 const MIME = {
@@ -21,6 +26,8 @@ const MIME = {
 
 let state = db.load();
 state.settings = state.settings || { youtubeApiKey: '' };
+
+const auth = new Auth({ getState: () => state, persist: () => persist() });
 
 const crawler = new Crawler({
   getState: () => state,
@@ -177,27 +184,114 @@ const routes = [
   ['POST', /^\/api\/crawl$/, async (req) => crawler.start({ ...(await json(req)), apiKey: state.settings.youtubeApiKey, githubToken: state.settings.githubToken })],
   ['POST', /^\/api\/crawl\/stop$/, () => { crawler.stop(); return crawler.status; }],
   ['GET', /^\/api\/youtube$/, (req, m, url) => youtubeSearch(url.searchParams.get('q') || 'roblox studio', 2, state.settings.youtubeApiKey)],
-  ['GET', /^\/api\/settings$/, () => ({ youtubeApiKey: state.settings.youtubeApiKey ? '••••' + state.settings.youtubeApiKey.slice(-4) : '', hasKey: Boolean(state.settings.youtubeApiKey), hasGithub: Boolean(state.settings.githubToken), autoSyncHours: state.settings.autoSyncHours || 0, lastAutoSync: state.settings.lastAutoSync || null })],
+  ['GET', /^\/api\/settings$/, () => ({ youtubeApiKey: state.settings.youtubeApiKey ? '••••' + state.settings.youtubeApiKey.slice(-4) : '', hasKey: Boolean(state.settings.youtubeApiKey), hasGithub: Boolean(state.settings.githubToken), autoSyncHours: state.settings.autoSyncHours || 0, lastAutoSync: state.settings.lastAutoSync || null, cloudUrl: state.settings.cloudUrl ?? CLOUD_DEFAULT, lastCloudSync: state.settings.lastCloudSync || null, lastCloudAdded: state.settings.lastCloudAdded ?? null, cloudUpdatedAt: state.settings.cloudUpdatedAt || null })],
   ['PUT', /^\/api\/settings$/, async (req) => {
     const b = await json(req);
     if (typeof b.youtubeApiKey === 'string') state.settings.youtubeApiKey = b.youtubeApiKey.trim();
     if (typeof b.githubToken === 'string') state.settings.githubToken = b.githubToken.trim();
+    if (typeof b.cloudUrl === 'string') state.settings.cloudUrl = b.cloudUrl.trim();
     if (b.autoSyncHours !== undefined) state.settings.autoSyncHours = Math.max(0, Number(b.autoSyncHours) || 0);
     persist();
     return { ok: true };
   }],
-  ['GET', /^\/api\/export$/, () => state],
+  ['GET', /^\/api\/export$/, () => ({ ...state, auth: undefined })],
+  ['POST', /^\/api\/cloud\/sync$/, () => cloudSync()],
+  ['GET', /^\/api\/admin\/codes$/, () => auth.list()],
+  ['POST', /^\/api\/admin\/codes$/, async (req) => auth.create(await json(req))],
+  ['PUT', /^\/api\/admin\/codes\/(\w+)$/, async (req, m) => auth.update(m[1], await json(req))],
+  ['DELETE', /^\/api\/admin\/codes\/(\w+)$/, (req, m) => { auth.remove(m[1]); return { ok: true }; }],
+  ['GET', /^\/api\/admin\/info$/, () => ({
+    host: HOST, port: PORT, shared: HOST !== '127.0.0.1',
+    addresses: Object.values(os.networkInterfaces()).flat().filter((i) => i && i.family === 'IPv4' && !i.internal).map((i) => `http://${i.address}:${PORT}`),
+    keyFile: KEY_FILE,
+  })],
+  ['POST', /^\/api\/admin\/reset-key$/, () => ({ key: auth.resetMasterKey() })],
 ];
+
+// Routes accessibles à un ID d'accès simple (lecture seule). Tout le reste est réservé à l'admin.
+const USER_ROUTES = [/^\/api\/meta$/, /^\/api\/stats$/, /^\/api\/resources$/, /^\/api\/channels$/, /^\/api\/youtube$/, /^\/api\/crawl$/];
+
+const cookies = (req) => Object.fromEntries(String(req.headers.cookie || '').split(';').map((c) => c.trim().split('=')).filter((p) => p[0]).map(([k, ...v]) => [k, decodeURIComponent(v.join('='))]));
+const clientIp = (req) => req.socket.remoteAddress || '';
+const isLoopback = (req) => /^(::1|127\.0\.0\.1|::ffff:127\.0\.0\.1)$/.test(clientIp(req)) && !req.headers['x-forwarded-for'];
+
+function setSession(res, token, expiresAt) {
+  const maxAge = token ? Math.max(0, Math.floor((Date.parse(expiresAt) - Date.now()) / 1000)) : 0;
+  res.setHeader('Set-Cookie', `rdh_session=${token || ''}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAge}`);
+}
+
+async function authRoutes(req, res, url) {
+  if (url.pathname === '/api/login' && req.method === 'POST') {
+    try {
+      const s = auth.login((await json(req)).code, clientIp(req));
+      setSession(res, s.token, s.expiresAt);
+      return send(res, 200, { role: s.role, label: s.label, expiresAt: s.expiresAt });
+    } catch (e) { return send(res, e.code || 400, { error: e.message }); }
+  }
+  if (url.pathname === '/api/logout' && req.method === 'POST') {
+    auth.logout(cookies(req).rdh_session);
+    setSession(res, '');
+    return send(res, 200, { ok: true });
+  }
+  if (url.pathname === '/api/session') {
+    const s = auth.check(cookies(req).rdh_session);
+    return send(res, 200, s ? { loggedIn: true, role: s.role, label: s.label, expiresAt: s.expiresAt } : { loggedIn: false });
+  }
+  return false;
+}
+
+// Récupère les trouvailles de l'algo cloud (GitHub Actions) et les ajoute à la base.
+let cloudBusy = false;
+async function cloudSync() {
+  const src = state.settings.cloudUrl ?? CLOUD_DEFAULT;
+  if (!src) throw new Error('Aucune source cloud configurée');
+  if (cloudBusy) throw new Error('Synchronisation déjà en cours');
+  if (crawler.status.running) throw new Error('Attends la fin de l\'exploration en cours');
+  cloudBusy = true;
+  try {
+    const token = state.settings.githubToken;
+    const res = await fetch(src, { headers: { 'User-Agent': 'roblox-dev-hub', ...(token && { Authorization: `token ${token}` }) }, signal: AbortSignal.timeout(120000) });
+    if (res.status === 404) throw new Error('Fichier cloud introuvable : l\'algo n\'a pas encore tourné, ou le dépôt est privé (ajoute un jeton GitHub)');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const cloud = await res.json();
+    const urls = new Set(state.resources.map((r) => r.url).filter(Boolean));
+    let added = 0;
+    for (const r of cloud.resources || []) {
+      if (!r.url || urls.has(r.url)) continue;
+      urls.add(r.url);
+      state.resources.push(db.normalize({ ...r, id: undefined, source: 'cloud', favorite: false }));
+      added++;
+    }
+    const ids = new Set(state.channels.map((c) => c.channelId).filter(Boolean));
+    let chans = 0;
+    for (const c of cloud.channels || []) {
+      if (!c.channelId || ids.has(c.channelId)) continue;
+      ids.add(c.channelId);
+      state.channels.push({ ...c, id: db.newId() });
+      chans++;
+    }
+    Object.assign(state.settings, { lastCloudSync: new Date().toISOString(), lastCloudAdded: added, cloudUpdatedAt: cloud.updatedAt || null });
+    persist();
+    return { added, channels: chans, total: (cloud.resources || []).length, cloudUpdatedAt: cloud.updatedAt };
+  } finally {
+    cloudBusy = false;
+  }
+}
 
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
   // Protection : on refuse les requêtes d'écriture venant d'un autre site.
-  if (req.method !== 'GET' && req.headers.origin && !/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(req.headers.origin)) {
-    return send(res, 403, { error: 'Origine refusée' });
+  if (req.method !== 'GET' && req.headers.origin) {
+    let host = '';
+    try { host = new URL(req.headers.origin).host; } catch {}
+    if (host !== req.headers.host) return send(res, 403, { error: 'Origine refusée' });
   }
   if (url.pathname === '/mcp') {
     // Endpoint MCP « Streamable HTTP » (réponses JSON simples, pas de flux SSE).
-    if (!/^(localhost|127\.0\.0\.1)(:\d+)?$/.test(req.headers.host || '')) return send(res, 403, { error: 'Hôte refusé' });
+    // Libre depuis ce PC ; depuis ailleurs, il faut « Authorization: Bearer <ID ou clé admin> ».
+    const bearer = String(req.headers.authorization || '').replace(/^Bearer\s+/i, '');
+    const local = isLoopback(req) && /^(localhost|127\.0\.0\.1)(:\d+)?$/.test(req.headers.host || '');
+    if (!local && !auth.checkCode(bearer)) return send(res, 401, { error: 'ID d\'accès requis' });
     if (req.method !== 'POST') { res.writeHead(405, { Allow: 'POST' }); return res.end(); }
     let msg;
     try { msg = JSON.parse((await readBody(req, 5 * 1024 * 1024)).toString('utf8')); }
@@ -208,6 +302,13 @@ const server = http.createServer(async (req, res) => {
   }
   if (url.pathname.startsWith('/api/')) {
     refresh();
+    if (await authRoutes(req, res, url) !== false) return;
+    const bearer = String(req.headers.authorization || '').replace(/^Bearer\s+/i, '');
+    const session = auth.check(cookies(req).rdh_session) || auth.checkCode(bearer);
+    if (!session) return send(res, 401, { error: 'Connecte-toi avec ton ID d\'accès' });
+    if (session.role !== 'admin' && !(req.method === 'GET' && USER_ROUTES.some((re) => re.test(url.pathname)))) {
+      return send(res, 403, { error: 'Réservé à l\'admin' });
+    }
     for (const [method, re, fn] of routes) {
       const m = url.pathname.match(re);
       if (m && method === req.method) {
@@ -218,6 +319,7 @@ const server = http.createServer(async (req, res) => {
     return send(res, 404, { error: 'Route inconnue' });
   }
   if (url.pathname.startsWith('/media/')) {
+    if (!auth.check(cookies(req).rdh_session)) return send(res, 401, { error: 'Connexion requise' });
     const f = safeJoin(db.MEDIA_DIR, url.pathname.slice(7));
     return f ? serveFile(req, res, f) : send(res, 403, { error: 'Interdit' });
   }
@@ -233,8 +335,13 @@ server.on('error', (e) => {
   throw e;
 });
 
-server.listen(PORT, '127.0.0.1', () => {
-  console.log(`\n  Roblox Dev Hub prêt  →  http://localhost:${PORT}\n  (Ctrl+C pour arrêter)\n`);
+server.listen(PORT, HOST, () => {
+  console.log(`\n  Roblox Dev Hub prêt  →  http://localhost:${PORT}`);
+  if (HOST !== '127.0.0.1') {
+    for (const i of Object.values(os.networkInterfaces()).flat()) if (i && i.family === 'IPv4' && !i.internal) console.log(`  Mode partagé         →  http://${i.address}:${PORT}`);
+  }
+  console.log(`\n  Clé admin (permanente) : ${auth.masterKey()}`);
+  console.log(`  (aussi enregistrée dans ${KEY_FILE})\n  Ctrl+C pour arrêter\n`);
 });
 
 
@@ -247,3 +354,8 @@ setInterval(() => {
   state.settings.lastAutoSync = new Date().toISOString();
   crawler.start({ mode: 'sync' });
 }, 60e3);
+
+// Source cloud : récupère les trouvailles de l'algo GitHub toutes les 30 minutes.
+setInterval(() => { if (state.settings.cloudUrl !== '') cloudSync().catch(() => {}); }, 30 * 60e3);
+setTimeout(() => { if (state.settings.cloudUrl !== '') cloudSync().catch(() => {}); }, 10e3);
+setInterval(() => auth.sweep(), 3600e3);

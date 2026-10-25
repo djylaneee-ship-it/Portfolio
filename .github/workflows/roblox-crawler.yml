@@ -1,0 +1,47 @@
+# Algo Roblox Dev Hub : cherche en continu (un passage chaque heure, en boucle)
+# et enregistre ses trouvailles dans roblox-dev-hub/cloud/library.json.
+name: Roblox Dev Hub — exploration continue
+
+on:
+  schedule:
+    - cron: '7 * * * *'   # toutes les heures
+  workflow_dispatch:       # bouton « Run workflow » pour lancer à la main
+    inputs:
+      minutes:
+        description: 'Durée du passage en minutes'
+        default: '45'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: roblox-crawler
+  cancel-in-progress: false
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    timeout-minutes: 58
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Exploration
+        working-directory: roblox-dev-hub
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        run: node cloud-crawl.js ${{ github.event.inputs.minutes || '45' }}
+
+      - name: Enregistrer les trouvailles
+        if: always()
+        run: |
+          git config user.name "roblox-dev-hub-bot"
+          git config user.email "roblox-dev-hub-bot@users.noreply.github.com"
+          git add roblox-dev-hub/cloud/library.json
+          git diff --cached --quiet && exit 0
+          git commit -m "Exploration : $(date -u +'%Y-%m-%d %H:%M') UTC"
+          for i in 1 2 3; do git pull --rebase -X theirs && git push && break; sleep 5; done

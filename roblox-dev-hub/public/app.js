@@ -43,8 +43,39 @@ async function api(path, opts = {}) {
     body: opts.body && !(opts.body instanceof Blob) ? JSON.stringify(opts.body) : opts.body,
   });
   const data = await res.json();
+  if (res.status === 401 && path !== '/login') { showLogin(); }
   if (!res.ok) throw new Error(data.error || 'Erreur');
   return data;
+}
+
+// ---------- Connexion ----------
+let SESSION = null;
+const isAdmin = () => SESSION && SESSION.role === 'admin';
+
+function showLogin(msg = '') {
+  document.body.classList.add('locked');
+  $('#login').hidden = false;
+  if (msg) $('#login-err').textContent = msg;
+  setTimeout(() => $('#login-code').focus(), 50);
+}
+
+$('#login-form').onsubmit = async (e) => {
+  e.preventDefault();
+  const btn = e.submitter; btn.disabled = true;
+  $('#login-err').textContent = '';
+  try {
+    await api('/login', { method: 'POST', body: { code: $('#login-code').value } });
+    location.reload();
+  } catch (err) { $('#login-err').textContent = err.message; btn.disabled = false; }
+};
+
+function renderSession() {
+  document.body.classList.toggle('role-user', !isAdmin());
+  const exp = new Date(SESSION.expiresAt);
+  $('#side-user').innerHTML = `<div class="who"><span class="role ${SESSION.role}">${isAdmin() ? 'Admin' : 'Membre'}</span>
+    <small>${isAdmin() ? 'Accès permanent' : esc(SESSION.label || 'ID d\'accès') + ' · jusqu\'au ' + exp.toLocaleDateString('fr-FR')}</small></div>
+    <button class="btn small" id="logout">Se déconnecter</button>`;
+  $('#logout').onclick = async () => { await api('/logout', { method: 'POST' }); location.reload(); };
 }
 
 function toast(msg, err) {
@@ -72,7 +103,7 @@ function card(r) {
       : `<div class="thumb ph">${fb}`;
   return `<article class="card" style="--c:${c.color}" data-id="${r.id}">
     ${thumb}<span class="badge">${TYPE_LABEL[r.type] || r.type}</span>
-    <button class="star ${r.favorite ? 'on' : ''}" data-star="${r.id}" title="Favori">${STAR}</button></div>
+    <button class="star admin-only ${r.favorite ? 'on' : ''}" data-star="${r.id}" title="Favori">${STAR}</button></div>
     <div class="card-body">
       <div class="card-cat"><span class="dot" style="background:${c.color}"></span>${esc(c.label)}</div>
       <h3>${esc(r.title)}</h3>
@@ -103,7 +134,7 @@ function bindCards(root, list) {
 function grid(list, emptyMsg = '') {
   if (!list.length) {
     return `<div class="empty"><b>Rien ici pour l'instant</b>${emptyMsg || 'Essaie une autre recherche, ou ajoute une ressource.'}
-      <div class="row"><button class="btn primary" onclick="openAdd()">Ajouter une ressource</button>
+      <div class="row"><button class="btn primary admin-only" onclick="openAdd()">Ajouter une ressource</button>
       <a class="btn" href="#/youtube?q=${encodeURIComponent($('#search').value || 'roblox studio')}">Chercher sur YouTube</a></div></div>`;
   }
   return `<div class="grid">${list.map(card).join('')}</div>`;
@@ -117,10 +148,10 @@ async function renderHome() {
       <h1>Ta base de dev<br><span>Roblox ultime</span></h1>
       <p>Tutos vidéo, docs, VFX, scripts, animations, GUI, GFX… tout au même endroit, consultable par toi <b>et par tes outils IA</b> via MCP.</p>
       <div class="row">
-        <button class="btn primary" onclick="openAdd()"><svg viewBox="0 0 24 24"><path d="M11 4h2v7h7v2h-7v7h-2v-7H4v-2h7z"/></svg>Ajouter</button>
-        <a class="btn" href="#/explore">⚡ Exploration auto</a>
+        <button class="btn primary admin-only" onclick="openAdd()"><svg viewBox="0 0 24 24"><path d="M11 4h2v7h7v2h-7v7h-2v-7H4v-2h7z"/></svg>Ajouter</button>
+        <a class="btn admin-only" href="#/explore">⚡ Exploration auto</a>
         <a class="btn" href="#/channels">Chaînes Roblox</a>
-        <a class="btn" href="#/mcp">Serveur MCP</a>
+        <a class="btn admin-only" href="#/mcp">Serveur MCP</a>
       </div>
       <div class="stats">
         <div class="stat"><b>${STATS.total}</b><span>ressources</span></div>
@@ -194,11 +225,11 @@ async function renderYoutube(params) {
   try {
     const res = await api('/youtube?q=' + encodeURIComponent(q));
     if (!res.length) { out.innerHTML = '<div class="empty"><b>Aucun résultat</b>Essaie d\'autres mots-clés.</div>'; return; }
-    out.innerHTML = `<div class="row" style="margin-bottom:16px"><button class="btn primary" id="add-all">+ Tout ajouter (${res.length})</button></div><div class="grid">${res.map((v, i) => `
+    out.innerHTML = `<div class="row admin-only" style="margin-bottom:16px"><button class="btn primary" id="add-all">+ Tout ajouter (${res.length})</button></div><div class="grid">${res.map((v, i) => `
       <article class="card" style="--c:#ff3d6e">
         <div class="thumb"><img src="${esc(v.thumbnail)}" alt="" loading="lazy"><span class="badge">${esc(v.duration || 'Vidéo')}</span></div>
         <div class="card-body"><h3>${esc(v.title)}</h3><div class="meta">${esc(v.author)}${v.views ? ' · ' + esc(v.views) : ''}</div>
-        <div class="row"><button class="btn small primary" data-add="${i}">+ Ajouter</button><a class="btn small" href="${esc(v.url)}" target="_blank">Voir</a></div></div>
+        <div class="row"><button class="btn small primary admin-only" data-add="${i}">+ Ajouter</button><a class="btn small" href="${esc(v.url)}" target="_blank">Voir</a></div></div>
       </article>`).join('')}</div>`;
     const addOne = async (b) => {
       if (b.disabled) return;
@@ -228,7 +259,7 @@ async function renderChannels(params) {
   view.innerHTML = `
     <h1 class="h1">Chaînes YouTube Roblox</h1>
     <p class="sub">${followed.toLocaleString('fr-FR')} chaîne${followed > 1 ? 's' : ''} reliée${followed > 1 ? 's' : ''} au site. Leurs nouvelles vidéos arrivent dans ta base automatiquement.</p>
-    <div class="explore-cards">
+    <div class="explore-cards admin-only">
       <div class="panel big-action">
         <h3>🔎 Trouver toutes les chaînes Roblox</h3>
         <p>Fouille YouTube (dev, VFX, scripting, gameplay, YouTubeurs FR/EN/ES…) et relie automatiquement chaque chaîne trouvée.</p>
@@ -242,7 +273,7 @@ async function renderChannels(params) {
       </div>
     </div>
     <div id="job"></div>
-    <div class="panel" style="margin-top:16px">
+    <div class="panel admin-only" style="margin-top:16px">
       <form class="row" id="ch-form">
         <input class="input" id="ch-h" style="flex:2;min-width:200px" placeholder="Ajouter une chaîne à la main : @pseudo ou lien">
         <select class="input" id="ch-c" style="flex:1;min-width:150px"><option value="">Catégorie auto</option>${META.categories.map((c) => `<option value="${c.id}">${esc(c.label)}</option>`).join('')}</select>
@@ -283,7 +314,7 @@ function chCard(c) {
   return `<a class="chc" href="https://www.youtube.com/channel/${esc(c.channelId)}" target="_blank" title="${esc(name)}">
     ${c.avatar ? `<img src="${esc(c.avatar)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.visibility='hidden'">` : `<span class="av">${esc(name.replace('@', '')[0] || '?')}</span>`}
     <b>${esc(name)}</b><small>${esc(c.subscribers || (c.category ? cat(c.category).label : ''))}</small>
-    <button class="del" data-del="${c.id}" title="Délier">✕</button></a>`;
+    <button class="del admin-only" data-del="${c.id}" title="Délier">✕</button></a>`;
 }
 
 // ---------- Exploration ----------
@@ -324,6 +355,72 @@ async function renderExplore() {
     intensity: $('#ex-int input:checked').value,
   });
   watchJob();
+}
+
+// ---------- Admin ----------
+async function renderAdmin() {
+  const [codes, info] = await Promise.all([api('/admin/codes'), api('/admin/info')]);
+  const actifs = codes.filter((c) => c.status === 'actif').length;
+  view.innerHTML = `
+    <h1 class="h1">🛡️ Panneau admin</h1>
+    <p class="sub">Crée des ID d'accès à envoyer. Chaque ID ouvre le site en lecture seule et se bloque tout seul à la fin de sa durée.</p>
+    <div class="panel big-action">
+      <h3>Créer un ID d'accès</h3>
+      <form class="row" id="code-form">
+        <input class="input" name="label" style="flex:2;min-width:200px" placeholder="Pour qui ? (ex. Lucas)">
+        <select class="input" name="days" style="flex:1;min-width:150px">
+          <option value="1">1 jour</option><option value="7">7 jours</option><option value="30" selected>1 mois</option><option value="90">3 mois</option><option value="365">1 an</option>
+        </select>
+        <button class="btn primary">Créer l'ID</button>
+      </form>
+      <div id="new-code"></div>
+    </div>
+    <div class="section-head"><h2>${codes.length} ID${codes.length > 1 ? 's' : ''} · ${actifs} actif${actifs > 1 ? 's' : ''}</h2></div>
+    <div class="codes">${codes.map((c) => `
+      <div class="code-row ${c.status}">
+        <div class="code-main"><code>${esc(c.code)}</code><b>${esc(c.label || 'Sans nom')}</b>
+          <small>${c.status === 'actif' ? 'Expire le' : c.status === 'expiré' ? 'A expiré le' : 'Bloqué · expirait le'} ${new Date(c.expiresAt).toLocaleDateString('fr-FR')} · ${c.uses} connexion${c.uses > 1 ? 's' : ''}${c.lastUsed ? ' · dernière le ' + new Date(c.lastUsed).toLocaleString('fr-FR') : ''}</small></div>
+        <span class="status ${c.status}">${c.status}</span>
+        <div class="row">
+          <button class="btn small" data-copy="${esc(c.code)}">Copier</button>
+          <button class="btn small" data-extend="${c.id}">+30 j</button>
+          <button class="btn small" data-block="${c.id}" data-v="${!c.revoked}">${c.revoked ? 'Débloquer' : 'Bloquer'}</button>
+          <button class="btn small danger" data-remove="${c.id}">Supprimer</button>
+        </div>
+      </div>`).join('') || '<div class="empty"><b>Aucun ID</b>Crée ton premier ID ci-dessus.</div>'}</div>
+    <div class="panel" style="margin-top:22px">
+      <h3>🔑 Ta clé admin permanente</h3>
+      <p>Elle n'expire jamais et donne accès à ce panneau. Elle est affichée dans la fenêtre noire au lancement et enregistrée ici :</p>
+      ${codeBox(info.keyFile)}
+      <div class="row" style="margin-top:14px"><button class="btn danger" id="reset-key">Générer une nouvelle clé</button></div>
+    </div>
+    <div class="panel">
+      <h3>🌐 Partager le site</h3>
+      ${info.shared
+        ? `<p>Mode partagé activé. Les appareils de ton réseau (Wi-Fi) peuvent ouvrir :</p>${info.addresses.map(codeBox).join('')}`
+        : `<p>Pour l'instant, le site n'est ouvert que sur ce PC. Lance <b>« Lancer en mode partage.bat »</b> (dans le dossier de l'app) pour l'ouvrir aux appareils de ton Wi-Fi.</p>`}
+      <p style="margin-top:14px">Pour un accès depuis n'importe où sur internet, il faut un tunnel (ex. <b>cloudflared tunnel --url http://localhost:${info.port}</b>) ou un hébergement.</p>
+    </div>`;
+  bindCopy();
+  $('#code-form').onsubmit = async (e) => {
+    e.preventDefault();
+    const d = Object.fromEntries(new FormData(e.target));
+    const c = await api('/admin/codes', { method: 'POST', body: d });
+    const msg = `Voici ton ID d'accès à Roblox Dev Hub : ${c.code}\nValable jusqu'au ${new Date(c.expiresAt).toLocaleDateString('fr-FR')}.`;
+    await renderAdmin();
+    $('#new-code').innerHTML = `<div class="new-code"><span>Nouvel ID${c.label ? ' pour ' + esc(c.label) : ''} :</span><strong>${esc(c.code)}</strong>
+      <div class="row"><button class="btn small primary" data-copy="${esc(c.code)}">Copier l'ID</button><button class="btn small" data-copy="${esc(msg)}">Copier le message à envoyer</button></div></div>`;
+    bindCopy();
+  };
+  $$('[data-extend]').forEach((b) => b.onclick = async () => { await api('/admin/codes/' + b.dataset.extend, { method: 'PUT', body: { addDays: 30 } }); toast('Prolongé de 30 jours'); renderAdmin(); });
+  $$('[data-block]').forEach((b) => b.onclick = async () => { await api('/admin/codes/' + b.dataset.block, { method: 'PUT', body: { revoked: b.dataset.v === 'true' } }); renderAdmin(); });
+  $$('[data-remove]').forEach((b) => b.onclick = async () => { if (!confirm('Supprimer cet ID ? La personne perdra l\'accès.')) return; await api('/admin/codes/' + b.dataset.remove, { method: 'DELETE' }); renderAdmin(); });
+  $('#reset-key').onclick = async () => {
+    if (!confirm('Créer une nouvelle clé admin ? L\'ancienne ne marchera plus, et tu seras déconnecté.')) return;
+    const r = await api('/admin/reset-key', { method: 'POST' });
+    prompt('Ta nouvelle clé admin (note-la !) :', r.key);
+    location.reload();
+  };
 }
 
 function bindCrawlButtons() {
@@ -426,6 +523,16 @@ async function renderSettings() {
       </form>
     </div>
     <div class="panel">
+      <h3>☁️ Source cloud (algo GitHub)</h3>
+      <p>L'algo qui tourne sur GitHub en continu dépose ses trouvailles dans un fichier. L'app le récupère toutes les 30 minutes.
+      ${s.lastCloudSync ? `Dernière synchro : ${new Date(s.lastCloudSync).toLocaleString('fr-FR')} (+${s.lastCloudAdded} ressources)${s.cloudUpdatedAt ? ', fichier cloud mis à jour le ' + new Date(s.cloudUpdatedAt).toLocaleString('fr-FR') : ''}.` : 'Pas encore synchronisée.'}</p>
+      <form class="row" id="cloud-form">
+        <input class="input" id="cloud-url" style="flex:1;min-width:260px" value="${esc(s.cloudUrl)}" placeholder="URL du fichier library.json (vide = désactivé)">
+        <button class="btn">Enregistrer</button>
+        <button class="btn primary" type="button" id="cloud-sync">Synchroniser maintenant</button>
+      </form>
+    </div>
+    <div class="panel">
       <h3>Jeton GitHub (optionnel)</h3>
       <p>Accélère la récupération de l'open source (30 recherches/min au lieu de 10). github.com → Settings → Developer settings → Personal access tokens → Fine-grained, sans aucune permission.</p>
       <form class="row" id="gh-form">
@@ -444,6 +551,12 @@ async function renderSettings() {
       <a class="btn" href="/api/export" download="roblox-dev-hub.json">Exporter la base</a>
     </div>`;
   $('#key-form').onsubmit = async (e) => { e.preventDefault(); await api('/settings', { method: 'PUT', body: { youtubeApiKey: $('#key').value } }); toast('Clé enregistrée'); renderSettings(); };
+  $('#cloud-form').onsubmit = async (e) => { e.preventDefault(); await api('/settings', { method: 'PUT', body: { cloudUrl: $('#cloud-url').value } }); toast('Source enregistrée'); };
+  $('#cloud-sync').onclick = async (e) => {
+    const b = e.currentTarget; b.disabled = true; b.innerHTML = '<span class="spinner"></span>Synchro…';
+    try { const r = await api('/cloud/sync', { method: 'POST' }); toast(`+${r.added} ressources et +${r.channels} chaînes depuis le cloud`); refreshStats(); renderSettings(); }
+    catch (err) { toast(err.message, true); b.disabled = false; b.textContent = 'Synchroniser maintenant'; }
+  };
   $('#gh-form').onsubmit = async (e) => { e.preventDefault(); await api('/settings', { method: 'PUT', body: { githubToken: $('#gh').value } }); toast('Jeton enregistré'); renderSettings(); };
   $('#auto').onchange = async (e) => { await api('/settings', { method: 'PUT', body: { autoSyncHours: Number(e.target.value) } }); toast('Réglage enregistré'); };
   if ($('#key-del')) $('#key-del').onclick = async () => { await api('/settings', { method: 'PUT', body: { youtubeApiKey: '' } }); toast('Clé supprimée'); renderSettings(); };
@@ -470,10 +583,10 @@ function openDetail(r) {
     <p class="sub">${esc(r.author || '')}${r.description ? (r.author ? ' — ' : '') + esc(r.description) : ''}</p>
     <div class="row" style="margin-bottom:22px">
       ${link ? `<a class="btn primary" href="${esc(link)}" target="_blank" ${r.file ? 'download' : ''}>${r.file ? 'Ouvrir / télécharger' : 'Ouvrir le lien'}</a>` : ''}
-      <button class="btn" id="d-fav">${STAR}${r.favorite ? 'Retirer des favoris' : 'Favori'}</button>
-      <button class="btn danger" id="d-del">Supprimer</button>
+      <span class="admin-only row"><button class="btn" id="d-fav">${STAR}${r.favorite ? 'Retirer des favoris' : 'Favori'}</button>
+      <button class="btn danger" id="d-del">Supprimer</button></span>
     </div>
-    <form id="d-form">
+    <form id="d-form" class="admin-only">
       <div class="field"><label>Titre</label><input name="title" value="${esc(r.title)}"></div>
       <div class="two">
         <div class="field"><label>Catégorie</label><select name="category">${META.categories.map((x) => `<option value="${x.id}" ${x.id === r.category ? 'selected' : ''}>${esc(x.label)}</option>`).join('')}</select></div>
@@ -615,12 +728,14 @@ async function route() {
   $$('#nav a').forEach((a) => a.classList.toggle('active', a.dataset.route === name));
   $$('#side-cats a').forEach((a) => a.classList.toggle('active', a.getAttribute('href') === '#/library?cat=' + params.get('cat')));
   document.body.classList.remove('menu');
+  if (!isAdmin() && ['explore', 'mcp', 'settings', 'admin'].includes(path)) { location.hash = '#/'; return; }
   try {
     if (path === 'library') await renderLibrary(params);
     else if (path === 'favorites') await renderLibrary(params, true);
     else if (path === 'youtube') await renderYoutube(params);
     else if (path === 'channels') await renderChannels(params);
     else if (path === 'explore') await renderExplore();
+    else if (path === 'admin' && isAdmin()) await renderAdmin();
     else if (path === 'mcp') await renderMcp();
     else if (path === 'settings') await renderSettings();
     else await renderHome();
@@ -648,19 +763,22 @@ $('#menu-btn').onclick = () => document.body.classList.toggle('menu');
 
 // Glisser-déposer des fichiers n'importe où sur la page.
 let dragDepth = 0;
-window.addEventListener('dragenter', (e) => { if (e.dataTransfer.types.includes('Files') && $('#modal').hidden) { dragDepth++; $('#dropzone').hidden = false; } });
+window.addEventListener('dragenter', (e) => { if (isAdmin() && e.dataTransfer.types.includes('Files') && $('#modal').hidden) { dragDepth++; $('#dropzone').hidden = false; } });
 window.addEventListener('dragleave', () => { if (--dragDepth <= 0) { dragDepth = 0; $('#dropzone').hidden = true; } });
 window.addEventListener('dragover', (e) => e.preventDefault());
 window.addEventListener('drop', (e) => {
   e.preventDefault();
   dragDepth = 0; $('#dropzone').hidden = true;
-  if ($('#modal').hidden && e.dataTransfer.files.length) upload(e.dataTransfer.files);
+  if (isAdmin() && $('#modal').hidden && e.dataTransfer.files.length) upload(e.dataTransfer.files);
 });
 
 window.addEventListener('hashchange', route);
 (async () => {
+  SESSION = await api('/session');
+  if (!SESSION.loggedIn) return showLogin();
+  renderSession();
   META = await api('/meta');
   await refreshStats();
   route();
-  watchJob();
+  if (isAdmin()) watchJob();
 })();

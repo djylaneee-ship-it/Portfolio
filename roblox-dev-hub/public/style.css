@@ -258,6 +258,39 @@ kbd { font: 600 11px Inter, sans-serif; color: var(--muted); border: 1px solid v
 .chc:hover .del { opacity: 1; }
 .chc .del:hover { color: #ff6b7f; }
 
+/* ---------- Connexion & admin ---------- */
+.role-user .admin-only { display: none !important; }
+body.locked .app { filter: blur(6px); pointer-events: none; }
+.login { position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; padding: 16px; background: radial-gradient(circle at 50% 0%, rgba(255, 61, 110, .25), transparent 60%), rgba(6, 7, 12, .92); }
+.login[hidden] { display: none; }
+.login-card { width: min(420px, 100%); background: var(--bg2); border: 1px solid var(--line); border-radius: 24px; padding: 34px 28px; text-align: center; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 12px; align-items: center; animation: pop .25s; }
+.logo.big { width: 64px; height: 64px; border-radius: 16px; margin-bottom: 6px; }
+.logo.big span { width: 22px; height: 22px; border-radius: 5px; }
+.login-card h1 { font-family: var(--display); font-weight: 400; font-size: 32px; margin: 0; }
+.login-card h1 b { font-weight: 400; color: var(--accent); }
+.login-card p { color: var(--muted); margin: 0 0 6px; }
+.login-card input { text-align: center; font: 700 18px/1 'Cascadia Code', Consolas, monospace; letter-spacing: 1.5px; text-transform: uppercase; }
+.login-card .btn { width: 100%; padding: 13px; }
+.login-err { color: #ff7d8f; font-weight: 700; min-height: 20px; }
+.login-card small { color: var(--muted); }
+.side-user { margin: 18px 4px 0; padding: 12px; border-top: 1px solid var(--line); display: grid; gap: 10px; }
+.who { display: grid; gap: 4px; }
+.who small { color: var(--muted); font-size: 12px; }
+.role { width: fit-content; font-size: 11px; font-weight: 800; letter-spacing: .8px; text-transform: uppercase; padding: 3px 9px; border-radius: 7px; background: var(--panel2); color: var(--ok); }
+.role.admin { background: var(--accent); color: #fff; }
+.codes { display: grid; gap: 10px; }
+.code-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; }
+.code-row.expiré, .code-row.bloqué { opacity: .6; }
+.code-main { flex: 1; min-width: 240px; display: grid; gap: 3px; }
+.code-main code { font: 700 15px 'Cascadia Code', Consolas, monospace; color: #c9f7e4; letter-spacing: 1px; }
+.code-main small { color: var(--muted); }
+.status { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .6px; padding: 4px 10px; border-radius: 8px; background: rgba(46, 230, 166, .14); color: var(--ok); }
+.status.expiré { background: rgba(255, 176, 46, .14); color: var(--accent2); }
+.status.bloqué { background: rgba(255, 61, 110, .14); color: #ff7d8f; }
+.new-code { margin-top: 16px; display: grid; gap: 10px; background: #07080d; border: 1px dashed var(--ok); border-radius: 14px; padding: 16px; }
+.new-code span { color: var(--muted); font-weight: 600; }
+.new-code strong { font: 800 26px 'Cascadia Code', Consolas, monospace; letter-spacing: 2px; color: var(--ok); word-break: break-all; }
+
 /* ---------- Fenêtre ---------- */
 .modal { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 20px; }
 .modal[hidden] { display: none; }

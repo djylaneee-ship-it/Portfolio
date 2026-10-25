@@ -27,11 +27,29 @@ Laisse la petite fenêtre noire ouverte tant que tu utilises l'app.
 
 Après une modification du code, régénère l'installateur avec `node build-installer.js`.
 
+## Accès par ID et panneau admin
+
+Le site demande un **ID d'accès** pour entrer.
+
+- **Clé admin permanente** : créée au premier lancement, affichée dans la fenêtre noire et enregistrée dans `data/CLE-ADMIN.txt`. Elle n'expire jamais et ouvre le **panneau Admin**. Ne la partage pas.
+- **IDs d'accès** (`RDH-XXXX-XXXX-XXXX`) : crée-les dans **Admin**, envoie-les. Ils donnent accès au site en lecture seule et se bloquent tout seuls après leur durée (1 mois par défaut). Tu peux les prolonger, les bloquer ou les supprimer.
+- **Partager le site** : `Lancer en mode partage.bat` l'ouvre aux appareils de ton Wi-Fi. Pour internet, il faut un tunnel (ex. `cloudflared tunnel --url http://localhost:4747`) ou un hébergement.
+
+## Algo cloud (GitHub Actions)
+
+`cloud-crawl.js` + `.github/workflows/roblox-crawler.yml` : GitHub lance l'algo **toutes les heures, sans fin**. Chaque passage (45 min) reprend le cycle : nouvelles vidéos des chaînes → découverte de chaînes → exploration → open source. Les trouvailles sont enregistrées dans `roblox-dev-hub/cloud/library.json`.
+
+L'app récupère ce fichier toutes les 30 minutes (**Réglages → Source cloud**), même si ton PC était éteint pendant que l'algo cherchait.
+
+- Lancer à la main : onglet **Actions** du dépôt → « Roblox Dev Hub — exploration continue » → **Run workflow**.
+- Optionnel : un secret `YOUTUBE_API_KEY` (Settings → Secrets → Actions) pour la recherche de vidéos YouTube.
+- GitHub désactive les tâches planifiées d'un dépôt public après 60 jours sans activité : les commits de l'algo comptent comme activité, mais s'il s'arrête, réactive-le dans l'onglet Actions.
+
 ## Relier en MCP
 
 L'app expose un serveur MCP, à brancher dans le client de ton choix (Claude Desktop, Cursor, VS Code, LM Studio…). La page **Serveur MCP** de l'app affiche les adresses exactes, prêtes à copier.
 
-- **Mode HTTP** (l'app doit être ouverte) : `http://localhost:4747/mcp`
+- **Mode HTTP** (l'app doit être ouverte) : `http://localhost:4747/mcp` — libre depuis ton PC ; depuis un autre appareil, ajoute l'en-tête `Authorization: Bearer <ID ou clé admin>`.
 - **Mode stdio** (marche même app fermée) : `node "%LOCALAPPDATA%\RobloxDevHub\mcp.js"`
 
 Outils exposés : `search_resources`, `get_resource`, `list_categories`, `add_resource`, `import_url`, `update_notes`, `explore_internet`, `explore_status`, `list_channels`, `sync_channels`.

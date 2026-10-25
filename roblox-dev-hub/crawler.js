@@ -372,7 +372,7 @@ class Crawler {
       this.status.steps = jobs.length + (sources.includes('youtube') && level.expandChannels ? 1 : 0) + (sources.includes('devforum') ? 1 : 0);
       job = this.run(jobs, sources, level, opts.apiKey);
     }
-    job.catch((e) => this.log('Erreur : ' + e.message, true)).finally(() => {
+    this.done = job.catch((e) => this.log('Erreur : ' + e.message, true)).finally(() => {
       this.status.running = false;
       this.status.finishedAt = new Date().toISOString();
       this.status.current = '';
