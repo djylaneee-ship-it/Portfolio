@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Download Rovex Hub</title>
+  <meta name="description" content="Download Rovex Hub for Windows. Free download — an access ID is required to sign in.">
+  <link rel="icon" href="assets/icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Unbounded:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+
+  <header class="nav">
+    <div class="wrap">
+      <a class="brand" href="index.html"><span class="logo"><img src="assets/logo.png" alt=""></span><span>ROVEX <b>HUB</b></span></a>
+      <button class="menu-btn" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+      <nav class="nav-links">
+        <a href="index.html#features" data-i18n="nav.features"></a>
+        <a href="docs.html" data-i18n="nav.docs"></a>
+        <a href="download.html" class="on" data-i18n="nav.download"></a>
+        <a href="index.html#faq" data-i18n="nav.faq"></a>
+        <a href="#" data-discord data-i18n="nav.discord"></a>
+        <div class="lang"><button data-lang="en">EN</button><button data-lang="fr">FR</button></div>
+        <a class="btn primary small" href="index.html#pricing" data-i18n="nav.pricing" style="margin-left:8px"></a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="page-hero">
+      <h1 class="reveal"><span data-i18n="dl.t1"></span> <span class="hl">Rovex Hub</span></h1>
+      <p class="reveal" style="--d:1" data-i18n="dl.lead"></p>
+      <p class="reveal" style="--d:2;margin-top:14px"><a class="link" href="docs.html#install" data-i18n="dl.start"></a></p>
+    </div>
+
+    <div class="dl-grid">
+      <div class="dl-card main reveal">
+        <h3 data-i18n="dl.win"></h3>
+        <p data-i18n="dl.winP"></p>
+        <a class="btn primary block" href="#" data-download><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 5.5 10 4.5v7H3zM11 4.4 21 3v8.5H11zM3 12.5h7v7l-7-1zM11 12.5h10V21l-10-1.4z"/></svg><span data-i18n="dl.winBtn"></span></a>
+        <div class="meta" id="dl-meta"></div>
+      </div>
+      <div class="dl-card soon reveal" style="--d:1">
+        <h3 data-i18n="dl.mac"></h3>
+        <p data-i18n="dl.macP"></p>
+        <span class="btn block" aria-disabled="true" style="cursor:default" data-i18n="dl.macBtn"></span>
+      </div>
+    </div>
+
+    <div class="notice reveal"><span class="i">🔑</span><div><b data-i18n="dl.noticeT"></b><br><span data-i18n="dl.notice"></span></div></div>
+
+    <div class="install-steps">
+      <p class="eyebrow reveal" data-i18n="dl.steps"></p>
+      <div class="reveal"><i>1</i><span data-i18n="dl.s1"></span></div>
+      <div class="reveal" style="--d:1"><i>2</i><span data-i18n="dl.s2"></span></div>
+      <div class="reveal" style="--d:2"><i>3</i><span data-i18n="dl.s3"></span></div>
+      <div class="reveal" style="--d:3"><i>4</i><span data-i18n="dl.s4"></span></div>
+    </div>
+
+    <div class="specs reveal">
+      <p class="eyebrow" data-i18n="dl.specs"></p>
+      <table>
+        <tr><th data-i18n="dl.os"></th><td data-i18n="dl.osV"></td></tr>
+        <tr><th data-i18n="dl.ram"></th><td data-i18n="dl.ramV"></td></tr>
+        <tr><th data-i18n="dl.disk"></th><td data-i18n="dl.diskV"></td></tr>
+        <tr><th data-i18n="dl.net"></th><td data-i18n="dl.netV"></td></tr>
+        <tr><th data-i18n="dl.ai"></th><td data-i18n="dl.aiV"></td></tr>
+      </table>
+    </div>
+
+    <section style="padding-bottom:0">
+      <div class="final reveal">
+        <h2 data-i18n="final.t"></h2>
+        <p data-i18n="final.p"></p>
+        <div class="ctas"><a class="btn primary" href="index.html#pricing" data-i18n="nav.pricing"></a><a class="btn" href="#" data-discord data-i18n="final.buy"></a></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <div>
+        <a class="brand" href="index.html"><span class="logo"><img src="assets/logo.png" alt=""></span><span>ROVEX <b>HUB</b></span></a>
+        <p style="margin:12px 0 4px" data-i18n="foot.tag"></p>
+        <small>© <span id="year"></span> Rovex Hub · <span data-i18n="foot.rights"></span></small>
+      </div>
+      <nav><a href="docs.html" data-i18n="nav.docs"></a><a href="download.html" data-i18n="nav.download"></a><a href="index.html#pricing" data-i18n="nav.pricing"></a><a href="index.html#faq" data-i18n="nav.faq"></a><a href="#" data-discord data-i18n="nav.discord"></a></nav>
+    </div>
+  </footer>
+  <script src="main.js"></script>
+</body>
+</html>

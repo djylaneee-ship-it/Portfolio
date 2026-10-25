@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Documentation — Rovex Hub</title>
+  <meta name="description" content="Rovex Hub documentation: install, sign in, connect Claude Desktop and Claude Code, skills, prompts, learning examples and troubleshooting.">
+  <link rel="icon" href="assets/icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Unbounded:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+
+  <header class="nav">
+    <div class="wrap">
+      <a class="brand" href="index.html"><span class="logo"><img src="assets/logo.png" alt=""></span><span>ROVEX <b>HUB</b></span></a>
+      <button class="menu-btn" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+      <nav class="nav-links">
+        <a href="index.html#features" data-i18n="nav.features"></a>
+        <a href="docs.html" class="on" data-i18n="nav.docs"></a>
+        <a href="download.html" data-i18n="nav.download"></a>
+        <a href="index.html#faq" data-i18n="nav.faq"></a>
+        <a href="#" data-discord data-i18n="nav.discord"></a>
+        <div class="lang"><button data-lang="en">EN</button><button data-lang="fr">FR</button></div>
+        <a class="btn primary small" href="index.html#pricing" data-i18n="nav.pricing" style="margin-left:8px"></a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap docs">
+    <aside>
+      <div data-lang-block="en">
+        <p>Get started</p>
+        <a href="#intro">What is Rovex Hub?</a>
+        <a href="#install">Install</a>
+        <a href="#signin">Sign in with your ID</a>
+        <p>Claude</p>
+        <a href="#desktop">Claude Desktop</a>
+        <a href="#code">Claude Code</a>
+        <a href="#ask">Ask Claude</a>
+        <p>Features</p>
+        <a href="#library">Library</a>
+        <a href="#opensource">Open source</a>
+        <a href="#examples">Learning examples</a>
+        <a href="#skills">Skills</a>
+        <a href="#prompts">Prompts</a>
+        <a href="#level">Claude level</a>
+        <p>Help</p>
+        <a href="#updates">Updates</a>
+        <a href="#plans">Plans & access</a>
+        <a href="#trouble">Troubleshooting</a>
+        <a href="#privacy">Privacy</a>
+      </div>
+      <div data-lang-block="fr">
+        <p>Bien démarrer</p>
+        <a href="#fr-intro">C’est quoi Rovex Hub ?</a>
+        <a href="#fr-install">Installation</a>
+        <a href="#fr-signin">Se connecter avec son ID</a>
+        <p>Claude</p>
+        <a href="#fr-desktop">Claude Desktop</a>
+        <a href="#fr-code">Claude Code</a>
+        <a href="#fr-ask">Demander à Claude</a>
+        <p>Fonctionnalités</p>
+        <a href="#fr-library">Bibliothèque</a>
+        <a href="#fr-opensource">Open source</a>
+        <a href="#fr-examples">Exemples d’apprentissage</a>
+        <a href="#fr-skills">Skills</a>
+        <a href="#fr-prompts">Prompts</a>
+        <a href="#fr-level">Niveau de Claude</a>
+        <p>Aide</p>
+        <a href="#fr-updates">Mises à jour</a>
+        <a href="#fr-plans">Plans & accès</a>
+        <a href="#fr-trouble">Problèmes fréquents</a>
+        <a href="#fr-privacy">Confidentialité</a>
+      </div>
+    </aside>
+
+    <!-- ===================== ENGLISH ===================== -->
+    <article class="doc" data-lang-block="en">
+      <p class="eyebrow">Documentation</p>
+      <h1 id="intro">What is <span class="hl">Rovex Hub</span>?</h1>
+      <p class="intro">Rovex Hub is a Windows desktop app that turns Claude into a Roblox expert. It collects thousands of Roblox dev resources (videos, docs, DevForum posts, open source systems), sorts them by category, and serves them to Claude through MCP — the standard way Claude talks to apps.</p>
+      <p>You keep working in <b>Claude Desktop</b> or <b>Claude Code</b>. When you ask for a Roblox script, a VFX or a UI, Claude first loads the matching Rovex skill, reads your validated examples and the best resources of that category, then writes the code.</p>
+
+      <h2 id="install">Install</h2>
+      <ol>
+        <li>Go to the <a href="download.html">Download page</a> and click <b>Download for Windows</b>.</li>
+        <li>Double-click <code>Rovex-Hub-Setup-x.y.z.exe</code>. The app installs itself in a few seconds and opens.</li>
+        <li>A <b>Rovex Hub</b> icon is added to your desktop and Start menu.</li>
+      </ol>
+      <div class="callout warn">If Windows shows <b>“Windows protected your PC”</b>, click <b>More info</b> then <b>Run anyway</b>. This message appears for new apps that are not signed with a paid certificate yet.</div>
+      <p>Requirements: Windows 10 or 11 (64-bit), 4 GB of RAM, 500 MB of free space and an internet connection.</p>
+
+      <h2 id="signin">Sign in with your ID</h2>
+      <p>Rovex Hub asks for an <b>access ID</b> (it looks like <code>RDH-XXXX-XXXX-XXXX</code>). You get it on our <a href="#" data-discord>Discord</a> after choosing a plan. Type it in and press <b>Sign in</b>.</p>
+      <ul>
+        <li>Your ID is personal: do not share it. A shared ID can be blocked.</li>
+        <li>You stay signed in until your plan ends. The <b>Immortal</b> plan never expires.</li>
+        <li>The language can be changed on the sign-in screen and in the sidebar (English, Français, Español, Português).</li>
+      </ul>
+
+      <h2 id="desktop">Claude Desktop</h2>
+      <p>Nothing to configure. When Rovex Hub starts, it detects Claude Desktop and adds itself to its MCP servers (your other servers are kept, and a backup of the config is saved).</p>
+      <ol>
+        <li>Open Rovex Hub once.</li>
+        <li><b>Fully quit</b> Claude Desktop: right-click its icon next to the clock → <b>Quit</b>.</li>
+        <li>Reopen Claude Desktop. The Rovex tools appear in the tools menu.</li>
+      </ol>
+      <p>The <b>Connect Claude</b> page of the app shows the status: <i>Added — restart Claude Desktop</i>, then <i>Active</i> once Claude has used Rovex.</p>
+      <div class="callout">Rovex Hub keeps running next to the clock when you close its window, so Claude stays connected. Right-click the icon to quit.</div>
+
+      <h2 id="code">Claude Code</h2>
+      <p>If Claude Code is installed, Rovex Hub connects to it automatically and installs the Rovex skills in <code>~/.claude/skills</code>. You can also do it by hand:</p>
+      <pre><code>claude mcp add --scope user --transport http rovex-hub http://localhost:4747/mcp</code></pre>
+
+      <h2 id="ask">Ask Claude</h2>
+      <p>Just talk to Claude normally, starting with “Using Rovex Hub”:</p>
+      <pre><code>Using Rovex Hub, make me a pet system that follows the player, with a shop to buy pets.</code></pre>
+      <p>Claude picks the category, loads the skill, reads the examples and cites the Rovex resources it used. Ready-made prompts are on the <a href="#prompts">Prompts</a> page.</p>
+
+      <h2 id="library">Library</h2>
+      <p>Every resource collected by Rovex, sorted into categories: Scripting, VFX, Animation, GUI / UI, GFX, Modeling, Building / Maps, Audio, Game design and Tools. Filter by type (video, doc, article, tool…) and level, search with <code>Ctrl K</code>, and open any resource for its details.</p>
+      <p>The library grows on its own: an algorithm searches YouTube, the DevForum and the Roblox community every hour, keeps only real dev content (no trolling, gameplay or cheats) and sends it to your app.</p>
+      <img src="assets/app-library.jpg" alt="Rovex Hub library" loading="lazy">
+
+      <h2 id="opensource">Open source</h2>
+      <p>A separate page for free systems: GitHub repositories sorted by stars, community resources from the DevForum, and free models and plugins from the Creator Store. Claude can search it too, to suggest an existing module instead of rewriting one.</p>
+
+      <h2 id="examples">Learning examples</h2>
+      <p>Each example is a request, the right Luau code and the reasons it is right. Validated examples are served to Claude first, so it follows proven structures before writing code for your game.</p>
+      <img src="assets/app-examples.jpg" alt="Rovex Hub learning examples" loading="lazy">
+
+      <h2 id="skills">Skills</h2>
+      <p>There is one skill per category. Before a task, Claude loads the right one: the rules of that category, every validated example with its code, the best learning resources and the top open source projects. Example: you ask for a script → Claude loads <code>rovex-scripting</code>, reads everything in Scripting, then starts.</p>
+      <ul>
+        <li><b>Claude Desktop</b>: skills are also in the <b>+</b> menu → Rovex Hub (<code>rovex-scripting</code>, <code>rovex-vfx</code>…).</li>
+        <li><b>Claude Code</b>: skills are installed automatically and used whenever a task matches.</li>
+      </ul>
+      <img src="assets/app-skills.jpg" alt="Rovex Hub skills" loading="lazy">
+
+      <h2 id="prompts">Prompts</h2>
+      <p>21 ready-made templates to get the most out of Rovex: build a system, save player data, create a VFX, design a UI, fix a bug, review a script, learn a concept, find tutorials or open source… Pick one, fill in the blanks, copy it and paste it into Claude. The prompt also reminds Claude to load the right skill.</p>
+      <img src="assets/app-prompt-modal.jpg" alt="Rovex Hub prompt template" loading="lazy">
+
+      <h2 id="level">Claude level</h2>
+      <p>See how well Claude understands Roblox with your Rovex Hub: a level, XP, mastery per category, badges and a progress curve. Claude does not rewrite itself — the level measures the knowledge Rovex gives it and how much it uses it.</p>
+
+      <h2 id="updates">Updates</h2>
+      <p>Rovex Hub updates itself: it checks for new versions at launch and every few hours, downloads them in the background and offers to restart. You never need to reinstall. The library, the skills and the examples are updated continuously.</p>
+
+      <h2 id="plans">Plans & access</h2>
+      <ul>
+        <li><b>Monthly</b> — €35 per month.</li>
+        <li><b>Yearly</b> — €299 per year.</li>
+        <li><b>Immortal</b> — €528.99 once, access forever.</li>
+      </ul>
+      <p>All plans unlock the whole app. Purchases happen on our <a href="#" data-discord>Discord</a>, where you receive your access ID. When a plan ends, the ID stops working: renew it on the Discord to get your access back.</p>
+
+      <h2 id="trouble">Troubleshooting</h2>
+      <h3>Claude does not see Rovex Hub</h3>
+      <p>Fully quit Claude Desktop (right-click its icon next to the clock → Quit, or end “Claude” in the Task Manager), then reopen it. If it still does not work, open the <b>Connect Claude</b> page of the app and click <b>Check again</b>.</p>
+      <h3>“Unknown ID”, “ID expired” or “ID blocked”</h3>
+      <p>Check that you typed the ID correctly (letters and dashes). If your plan has ended, renew it on the Discord.</p>
+      <h3>“Cannot reach the Rovex server”</h3>
+      <p>Signing in needs internet. Check your connection and try again.</p>
+      <h3>The installer says the file is in use</h3>
+      <p>The download is not finished yet (the file should be about 115 MB). Wait for it to complete, or for Windows Defender to finish scanning it, then try again.</p>
+      <h3>Something else</h3>
+      <p>Ask us on the <a href="#" data-discord>Discord</a> with a screenshot.</p>
+
+      <h2 id="privacy">Privacy</h2>
+      <p>Your library, notes, favorites and examples are stored on your PC (<code>%APPDATA%\Rovex Hub</code>) and are kept across updates. Only your access ID is checked online when you sign in. Claude only receives the excerpts it asks for.</p>
+    </article>
+
+    <!-- ===================== FRANÇAIS ===================== -->
+    <article class="doc" data-lang-block="fr">
+      <p class="eyebrow">Documentation</p>
+      <h1 id="fr-intro">C’est quoi <span class="hl">Rovex Hub</span> ?</h1>
+      <p class="intro">Rovex Hub est une app de bureau Windows qui transforme Claude en expert Roblox. Elle rassemble des milliers de ressources de dev Roblox (vidéos, docs, posts du DevForum, systèmes open source), les range par catégorie et les sert à Claude via MCP — la façon standard dont Claude parle aux apps.</p>
+      <p>Tu continues de travailler dans <b>Claude Desktop</b> ou <b>Claude Code</b>. Quand tu demandes un script Roblox, un VFX ou une interface, Claude charge d’abord le skill Rovex qui correspond, lit tes exemples validés et les meilleures ressources de la catégorie, puis écrit le code.</p>
+
+      <h2 id="fr-install">Installation</h2>
+      <ol>
+        <li>Va sur la <a href="download.html">page Télécharger</a> et clique sur <b>Télécharger pour Windows</b>.</li>
+        <li>Double-clique sur <code>Rovex-Hub-Setup-x.y.z.exe</code>. L’app s’installe en quelques secondes et s’ouvre.</li>
+        <li>Une icône <b>Rovex Hub</b> est ajoutée sur ton bureau et dans le menu Démarrer.</li>
+      </ol>
+      <div class="callout warn">Si Windows affiche <b>« Windows a protégé votre ordinateur »</b>, clique sur <b>Informations complémentaires</b> puis <b>Exécuter quand même</b>. Ce message apparaît pour les nouvelles apps qui ne sont pas encore signées avec un certificat payant.</div>
+      <p>Configuration : Windows 10 ou 11 (64 bits), 4 Go de RAM, 500 Mo d’espace libre et une connexion internet.</p>
+
+      <h2 id="fr-signin">Se connecter avec son ID</h2>
+      <p>Rovex Hub demande un <b>ID d’accès</b> (il ressemble à <code>RDH-XXXX-XXXX-XXXX</code>). Tu le reçois sur notre <a href="#" data-discord>Discord</a> après avoir choisi un plan. Tape-le et clique sur <b>Se connecter</b>.</p>
+      <ul>
+        <li>Ton ID est personnel : ne le partage pas. Un ID partagé peut être bloqué.</li>
+        <li>Tu restes connecté jusqu’à la fin de ton plan. Le plan <b>Immortel</b> n’expire jamais.</li>
+        <li>La langue se change sur l’écran de connexion et dans la barre latérale (English, Français, Español, Português).</li>
+      </ul>
+
+      <h2 id="fr-desktop">Claude Desktop</h2>
+      <p>Rien à configurer. Au lancement, Rovex Hub détecte Claude Desktop et s’ajoute à ses serveurs MCP (tes autres serveurs sont gardés, et une copie de la config est sauvegardée).</p>
+      <ol>
+        <li>Ouvre Rovex Hub une fois.</li>
+        <li><b>Quitte complètement</b> Claude Desktop : clic droit sur son icône à côté de l’heure → <b>Quitter</b>.</li>
+        <li>Rouvre Claude Desktop. Les outils Rovex apparaissent dans le menu des outils.</li>
+      </ol>
+      <p>La page <b>Connexion Claude</b> de l’app montre l’état : <i>Ajouté — redémarre Claude Desktop</i>, puis <i>Actif</i> quand Claude a utilisé Rovex.</p>
+      <div class="callout">Rovex Hub reste à côté de l’heure quand tu fermes sa fenêtre, pour que Claude reste connecté. Clic droit sur l’icône pour quitter.</div>
+
+      <h2 id="fr-code">Claude Code</h2>
+      <p>Si Claude Code est installé, Rovex Hub s’y connecte tout seul et installe les skills Rovex dans <code>~/.claude/skills</code>. Tu peux aussi le faire à la main :</p>
+      <pre><code>claude mcp add --scope user --transport http rovex-hub http://localhost:4747/mcp</code></pre>
+
+      <h2 id="fr-ask">Demander à Claude</h2>
+      <p>Parle à Claude normalement, en commençant par « En utilisant Rovex Hub » :</p>
+      <pre><code>En utilisant Rovex Hub, fais-moi un système de pets qui suivent le joueur, avec une boutique pour en acheter.</code></pre>
+      <p>Claude choisit la catégorie, charge le skill, lit les exemples et cite les ressources Rovex utilisées. Des prompts tout prêts t’attendent sur la page <a href="#fr-prompts">Prompts</a>.</p>
+
+      <h2 id="fr-library">Bibliothèque</h2>
+      <p>Toutes les ressources collectées par Rovex, rangées par catégorie : Scripting, VFX, Animation, GUI / UI, GFX, Modélisation, Build / Maps, Audio, Game design et Outils. Filtre par type (vidéo, doc, article, outil…) et par niveau, cherche avec <code>Ctrl K</code> et ouvre chaque ressource pour voir ses détails.</p>
+      <p>La bibliothèque grandit toute seule : un algorithme fouille YouTube, le DevForum et la communauté Roblox chaque heure, ne garde que le vrai contenu de dev (pas de troll, de gameplay ni de triche) et l’envoie dans ton app.</p>
+      <img src="assets/app-library.jpg" alt="Bibliothèque Rovex Hub" loading="lazy">
+
+      <h2 id="fr-opensource">Open source</h2>
+      <p>Une page à part pour les systèmes gratuits : dépôts GitHub triés par étoiles, ressources communautaires du DevForum, modèles et plugins gratuits du Creator Store. Claude peut aussi y chercher, pour te proposer un module existant plutôt que d’en réécrire un.</p>
+
+      <h2 id="fr-examples">Exemples d’apprentissage</h2>
+      <p>Chaque exemple, c’est une demande, le bon code Luau et pourquoi il est bon. Les exemples validés sont servis à Claude en priorité : il suit des structures qui marchent avant d’écrire le code de ton jeu.</p>
+      <img src="assets/app-examples.jpg" alt="Exemples d’apprentissage Rovex Hub" loading="lazy">
+
+      <h2 id="fr-skills">Skills</h2>
+      <p>Il y a un skill par catégorie. Avant une tâche, Claude charge le bon : les règles de la catégorie, tous les exemples validés avec leur code, les meilleures ressources et les meilleurs projets open source. Exemple : tu demandes un script → Claude charge <code>rovex-scripting</code>, lit tout ce qu’il y a dans Scripting, puis se lance.</p>
+      <ul>
+        <li><b>Claude Desktop</b> : les skills sont aussi dans le menu <b>+</b> → Rovex Hub (<code>rovex-scripting</code>, <code>rovex-vfx</code>…).</li>
+        <li><b>Claude Code</b> : les skills sont installés automatiquement et utilisés dès qu’une tâche correspond.</li>
+      </ul>
+      <img src="assets/app-skills.jpg" alt="Skills Rovex Hub" loading="lazy">
+
+      <h2 id="fr-prompts">Prompts</h2>
+      <p>21 modèles prêts à l’emploi pour tirer le maximum de Rovex : créer un système, sauvegarder les données, faire un VFX, une interface, corriger un bug, relire un script, apprendre une notion, trouver des tutos ou de l’open source… Choisis-en un, remplis les trous, copie-le et colle-le dans Claude. Le prompt rappelle aussi à Claude de charger le bon skill.</p>
+      <img src="assets/app-prompt-modal.jpg" alt="Modèle de prompt Rovex Hub" loading="lazy">
+
+      <h2 id="fr-level">Niveau de Claude</h2>
+      <p>Regarde à quel point Claude comprend Roblox avec ton Rovex Hub : un niveau, de l’XP, la maîtrise par catégorie, des badges et une courbe de progression. Claude ne se modifie pas lui-même — le niveau mesure le savoir que Rovex lui apporte et à quel point il s’en sert.</p>
+
+      <h2 id="fr-updates">Mises à jour</h2>
+      <p>Rovex Hub se met à jour tout seul : il cherche les nouvelles versions au lancement et toutes les quelques heures, les télécharge en arrière-plan et te propose de redémarrer. Tu n’as jamais besoin de réinstaller. La bibliothèque, les skills et les exemples sont mis à jour en continu.</p>
+
+      <h2 id="fr-plans">Plans & accès</h2>
+      <ul>
+        <li><b>Mensuel</b> — 35 € par mois.</li>
+        <li><b>Annuel</b> — 299 € par an.</li>
+        <li><b>Immortel</b> — 528,99 € une fois, accès pour toujours.</li>
+      </ul>
+      <p>Tous les plans débloquent toute l’app. L’achat se fait sur notre <a href="#" data-discord>Discord</a>, où tu reçois ton ID d’accès. À la fin d’un plan, l’ID ne marche plus : renouvelle-le sur le Discord pour retrouver ton accès.</p>
+
+      <h2 id="fr-trouble">Problèmes fréquents</h2>
+      <h3>Claude ne voit pas Rovex Hub</h3>
+      <p>Quitte complètement Claude Desktop (clic droit sur son icône à côté de l’heure → Quitter, ou termine « Claude » dans le Gestionnaire des tâches), puis rouvre-le. Si ça ne marche toujours pas, ouvre la page <b>Connexion Claude</b> de l’app et clique sur <b>Revérifier</b>.</p>
+      <h3>« ID inconnu », « ID expiré » ou « ID bloqué »</h3>
+      <p>Vérifie que tu as bien tapé l’ID (lettres et tirets). Si ton plan est terminé, renouvelle-le sur le Discord.</p>
+      <h3>« Impossible de joindre le serveur Rovex »</h3>
+      <p>La connexion demande internet. Vérifie ta connexion et réessaie.</p>
+      <h3>L’installeur dit que le fichier est utilisé</h3>
+      <p>Le téléchargement n’est pas encore fini (le fichier fait environ 115 Mo). Attends qu’il se termine, ou que Windows Defender finisse de l’analyser, puis réessaie.</p>
+      <h3>Autre chose</h3>
+      <p>Demande-nous sur le <a href="#" data-discord>Discord</a> avec une capture d’écran.</p>
+
+      <h2 id="fr-privacy">Confidentialité</h2>
+      <p>Ta bibliothèque, tes notes, tes favoris et tes exemples sont stockés sur ton PC (<code>%APPDATA%\Rovex Hub</code>) et sont gardés lors des mises à jour. Seul ton ID d’accès est vérifié en ligne à la connexion. Claude ne reçoit que les extraits qu’il demande.</p>
+    </article>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <div>
+        <a class="brand" href="index.html"><span class="logo"><img src="assets/logo.png" alt=""></span><span>ROVEX <b>HUB</b></span></a>
+        <p style="margin:12px 0 4px" data-i18n="foot.tag"></p>
+        <small>© <span id="year"></span> Rovex Hub · <span data-i18n="foot.rights"></span></small>
+      </div>
+      <nav><a href="docs.html" data-i18n="nav.docs"></a><a href="download.html" data-i18n="nav.download"></a><a href="index.html#pricing" data-i18n="nav.pricing"></a><a href="index.html#faq" data-i18n="nav.faq"></a><a href="#" data-discord data-i18n="nav.discord"></a></nav>
+    </div>
+  </footer>
+  <script src="main.js"></script>
+</body>
+</html>
