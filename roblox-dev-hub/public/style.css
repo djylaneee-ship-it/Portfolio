@@ -527,3 +527,30 @@ a.stat { display: block; }
 .sk-counts { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; font-size: 12.5px; color: var(--muted2); }
 .sk-list { margin: 8px 0 0; padding-left: 18px; display: grid; gap: 4px; font-size: 13px; color: var(--soft); }
 .sk-list .mono { font-size: 11px; color: var(--muted); }
+
+/* ---------- Prompts ---------- */
+.pr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px; }
+.pr-card { --c: var(--accent); position: relative; text-align: left; display: flex; flex-direction: column; gap: 10px; min-width: 0; padding: 22px; border-radius: 20px; background: var(--panel); border: 1px solid var(--line); color: var(--text); cursor: pointer; transition: transform .45s var(--spring), border-color .3s, box-shadow .4s; }
+.pr-card:hover { transform: translateY(-6px) scale(1.025); border-color: color-mix(in srgb, var(--c) 55%, var(--line)); box-shadow: 0 18px 40px color-mix(in srgb, var(--c) 18%, transparent); }
+.pr-card:active { transform: scale(.97); }
+.pr-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.pr-ico { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 12px; font-size: 19px; background: color-mix(in srgb, var(--c) 16%, transparent); border: 1px solid color-mix(in srgb, var(--c) 35%, transparent); transition: transform .45s var(--spring); }
+.pr-card:hover .pr-ico { transform: rotate(-8deg) scale(1.12); }
+.pr-kind { font: 600 10.5px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--accent2); background: var(--accent-bg); padding: 4px 9px; border-radius: 99px; }
+.pr-cat { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted2); }
+.pr-cat .dot { width: 7px; height: 7px; border-radius: 50%; }
+.pr-del { margin-left: auto; width: 28px; height: 28px; display: grid; place-items: center; border-radius: 8px; color: var(--muted); transition: background .2s, color .2s, transform .3s var(--spring); }
+.pr-del:hover { background: rgba(239, 68, 68, .15); color: #F87171; transform: scale(1.15); }
+.pr-card h3 { font-family: var(--display); font-size: 17px; margin: 2px 0 0; }
+.pr-text { margin: 0; color: var(--muted2); font-size: 13.5px; line-height: 1.65; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; white-space: pre-line; }
+.pr-go { margin-top: auto; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; font-size: 13px; color: var(--accent2); }
+.pr-go svg { width: 16px; height: 16px; transition: transform .35s var(--spring); }
+.pr-card:hover .pr-go svg { transform: translateX(5px); }
+.slot { display: inline; padding: 1px 7px; border-radius: 6px; background: var(--accent-bg); border: 1px dashed color-mix(in srgb, var(--accent) 60%, transparent); color: var(--accent2); font-size: .92em; white-space: nowrap; }
+.slot-fill { background: color-mix(in srgb, var(--ok, #22C55E) 18%, transparent); color: var(--text); padding: 1px 5px; border-radius: 6px; }
+.pr-compose { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 26px; align-items: start; }
+.pr-compose .field textarea[data-slot="code"] { min-height: 160px; }
+.pr-preview { white-space: pre-wrap; word-break: break-word; max-height: 420px; overflow: auto; padding: 18px; border-radius: 16px; background: #0B0814; border: 1px solid var(--line2); font: 13px/1.7 var(--mono); color: #E9E3F7; }
+.pr-tail { color: var(--muted2); }
+@media (max-width: 860px) { .pr-compose { grid-template-columns: 1fr; } }
+@media (max-width: 700px) { .flow-arrow { display: none; } .flow-step { flex-basis: 100%; } }

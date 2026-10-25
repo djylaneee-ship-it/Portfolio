@@ -176,10 +176,15 @@ $('#login-form').onsubmit = async (e) => {
 function langSelect(id) {
   return `<select class="select" id="${id}" aria-label="Language">${LANGS.map(([k, l]) => `<option value="${k}" ${k === LANG ? 'selected' : ''}>${l}</option>`).join('')}</select>`;
 }
+// La langue de l'admin sert aussi aux modèles de prompts proposés dans Claude (menu +).
+function syncLang() {
+  if (isAdmin()) api('/settings', { method: 'PUT', body: { lang: LANG } }).catch(() => {});
+}
 function setLang(l) {
   LANG = l;
   try { localStorage.setItem('rdh-lang', l); } catch {}
   applyStatic();
+  syncLang();
   if (SESSION && SESSION.loggedIn) { renderSession(); refreshStats(); refreshMcp(); route(); }
 }
 
@@ -535,6 +540,150 @@ async function openSkill(id) {
   $('#sk-reset').onclick = () => {
     $('#sk-instr').value = sk.defaultInstructions;
     $('#sk-instr').animate([{ background: 'rgba(124,58,237,.25)' }, { background: 'transparent' }], { duration: 700 });
+  };
+}
+
+// ---------- Prompts : modèles prêts à copier pour bien utiliser Rovex Hub ----------
+const PR_KINDS = ['', 'create', 'fix', 'learn', 'find', 'library', 'custom'];
+const PR_SLOT = /\[\[([^\]\n]{1,40})\]\]/g;
+const prF = { kind: '', cat: '' };
+let PROMPTS = [];
+const prText = (p) => (p.kind === 'custom' ? p.text : p.text[LANG] || p.text.en);
+const prTitle = (p) => (p.kind === 'custom' ? p.title : p.title[LANG] || p.title.en);
+const slotLabel = (s) => (PROMPT_SLOTS[s] && (PROMPT_SLOTS[s][LANG] || PROMPT_SLOTS[s].en)) || s;
+const slotsOf = (text) => [...new Set([...text.matchAll(PR_SLOT)].map((m) => m[1]))];
+// Texte du modèle en HTML : les champs deviennent des pastilles (remplies ou à remplir).
+const prHtml = (text, vals = {}) => esc(text).replace(PR_SLOT, (_, s) => {
+  const v = String(vals[s] || '').trim();
+  return v ? `<mark class="slot-fill">${esc(v)}</mark>` : `<span class="slot">${esc(slotLabel(s))}</span>`;
+});
+
+async function copyText(text) {
+  try { await navigator.clipboard.writeText(text); return true; } catch {}
+  // Mode partagé en http : pas d'API presse-papiers, on passe par une zone de texte.
+  const ta = Object.assign(document.createElement('textarea'), { value: text });
+  document.body.append(ta); ta.select();
+  const ok = document.execCommand('copy');
+  ta.remove();
+  return ok;
+}
+
+async function renderPrompts() {
+  const custom = await api('/prompts');
+  PROMPTS = [...custom, ...PROMPT_TEMPLATES.filter((p) => !p.admin || isAdmin())];
+  const kinds = PR_KINDS.filter((k) => (k !== 'custom' || custom.length) && (k !== 'library' || isAdmin()));
+  if (!kinds.includes(prF.kind)) prF.kind = '';
+  view.innerHTML = `
+    ${pageHead(t('pr.eyebrow'), t('pr.title'), t('pr.sub'), `<button class="btn primary admin-only" id="pr-new">${PLUS}${t('pr.new')}</button>`)}
+    <div class="flow">
+      ${[['✍️', 'pr.tip1'], ['🧠', 'pr.tip2'], ['📋', 'pr.tip3']].map(([ico, k], i) => `<div class="flow-step" style="--i:${i}"><span>${ico}</span><b>${t(k + 't')}</b><small>${t(k)}</small></div>`).join('<i class="flow-arrow">→</i>')}
+    </div>
+    <div class="toolbar">
+      ${kinds.map((k) => `<button class="chip solid ${prF.kind === k ? 'on' : ''}" data-prk="${k}">${t('pr.k.' + (k || 'all'))}</button>`).join('')}
+      <select class="select" id="pr-cat" style="padding:11px 14px;margin-left:auto"><option value="">${t('os2.allCats')}</option>${catOptions(prF.cat)}</select>
+    </div>
+    <div class="pr-grid stagger" id="pr-list"></div>`;
+  drawPrompts();
+  $$('[data-prk]').forEach((b) => b.onclick = () => {
+    prF.kind = b.dataset.prk;
+    $$('[data-prk]').forEach((x) => x.classList.toggle('on', x === b));
+    drawPrompts();
+  });
+  $('#pr-cat').onchange = (e) => { prF.cat = e.target.value; drawPrompts(); };
+  const nb = $('#pr-new');
+  if (nb) nb.onclick = () => newPrompt();
+}
+
+function drawPrompts() {
+  const list = PROMPTS.filter((p) => (!prF.kind || p.kind === prF.kind) && (!prF.cat || !p.cat || p.cat === prF.cat));
+  const box = $('#pr-list');
+  if (!box) return;
+  box.innerHTML = list.length ? list.map((p, i) => {
+    const c = p.cat ? cat(p.cat) : null;
+    return `<button class="pr-card" data-pr="${esc(p.id)}" style="--i:${i};--c:${c ? c.color : 'var(--accent)'}" data-spot>
+      <span class="pr-top"><span class="pr-ico">${p.icon || '💬'}</span><span class="pr-kind">${t('pr.k.' + p.kind)}</span>${c ? `<span class="pr-cat"><span class="dot" style="background:${c.color}"></span>${esc(c.label)}</span>` : ''}
+        ${p.kind === 'custom' && isAdmin() ? `<span class="pr-del" data-prdel="${esc(p.id)}" title="${t('delete')}">✕</span>` : ''}</span>
+      <h3>${esc(prTitle(p))}</h3>
+      <p class="pr-text">${prHtml(prText(p))}</p>
+      <span class="pr-go">${t('pr.use')} ${ARROW}</span>
+    </button>`;
+  }).join('') : `<div class="empty"><b>${t('empty.title')}</b>${t('pr.none')}</div>`;
+  stagger(box);
+  $$('[data-pr]', box).forEach((b) => b.onclick = () => openPrompt(PROMPTS.find((p) => p.id === b.dataset.pr)));
+  $$('[data-prdel]', box).forEach((b) => b.onclick = async (e) => {
+    e.stopPropagation();
+    if (!confirm(t('detail.confirmDelete', { title: prTitle(PROMPTS.find((p) => p.id === b.dataset.prdel)) }))) return;
+    await api('/prompts/' + b.dataset.prdel, { method: 'DELETE' });
+    toast(t('toast.deleted'));
+    transition(renderPrompts);
+  });
+}
+
+function openPrompt(p) {
+  const text = prText(p);
+  const slots = slotsOf(text);
+  const vals = {};
+  const c = p.cat ? cat(p.cat) : null;
+  openModal(`
+    <div class="card-cat"><span>${p.icon || '💬'}</span> ${t('pr.k.' + p.kind)}${c ? ` · <span class="dot" style="background:${c.color}"></span>${esc(c.label)}` : ''}</div>
+    <h2 class="detail-title" style="margin-top:8px">${esc(prTitle(p))}</h2>
+    <p class="sub" style="margin-bottom:18px">${t(slots.length ? 'pr.fill' : 'pr.noFill')}</p>
+    <div class="pr-compose">
+      <div>
+        ${slots.map((s, i) => `<div class="field"><label>${esc(slotLabel(s))}</label>${s === 'code'
+          ? `<textarea data-slot="code" spellcheck="false" placeholder="-- ${esc(slotLabel(s))}"></textarea>`
+          : `<input class="input" data-slot="${esc(s)}" placeholder="${esc(slotLabel(s))}" ${i ? '' : 'autofocus'}>`}</div>`).join('')}
+        <div class="field"><label>${t('pr.skillCat')}</label><select class="select" id="pr-skcat"><option value="">${t('pr.anyCat')}</option>${catOptions(prF.cat || p.cat)}</select></div>
+        <div class="row"><label class="switch"><input type="checkbox" id="pr-remind" checked><span></span></label><span>${t('pr.remind')}</span></div>
+      </div>
+      <div>
+        <p class="label" style="margin-top:0">${t('pr.preview')}</p>
+        <div class="pr-preview" id="pr-out"></div>
+        <div class="row" style="margin-top:14px">
+          <button class="btn primary" id="pr-copy">${t('pr.copy')}</button>
+        </div>
+        <p class="sub" style="font-size:13px;margin-top:10px">${t('pr.pasteHint')}</p>
+      </div>
+    </div>`);
+  const opts = () => ({ lang: LANG, cat: $('#pr-skcat').value, remind: $('#pr-remind').checked });
+  const draw = () => {
+    const o = opts();
+    const tail = o.remind ? '\n\n' + fillPrompt('', {}, o).trim() : '';
+    $('#pr-out').innerHTML = prHtml(text, vals) + `<span class="pr-tail">${esc(tail)}</span>`;
+  };
+  $$('[data-slot]').forEach((el) => el.oninput = () => { vals[el.dataset.slot] = el.value; draw(); });
+  $('#pr-skcat').onchange = draw;
+  $('#pr-remind').onchange = draw;
+  draw();
+  const first = $('[data-slot]');
+  if (first) setTimeout(() => first.focus(), 350);
+  $('#pr-copy').onclick = async (e) => {
+    const b = e.currentTarget;
+    const missing = slots.filter((s) => !String(vals[s] || '').trim());
+    const ok = await copyText(fillPrompt(text, vals, opts()));
+    if (!ok) return toast(t('toast.copyFail'), true);
+    b.textContent = '✓ ' + t('copied');
+    setTimeout(() => (b.textContent = t('pr.copy')), 1600);
+    toast(missing.length ? t('pr.copiedMissing', { n: missing.length }) : t('pr.copied'));
+  };
+}
+
+function newPrompt() {
+  openModal(`
+    <h2 class="detail-title">${t('pr.new')}</h2>
+    <p class="sub" style="margin-bottom:18px">${t('pr.newSub')}</p>
+    <div class="field"><label>${t('pr.fTitle')}</label><input class="input" id="np-title" placeholder="${t('pr.fTitlePh')}"></div>
+    <div class="field"><label>${t('pr.fText')}</label><textarea id="np-text" style="min-height:180px" placeholder="${t('pr.fTextPh')}"></textarea></div>
+    <div class="field"><label>${t('pr.skillCat')}</label><select class="select" id="np-cat"><option value="">${t('pr.anyCat')}</option>${catOptions('')}</select></div>
+    <button class="btn primary" id="np-save">${t('save')}</button>`);
+  $('#np-save').onclick = async () => {
+    try {
+      await api('/prompts', { method: 'POST', body: { title: $('#np-title').value, text: $('#np-text').value, cat: $('#np-cat').value } });
+      toast(t('toast.saved'));
+      prF.kind = 'custom';
+      await closeModal();
+      transition(renderPrompts);
+    } catch (e) { toast(e.message, true); }
   };
 }
 
@@ -1411,7 +1560,7 @@ async function route() {
   const pages = {
     library: () => renderLibrary(params), favorites: () => renderLibrary(params, true), examples: renderExamples,
     youtube: () => renderYoutube(params), channels: () => renderChannels(params), explore: renderExplore,
-    connect: renderConnect, admin: renderAdmin, settings: renderSettings, level: renderLevel, opensource: renderOpenSource, skills: renderSkills,
+    connect: renderConnect, admin: renderAdmin, settings: renderSettings, level: renderLevel, opensource: renderOpenSource, skills: renderSkills, prompts: renderPrompts,
   };
   try {
     await transition(pages[path] || renderHome);
@@ -1464,7 +1613,7 @@ window.addEventListener('hashchange', route);
   META = await api('/meta');
   await Promise.all([refreshStats(), refreshMcp()]);
   route();
-  if (isAdmin()) watchJob();
+  if (isAdmin()) { watchJob(); syncLang(); }
   setInterval(async () => {
     await refreshMcp();
     const list = $('#act-list') || $('#cn-log');

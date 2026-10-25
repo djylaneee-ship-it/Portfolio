@@ -7,7 +7,7 @@ const ROOT = __dirname;
 const OUT = path.join(ROOT, '..', 'Installer Rovex Hub.bat');
 const FILES = [
   'db.js', 'mcp.js', 'server.js', 'web.js', 'crawler.js', 'seed.json', 'package.json', 'README.md',
-  'public/index.html', 'public/style.css', 'public/app.js', 'public/i18n.js',
+  'public/index.html', 'public/style.css', 'public/app.js', 'public/i18n.js', 'public/prompts.js',
   'Lancer Rovex Hub.bat', 'Lancer en mode partage.bat', 'auth.js', 'claude.js', 'level.js', 'quality.js', 'skills.js', 'rovex.ico', 'public/logo.png', 'public/icon.png',
 ];
 

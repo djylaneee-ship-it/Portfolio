@@ -208,6 +208,7 @@ const routes = [
     if (typeof b.youtubeApiKey === 'string') state.settings.youtubeApiKey = b.youtubeApiKey.trim();
     if (typeof b.githubToken === 'string') state.settings.githubToken = b.githubToken.trim();
     if (typeof b.cloudUrl === 'string') state.settings.cloudUrl = b.cloudUrl.trim();
+    if (['en', 'fr', 'es', 'pt'].includes(b.lang)) state.settings.lang = b.lang;
     if (b.autoSyncHours !== undefined) state.settings.autoSyncHours = Math.max(0, Number(b.autoSyncHours) || 0);
     persist();
     return { ok: true };
@@ -259,6 +260,24 @@ const routes = [
   }],
   ['DELETE', /^\/api\/examples\/(\w+)$/, (req, m) => {
     state.examples = (state.examples || []).filter((x) => x.id !== m[1]);
+    persist();
+    return { ok: true };
+  }],
+  // Modèles de prompts perso (les modèles de base sont dans public/prompts.js).
+  ['GET', /^\/api\/prompts$/, () => state.prompts || []],
+  ['POST', /^\/api\/prompts$/, async (req) => {
+    const b = await json(req);
+    const title = String(b.title || '').trim().slice(0, 120);
+    const text = String(b.text || '').trim().slice(0, 8000);
+    if (!title || !text) throw Object.assign(new Error('Title and text required'), { code: 400, key: 'required' });
+    const cat = db.CATEGORIES.some((c) => c.id === b.cat) ? b.cat : '';
+    const p = { id: db.newId(), title, text, cat, kind: 'custom', createdAt: new Date().toISOString() };
+    state.prompts = [p, ...(state.prompts || [])];
+    persist();
+    return p;
+  }],
+  ['DELETE', /^\/api\/prompts\/(\w+)$/, (req, m) => {
+    state.prompts = (state.prompts || []).filter((x) => x.id !== m[1]);
     persist();
     return { ok: true };
   }],
@@ -321,7 +340,7 @@ const routes = [
 ];
 
 // Routes accessibles à un ID d'accès simple (lecture seule). Tout le reste est réservé à l'admin.
-const USER_ROUTES = [/^\/api\/skills$/, /^\/api\/skills\/\w+$/, /^\/api\/level$/, /^\/api\/meta$/, /^\/api\/stats$/, /^\/api\/resources$/, /^\/api\/channels$/, /^\/api\/youtube$/, /^\/api\/crawl$/, /^\/api\/examples$/, /^\/api\/mcp$/];
+const USER_ROUTES = [/^\/api\/prompts$/, /^\/api\/skills$/, /^\/api\/skills\/\w+$/, /^\/api\/level$/, /^\/api\/meta$/, /^\/api\/stats$/, /^\/api\/resources$/, /^\/api\/channels$/, /^\/api\/youtube$/, /^\/api\/crawl$/, /^\/api\/examples$/, /^\/api\/mcp$/];
 
 const cookies = (req) => Object.fromEntries(String(req.headers.cookie || '').split(';').map((c) => c.trim().split('=')).filter((p) => p[0]).map(([k, ...v]) => [k, decodeURIComponent(v.join('='))]));
 const clientIp = (req) => req.socket.remoteAddress || '';

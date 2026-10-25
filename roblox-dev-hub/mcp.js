@@ -7,6 +7,17 @@ const path = require('path');
 const db = require('./db');
 const web = require('./web');
 const skills = require('./skills');
+const vm = require('vm');
+
+// Les modèles de prompts de la page « Prompts » (public/prompts.js), aussi proposés dans le menu + de Claude.
+const TPL = vm.runInNewContext(fs.readFileSync(path.join(__dirname, 'public', 'prompts.js'), 'utf8') + ';({ PROMPT_TEMPLATES, PROMPT_SLOTS, fillPrompt })');
+const SLOT_RE = /\[\[([^\]\n]{1,40})\]\]/g;
+const tplName = (p) => 'template-' + p.id.replace(/[^\w-]/g, '');
+function templates(st) {
+  const lang = (st.settings && st.settings.lang) || 'en';
+  const builtIn = TPL.PROMPT_TEMPLATES.map((p) => ({ id: p.id, cat: p.cat, title: p.title[lang] || p.title.en, text: p.text[lang] || p.text.en }));
+  return { lang, list: [...(st.prompts || []), ...builtIn] };
+}
 
 const CAT_IDS = db.CATEGORIES.map((c) => c.id);
 
@@ -348,10 +359,25 @@ async function handle(msg) {
     // Chaque skill est aussi un « prompt » MCP, sélectionnable dans Claude Desktop.
     if (method === 'prompts/list') {
       const st = store.load();
+      const tpl = templates(st);
       return ok({ prompts: skills.SKILL_CATS.map((c) => skills.getSkill(st, c)).filter((x) => x.enabled).map((x) => ({
         name: x.name, description: `Rovex skill: ${db.CATEGORIES.find((k) => k.id === x.id).label} — loads the category knowledge, then does your task`,
         arguments: [{ name: 'task', description: 'What you want Claude to do', required: false }],
+      })).concat(tpl.list.map((p) => {
+        const lang = tpl.lang;
+        const slots = [...new Set([...p.text.matchAll(SLOT_RE)].map((m) => m[1]))];
+        return {
+          name: tplName(p), title: 'Rovex · ' + p.title, description: 'Rovex Hub prompt template: ' + p.title,
+          arguments: slots.map((x) => ({ name: x, description: (TPL.PROMPT_SLOTS[x] && (TPL.PROMPT_SLOTS[x][lang] || TPL.PROMPT_SLOTS[x].en)) || x, required: false })),
+        };
       })) });
+    }
+    if (method === 'prompts/get' && String(params.name || '').startsWith('template-')) {
+      const { lang, list } = templates(store.load());
+      const p = list.find((x) => tplName(x) === params.name);
+      if (!p) return fail(-32602, 'Unknown prompt: ' + params.name);
+      const text = TPL.fillPrompt(p.text, params.arguments || {}, { lang, cat: p.cat });
+      return ok({ description: p.title, messages: [{ role: 'user', content: { type: 'text', text } }] });
     }
     if (method === 'prompts/get') {
       const cat = String(params.name || '').replace(/^rovex-/, '');
