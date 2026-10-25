@@ -10,17 +10,17 @@ const DB_FILE = path.join(DATA_DIR, 'library.json');
 const SEED_FILE = path.join(ROOT, 'seed.json');
 
 const CATEGORIES = [
-  { id: 'scripting', label: 'Scripting', color: '#4f8cff', desc: 'Luau, services, RemoteEvents, DataStores, POO' },
-  { id: 'vfx', label: 'VFX', color: '#ff4fd8', desc: 'Particules, beams, trails, slashs, explosions' },
-  { id: 'animation', label: 'Animation', color: '#ffb02e', desc: 'Animation Editor, Moon Animator, rigs R6/R15' },
-  { id: 'gui', label: 'GUI / UI', color: '#2ee6a6', desc: 'Interfaces, HUD, boutiques, tweens d\'UI' },
-  { id: 'gfx', label: 'GFX', color: '#a970ff', desc: 'Miniatures, icônes, rendus Blender' },
-  { id: 'modeling', label: 'Modélisation', color: '#ff6b4a', desc: 'Blender, meshes, textures, UV' },
-  { id: 'building', label: 'Build / Maps', color: '#3ad1ff', desc: 'Terrain, éclairage, level design' },
-  { id: 'audio', label: 'Audio', color: '#f5e642', desc: 'Sons, musiques, SoundService' },
-  { id: 'design', label: 'Game design', color: '#ff8fa3', desc: 'Boucles de jeu, rétention, monétisation' },
-  { id: 'gameplay', label: 'Gameplay & YouTubeurs', color: '#ff9f43', desc: 'Chaînes et vidéos de jeux Roblox, actus, inspiration' },
-  { id: 'tools', label: 'Outils & plugins', color: '#9aa4b8', desc: 'Plugins Studio, Rojo, logiciels' },
+  { id: 'scripting', label: 'Scripting', color: '#4f8cff', desc: 'Luau, services, RemoteEvents, DataStores, OOP' },
+  { id: 'vfx', label: 'VFX', color: '#ff4fd8', desc: 'Particles, beams, trails, slashes, explosions' },
+  { id: 'animation', label: 'Animation', color: '#ffb02e', desc: 'Animation Editor, Moon Animator, R6/R15 rigs' },
+  { id: 'gui', label: 'GUI / UI', color: '#2ee6a6', desc: 'Interfaces, HUD, shops, UI tweens' },
+  { id: 'gfx', label: 'GFX', color: '#a970ff', desc: 'Thumbnails, icons, Blender renders' },
+  { id: 'modeling', label: 'Modeling', color: '#ff6b4a', desc: 'Blender, meshes, textures, UVs' },
+  { id: 'building', label: 'Building / Maps', color: '#3ad1ff', desc: 'Terrain, lighting, level design' },
+  { id: 'audio', label: 'Audio', color: '#f5e642', desc: 'Sounds, music, SoundService' },
+  { id: 'design', label: 'Game design', color: '#ff8fa3', desc: 'Game loops, retention, monetization' },
+  { id: 'gameplay', label: 'Gameplay & YouTubers', color: '#ff9f43', desc: 'Roblox game channels and videos, news, inspiration' },
+  { id: 'tools', label: 'Tools & plugins', color: '#9aa4b8', desc: 'Studio plugins, Rojo, software' },
 ];
 
 const TYPES = ['video', 'chaine', 'opensource', 'asset', 'doc', 'article', 'outil', 'image', 'fichier', 'recherche'];

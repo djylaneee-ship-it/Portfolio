@@ -10,38 +10,38 @@ const CAT_IDS = db.CATEGORIES.map((c) => c.id);
 const TOOLS = [
   {
     name: 'search_resources',
-    description: 'Cherche dans la bibliothèque Roblox Dev Hub (vidéos, docs, outils, images, fichiers) sur le dev Roblox : scripting, VFX, animation, GUI, GFX, etc. À utiliser avant de répondre à une question Roblox pour s\'appuyer sur les ressources de l\'utilisateur.',
+    description: 'Search the Roblox Dev Hub library (videos, docs, open source repos, free models, tools, images, files) about Roblox development: scripting, VFX, animation, GUI, GFX, etc. Use it before answering a Roblox question to rely on the user\'s resources.',
     inputSchema: {
       type: 'object',
       properties: {
-        query: { type: 'string', description: 'Mots-clés (ex. "slash vfx", "datastore", "tween ui")' },
+        query: { type: 'string', description: 'Keywords (e.g. "slash vfx", "datastore", "tween ui")' },
         category: { type: 'string', enum: CAT_IDS },
         type: { type: 'string', enum: db.TYPES },
         favorites_only: { type: 'boolean' },
-        limit: { type: 'number', description: 'Nombre max de résultats (défaut 15)' },
+        limit: { type: 'number', description: 'Max results (default 15)' },
       },
     },
   },
   {
     name: 'get_resource',
-    description: 'Détail complet d\'une ressource (notes personnelles incluses) par son id.',
+    description: 'Full details of a resource (including personal notes) by id.',
     inputSchema: { type: 'object', properties: { id: { type: 'string' } }, required: ['id'] },
   },
   {
     name: 'list_categories',
-    description: 'Liste les catégories et le nombre de ressources dans chacune.',
+    description: 'List categories and how many resources each contains.',
     inputSchema: { type: 'object', properties: {} },
   },
   {
     name: 'add_resource',
-    description: 'Ajoute une ressource (lien, tuto, astuce) à la bibliothèque.',
+    description: 'Add a resource (link, tutorial, tip) to the library.',
     inputSchema: {
       type: 'object',
       properties: {
         title: { type: 'string' }, url: { type: 'string' },
         category: { type: 'string', enum: CAT_IDS }, type: { type: 'string', enum: db.TYPES },
         tags: { type: 'array', items: { type: 'string' } }, description: { type: 'string' },
-        notes: { type: 'string', description: 'Notes, extraits de code, résumé' },
+        notes: { type: 'string', description: 'Notes, code snippets, summary' },
         level: { type: 'string', enum: ['debutant', 'intermediaire', 'avance'] },
       },
       required: ['title', 'category'],
@@ -49,7 +49,7 @@ const TOOLS = [
   },
   {
     name: 'import_url',
-    description: 'Importe une URL (vidéo YouTube, chaîne, page web, doc) : titre, auteur et miniature sont récupérés automatiquement.',
+    description: 'Import a URL (YouTube video, channel, web page, doc): title, author and thumbnail are fetched automatically.',
     inputSchema: {
       type: 'object',
       properties: { url: { type: 'string' }, category: { type: 'string', enum: CAT_IDS }, tags: { type: 'array', items: { type: 'string' } } },
@@ -58,16 +58,16 @@ const TOOLS = [
   },
   {
     name: 'update_notes',
-    description: 'Remplace les notes d\'une ressource (résumé de tuto, code clé, etc.).',
+    description: 'Replace a resource\'s notes (tutorial summary, key code, etc.).',
     inputSchema: { type: 'object', properties: { id: { type: 'string' }, notes: { type: 'string' } }, required: ['id', 'notes'] },
   },
   {
     name: 'explore_internet',
-    description: 'Lance l\'exploration automatique d\'internet (YouTube, DevForum Roblox, Reddit, GitHub, Creator Store) : vidéos, chaînes Roblox, open source et systèmes gratuits. Nécessite que l\'app soit ouverte. Tourne en arrière-plan : suivre avec explore_status.',
+    description: 'Start the automatic internet exploration (YouTube, Roblox DevForum, Reddit, GitHub, Creator Store): videos, Roblox channels, open source and free systems. Requires the app to be open. Runs in the background: follow it with explore_status.',
     inputSchema: {
       type: 'object',
       properties: {
-        mode: { type: 'string', enum: ['explore', 'channels', 'opensource', 'sync'], description: 'explore = vidéos/tutos/images, channels = trouver et suivre les chaînes Roblox, opensource = dépôts GitHub, ressources DevForum, modèles et plugins gratuits, sync = nouvelles vidéos des chaînes suivies' },
+        mode: { type: 'string', enum: ['explore', 'channels', 'opensource', 'sync'], description: 'explore = videos/tutorials/images, channels = find and link Roblox channels, opensource = GitHub repos, DevForum resources, free models and plugins, sync = new videos from linked channels' },
         intensity: { type: 'string', enum: ['rapide', 'normal', 'massif'] },
         categories: { type: 'array', items: { type: 'string', enum: CAT_IDS } },
       },
@@ -75,17 +75,17 @@ const TOOLS = [
   },
   {
     name: 'explore_status',
-    description: 'Progression de l\'exploration en cours (ou de la dernière).',
+    description: 'Progress of the running exploration (or the last one).',
     inputSchema: { type: 'object', properties: {} },
   },
   {
     name: 'list_channels',
-    description: 'Liste les chaînes YouTube suivies (filtre optionnel par nom).',
+    description: 'List linked YouTube channels (optional name filter).',
     inputSchema: { type: 'object', properties: { query: { type: 'string' }, limit: { type: 'number' } } },
   },
   {
     name: 'sync_channels',
-    description: 'Récupère les dernières vidéos des chaînes YouTube suivies et les ajoute à la bibliothèque.',
+    description: 'Fetch the latest videos from linked YouTube channels and add them to the library.',
     inputSchema: { type: 'object', properties: {} },
   },
 ];
@@ -97,10 +97,10 @@ async function app(pathname, body) {
   try {
     const res = await fetch('http://localhost:4747' + pathname, body ? { method: 'POST', headers: { ...headers, 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : { headers });
     const j = await res.json();
-    if (!res.ok) throw new Error(j.error || 'Erreur');
+    if (!res.ok) throw new Error(j.error || 'Error');
     return j;
   } catch (e) {
-    if (e.cause && e.cause.code === 'ECONNREFUSED') throw new Error('Ouvre l\'app Roblox Dev Hub (raccourci du Bureau) puis réessaie.');
+    if (e.cause && e.cause.code === 'ECONNREFUSED') throw new Error('Open the Roblox Dev Hub app (desktop shortcut), then try again.');
     throw e;
   }
 }
@@ -123,7 +123,7 @@ async function call(name, a = {}) {
     }
     case 'get_resource': {
       const r = state.resources.find((x) => x.id === a.id);
-      if (!r) throw new Error('Ressource introuvable');
+      if (!r) throw new Error('Resource not found');
       return r;
     }
     case 'list_categories': {
@@ -143,7 +143,7 @@ async function call(name, a = {}) {
     }
     case 'update_notes': {
       const r = state.resources.find((x) => x.id === a.id);
-      if (!r) throw new Error('Ressource introuvable');
+      if (!r) throw new Error('Resource not found');
       r.notes = String(a.notes);
       db.save(state);
       return { ok: true };
@@ -180,7 +180,7 @@ async function call(name, a = {}) {
       return report;
     }
     default:
-      throw new Error('Outil inconnu : ' + name);
+      throw new Error('Unknown tool: ' + name);
   }
 }
 
@@ -189,7 +189,7 @@ async function handle(msg) {
   const { id, method, params = {} } = msg || {};
   const ok = (result) => ({ jsonrpc: '2.0', id, result });
   const fail = (code, message) => ({ jsonrpc: '2.0', id: id ?? null, error: { code, message } });
-  if (!msg || msg.jsonrpc !== '2.0' || typeof method !== 'string') return fail(-32600, 'Requête invalide');
+  if (!msg || msg.jsonrpc !== '2.0' || typeof method !== 'string') return fail(-32600, 'Invalid request');
   if (id === undefined) return null;
   try {
     if (method === 'initialize') {
@@ -197,7 +197,7 @@ async function handle(msg) {
         protocolVersion: params.protocolVersion || '2025-06-18',
         capabilities: { tools: {} },
         serverInfo: { name: 'roblox-dev-hub', version: '1.0.0' },
-        instructions: 'Bibliothèque personnelle de ressources de dev Roblox. Cherche ici (search_resources) avant de répondre à une question Roblox, et cite les liens trouvés.',
+        instructions: 'Personal library of Roblox development resources. Search it (search_resources) before answering a Roblox question, and cite the links you find.',
       });
     }
     if (method === 'ping') return ok({});
@@ -207,10 +207,10 @@ async function handle(msg) {
         const out = await call(params.name, params.arguments);
         return ok({ content: [{ type: 'text', text: JSON.stringify(out, null, 2) }] });
       } catch (e) {
-        return ok({ content: [{ type: 'text', text: 'Erreur : ' + e.message }], isError: true });
+        return ok({ content: [{ type: 'text', text: 'Error: ' + e.message }], isError: true });
       }
     }
-    return fail(-32601, 'Méthode inconnue : ' + method);
+    return fail(-32601, 'Unknown method: ' + method);
   } catch (e) {
     return fail(-32603, e.message);
   }

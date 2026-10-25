@@ -47,7 +47,7 @@ function readBody(req, limit = 2 * 1024 * 1024 * 1024) {
     let size = 0;
     req.on('data', (c) => {
       size += c.length;
-      if (size > limit) { reject(new Error('Fichier trop gros')); req.destroy(); return; }
+      if (size > limit) { reject(Object.assign(new Error('File too large'), { key: 'tooBig' })); req.destroy(); return; }
       chunks.push(c);
     });
     req.on('end', () => resolve(Buffer.concat(chunks)));
@@ -63,7 +63,7 @@ async function json(req) {
 // Sert un fichier avec prise en charge des « Range » pour lire les vidéos locales.
 function serveFile(req, res, file) {
   fs.stat(file, (err, st) => {
-    if (err || !st.isFile()) return send(res, 404, { error: 'Introuvable' });
+    if (err || !st.isFile()) return send(res, 404, { error: 'Not found', key: 'notFound' });
     const type = MIME[path.extname(file).toLowerCase()] || 'application/octet-stream';
     const range = req.headers.range && req.headers.range.match(/bytes=(\d*)-(\d*)/);
     if (range) {
@@ -116,14 +116,14 @@ const routes = [
   }],
   ['PUT', /^\/api\/resources\/(\w+)$/, async (req, m) => {
     const r = state.resources.find((x) => x.id === m[1]);
-    if (!r) throw Object.assign(new Error('Introuvable'), { code: 404 });
+    if (!r) throw Object.assign(new Error('Not found'), { code: 404, key: 'notFound' });
     Object.assign(r, db.normalize({ ...r, ...(await json(req)), id: r.id, createdAt: r.createdAt }));
     persist();
     return r;
   }],
   ['DELETE', /^\/api\/resources\/(\w+)$/, (req, m) => {
     const i = state.resources.findIndex((x) => x.id === m[1]);
-    if (i < 0) throw Object.assign(new Error('Introuvable'), { code: 404 });
+    if (i < 0) throw Object.assign(new Error('Not found'), { code: 404, key: 'notFound' });
     const [r] = state.resources.splice(i, 1);
     if (r.file) fs.rm(path.join(db.MEDIA_DIR, r.file), () => {});
     persist();
@@ -165,9 +165,9 @@ const routes = [
   ['POST', /^\/api\/channels$/, async (req) => {
     const body = await json(req);
     const handle = String(body.handle || '').trim();
-    if (!handle) throw new Error('Indique un @pseudo ou une URL de chaîne');
+    if (!handle) throw Object.assign(new Error('Enter a @handle or channel URL'), { key: 'channelMissing' });
     const info = await web.resolveChannel(handle);
-    if (state.channels.some((c) => c.channelId === info.channelId)) throw new Error('Chaîne déjà suivie');
+    if (state.channels.some((c) => c.channelId === info.channelId)) throw Object.assign(new Error('Channel already linked'), { key: 'channelExists' });
     const ch = { id: db.newId(), handle, name: info.name, avatar: info.avatar, channelId: info.channelId, category: body.category || '', lastFetch: null };
     state.channels.push(ch);
     db.upsert(state, { title: info.name, url: info.url, type: 'chaine', author: info.name, thumbnail: info.avatar, category: body.category || 'scripting', source: 'veille' });
@@ -226,7 +226,7 @@ async function authRoutes(req, res, url) {
       const s = auth.login((await json(req)).code, clientIp(req));
       setSession(res, s.token, s.expiresAt);
       return send(res, 200, { role: s.role, label: s.label, expiresAt: s.expiresAt });
-    } catch (e) { return send(res, e.code || 400, { error: e.message }); }
+    } catch (e) { return send(res, e.code || 400, { error: e.message, key: e.key }); }
   }
   if (url.pathname === '/api/logout' && req.method === 'POST') {
     auth.logout(cookies(req).rdh_session);
@@ -235,7 +235,7 @@ async function authRoutes(req, res, url) {
   }
   if (url.pathname === '/api/session') {
     const s = auth.check(cookies(req).rdh_session);
-    return send(res, 200, s ? { loggedIn: true, role: s.role, label: s.label, expiresAt: s.expiresAt } : { loggedIn: false });
+    return send(res, 200, s ? { loggedIn: true, role: s.role, label: s.label, expiresAt: s.expiresAt, permanent: Boolean(s.permanent || !s.codeId) } : { loggedIn: false });
   }
   return false;
 }
@@ -244,14 +244,14 @@ async function authRoutes(req, res, url) {
 let cloudBusy = false;
 async function cloudSync() {
   const src = state.settings.cloudUrl ?? CLOUD_DEFAULT;
-  if (!src) throw new Error('Aucune source cloud configurée');
-  if (cloudBusy) throw new Error('Synchronisation déjà en cours');
-  if (crawler.status.running) throw new Error('Attends la fin de l\'exploration en cours');
+  if (!src) throw Object.assign(new Error('No cloud source configured'), { key: 'cloudNone' });
+  if (cloudBusy) throw Object.assign(new Error('Sync already running'), { key: 'cloudBusy' });
+  if (crawler.status.running) throw Object.assign(new Error('Wait for the running exploration to finish'), { key: 'cloudCrawling' });
   cloudBusy = true;
   try {
     const token = state.settings.githubToken;
     const res = await fetch(src, { headers: { 'User-Agent': 'roblox-dev-hub', ...(token && { Authorization: `token ${token}` }) }, signal: AbortSignal.timeout(120000) });
-    if (res.status === 404) throw new Error('Fichier cloud introuvable : l\'algo n\'a pas encore tourné, ou le dépôt est privé (ajoute un jeton GitHub)');
+    if (res.status === 404) throw Object.assign(new Error('Cloud file not found'), { key: 'cloudMissing' });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const cloud = await res.json();
     const urls = new Set(state.resources.map((r) => r.url).filter(Boolean));
@@ -284,14 +284,14 @@ const server = http.createServer(async (req, res) => {
   if (req.method !== 'GET' && req.headers.origin) {
     let host = '';
     try { host = new URL(req.headers.origin).host; } catch {}
-    if (host !== req.headers.host) return send(res, 403, { error: 'Origine refusée' });
+    if (host !== req.headers.host) return send(res, 403, { error: 'Origin refused', key: 'forbidden' });
   }
   if (url.pathname === '/mcp') {
     // Endpoint MCP « Streamable HTTP » (réponses JSON simples, pas de flux SSE).
     // Libre depuis ce PC ; depuis ailleurs, il faut « Authorization: Bearer <ID ou clé admin> ».
     const bearer = String(req.headers.authorization || '').replace(/^Bearer\s+/i, '');
     const local = isLoopback(req) && /^(localhost|127\.0\.0\.1)(:\d+)?$/.test(req.headers.host || '');
-    if (!local && !auth.checkCode(bearer)) return send(res, 401, { error: 'ID d\'accès requis' });
+    if (!local && !auth.checkCode(bearer)) return send(res, 401, { error: 'Access ID required', key: 'loginRequired' });
     if (req.method !== 'POST') { res.writeHead(405, { Allow: 'POST' }); return res.end(); }
     let msg;
     try { msg = JSON.parse((await readBody(req, 5 * 1024 * 1024)).toString('utf8')); }
@@ -305,44 +305,44 @@ const server = http.createServer(async (req, res) => {
     if (await authRoutes(req, res, url) !== false) return;
     const bearer = String(req.headers.authorization || '').replace(/^Bearer\s+/i, '');
     const session = auth.check(cookies(req).rdh_session) || auth.checkCode(bearer);
-    if (session && url.pathname === '/api/admin/reset-key' && session.codeId) return send(res, 403, { error: 'Seule la clé admin principale peut faire ça' });
-    if (!session) return send(res, 401, { error: 'Connecte-toi avec ton ID d\'accès' });
+    if (session && url.pathname === '/api/admin/reset-key' && session.codeId) return send(res, 403, { error: 'Only the main admin key can do this', key: 'masterOnly' });
+    if (!session) return send(res, 401, { error: 'Sign in with your access ID', key: 'loginRequired' });
     if (session.role !== 'admin' && !(req.method === 'GET' && USER_ROUTES.some((re) => re.test(url.pathname)))) {
-      return send(res, 403, { error: 'Réservé à l\'admin' });
+      return send(res, 403, { error: 'Admin only', key: 'adminOnly' });
     }
     for (const [method, re, fn] of routes) {
       const m = url.pathname.match(re);
       if (m && method === req.method) {
         try { return send(res, 200, await fn(req, m, url)); }
-        catch (e) { return send(res, e.code || 400, { error: e.message }); }
+        catch (e) { return send(res, e.code || 400, { error: e.message, key: e.key, vars: e.vars }); }
       }
     }
-    return send(res, 404, { error: 'Route inconnue' });
+    return send(res, 404, { error: 'Unknown route', key: 'notFound' });
   }
   if (url.pathname.startsWith('/media/')) {
-    if (!auth.check(cookies(req).rdh_session)) return send(res, 401, { error: 'Connexion requise' });
+    if (!auth.check(cookies(req).rdh_session)) return send(res, 401, { error: 'Sign-in required', key: 'loginRequired' });
     const f = safeJoin(db.MEDIA_DIR, url.pathname.slice(7));
-    return f ? serveFile(req, res, f) : send(res, 403, { error: 'Interdit' });
+    return f ? serveFile(req, res, f) : send(res, 403, { error: 'Forbidden', key: 'forbidden' });
   }
   const f = safeJoin(PUBLIC, url.pathname === '/' ? 'index.html' : url.pathname.slice(1));
-  return f ? serveFile(req, res, f) : send(res, 403, { error: 'Interdit' });
+  return f ? serveFile(req, res, f) : send(res, 403, { error: 'Forbidden', key: 'forbidden' });
 });
 
 server.on('error', (e) => {
   if (e.code === 'EADDRINUSE') {
-    console.log(`\n  Roblox Dev Hub tourne déjà  →  http://localhost:${PORT}\n`);
+    console.log(`\n  Roblox Dev Hub is already running  →  http://localhost:${PORT}\n`);
     process.exit(0);
   }
   throw e;
 });
 
 server.listen(PORT, HOST, () => {
-  console.log(`\n  Roblox Dev Hub prêt  →  http://localhost:${PORT}`);
+  console.log(`\n  Roblox Dev Hub ready  →  http://localhost:${PORT}`);
   if (HOST !== '127.0.0.1') {
-    for (const i of Object.values(os.networkInterfaces()).flat()) if (i && i.family === 'IPv4' && !i.internal) console.log(`  Mode partagé         →  http://${i.address}:${PORT}`);
+    for (const i of Object.values(os.networkInterfaces()).flat()) if (i && i.family === 'IPv4' && !i.internal) console.log(`  Shared mode          →  http://${i.address}:${PORT}`);
   }
-  console.log(`\n  Clé admin (permanente) : ${auth.masterKey()}`);
-  console.log(`  (aussi enregistrée dans ${KEY_FILE})\n  Ctrl+C pour arrêter\n`);
+  console.log(`\n  Admin key (permanent) / Clé admin : ${auth.masterKey()}`);
+  console.log(`  (saved in ${KEY_FILE})\n  Ctrl+C to stop\n`);
 });
 
 

@@ -43,7 +43,7 @@ class Auth {
       if (fs.existsSync(KEY_FILE)) this.key = clean(fs.readFileSync(KEY_FILE, 'utf8').split('\n').find((l) => l.startsWith('ADMIN-')) || '');
       if (!this.key) {
         this.key = randomCode('ADMIN', 5);
-        fs.writeFileSync(KEY_FILE, `${this.key}\n\nClé admin permanente de Roblox Dev Hub.\nElle n'expire jamais et donne accès au panneau admin. Ne la partage pas.\n`);
+        fs.writeFileSync(KEY_FILE, `${this.key}\n\nRoblox Dev Hub permanent admin key: never expires, opens the admin panel. Do not share it.\nClé admin permanente de Roblox Dev Hub : n'expire jamais, ouvre le panneau admin. Ne la partage pas.\n`);
       }
     }
     return this.key;
@@ -60,7 +60,7 @@ class Auth {
 
   login(input, ip) {
     const f = this.fails.get(ip);
-    if (f && f.n >= 8 && Date.now() < f.until) throw Object.assign(new Error('Trop d\'essais. Réessaie dans 15 minutes.'), { code: 429 });
+    if (f && f.n >= 8 && Date.now() < f.until) throw Object.assign(new Error('Too many attempts. Try again in 15 minutes.'), { code: 429, key: 'tooMany' });
     const code = clean(input);
     const d = this.data;
     let session;
@@ -68,17 +68,17 @@ class Auth {
       session = { role: 'admin', codeId: null, label: 'Admin', expiresAt: new Date(Date.now() + 365 * DAY).toISOString() };
     } else {
       const c = d.codes.find((x) => x.code === code);
-      const err = !c ? 'ID inconnu' : c.revoked ? 'Cet ID a été bloqué' : Date.now() > Date.parse(c.expiresAt) ? 'Cet ID a expiré' : '';
+      const err = !c ? 'unknownId' : c.revoked ? 'idBlocked' : c.expiresAt && Date.now() > Date.parse(c.expiresAt) ? 'idExpired' : '';
       if (err) {
         const cur = f && Date.now() < f.until ? f : { n: 0 };
         this.fails.set(ip, { n: cur.n + 1, until: Date.now() + 15 * 60e3 });
-        throw Object.assign(new Error(err), { code: 401 });
+        throw Object.assign(new Error(err), { code: 401, key: err });
       }
       c.lastUsed = new Date().toISOString();
       c.uses = (c.uses || 0) + 1;
-      session = c.admin
-        ? { role: 'admin', codeId: c.id, label: c.label, expiresAt: new Date(Date.now() + 365 * DAY).toISOString() }
-        : { role: 'user', codeId: c.id, label: c.label, expiresAt: c.expiresAt };
+      // Session : jusqu'à l'expiration de l'ID, ou 1 an (renouvelable) pour un ID permanent.
+      const until = c.expiresAt || new Date(Date.now() + 365 * DAY).toISOString();
+      session = { role: c.admin ? 'admin' : 'user', codeId: c.id, label: c.label, expiresAt: until, permanent: !c.expiresAt };
     }
     this.fails.delete(ip);
     const token = crypto.randomBytes(32).toString('hex');
@@ -95,7 +95,7 @@ class Auth {
     if (!s || Date.now() > Date.parse(s.expiresAt)) return null;
     if (s.codeId) {
       const c = d.codes.find((x) => x.id === s.codeId);
-      if (!c || c.revoked || Date.now() > Date.parse(c.expiresAt)) return null;
+      if (!c || c.revoked || (c.expiresAt && Date.now() > Date.parse(c.expiresAt))) return null;
     }
     return s;
   }
@@ -106,7 +106,7 @@ class Auth {
     if (!code) return null;
     if (sameText(code, this.masterKey())) return { role: 'admin' };
     const c = this.data.codes.find((x) => x.code === code);
-    return c && !c.revoked && Date.now() <= Date.parse(c.expiresAt) ? { role: c.admin ? 'admin' : 'user' } : null;
+    return c && !c.revoked && !(c.expiresAt && Date.now() > Date.parse(c.expiresAt)) ? { role: c.admin ? 'admin' : 'user' } : null;
   }
 
   logout(token) {
@@ -114,16 +114,17 @@ class Auth {
     this.persist();
   }
 
-  // `admin: true` : ID admin permanent (pour un co-admin), sinon ID membre qui expire.
+  // `admin: true` : ID avec les droits admin. `days: 0` : ID permanent (n'expire jamais).
   create({ label = '', days = 30, admin = false } = {}) {
     const d = this.data;
     admin = admin === true || admin === 'true' || admin === 'on';
-    if (admin) days = 36500;
+    days = Number(days);
+    const permanent = !days || days < 0;
     let code;
     do code = admin ? randomCode('ADMIN', 5) : randomCode('RDH'); while (d.codes.some((c) => c.code === code));
     const c = {
       id: crypto.randomBytes(6).toString('hex'), code, label: String(label).trim().slice(0, 60),
-      createdAt: new Date().toISOString(), expiresAt: new Date(Date.now() + Math.max(1, Number(days) || 30) * DAY).toISOString(),
+      createdAt: new Date().toISOString(), expiresAt: permanent ? null : new Date(Date.now() + days * DAY).toISOString(),
       revoked: false, lastUsed: null, uses: 0, admin,
     };
     d.codes.unshift(c);
@@ -136,16 +137,17 @@ class Auth {
     const active = Object.values(this.data.sessions).filter((s) => now <= Date.parse(s.expiresAt));
     return this.data.codes.map((c) => ({
       ...c,
-      status: c.revoked ? 'bloqué' : now > Date.parse(c.expiresAt) ? 'expiré' : 'actif',
+      status: c.revoked ? 'blocked' : c.expiresAt && now > Date.parse(c.expiresAt) ? 'expired' : 'active',
       sessions: active.filter((s) => s.codeId === c.id).length,
     }));
   }
 
-  update(id, { revoked, addDays }) {
+  update(id, { revoked, addDays, permanent }) {
     const c = this.data.codes.find((x) => x.id === id);
-    if (!c) throw Object.assign(new Error('ID introuvable'), { code: 404 });
+    if (!c) throw Object.assign(new Error('ID not found'), { code: 404, key: 'idNotFound' });
     if (typeof revoked === 'boolean') c.revoked = revoked;
-    if (addDays) c.expiresAt = new Date(Math.max(Date.now(), Date.parse(c.expiresAt)) + Number(addDays) * DAY).toISOString();
+    if (permanent === true) c.expiresAt = null;
+    if (addDays && c.expiresAt) c.expiresAt = new Date(Math.max(Date.now(), Date.parse(c.expiresAt)) + Number(addDays) * DAY).toISOString();
     this.persist();
     return c;
   }

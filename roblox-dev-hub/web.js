@@ -86,7 +86,7 @@ async function resolveChannel(input) {
   else url = `https://www.youtube.com/@${input.replace(/^@/, '')}`;
   const html = await (await get(url)).text();
   const id = (html.match(/"externalId":"(UC[\w-]{22})"/) || html.match(/channel_id=(UC[\w-]{22})/) || html.match(/"channelId":"(UC[\w-]{22})"/) || [])[1];
-  if (!id) throw new Error('Chaîne introuvable : ' + input);
+  if (!id) throw Object.assign(new Error('Channel not found: ' + input), { key: 'channelNotFound', vars: { name: input } });
   return {
     channelId: id,
     name: meta(html, 'og:title') || input,

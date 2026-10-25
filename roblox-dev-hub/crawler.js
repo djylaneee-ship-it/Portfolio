@@ -121,7 +121,7 @@ async function youtubeChannelSearch(query, pages) {
 
 function extractInitialData(html) {
   const m = html.match(/var ytInitialData\s*=\s*(\{.+?\});\s*<\/script>/s) || html.match(/ytInitialData"\]\s*=\s*(\{.+?\});/s);
-  if (!m) throw new Error('Page YouTube illisible (consentement ou blocage ?)');
+  if (!m) throw new Error('YouTube page unreadable (consent page or blocked?)');
   return JSON.parse(m[1]);
 }
 
@@ -248,7 +248,7 @@ async function githubSearch(q, page, token) {
     headers: { 'User-Agent': 'roblox-dev-hub', Accept: 'application/vnd.github+json', ...(token && { Authorization: `Bearer ${token}` }) },
     signal: AbortSignal.timeout(20000),
   });
-  if (res.status === 403 || res.status === 429) throw new Error('limite GitHub atteinte (ajoute un jeton GitHub dans Réglages)');
+  if (res.status === 403 || res.status === 429) throw new Error('GitHub rate limit reached (add a GitHub token in Settings)');
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const j = await res.json();
   return { total: j.total_count || 0, items: (j.items || []).filter((r) => !r.fork || r.stargazers_count > 5).map(githubRepo) };
@@ -292,15 +292,25 @@ async function storeSearch(keyword, kind, pages) {
   return out;
 }
 
+const LOG_EN = {
+  stopping: 'Stopping…', error: 'Error: {msg}', done: 'Done: {added} new resources, {channels} new channels.',
+  chanQuery: '"{q}": {found} channels found, +{n} linked', query: '"{q}": +{n}', forumRes: 'DevForum resources page {page}: +{n}',
+  storeModels: 'Store models "{q}": +{n}', storePlugins: 'Store plugins "{q}": +{n}', syncStart: 'Fetching videos from {n} channels…',
+  chanVideos: '{name}: +{n} videos', fail: '{label}: {msg}', expandStart: 'Exploring {n} discovered Roblox channels…',
+  forumTutStart: 'Browsing DevForum community tutorials…', forumTut: 'DevForum tutorials page {page}: +{n}',
+};
+const fmt = (k, p = {}) => (LOG_EN[k] || k).replace(/\{(\w+)\}/g, (_, v) => p[v] ?? '');
+
 class Crawler {
   constructor({ getState, persist, upsert, newId }) {
     Object.assign(this, { getState, persist, upsert, newId });
     this.status = { running: false };
   }
 
-  log(msg, err) {
+  // Journal : clé + paramètres (traduits par l'interface) et texte anglais pour la console.
+  log(k, p = {}, err) {
     const l = this.status.log;
-    l.unshift({ t: new Date().toISOString(), msg, err: Boolean(err) });
+    l.unshift({ t: new Date().toISOString(), k, p, msg: fmt(k, p), err: Boolean(err) });
     if (l.length > 80) l.length = 80;
   }
 
@@ -344,15 +354,15 @@ class Crawler {
     return true;
   }
 
-  stop() { if (this.status.running) { this.status.cancel = true; this.log('Arrêt demandé…'); } }
+  stop() { if (this.status.running) { this.status.cancel = true; this.log('stopping'); } }
 
   start(opts = {}) {
-    if (this.status.running) throw new Error('Une tâche est déjà en cours');
+    if (this.status.running) throw Object.assign(new Error('A task is already running'), { key: 'jobRunning' });
     const mode = opts.mode || 'explore';
     const level = INTENSITY[opts.intensity] || INTENSITY.normal;
     this.status = {
       running: true, cancel: false, mode, startedAt: new Date().toISOString(), finishedAt: null,
-      intensity: opts.intensity || 'normal', step: 0, steps: 1, current: '', found: 0, added: 0, channels: 0, errors: 0, log: [],
+      intensity: opts.intensity || 'normal', step: 0, steps: 1, current: null, found: 0, added: 0, channels: 0, errors: 0, log: [],
     };
     this.urls = new Set(this.getState().resources.map((r) => r.url).filter(Boolean));
     let job;
@@ -377,12 +387,12 @@ class Crawler {
       this.status.steps = jobs.length + (sources.includes('youtube') && level.expandChannels ? 1 : 0) + (sources.includes('devforum') ? 1 : 0);
       job = this.run(jobs, sources, level, opts.apiKey);
     }
-    this.done = job.catch((e) => this.log('Erreur : ' + e.message, true)).finally(() => {
+    this.done = job.catch((e) => this.log('error', { msg: e.message }, true)).finally(() => {
       this.status.running = false;
       this.status.finishedAt = new Date().toISOString();
-      this.status.current = '';
+      this.status.current = null;
       this.persist();
-      this.log(`Terminé : ${this.status.added} nouvelles ressources, ${this.status.channels} nouvelles chaînes.`);
+      this.log('done', { added: this.status.added, channels: this.status.channels });
     });
     return this.status;
   }
@@ -393,8 +403,8 @@ class Crawler {
     for (const q of queries) {
       if (this.status.cancel) return;
       this.status.step++;
-      this.status.current = `chaînes « ${q} »`;
-      const found = await this.safe(`Chaînes « ${q} »`, () => youtubeChannelSearch(q, pages));
+      this.status.current = { k: 'channels', p: { q } };
+      const found = await this.safe(`Channels "${q}"`, () => youtubeChannelSearch(q, pages));
       if (found) {
         // Recherche « roblox … » : YouTube renvoie des chaînes Roblox. Sinon on exige « roblox » dans la fiche.
         const keep = /roblox/i.test(q) ? found : found.filter((c) => ROBLOX_RE.test(`${c.name} ${c.handle} ${c.description}`));
@@ -405,7 +415,7 @@ class Crawler {
           const cat = gameplay ? 'gameplay' : guessCategory(`${c.name} ${c.description} ${q}`);
           if (this.follow(c, cat)) n++;
         }
-        this.log(`« ${q} » : ${found.length} chaînes trouvées, +${n} suivies`);
+        this.log('chanQuery', { q, found: found.length, n });
       }
       this.persist();
       await sleep(800);
@@ -425,14 +435,14 @@ class Crawler {
         let n = 0;
         for (let p = 1; p <= level.ghPages; p++) {
           if (this.status.cancel) return;
-          this.status.current = `GitHub « ${label} » page ${p}`;
-          const res = await this.safe(`GitHub « ${label} »`, () => githubSearch(q, p, token));
+          this.status.current = { k: 'github', p: { q: label, page: p } };
+          const res = await this.safe(`GitHub "${label}"`, () => githubSearch(q, p, token));
           await sleep(gap);
           if (!res) break;
           for (const r of res.items) n += this.add([r], { category: guessCategory(`${r.title} ${r.description} ${r.tags.join(' ')}`), type: 'opensource', source: 'github', tags: ['open source', ...r.tags] });
           if (res.items.length < 100 || p * 100 >= Math.min(res.total, 1000)) break;
         }
-        this.log(`GitHub « ${label} » : +${n}`);
+        this.log('query', { q: 'GitHub ' + label, n });
         this.persist();
       }
     }
@@ -440,18 +450,18 @@ class Crawler {
       for (const q of FORUM_RESOURCE_SEARCH) {
         if (this.status.cancel) return;
         this.status.step++;
-        this.status.current = `DevForum « ${q} »`;
-        const topics = await this.safe(`DevForum « ${q} »`, () => forumSearch(`${q} #resources:community-resources`, level.forumPages));
-        if (topics) this.log(`DevForum « ${q} » : +${this.add(topics.map((t) => ({ ...t, type: 'opensource' })), { category: '', type: 'opensource', source: 'devforum', tags: ['open source', 'ressource'] })}`);
+        this.status.current = { k: 'query', p: { q: 'DevForum ' + q } };
+        const topics = await this.safe(`DevForum "${q}"`, () => forumSearch(`${q} #resources:community-resources`, level.forumPages));
+        if (topics) this.log('query', { q: 'DevForum ' + q, n: this.add(topics.map((t) => ({ ...t, type: 'opensource' })), { category: '', type: 'opensource', source: 'devforum', tags: ['open source', 'ressource'] }) });
         this.persist();
         await sleep(800);
       }
       this.status.step++;
-      await this.safe('DevForum ressources', () => forumBrowse('resources/community-resources', level.browsePages, async (topics, p) => {
-        if (this.status.cancel) throw new Error('arrêt');
-        this.status.current = `DevForum ressources communautaires, page ${p + 1}`;
+      await this.safe('DevForum resources', () => forumBrowse('resources/community-resources', level.browsePages, async (topics, p) => {
+        if (this.status.cancel) throw new Error('stopped');
+        this.status.current = { k: 'forumRes', p: { page: p + 1 } };
         const n = this.add(topics.map((t) => ({ ...t, type: 'opensource' })), { category: '', type: 'opensource', source: 'devforum', tags: ['open source', 'ressource'] });
-        this.log(`Ressources DevForum page ${p + 1} : +${n}`);
+        this.log('forumRes', { page: p + 1, n });
         this.persist();
       }));
     }
@@ -460,11 +470,11 @@ class Crawler {
       for (const { k, kind } of jobs) {
         if (this.status.cancel) return;
         this.status.step++;
-        this.status.current = `Creator Store ${kind === 'plugin' ? 'plugins' : 'modèles'} « ${k} »`;
-        const items = await this.safe(`Store « ${k} »`, () => storeSearch(k, kind, level.storePages));
+        this.status.current = { k: kind === 'plugin' ? 'storePlugins' : 'storeModels', p: { q: k } };
+        const items = await this.safe(`Store "${k}"`, () => storeSearch(k, kind, level.storePages));
         if (items) {
           const cat = kind === 'plugin' ? 'tools' : '';
-          this.log(`Store ${kind === 'plugin' ? 'plugins' : 'modèles'} « ${k} » : +${this.add(items, { category: cat, type: 'asset', source: 'creator-store', tags: [k, 'gratuit'] })}`);
+          this.log(kind === 'plugin' ? 'storePlugins' : 'storeModels', { q: k, n: this.add(items, { category: cat, type: 'asset', source: 'creator-store', tags: [k, 'gratuit'] }) });
         }
         this.persist();
         await sleep(600);
@@ -477,21 +487,21 @@ class Crawler {
     const chans = this.getState().channels;
     if (!nested) this.status.steps = chans.length;
     else this.status.steps += chans.length;
-    this.log(`Récupération des vidéos de ${chans.length} chaînes…`);
+    this.log('syncStart', { n: chans.length });
     for (const ch of chans) {
       if (this.status.cancel) return;
       this.status.step++;
-      this.status.current = `vidéos de ${ch.name || ch.handle}`;
+      this.status.current = { k: 'videosOf', p: { name: ch.name || ch.handle } };
       if (!ch.channelId) {
-        const info = await this.safe(`Chaîne ${ch.handle}`, () => resolveChannel(ch.handle));
+        const info = await this.safe(`Channel ${ch.handle}`, () => resolveChannel(ch.handle));
         if (!info) continue;
         Object.assign(ch, { channelId: info.channelId, name: ch.name || info.name, avatar: info.avatar });
       }
-      const feed = await this.safe(`Chaîne ${ch.name}`, () => channelFeed(ch.channelId));
+      const feed = await this.safe(`Channel ${ch.name}`, () => channelFeed(ch.channelId));
       if (feed) {
         const n = this.add(feed, { category: ch.category || '', type: 'video', source: 'youtube', tags: [ch.name || ch.handle] });
         ch.lastFetch = new Date().toISOString();
-        if (n) this.log(`${ch.name} : +${n} vidéos`);
+        if (n) this.log('chanVideos', { name: ch.name, n });
       }
       if (this.status.step % 10 === 0) this.persist();
       await sleep(350);
@@ -501,7 +511,7 @@ class Crawler {
 
   async safe(label, fn) {
     try { return await fn(); }
-    catch (e) { this.status.errors++; this.log(`${label} : ${e.message}`, true); return null; }
+    catch (e) { this.status.errors++; this.log('fail', { label, msg: e.message }, true); return null; }
   }
 
   async run(jobs, sources, level, apiKey) {
@@ -509,11 +519,11 @@ class Crawler {
     for (const { c, q } of jobs) {
       if (this.status.cancel) return;
       this.status.step++;
-      this.status.current = `« ${q} »`;
+      this.status.current = { k: 'query', p: { q } };
       const plain = q.replace(/\broblox( studio)?\b/gi, '').trim() || q;
       let n = 0;
       if (sources.includes('youtube')) {
-        const vids = await this.safe(`YouTube « ${q} »`, () => youtubeSearch(q, level.ytPages, apiKey));
+        const vids = await this.safe(`YouTube "${q}"`, () => youtubeSearch(q, level.ytPages, apiKey));
         if (vids) {
           const keep = vids.filter((v) => ROBLOX_RE.test(v.title + ' ' + v.author));
           for (const v of keep) {
@@ -527,16 +537,16 @@ class Crawler {
         await sleep(700);
       }
       if (sources.includes('devforum') && !this.status.cancel) {
-        const topics = await this.safe(`DevForum « ${plain} »`, () => forumSearch(plain, level.forumPages));
+        const topics = await this.safe(`DevForum "${plain}"`, () => forumSearch(plain, level.forumPages));
         if (topics) n += this.add(topics, { category: c, type: 'article', source: 'devforum', tags: [plain] });
         await sleep(700);
       }
       if (sources.includes('reddit') && !this.status.cancel) {
-        const posts = await this.safe(`Reddit « ${plain} »`, () => redditSearch(plain, level.redditLimit));
+        const posts = await this.safe(`Reddit "${plain}"`, () => redditSearch(plain, level.redditLimit));
         if (posts) n += this.add(posts, { category: c, type: 'article', source: 'reddit', tags: [plain] });
         await sleep(1200);
       }
-      this.log(`« ${q} » : +${n}`);
+      this.log('query', { q, n });
       this.persist();
     }
 
@@ -544,12 +554,12 @@ class Crawler {
     if (sources.includes('youtube') && level.expandChannels && !this.status.cancel) {
       this.status.step++;
       const top = [...channels.entries()].filter(([, v]) => v.n >= 2).sort((a, b) => b[1].n - a[1].n).slice(0, level.expandChannels);
-      this.log(`Exploration de ${top.length} chaînes Roblox découvertes…`);
+      this.log('expandStart', { n: top.length });
       for (const [id, info] of top) {
         if (this.status.cancel) return;
-        this.status.current = `chaîne ${info.name}`;
+        this.status.current = { k: 'videosOf', p: { name: info.name } };
         this.follow({ channelId: id, name: info.name }, Object.entries(info.cats).sort((a, b) => b[1] - a[1])[0][0]);
-        const feed = await this.safe(`Chaîne ${info.name}`, () => channelFeed(id));
+        const feed = await this.safe(`Channel ${info.name}`, () => channelFeed(id));
         if (feed) {
           const main = Object.entries(info.cats).sort((a, b) => b[1] - a[1])[0][0];
           const keep = feed.filter((v) => ROBLOX_RE.test(v.title + ' ' + v.description));
@@ -559,7 +569,7 @@ class Crawler {
             const r = this.getState().resources.find((x) => x.url === v.url && x.source === 'exploration');
             if (r && r.category === 'tools' && !/plugin|tool|outil/i.test(v.title)) r.category = main;
           }
-          if (n) this.log(`Chaîne ${info.name} : +${n}`);
+          if (n) this.log('chanVideos', { name: info.name, n });
         }
         await sleep(500);
       }
@@ -569,12 +579,12 @@ class Crawler {
     // Parcours des tutoriels communautaires du DevForum, page par page.
     if (sources.includes('devforum') && !this.status.cancel) {
       this.status.step++;
-      this.log('Parcours des tutoriels communautaires du DevForum…');
-      await this.safe('DevForum tutoriels', () => forumBrowse('resources/community-tutorials', level.browsePages, async (topics, p) => {
-        if (this.status.cancel) throw new Error('arrêt');
-        this.status.current = `DevForum tutoriels, page ${p + 1}`;
+      this.log('forumTutStart');
+      await this.safe('DevForum tutorials', () => forumBrowse('resources/community-tutorials', level.browsePages, async (topics, p) => {
+        if (this.status.cancel) throw new Error('stopped');
+        this.status.current = { k: 'forumTut', p: { page: p + 1 } };
         const n = this.add(topics, { category: '', type: 'article', source: 'devforum', tags: ['tutoriel'] });
-        this.log(`Tutoriels DevForum page ${p + 1} : +${n}`);
+        this.log('forumTut', { page: p + 1, n });
         this.persist();
       }));
     }

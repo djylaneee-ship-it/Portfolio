@@ -32,8 +32,12 @@ Après une modification du code, régénère l'installateur avec `node build-ins
 Le site demande un **ID d'accès** pour entrer.
 
 - **Clé admin permanente** : créée au premier lancement, affichée dans la fenêtre noire et enregistrée dans `data/CLE-ADMIN.txt`. Elle n'expire jamais et ouvre le **panneau Admin**. Ne la partage pas.
-- **IDs d'accès** (`RDH-XXXX-XXXX-XXXX`) : crée-les dans **Admin**, envoie-les. Ils donnent accès au site en lecture seule et se bloquent tout seuls après leur durée (1 mois par défaut). Tu peux les prolonger, les bloquer ou les supprimer.
-- **Co-admin** : coche « 👑 Admin permanent » en créant un ID pour donner un accès admin qui n'expire pas. Seule la clé principale peut être régénérée.
+- **IDs d'accès** (`RDH-XXXX-XXXX-XXXX`) : crée-les dans **Admin**, envoie-les. Ils donnent accès au site en lecture seule et se bloquent tout seuls après leur durée (1 jour, 7 jours, 1 mois, 3 mois, 1 an) ou sont **permanents** (∞). Tu peux les prolonger, les rendre permanents, les bloquer ou les supprimer.
+- **Co-admin** : coche « 👑 Droits admin » en créant un ID pour lui donner le panneau Admin (choisis « ∞ Permanent » pour qu'il n'expire pas). Seule la clé principale peut être régénérée.
+
+## Langues
+
+Le site est en **anglais** par défaut. Chaque visiteur choisit sa langue (English, Français, Español, Português) sur l'écran de connexion, dans la barre latérale ou dans Réglages ; le choix est gardé dans son navigateur. Les textes sont dans `public/i18n.js`.
 - **Partager le site** : `Lancer en mode partage.bat` l'ouvre aux appareils de ton Wi-Fi. Pour internet, il faut un tunnel (ex. `cloudflared tunnel --url http://localhost:4747`) ou un hébergement.
 
 ## Algo cloud (GitHub Actions)
