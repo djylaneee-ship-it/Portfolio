@@ -8,6 +8,8 @@ const mcp = require('./mcp');
 const { Crawler, youtubeSearch } = require('./crawler');
 const { Auth, KEY_FILE } = require('./auth');
 const os = require('os');
+const claude = require('./claude');
+const level = require('./level');
 
 const PORT = Number(process.env.PORT) || 4747;
 // HOST=0.0.0.0 rend le site accessible aux autres appareils (mode partagé).
@@ -241,6 +243,17 @@ const routes = [
     persist();
     return { ok: true };
   }],
+  // Niveau de Claude (visible par tous les connectés).
+  ['GET', /^\/api\/level$/, () => {
+    const lv = level.compute(state);
+    if (level.snapshot(state, lv)) persist();
+    return { ...lv, history: state.levelHistory || [] };
+  }],
+  // Claude Desktop / Claude Code : détection et branchement.
+  ['GET', /^\/api\/claude$/, async () => ({ desktop: claude.desktopStatus(), code: await claude.codeStatus(), auto: state.settings.autoConnectClaude !== false })],
+  ['POST', /^\/api\/claude\/desktop$/, () => { state.settings.autoConnectClaude = true; persist(); return claude.linkDesktop(); }],
+  ['DELETE', /^\/api\/claude\/desktop$/, () => { state.settings.autoConnectClaude = false; persist(); return claude.unlinkDesktop(); }],
+  ['POST', /^\/api\/claude\/code$/, () => claude.linkCode(`http://localhost:${PORT}/mcp`)],
   ['POST', /^\/api\/mcp\/test$/, async (req) => {
     const q = String((await json(req)).query || '').slice(0, 200);
     return mcp.call('search_resources', { query: q, limit: 8 });
@@ -258,7 +271,7 @@ const routes = [
 ];
 
 // Routes accessibles à un ID d'accès simple (lecture seule). Tout le reste est réservé à l'admin.
-const USER_ROUTES = [/^\/api\/meta$/, /^\/api\/stats$/, /^\/api\/resources$/, /^\/api\/channels$/, /^\/api\/youtube$/, /^\/api\/crawl$/, /^\/api\/examples$/, /^\/api\/mcp$/];
+const USER_ROUTES = [/^\/api\/level$/, /^\/api\/meta$/, /^\/api\/stats$/, /^\/api\/resources$/, /^\/api\/channels$/, /^\/api\/youtube$/, /^\/api\/crawl$/, /^\/api\/examples$/, /^\/api\/mcp$/];
 
 const cookies = (req) => Object.fromEntries(String(req.headers.cookie || '').split(';').map((c) => c.trim().split('=')).filter((p) => p[0]).map(([k, ...v]) => [k, decodeURIComponent(v.join('='))]));
 const clientIp = (req) => req.socket.remoteAddress || '';
@@ -392,7 +405,30 @@ server.listen(PORT, HOST, () => {
   }
   console.log(`\n  Admin key (permanent) / Clé admin : ${auth.masterKey()}`);
   console.log(`  (saved in ${KEY_FILE})\n  Ctrl+C to stop\n`);
+  autoConnectClaude();
 });
+
+// Au démarrage : si Claude Desktop est installé, on y branche Rovex Hub automatiquement
+// (sauf si l'admin l'a débranché). Claude Code est branché aussi s'il est présent.
+async function autoConnectClaude() {
+  if (state.settings.autoConnectClaude === false || process.env.ROVEX_NO_AUTOCONNECT) return;
+  try {
+    const st = claude.desktopStatus();
+    if (st.installed && !st.linked) {
+      claude.linkDesktop();
+      console.log('  Claude Desktop detected: Rovex Hub added. Restart Claude Desktop to use it.');
+    } else if (st.linked) {
+      console.log('  Claude Desktop: Rovex Hub connected.');
+    }
+  } catch (e) { console.log('  Claude Desktop: ' + e.message); }
+  try {
+    const code = await claude.codeStatus();
+    if (code.installed && !code.linked) {
+      await claude.linkCode(`http://localhost:${PORT}/mcp`);
+      console.log('  Claude Code detected: Rovex Hub added.');
+    }
+  } catch {}
+}
 
 
 // Mise à jour automatique : récupère les nouvelles vidéos des chaînes suivies à intervalle régulier.

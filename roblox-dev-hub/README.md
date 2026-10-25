@@ -4,6 +4,8 @@ Le cerveau Roblox de ton Claude : une bibliothèque de ressources de dev Roblox 
 
 - **Exemples d'apprentissage** : une demande, le bon code Luau et pourquoi il est bon. Les exemples validés sont servis en priorité à Claude (`list_examples`, `get_example`).
 - **Connexion Claude** : config prête à copier, outils activables un par un, consignes envoyées à Claude, test d'une question et journal de son activité en direct.
+- **Niveau de Claude** : niveau, XP, titre (Novice → Légende Roblox), maîtrise par catégorie, courbe de progression, badges et animation « LEVEL UP ». Le niveau mesure la connaissance Roblox que Rovex apporte à Claude (exemples validés, couverture des catégories) et à quel point il s'en sert : Claude lui-même ne se modifie pas.
+- **Connexion automatique** : au lancement, l'app détecte Claude Desktop (et Claude Code) et y ajoute Rovex Hub tout seul, sans toucher aux autres serveurs (une copie de la config est gardée en `.rovex-backup`). Redémarre Claude Desktop pour qu'il le charge. Débranchable depuis **Connexion Claude**.
 - **Interface animée** : transitions entre les pages, boutons qui grossissent et ondes au clic, halo qui suit la souris, compteurs animés.
 - **Près de 70 ressources de départ** : docs officielles Roblox, outils (Blender, Rojo, Mixamo…) et recherches YouTube par thème.
 - **Exploration automatique** : fouille YouTube, le DevForum Roblox et Reddit (r/robloxgamedev) pour référencer des milliers de vidéos, tutos et images, rangés par catégorie.

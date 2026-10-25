@@ -279,7 +279,7 @@ kbd { font-family: var(--mono); font-size: 11px; padding: 4px 8px; border-radius
 .prog .top { display: flex; justify-content: space-between; font-size: 13.5px; font-weight: 600; margin-bottom: 8px; }
 .prog .top span { font-family: var(--mono); font-size: 12px; color: var(--muted2); }
 .bar { height: 7px; background: var(--line2); border-radius: 99px; overflow: hidden; }
-.bar i { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, #7C3AED, #A78BFA); background-size: 200% 100%; animation: flow 2s linear infinite; transition: width .6s var(--out); }
+.bar i { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, #7C3AED, #A78BFA, #7C3AED); background-size: 200% 100%; animation: flow 2s linear infinite; transition: width .6s var(--out); }
 @keyframes flow { to { background-position: -200% 0; } }
 .log { margin-top: 18px; max-height: 240px; overflow-y: auto; background: #0B0814; border: 1px solid var(--line2); border-radius: 14px; padding: 12px 16px; font: 12.5px/1.75 var(--mono); color: var(--soft); }
 .log div { animation: slidein .35s var(--out) both; }
@@ -432,3 +432,72 @@ body.locked .app { filter: blur(10px) saturate(.6); pointer-events: none; transf
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+/* ---------- Niveau de Claude ---------- */
+.lv-hero { display: grid; grid-template-columns: 260px 1fr; gap: 36px; align-items: center; padding: 36px; border-radius: 26px; background: var(--panel); border: 1px solid var(--line2); position: relative; overflow: hidden; }
+.lv-hero::after { content: ''; position: absolute; width: 420px; height: 420px; right: -120px; top: -160px; border-radius: 50%; background: radial-gradient(circle, rgba(124, 58, 237, .28), transparent 65%); pointer-events: none; }
+.ring { position: relative; width: 240px; height: 240px; }
+.ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ring circle { fill: none; stroke-width: 14; stroke-linecap: round; }
+.ring .track { stroke: var(--line2); }
+.ring .val { stroke: url(#lvgrad); transition: stroke-dashoffset 1.6s var(--out); filter: drop-shadow(0 0 10px rgba(167, 139, 250, .55)); }
+.ring .in { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; align-content: center; }
+.ring .in small { font-family: var(--mono); font-size: 11px; letter-spacing: .2em; color: var(--muted); }
+.ring .in b { font-family: var(--display); font-weight: 800; font-size: 76px; line-height: 1; letter-spacing: -.04em; background: linear-gradient(180deg, #fff, #C4B5FD); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.ring .in span { font-weight: 700; color: var(--accent3); font-size: 14px; }
+.ring.mini { width: 74px; height: 74px; flex: none; }
+.ring.mini circle { stroke-width: 9; }
+.ring.mini .in b { font-size: 26px; }
+.lv-title { font-family: var(--display); font-weight: 800; font-size: clamp(28px, 3.4vw, 44px); letter-spacing: -.03em; margin: 0 0 8px; }
+.xpbar { height: 14px; border-radius: 99px; background: var(--line2); overflow: hidden; margin: 18px 0 8px; }
+.xpbar i { display: block; height: 100%; width: 0; border-radius: 99px; background: linear-gradient(90deg, #7C3AED, #C084FC, #7C3AED); background-size: 200% 100%; animation: flow 2.5s linear infinite; transition: width 1.6s var(--out); box-shadow: 0 0 18px rgba(167, 139, 250, .5); }
+.xpmeta { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 12px; color: var(--muted2); }
+.lv-note { margin-top: 16px; font-size: 12.5px; color: var(--muted); max-width: 620px; }
+.mastery { display: grid; gap: 14px; }
+.mrow { display: grid; grid-template-columns: 150px 1fr 54px; gap: 14px; align-items: center; }
+.mrow .name { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 13.5px; }
+.mrow .bar { height: 10px; }
+.mrow .bar i { background: linear-gradient(90deg, var(--c), color-mix(in srgb, var(--c) 60%, #fff)); width: 0; }
+.mrow .pct { font-family: var(--mono); font-size: 12.5px; text-align: right; color: var(--soft); }
+.mrow small { grid-column: 2 / 4; margin-top: -8px; font-size: 11.5px; color: var(--muted); }
+.badges { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.bdg { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px; padding: 18px 12px; border-radius: 18px; background: var(--bg); border: 1px solid var(--line); transition: transform .4s var(--spring); }
+.bdg:hover { transform: translateY(-4px) scale(1.05); }
+.bdg .ico { width: 52px; height: 52px; border-radius: 16px; display: grid; place-items: center; font-size: 24px; background: var(--panel2); filter: grayscale(1); opacity: .45; }
+.bdg.done { border-color: #3A2D57; background: linear-gradient(160deg, #1B1231, var(--bg)); }
+.bdg.done .ico { filter: none; opacity: 1; background: radial-gradient(circle, rgba(167, 139, 250, .35), var(--panel2)); box-shadow: 0 0 22px rgba(167, 139, 250, .35); animation: glow 3s ease-in-out infinite; }
+@keyframes glow { 50% { box-shadow: 0 0 34px rgba(192, 132, 252, .55); } }
+.bdg b { font-size: 13px; }
+.bdg small { font-size: 11.5px; color: var(--muted); }
+.chart { width: 100%; height: 190px; }
+.chart .area { fill: url(#chartgrad); }
+.chart .line { fill: none; stroke: #A78BFA; stroke-width: 2.5; stroke-dasharray: 2000; stroke-dashoffset: 2000; animation: draw 2s var(--out) forwards; }
+.chart .dot { fill: #fff; stroke: #7C3AED; stroke-width: 3; }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+.tips { display: grid; gap: 10px; }
+.tips a, .tips div { display: flex; gap: 12px; align-items: center; padding: 14px 16px; border-radius: 14px; background: var(--bg); border: 1px solid var(--line); transition: transform .35s var(--spring), border-color .2s; }
+.tips a:hover { transform: translateX(6px); border-color: var(--accent); }
+.lv-widget { display: flex; align-items: center; gap: 14px; padding: 16px; margin: 4px 0 10px; border-radius: 18px; background: linear-gradient(140deg, #1B1231, var(--bg)); border: 1px solid #3A2D57; transition: transform .4s var(--spring); }
+.lv-widget:hover { transform: scale(1.03); }
+.lv-widget b { font-family: var(--display); font-size: 16px; display: block; }
+.lv-widget small { color: var(--muted2); font-size: 12px; }
+
+/* Montée de niveau : explosion de confettis */
+.levelup { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; background: rgba(6, 4, 11, .7); backdrop-filter: blur(6px); animation: fade .3s; cursor: pointer; }
+.levelup .box { text-align: center; animation: modalIn .7s var(--spring); }
+.levelup small { font-family: var(--mono); letter-spacing: .3em; color: var(--accent3); }
+.levelup h2 { font-family: var(--display); font-weight: 800; font-size: clamp(54px, 9vw, 110px); letter-spacing: -.04em; margin: 6px 0; background: linear-gradient(90deg, #A78BFA, #F0ABFC, #FCD34D, #A78BFA); background-size: 200% auto; -webkit-background-clip: text; background-clip: text; color: transparent; animation: shine 2.5s linear infinite; }
+.levelup p { color: var(--soft); font-size: 18px; margin: 0; }
+.confetti { position: fixed; top: 50%; left: 50%; width: 10px; height: 14px; border-radius: 3px; pointer-events: none; animation: burst 1.6s var(--out) forwards; }
+@keyframes burst { to { transform: translate(var(--x), var(--y)) rotate(var(--r)); opacity: 0; } }
+
+.claude-apps { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.app-card { display: flex; gap: 16px; align-items: flex-start; }
+.app-card .ico { width: 48px; height: 48px; border-radius: 14px; display: grid; place-items: center; background: var(--panel2); flex: none; font-size: 22px; }
+.app-card .state { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; font-weight: 700; margin: 4px 0 12px; color: var(--muted2); }
+.app-card .state.on { color: var(--ok2); }
+.app-card .state.on .pulse { background: var(--ok); }
+.app-card .state .pulse { animation: none; background: var(--muted); }
+.app-card .state.on .pulse { animation: pulse 2s infinite; }
+
+@media (max-width: 1100px) { .lv-hero, .claude-apps { grid-template-columns: 1fr; } .ring { margin: auto; } }

@@ -266,7 +266,7 @@ function pageHead(eyebrow, title, sub, actions = '') {
 
 // ---------- Accueil ----------
 async function renderHome() {
-  const [recent, mcp] = await Promise.all([api('/resources?limit=8'), api('/mcp').catch(() => ({ log: [] }))]);
+  const [recent, mcp, lv] = await Promise.all([api('/resources?limit=8'), api('/mcp').catch(() => ({ log: [] })), api('/level').catch(() => null)]);
   const s = STATS.byType || {};
   view.innerHTML = `
     <section class="hero" data-spot>
@@ -300,6 +300,7 @@ async function renderHome() {
           </a>`).join('')}</div>
       </div>
       <aside class="panel activity" data-spot>
+        ${lv ? `<a class="lv-widget" href="#/level">${ring(lv.progress, `<b>${lv.level}</b>`, true)}<span><b>${t('lvt.' + lv.title)}</b><small>${t('lv.understanding', { n: lv.overall })} · ${num(lv.xp)} XP</small></span></a>` : ''}
         <div class="section-head" style="margin-bottom:8px"><h2 style="font-size:19px">${t('act.title')}</h2><span class="live"><span class="pulse"></span>${t('act.live')}</span></div>
         <div id="act-list">${activityList(mcp.log || [])}</div>
         <a class="link admin-only" href="#/connect">${t('act.journal')}</a>
@@ -309,6 +310,8 @@ async function renderHome() {
     <div id="recent">${grid(recent.items)}</div>`;
   $$('.role-only-user', view).forEach((el) => { el.hidden = isAdmin(); });
   bindCards($('#recent'), recent.items);
+  animateBars(view);
+  if (lv) checkLevelUp(lv);
   runTerminal();
 }
 
@@ -750,6 +753,7 @@ async function renderConnect() {
     ${pageHead(t('cn.eyebrow'), t('nav.connect'), t('cn.sub'), `
       <div class="server-card ${m.connected ? '' : 'off'}"><span class="pulse"></span><div><b>${m.connected ? t('cn.statusOn') : t('cn.statusOff')}</b><small>${esc(m.url.replace('http://', ''))}${m.lastCall ? ' · ' + ago(m.lastCall) : ''}</small></div>
       <button class="btn small" data-copy="${esc(m.url)}">${t('copy')}</button></div>`)}
+    <div class="claude-apps" id="claude-apps"><div class="skel" style="min-height:150px"></div><div class="skel" style="min-height:150px"></div></div>
     <div class="steps">
       <div class="panel" data-spot><span class="num">1</span><h3>${t('cn.s1')}</h3><p>${t('cn.s1t')}</p></div>
       <div class="panel" data-spot><span class="num">2</span><h3>${t('cn.s2')}</h3><p>${t('cn.s2t')}</p>
@@ -774,6 +778,7 @@ async function renderConnect() {
       <div class="panel" data-spot><h3>${t('cn.stdio')}</h3><p>${t('cn.stdioT')}</p><div class="codebox"><code>${esc(stdio)}</code></div><div class="row" style="margin-top:12px"><button class="btn" data-copy="${esc(stdio)}">${t('copy')}</button></div></div>
     </div>`;
   bindCopy(view);
+  loadClaudeApps();
   $$('[data-tool]').forEach((i) => i.onchange = async () => {
     await api('/mcp', { method: 'PUT', body: { tools: { [i.dataset.tool]: i.checked } } });
     toast(t('toast.saved'));
@@ -792,6 +797,141 @@ async function renderConnect() {
     } catch (err) { toast(err.message, true); }
     b.disabled = false;
   };
+}
+
+// ---------- Niveau de Claude ----------
+const BADGE_ICONS = { firstCall: '🔌', calls50: '⚡', calls500: '🚀', examples5: '📘', examples25: '📚', resources1k: '🗂️', resources10k: '🌌', allRounder: '🧭', master: '👑' };
+
+// Anneau de progression (SVG) ; la valeur s'anime après l'insertion.
+function ring(pct, inner, mini) {
+  const r = mini ? 30 : 106;
+  const size = mini ? 74 : 240;
+  const c = 2 * Math.PI * r;
+  return `<div class="ring ${mini ? 'mini' : ''}"><svg viewBox="0 0 ${size} ${size}">
+    <defs><linearGradient id="lvgrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7C3AED"/><stop offset=".6" stop-color="#C084FC"/><stop offset="1" stop-color="#F0ABFC"/></linearGradient></defs>
+    <circle class="track" cx="${size / 2}" cy="${size / 2}" r="${r}"/>
+    <circle class="val" cx="${size / 2}" cy="${size / 2}" r="${r}" stroke-dasharray="${c}" stroke-dashoffset="${c}" data-ring="${c * (1 - Math.max(0, Math.min(100, pct)) / 100)}"/>
+  </svg><div class="in">${inner}</div></div>`;
+}
+function animateBars(root) {
+  requestAnimationFrame(() => setTimeout(() => {
+    for (const el of $$('[data-ring]', root)) el.style.strokeDashoffset = el.dataset.ring;
+    for (const el of $$('[data-w]', root)) el.style.width = el.dataset.w + '%';
+  }, 120));
+}
+
+// Courbe d'XP sur les derniers jours.
+function xpChart(history) {
+  if (history.length < 2) return `<p class="sub" style="font-size:13.5px">${t('lv.chartEmpty')}</p>`;
+  const W = 700, H = 190, P = 12;
+  const max = Math.max(...history.map((h) => h.xp), 1);
+  const pts = history.map((h, i) => [P + (i * (W - 2 * P)) / (history.length - 1), H - P - (h.xp / max) * (H - 2 * P)]);
+  const line = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
+  const last = pts[pts.length - 1];
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+    <defs><linearGradient id="chartgrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="rgba(167,139,250,.35)"/><stop offset="1" stop-color="rgba(167,139,250,0)"/></linearGradient></defs>
+    <path class="area" d="${line} L ${last[0]} ${H} L ${pts[0][0]} ${H} Z"/><path class="line" d="${line}"/>
+    <circle class="dot" cx="${last[0]}" cy="${last[1]}" r="6"/></svg>
+    <div class="xpmeta"><span>${date(history[0].d)}</span><span>${date(history[history.length - 1].d)}</span></div>`;
+}
+
+async function renderLevel() {
+  const lv = await api('/level');
+  const cats = [...lv.categories].sort((a, b) => b.mastery - a.mastery);
+  view.innerHTML = `
+    ${pageHead(t('lv.eyebrow'), t('lv.title'), t('lv.sub'))}
+    <section class="lv-hero" data-spot>
+      ${ring(lv.progress, `<small>${t('lv.level')}</small><b>${lv.level}</b><span>${t('lvt.' + lv.title)}</span>`)}
+      <div style="position:relative;z-index:1">
+        <p class="eyebrow">${t('lv.understanding', { n: lv.overall })}</p>
+        <h2 class="lv-title">${t('lvt.' + lv.title)} · ${t('lv.level')} ${lv.level}</h2>
+        <p class="sub">${t('lv.desc', { strong: cat(lv.strongest).label, weak: cat(lv.weakest).label })}</p>
+        <div class="xpbar"><i data-w="${lv.progress}"></i></div>
+        <div class="xpmeta"><span><b data-count="${lv.xp}">0</b> XP</span><span>${t('lv.next', { n: num(lv.levelNext - lv.xp), level: lv.level + 1 })}</span></div>
+        <p class="lv-note">${t('lv.note')}</p>
+      </div>
+    </section>
+    <div class="stats">
+      <div class="stat"><b data-count="${lv.totals.calls}">0</b><span>${t('lv.calls')}</span></div>
+      <div class="stat"><b data-count="${lv.totals.examplesUsed}">0</b><span>${t('lv.examplesUsed')}</span></div>
+      <div class="stat"><b data-count="${lv.totals.validated}">0</b><span>${t('stat.examples')}</span></div>
+      <div class="stat"><b data-count="${lv.totals.resources}">0</b><span>${t('stat.resources')}</span></div>
+      <div class="stat"><b data-count="${lv.overall}">0</b><span>${t('lv.overall')}</span></div>
+    </div>
+    <div class="two-col">
+      <div class="panel" data-spot>
+        <h3>${t('lv.mastery')}</h3><p>${t('lv.masteryT')}</p>
+        <div class="mastery">${cats.map((c) => { const k = cat(c.id); return `
+          <div class="mrow" style="--c:${k.color}"><span class="name"><span class="dot" style="background:${k.color}"></span>${esc(k.label)}</span>
+            <div class="bar"><i data-w="${c.mastery}"></i></div><span class="pct">${c.mastery}%</span>
+            <small>${t('lv.catDetail', { e: c.examples, r: num(c.resources), u: c.uses })}</small></div>`; }).join('')}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:24px">
+        <div class="panel" data-spot><h3>${t('lv.chart')}</h3>${xpChart(lv.history)}</div>
+        <div class="panel" data-spot><h3>${t('lv.tips')}</h3><div class="tips">${lv.tips.map((x) => {
+          const label = t('tip.' + x.k, { cat: x.p ? cat(x.p.cat).label : '' });
+          const href = x.k === 'addExamples' ? '#/examples' : x.k === 'explore' ? '#/explore' : '#/connect';
+          return isAdmin() ? `<a href="${href}">💡 <span>${label}</span></a>` : `<div>💡 <span>${label}</span></div>`;
+        }).join('') || `<div>🏆 <span>${t('tip.none')}</span></div>`}</div></div>
+      </div>
+    </div>
+    <div class="panel" data-spot><h3>${t('lv.badges')}</h3><p>${t('lv.badgesT', { n: lv.badges.filter((b) => b.done).length, total: lv.badges.length })}</p>
+      <div class="badges">${lv.badges.map((b) => `<div class="bdg ${b.done ? 'done' : ''}"><span class="ico">${BADGE_ICONS[b.id]}</span><b>${t('bdg.' + b.id)}</b><small>${t('bdgd.' + b.id)}</small></div>`).join('')}</div>
+    </div>`;
+  animateBars(view);
+  checkLevelUp(lv);
+}
+
+// Célébration quand le niveau a monté depuis la dernière visite.
+function checkLevelUp(lv) {
+  let seen = 0;
+  try { seen = Number(localStorage.getItem('rovex-level')) || 0; localStorage.setItem('rovex-level', lv.level); } catch {}
+  if (!seen || lv.level <= seen || reduced) return;
+  const el = document.createElement('div');
+  el.className = 'levelup';
+  el.innerHTML = `<div class="box"><small>${t('lv.levelUp')}</small><h2>${t('lv.level')} ${lv.level}</h2><p>${t('lvt.' + lv.title)} · ${t('lv.understanding', { n: lv.overall })}</p></div>`;
+  document.body.append(el);
+  const colors = ['#A78BFA', '#F0ABFC', '#FCD34D', '#6EE7B7', '#7DD3FC', '#fff'];
+  for (let i = 0; i < 90; i++) {
+    const c = document.createElement('i');
+    c.className = 'confetti';
+    const a = Math.random() * Math.PI * 2;
+    const d = 200 + Math.random() * 420;
+    c.style.cssText = `background:${colors[i % colors.length]};--x:${Math.cos(a) * d}px;--y:${Math.sin(a) * d}px;--r:${Math.random() * 720}deg;animation-delay:${Math.random() * 150}ms`;
+    el.append(c);
+  }
+  const close = () => { el.style.transition = 'opacity .4s'; el.style.opacity = 0; setTimeout(() => el.remove(), 400); };
+  el.onclick = close;
+  setTimeout(close, 4200);
+}
+
+// Claude Desktop / Claude Code détectés sur ce PC.
+async function loadClaudeApps() {
+  const box = $('#claude-apps');
+  if (!box) return;
+  let st;
+  try { st = await api('/claude'); } catch (e) { box.innerHTML = ''; return; }
+  const d = st.desktop;
+  const c = st.code;
+  const state = (on, txt) => `<span class="state ${on ? 'on' : ''}"><span class="pulse"></span>${txt}</span>`;
+  box.innerHTML = `
+    <div class="panel app-card" data-spot><span class="ico">🖥️</span><div style="flex:1">
+      <h3>Claude Desktop</h3>
+      ${!d.installed ? state(false, t('cl.notFound')) : d.linked ? state(true, t('cl.linked')) : state(false, t('cl.notLinked'))}
+      <p>${!d.installed ? t('cl.desktopMissing') : d.linked ? t('cl.restart') : t('cl.desktopFound')}</p>
+      <div class="row">${d.installed ? (d.linked ? `<button class="btn" id="cl-unlink">${t('cl.unlink')}</button>` : `<button class="btn primary" id="cl-link">${t('cl.link')}</button>`) : '<a class="btn" href="https://claude.ai/download" target="_blank">' + t('cl.download') + '</a>'}</div>
+    </div></div>
+    <div class="panel app-card" data-spot><span class="ico">⌨️</span><div style="flex:1">
+      <h3>Claude Code</h3>
+      ${!c.installed ? state(false, t('cl.notFound')) : c.linked ? state(true, t('cl.linked')) : state(false, t('cl.notLinked'))}
+      <p>${!c.installed ? t('cl.codeMissing') : c.linked ? t('cl.codeOk') : t('cl.codeFound')}</p>
+      <div class="row">${c.installed && !c.linked ? `<button class="btn primary" id="cl-code">${t('cl.link')}</button>` : ''}</div>
+    </div></div>`;
+  stagger(box); box.classList.add('stagger');
+  const act = (id, fn) => { const b = $('#' + id); if (b) b.onclick = async () => { b.disabled = true; try { await fn(); toast(t('toast.saved')); } catch (e) { toast(e.message, true); } loadClaudeApps(); }; };
+  act('cl-link', () => api('/claude/desktop', { method: 'POST' }));
+  act('cl-unlink', () => api('/claude/desktop', { method: 'DELETE' }));
+  act('cl-code', () => api('/claude/code', { method: 'POST' }));
 }
 
 // ---------- Admin ----------
@@ -1119,7 +1259,7 @@ async function route() {
   const pages = {
     library: () => renderLibrary(params), favorites: () => renderLibrary(params, true), examples: renderExamples,
     youtube: () => renderYoutube(params), channels: () => renderChannels(params), explore: renderExplore,
-    connect: renderConnect, admin: renderAdmin, settings: renderSettings,
+    connect: renderConnect, admin: renderAdmin, settings: renderSettings, level: renderLevel,
   };
   try {
     await transition(pages[path] || renderHome);

@@ -242,6 +242,15 @@ function logCall(tool, a, out) {
     count: out && typeof out.count === 'number' ? out.count : undefined,
   });
   st.mcpLog.length = Math.min(st.mcpLog.length, 100);
+  // Compteurs cumulés pour le niveau de Claude.
+  const ms = (st.mcpStats = st.mcpStats || { calls: 0, byTool: {}, byCat: {}, examples: 0 });
+  const cat = a.category || (out && out.category) || '';
+  ms.calls++;
+  ms.byTool[tool] = (ms.byTool[tool] || 0) + 1;
+  if (cat) ms.byCat[cat] = (ms.byCat[cat] || 0) + 1;
+  if (tool === 'get_example') ms.examples++;
+  if (out && Array.isArray(out.examples)) ms.examples += out.examples.length;
+  ms.firstCall = ms.firstCall || new Date().toISOString();
   store.save(st);
 }
 
