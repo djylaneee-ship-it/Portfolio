@@ -34,12 +34,22 @@ jobs:
       - name: Dépendances
         run: npm install --no-audit --no-fund
 
+      # GitHub ne publie une release que si son tag existe : on crée v<version> s'il manque.
+      - name: Tag de version
+        shell: bash
+        run: |
+          V="v$(node -p "require('./package.json').version")"
+          if [ -z "$(git ls-remote --tags origin "refs/tags/$V")" ]; then
+            git tag "$V" && git push origin "$V"
+          fi
+
       - name: Construire et publier l'installeur
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npx electron-builder --win nsis --publish always
 
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: Rovex-Hub-Setup
           path: roblox-dev-hub/dist/*.exe
