@@ -109,14 +109,24 @@ function buildTray() {
 }
 
 // Mises à jour automatiques depuis les releases GitHub (comme Discord).
+global.rovexCheckUpdates = () => checkUpdates(false);
+global.rovexInstallUpdate = () => { if (updater && global.rovexUpdate.state === 'ready') { quitting = true; updater.quitAndInstall(true, true); } };
 let updater = null;
+global.rovexUpdate = { state: 'idle' };
 function checkUpdates(manual) {
-  if (!app.isPackaged) return;
+  if (!app.isPackaged) { global.rovexUpdate = { state: 'dev' }; return; }
   try {
     if (!updater) {
       updater = require('electron-updater').autoUpdater;
       updater.autoDownload = true;
       updater.autoInstallOnAppQuit = true;
+      const set = (state, extra = {}) => { global.rovexUpdate = { state, at: Date.now(), ...extra }; };
+      updater.on('checking-for-update', () => set('checking'));
+      updater.on('update-available', (i) => set('downloading', { version: i.version, percent: 0 }));
+      updater.on('download-progress', (p) => set('downloading', { ...global.rovexUpdate, percent: Math.round(p.percent) }));
+      updater.on('update-not-available', () => set('latest'));
+      updater.on('update-downloaded', (i) => set('ready', { version: i.version }));
+      updater.on('error', (e) => set('error', { message: String(e && e.message || e).slice(0, 200) }));
       updater.on('update-downloaded', async (info) => {
         const r = await dialog.showMessageBox(main, {
           type: 'info', buttons: ['Redémarrer maintenant', 'Plus tard'], defaultId: 0, cancelId: 1, title: 'Rovex Hub',

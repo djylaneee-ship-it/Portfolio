@@ -159,16 +159,32 @@ class Auth {
   }
 
   // Revérifie en ligne, en arrière-plan, qu'un ID n'a pas été bloqué ou supprimé entre-temps.
+  // Une session ouverte hors ligne est réessayée toutes les 30 secondes jusqu'à ce que la base réponde.
   recheck(key, s) {
-    if (!s.cred || Date.now() - (s.checkedAt || 0) < RECHECK || this.checking.has(key)) return;
+    const wait = s.offline ? 30e3 : RECHECK;
+    if (!s.cred || Date.now() - (s.checkedAt || 0) < wait || this.checking.has(key)) return;
     this.checking.add(key);
-    cloud.rpc('rovex_check', { p_code: s.cred }).then((out) => {
+    // Clé admin de ce PC : on l'enregistre en ligne si ce n'est pas encore fait (comme à la connexion).
+    const ask = s.master && s.cred === this.masterKey()
+      ? cloud.rpc('rovex_claim', { p_key: s.cred }).then(async (c) => {
+        if (!c.ok) return cloud.rpc('rovex_check', { p_code: s.cred });
+        if (c.claimed || !this.data.imported) await this.importLocal(s.cred);
+        return { ok: true, role: 'admin', label: 'Admin' };
+      })
+      : cloud.rpc('rovex_check', { p_code: s.cred });
+    ask.then((out) => {
       const d = this.data;
       if (!d.sessions[key]) return;
       if (!out.ok) delete d.sessions[key];
-      else Object.assign(d.sessions[key], { checkedAt: Date.now(), role: out.role, label: out.label || d.sessions[key].label, offline: false });
+      else {
+        Object.assign(d.sessions[key], { checkedAt: Date.now(), role: out.role, label: out.label || d.sessions[key].label, offline: false, cloud: true });
+        if (!d.lastCred) d.lastCred = { code: s.cred, role: out.role };
+      }
       this.persist();
-    }).catch(() => {}).finally(() => this.checking.delete(key));
+    }).catch(() => {
+      const cur = this.data.sessions[key];
+      if (cur) cur.checkedAt = Date.now();
+    }).finally(() => this.checking.delete(key));
   }
 
   // Jeton « Bearer » pour les clients MCP distants : clé admin ou ID valide.

@@ -13,6 +13,7 @@ const level = require('./level');
 const quality = require('./quality');
 const skills = require('./skills');
 const cloud = require('./cloud');
+const APP_VERSION = require('./package.json').version;
 
 const PORT = Number(process.env.PORT) || 4747;
 // HOST=0.0.0.0 rend le site accessible aux autres appareils (mode partagé).
@@ -214,6 +215,10 @@ const routes = [
     persist();
     return { ok: true };
   }],
+  // Version de l'app et mises à jour (app de bureau).
+  ['GET', /^\/api\/version$/, () => ({ version: APP_VERSION, desktop: Boolean(process.versions.electron), online: auth.online, update: global.rovexUpdate || null })],
+  ['POST', /^\/api\/update\/check$/, () => { if (global.rovexCheckUpdates) global.rovexCheckUpdates(); return { ok: Boolean(global.rovexCheckUpdates) }; }],
+  ['POST', /^\/api\/update\/install$/, () => { if (global.rovexInstallUpdate) global.rovexInstallUpdate(); return { ok: true }; }],
   ['GET', /^\/api\/export$/, () => ({ ...state, auth: undefined })],
   ['POST', /^\/api\/cloud\/sync$/, () => cloudSync()],
   // Skills : un par catégorie.
@@ -350,7 +355,7 @@ const routes = [
 ];
 
 // Routes accessibles à un ID d'accès simple (lecture seule). Tout le reste est réservé à l'admin.
-const USER_ROUTES = [/^\/api\/prompts$/, /^\/api\/skills$/, /^\/api\/skills\/\w+$/, /^\/api\/level$/, /^\/api\/meta$/, /^\/api\/stats$/, /^\/api\/resources$/, /^\/api\/channels$/, /^\/api\/youtube$/, /^\/api\/crawl$/, /^\/api\/examples$/, /^\/api\/mcp$/];
+const USER_ROUTES = [/^\/api\/version$/, /^\/api\/prompts$/, /^\/api\/skills$/, /^\/api\/skills\/\w+$/, /^\/api\/level$/, /^\/api\/meta$/, /^\/api\/stats$/, /^\/api\/resources$/, /^\/api\/channels$/, /^\/api\/youtube$/, /^\/api\/crawl$/, /^\/api\/examples$/, /^\/api\/mcp$/];
 
 const cookies = (req) => Object.fromEntries(String(req.headers.cookie || '').split(';').map((c) => c.trim().split('=')).filter((p) => p[0]).map(([k, ...v]) => [k, decodeURIComponent(v.join('='))]));
 const clientIp = (req) => req.socket.remoteAddress || '';

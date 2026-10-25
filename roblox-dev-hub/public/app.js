@@ -197,8 +197,10 @@ function renderSession() {
       <span class="meta"><b>${esc(name)}</b><small>${isAdmin() ? t('session.admin') + ' · ' : ''}${SESSION.permanent ? t('session.permanent') : t('session.until', { date: date(SESSION.expiresAt) })}</small></span>
       <a class="icon-btn admin-only" href="#/settings" aria-label="${t('nav.settings')}" title="${t('nav.settings')}"><svg class="line" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg></a>
     </div>
+    <div class="ver" id="side-ver"></div>
     <div class="row">${langSelect('side-lang')}<button class="icon-btn" id="logout" title="${t('session.logout')}" aria-label="${t('session.logout')}"><svg class="line" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg></button></div>`;
   $('#side-lang').onchange = (e) => setLang(e.target.value);
+  api('/version').then((v) => { const el = $('#side-ver'); if (el) el.textContent = 'Rovex Hub v' + v.version; }).catch(() => {});
   $('#logout').onclick = async () => { await api('/logout', { method: 'POST' }); location.reload(); };
 }
 
@@ -1237,10 +1239,13 @@ async function loadClaudeApps() {
 
 // ---------- Admin ----------
 async function renderAdmin() {
-  const [codes, info] = await Promise.all([api('/admin/codes'), api('/admin/info')]);
+  let [codes, info] = await Promise.all([api('/admin/codes').catch((e) => ({ error: e.message })), api('/admin/info')]);
+  const codesErr = codes.error;
+  if (codesErr) codes = [];
   const actives = codes.filter((c) => c.status === 'active').length;
   view.innerHTML = `
     ${pageHead('ADMIN', t('admin.title'), t('admin.sub'))}
+    ${codesErr ? `<div class="panel warn-panel" data-spot><h3>⚠️ ${t('admin.offTitle')}</h3><p>${esc(codesErr)} ${t('admin.offText')}</p><button class="btn primary" id="admin-retry">${t('admin.retry')}</button></div>` : ''}
     <div class="panel" data-spot>
       <h3>${t('admin.create')}</h3>
       <form class="row" id="code-form">
@@ -1282,6 +1287,7 @@ async function renderAdmin() {
       </div>
     </div>`;
   bindCopy(view);
+  if ($('#admin-retry')) $('#admin-retry').onclick = () => transition(renderAdmin);
   $('#admin-toggle').onclick = (e) => {
     e.preventDefault();
     const i = $('input', e.currentTarget); i.checked = !i.checked;
@@ -1327,10 +1333,24 @@ function bindCopy(root = document) {
 }
 
 // ---------- Réglages ----------
+// État de la mise à jour (app de bureau) en texte.
+function updState(u) {
+  if (!u || u.state === 'idle') return '';
+  if (u.state === 'downloading') return t('upd.downloading', { v: esc(u.version || ''), p: u.percent || 0 });
+  if (u.state === 'error') return t('upd.error');
+  return t('upd.' + u.state, { v: esc(u.version || '') });
+}
+
 async function renderSettings() {
-  const s = await api('/settings');
+  const [s, ver] = await Promise.all([api('/settings'), api('/version').catch(() => ({}))]);
   view.innerHTML = `
     ${pageHead('ROVEX HUB', t('nav.settings'), t('set.sub'))}
+    <div class="panel" data-spot>
+      <h3>⬆️ ${t('upd.title')}</h3>
+      <p>${t('upd.current', { v: esc(ver.version || '?') })} <span id="upd-state">${updState(ver.update)}</span></p>
+      <div class="row"><button class="btn primary" id="upd-check" ${ver.desktop ? '' : 'disabled'}>${t('upd.check')}</button>
+        <button class="btn" id="upd-install" ${ver.update && ver.update.state === 'ready' ? '' : 'hidden'}>${t('upd.install')}</button></div>
+    </div>
     <div class="two-col">
       <div class="panel" data-spot><h3>${t('set.langTitle')}</h3><p>${t('set.langText')}</p>${langSelect('set-lang')}</div>
       <div class="panel" data-spot><h3>${t('set.autoTitle')}</h3>
@@ -1369,6 +1389,21 @@ async function renderSettings() {
     </div>`;
   $('#set-lang').onchange = (e) => setLang(e.target.value);
   $('#key-form').onsubmit = async (e) => { e.preventDefault(); await api('/settings', { method: 'PUT', body: { youtubeApiKey: $('#key').value } }); toast(t('toast.saved')); route(); };
+  const uc = $('#upd-check');
+  if (uc) uc.onclick = async () => {
+    uc.disabled = true;
+    await api('/update/check', { method: 'POST' });
+    // Suit l'état pendant une minute.
+    for (let i = 0; i < 30 && $('#upd-state'); i++) {
+      await sleep(2000);
+      const v = await api('/version');
+      $('#upd-state').textContent = updState(v.update);
+      $('#upd-install').hidden = !(v.update && v.update.state === 'ready');
+      if (v.update && ['latest', 'ready', 'error'].includes(v.update.state)) break;
+    }
+    uc.disabled = false;
+  };
+  $('#upd-install').onclick = () => api('/update/install', { method: 'POST' });
   $('#cloud-form').onsubmit = async (e) => { e.preventDefault(); await api('/settings', { method: 'PUT', body: { cloudUrl: $('#cloud-url').value } }); toast(t('toast.saved')); };
   $('#cloud-sync').onclick = async (e) => {
     const b = e.currentTarget; b.disabled = true; b.innerHTML = `<span class="spinner"></span>${t('set.syncing')}`;

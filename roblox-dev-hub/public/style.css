@@ -561,3 +561,5 @@ body.desktop .main { padding-top: 46px; }
 body.desktop .topbar { margin-top: -46px; padding-top: 46px; }
 body.desktop .sidebar { padding-top: 44px; }
 body.desktop .modal, body.desktop .login { padding-top: 40px; }
+.side-user .ver { font: 11px var(--mono); color: var(--muted); letter-spacing: .04em; }
+.warn-panel { border-color: #5B4517; background: linear-gradient(180deg, #1C160A, var(--panel)); }
