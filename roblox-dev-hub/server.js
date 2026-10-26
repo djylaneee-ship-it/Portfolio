@@ -229,7 +229,7 @@ const routes = [
     cloud.must(await cloud.rpc('rovex_gen_set_limits', { p_key: session.cred, p_images: n(b.images), p_sounds: null, p_texts: n(b.texts) }));
     return { ok: true };
   }],
-  // Prompt Booster : Gemini réécrit une demande en prompt détaillé pour Claude + Rovex.
+  // Prompt Booster : l'IA (Groq) réécrit une demande en prompt détaillé pour Claude + Rovex.
   ['GET', /^\/api\/gen\/boost$/, async () => {
     await gen.refreshShared();
     const q = await gen.quota(state);
@@ -346,7 +346,10 @@ const routes = [
     const log = state.mcpLog || [];
     const last = log[0] ? Date.parse(log[0].t) : 0;
     const clients = mcp.clients();
-    const base = { connected: clients.some((c) => c.alive) || Date.now() - last < 15 * 60e3, clients, lastCall: log[0] ? log[0].t : null, log: log.slice(0, 30), url: `http://localhost:${PORT}/mcp` };
+    const base = {
+      connected: clients.some((c) => c.alive) || Date.now() - last < 15 * 60e3, clients, lastCall: log[0] ? log[0].t : null, log: log.slice(0, 30),
+      url: `http://localhost:${PORT}/mcp`, mcpPath: path.join(__dirname, 'mcp.js'), desktopEntry: claude.entry(),
+    };
     if (session.role !== 'admin') return base;
     const off = state.settings.mcpTools || {};
     return {
@@ -354,8 +357,6 @@ const routes = [
       tools: mcp.TOOLS.map((x) => ({ name: x.name, description: x.description, enabled: off[x.name] !== false })),
       instructions: state.settings.mcpInstructions || mcp.DEFAULT_INSTRUCTIONS,
       defaultInstructions: mcp.DEFAULT_INSTRUCTIONS,
-      mcpPath: path.join(__dirname, 'mcp.js'),
-      desktopEntry: claude.entry(),
     };
   }],
   ['PUT', /^\/api\/mcp$/, async (req) => {
@@ -402,7 +403,10 @@ const routes = [
 ];
 
 // Routes accessibles à un ID d'accès simple (lecture seule). Tout le reste est réservé à l'admin.
-const USER_ROUTES = [/^\/api\/version$/, /^\/api\/prompts$/, /^\/api\/skills$/, /^\/api\/skills\/\w+$/, /^\/api\/level$/, /^\/api\/meta$/, /^\/api\/stats$/, /^\/api\/resources$/, /^\/api\/channels$/, /^\/api\/youtube$/, /^\/api\/crawl$/, /^\/api\/examples$/, /^\/api\/mcp$/];
+// Ce que les membres peuvent faire en plus de lire : brancher Claude sur leur PC, tester la recherche,
+// mettre à jour l'app, utiliser la génération IA.
+const MEMBER_ACTIONS = [/^\/api\/claude\/(desktop|code)$/, /^\/api\/mcp\/test$/, /^\/api\/update\/(check|install)$/, /^\/api\/gen(\/.*)?$/];
+const USER_ROUTES = [/^\/api\/claude$/, /^\/api\/version$/, /^\/api\/prompts$/, /^\/api\/skills$/, /^\/api\/skills\/\w+$/, /^\/api\/level$/, /^\/api\/meta$/, /^\/api\/stats$/, /^\/api\/resources$/, /^\/api\/channels$/, /^\/api\/youtube$/, /^\/api\/crawl$/, /^\/api\/examples$/, /^\/api\/mcp$/];
 
 const cookies = (req) => Object.fromEntries(String(req.headers.cookie || '').split(';').map((c) => c.trim().split('=')).filter((p) => p[0]).map(([k, ...v]) => [k, decodeURIComponent(v.join('='))]));
 const clientIp = (req) => req.socket.remoteAddress || '';
@@ -509,8 +513,8 @@ const server = http.createServer(async (req, res) => {
       if (kick) return send(res, 401, { error: 'This ID is now used on another device', key: 'otherDevice', vars: { device: kick.device || '?' } });
       return send(res, 401, { error: 'Sign in with your access ID', key: 'loginRequired' });
     }
-    const genRoute = url.pathname === '/api/gen' || url.pathname.startsWith('/api/gen/') || /^\/api\/update\/(check|install)$/.test(url.pathname);
-    if (session.role !== 'admin' && !genRoute && !(req.method === 'GET' && USER_ROUTES.some((re) => re.test(url.pathname)))) {
+    const memberAction = MEMBER_ACTIONS.some((re) => re.test(url.pathname));
+    if (session.role !== 'admin' && !memberAction && !(req.method === 'GET' && USER_ROUTES.some((re) => re.test(url.pathname)))) {
       return send(res, 403, { error: 'Admin only', key: 'adminOnly' });
     }
     const zipM = url.pathname.match(/^\/api\/skills\/(\w+)\/zip$/);

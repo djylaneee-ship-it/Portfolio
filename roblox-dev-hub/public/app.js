@@ -326,7 +326,7 @@ async function renderHome() {
 function activityList(log) {
   if (!log.length) return `<p class="sub" style="font-size:13.5px;padding:14px 0">${t('act.none')}</p>`;
   return log.slice(0, 6).map((l, i) => {
-    const c = l.category ? cat(l.category).label : '';
+    const c = l.category ? l.category.split(' + ').map((x) => cat(x).label).join(' + ') : '';
     return `<div class="act" style="--i:${i}"><span class="avatar">${esc(l.tool[0].toUpperCase())}</span><div>
       <b>${esc(l.tool)}${l.q ? ` · « ${esc(l.q)} »` : ''}</b>
       <small>${[c, typeof l.count === 'number' ? t('act.results', { n: l.count }) : '', ago(l.t)].filter(Boolean).join(' · ')}</small></div></div>`;
@@ -573,7 +573,7 @@ async function openSkill(id) {
   };
 }
 
-// ---------- Prompts : tu écris en vrac, Gemini en fait un prompt détaillé pour Claude + Rovex ----------
+// ---------- Prompts : tu écris en vrac, l'IA (Groq) en fait un prompt détaillé pour Claude + Rovex ----------
 async function copyText(text) {
   try { await navigator.clipboard.writeText(text); return true; } catch {}
   // Mode partagé en http : pas d'API presse-papiers, on passe par une zone de texte.
@@ -1118,17 +1118,15 @@ async function renderConnect() {
         <div class="field"><label>${t('cn.testLabel')}</label><input id="cn-q" value="${esc(t('cn.testQ'))}"></div>
         <button class="btn primary" id="cn-test">${t('cn.testGo')}</button><div class="test-out" id="cn-out"></div></div>
     </div>
-    <div class="two-col">
+    <div class="two-col admin-only">
       <div class="panel" data-spot><h3>${t('cn.tools')}</h3><p>${t('cn.toolsT')}</p>
-        ${m.tools.map((x) => `<div class="tool"><div><b>${esc(x.name)}</b><small>${esc(t('tool.' + x.name))}</small></div>
+        ${(m.tools || []).map((x) => `<div class="tool"><div><b>${esc(x.name)}</b><small>${esc(t('tool.' + x.name))}</small></div>
           <label class="switch"><input type="checkbox" data-tool="${x.name}" ${x.enabled ? 'checked' : ''}><span></span></label></div>`).join('')}
       </div>
       <div class="panel" data-spot><h3>${t('cn.instr')}</h3><p>${t('cn.instrT')}</p>
-        <textarea class="input big" id="cn-instr" spellcheck="false">${esc(m.instructions)}</textarea>
+        <textarea class="input big" id="cn-instr" spellcheck="false">${esc(m.instructions || '')}</textarea>
         <div class="row" style="margin-top:14px"><button class="btn primary" id="cn-save">${t('save')}</button><button class="btn" id="cn-default">${t('cn.default')}</button></div>
       </div>
-    </div>
-    <div class="two-col">
     </div>
     <div class="panel" data-spot><div class="section-head"><h3 style="margin:0">${t('act.title')}</h3><span class="live"><span class="pulse"></span>${t('act.live')}</span></div><div id="cn-log">${activityList(m.log)}</div></div>`;
   bindCopy(view);
@@ -1705,7 +1703,7 @@ async function refreshStats() {
     <a href="#/library?cat=${c.id}" class="${active === c.id ? 'active' : ''}"><span class="dot" style="background:${c.color}"></span>${esc(c.label)}<span class="n">${num((STATS.learnByCategory || STATS.byCategory)[c.id])}</span></a>`).join('');
 }
 
-const ADMIN_PAGES = ['explore', 'connect', 'settings', 'admin', 'favorites'];
+const ADMIN_PAGES = ['explore', 'settings', 'admin', 'favorites'];
 async function route() {
   const [p, qs] = location.hash.slice(1).split('?');
   let path = (p || '/').replace(/^\//, '') || 'home';

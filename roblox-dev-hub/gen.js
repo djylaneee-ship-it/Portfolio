@@ -155,7 +155,7 @@ async function generateImage(state, a = {}) {
   };
 }
 
-// ---------- Prompt Booster : Gemini réécrit une demande en vrac en prompt détaillé pour Claude + Rovex ----------
+// ---------- Prompt Booster : l'IA (Groq) réécrit une demande en vrac en prompt détaillé pour Claude + Rovex ----------
 const BOOSTER_RULES = `You are Rovex Prompt Architect. You turn a short, rough request from a Roblox game developer into a complete, precise prompt for Claude.
 
 Claude is connected to Rovex Hub, an MCP server holding the user's Roblox development knowledge base. Tools Claude can call:
@@ -189,7 +189,7 @@ function boosterContext(state, focus) {
   });
   // Les skills complets sont longs : le résumé de chacun, et les consignes entières de la catégorie visée.
   const rules = skills.SKILL_CATS.map((c) => `- ${c}: ${skills.getSkill(state, c).description}`).join('\n');
-  const full = focus && skills.SKILL_CATS.includes(focus) ? `\n\nFull rules of the focus category (${focus}):\n${skills.getSkill(state, focus).instructions.slice(0, 20000)}` : '';
+  const full = focus && skills.SKILL_CATS.includes(focus) ? `\n\nFull rules of the focus category (${focus}):\n${skills.getSkill(state, focus).instructions.slice(0, 9000)}` : '';
   return `What this user's Rovex Hub contains:\n${lines.join('\n')}\n\nRovex skills (Claude loads them with load_skill):\n${rules}${full}`;
 }
 

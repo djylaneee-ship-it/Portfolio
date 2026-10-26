@@ -1,13 +1,17 @@
-// Rovex Hub : génération d'images (OpenAI), de texte (Gemini, pour améliorer les prompts) et de sons
+// Rovex Hub : génération d'images (OpenAI), de texte (Groq, ou Gemini en secours, pour améliorer les prompts) et de sons
 // (ElevenLabs) pour tous les membres, avec les clés de l'admin gardées en secrets Supabase. L'app envoie
 // l'ID d'accès du membre ; on vérifie l'ID et sa limite du jour avant d'appeler le service, puis on décompte.
-// Secrets : OPENAI_API_KEY (images), GEMINI_API_KEY (prompts améliorés), ELEVENLABS_API_KEY (sons, facultatif).
+// Secrets : OPENAI_API_KEY (images), GROQ_API_KEY (prompts améliorés ; GEMINI_API_KEY en secours),
+// ELEVENLABS_API_KEY (sons, facultatif). GROQ_MODEL facultatif pour choisir le modèle Groq.
 import { decodeBase64, encodeBase64 } from 'jsr:@std/encoding@1/base64';
 
 const OPENAI = Deno.env.get('OPENAI_API_KEY') ?? '';
 const ELEVEN = Deno.env.get('ELEVENLABS_API_KEY') ?? '';
 const GEMINI = Deno.env.get('GEMINI_API_KEY') ?? '';
-const TEXT_MODEL = Deno.env.get('GEMINI_MODEL') ?? 'gemini-flash-latest';
+const GROQ = Deno.env.get('GROQ_API_KEY') ?? '';
+const GEMINI_MODEL = Deno.env.get('GEMINI_MODEL') ?? 'gemini-flash-latest';
+const GROQ_MODEL = Deno.env.get('GROQ_MODEL') ?? 'openai/gpt-oss-120b';
+const TEXT_MODEL = GROQ ? GROQ_MODEL : GEMINI_MODEL;
 const DB = Deno.env.get('SUPABASE_URL') ?? '';
 const DB_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? Deno.env.get('SUPABASE_ANON_KEY') ?? '';
 const IMAGE_MODEL = Deno.env.get('OPENAI_IMAGE_MODEL') ?? 'gpt-image-1';
@@ -62,19 +66,56 @@ async function image(b: Record<string, unknown>) {
   return { images: (j.data ?? []).map((d: { b64_json?: string }) => d.b64_json).filter(Boolean), model: IMAGE_MODEL };
 }
 
-// Texte : l'app envoie les consignes (system) et la demande ; Gemini répond. Si un modèle est surchargé
-// (fréquent en gratuit), on réessaie puis on passe au modèle Gemini suivant.
-const TEXT_MODELS = [...new Set([TEXT_MODEL, 'gemini-2.5-flash', 'gemini-flash-lite-latest', 'gemini-2.5-flash-lite'])];
+// Texte : l'app envoie les consignes (system) et la demande. Groq d'abord (gratuit et rapide), Gemini si
+// aucune clé Groq n'est configurée. Si un modèle est surchargé ou limité, on réessaie puis on passe au suivant.
+const GROQ_MODELS = [...new Set([GROQ_MODEL, 'openai/gpt-oss-120b', 'openai/gpt-oss-20b', 'llama-3.3-70b-versatile', 'groq/compound'])];
+const GEMINI_MODELS = [...new Set([GEMINI_MODEL, 'gemini-2.5-flash', 'gemini-flash-lite-latest', 'gemini-2.5-flash-lite'])];
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-async function text(b: Record<string, unknown>) {
+async function groqText(b: Record<string, unknown>) {
+  let last: Response | null = null;
+  for (const model of GROQ_MODELS) {
+    // Les modèles gpt-oss raisonnent avant de répondre : effort réduit pour aller vite et rester sous les limites gratuites.
+    const extra = model.startsWith('openai/gpt-oss') ? { reasoning_effort: 'low' } : {};
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${GROQ}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: 'system', content: String(b.system || '').slice(0, 30000) },
+            { role: 'user', content: String(b.prompt).slice(0, 8000) },
+          ],
+          temperature: 0.5,
+          max_completion_tokens: 3000,
+          ...(attempt === 0 ? extra : {}),
+        }),
+      });
+      if (res.ok) {
+        const j = await res.json();
+        const out = String(j.choices?.[0]?.message?.content ?? '').trim();
+        if (out) return { text: out, model };
+        break; // réponse vide : modèle suivant
+      }
+      last = res;
+      if (res.status === 400 && attempt === 0 && Object.keys(extra).length) continue; // option refusée : on réessaie sans
+      if ([400, 404, 413].includes(res.status)) break; // modèle inconnu, refusé ou demande trop grande : modèle suivant
+      if (![429, 500, 502, 503].includes(res.status)) return { error: await providerError(res, 'Groq') };
+      await sleep(1500 * (attempt + 1)); // limite ou surcharge : on attend un peu et on réessaie
+    }
+  }
+  return { error: last ? await providerError(last, 'Groq') : json({ error: 'Groq returned nothing', key: 'genEmpty' }, 502) };
+}
+
+async function geminiText(b: Record<string, unknown>) {
   const body = JSON.stringify({
     system_instruction: { parts: [{ text: String(b.system || '').slice(0, 60000) }] },
     contents: [{ role: 'user', parts: [{ text: String(b.prompt).slice(0, 8000) }] }],
     generationConfig: { temperature: 0.5, maxOutputTokens: 8192 },
   });
   let last: Response | null = null;
-  for (const model of TEXT_MODELS) {
+  for (const model of GEMINI_MODELS) {
     for (let attempt = 0; attempt < 2; attempt++) {
       const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
         method: 'POST', headers: { 'x-goog-api-key': GEMINI, 'Content-Type': 'application/json' }, body,
@@ -93,6 +134,8 @@ async function text(b: Record<string, unknown>) {
   }
   return { error: last ? await providerError(last, 'Gemini') : json({ error: 'Gemini returned nothing', key: 'genEmpty' }, 502) };
 }
+
+const text = (b: Record<string, unknown>) => (GROQ ? groqText(b) : geminiText(b));
 
 async function sound(b: Record<string, unknown>) {
   const headers = { 'xi-api-key': ELEVEN, 'Content-Type': 'application/json', Accept: 'audio/mpeg' };
@@ -115,14 +158,14 @@ async function sound(b: Record<string, unknown>) {
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
   // L'app demande ce qui est disponible.
-  if (req.method === 'GET') return json({ image: Boolean(OPENAI), sound: Boolean(ELEVEN), text: Boolean(GEMINI), model: IMAGE_MODEL, textModel: TEXT_MODEL });
+  if (req.method === 'GET') return json({ image: Boolean(OPENAI), sound: Boolean(ELEVEN), text: Boolean(GROQ || GEMINI), model: IMAGE_MODEL, textModel: TEXT_MODEL });
   if (req.method !== 'POST') return json({ error: 'Method not allowed' }, 405);
   try {
     const b = await req.json();
     const what = b.type === 'sound' ? 'sound' : b.type === 'text' ? 'text' : 'image';
     if (what === 'image' && !OPENAI) return json({ error: 'Shared image generation is not set up', key: 'genShared' }, 503);
     if (what === 'sound' && !ELEVEN) return json({ error: 'Shared sound generation is not set up', key: 'genShared' }, 503);
-    if (what === 'text' && !GEMINI) return json({ error: 'Prompt improvement is not set up', key: 'genShared' }, 503);
+    if (what === 'text' && !GROQ && !GEMINI) return json({ error: 'Prompt improvement is not set up', key: 'genShared' }, 503);
     if (!String(b.prompt || '').trim()) return json({ error: 'Describe what to generate', key: 'genPrompt' }, 400);
     const n = what === 'image' ? Math.max(1, Math.min(4, Number(b.n) || 1)) : 1;
     const allow = await rpc('rovex_gen_allow', { p_code: String(b.code || ''), p_kind: what, p_n: n, p_commit: false });
