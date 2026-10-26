@@ -64,6 +64,8 @@ Installation, une fois, dans ton projet Supabase :
 
 **Images en jeu** : l'outil MCP `upload_image_to_roblox` envoie une image (de `generate_image`, de la bibliothèque ou une URL) sur Roblox par l'outil `upload_image` de Studio (lien local temporaire `/share/…`, servi seulement à ce PC), ou sinon par Open Cloud avec la clé de l'utilisateur (page Roblox Studio), puis la pose dans la place (`Image` d'un ImageLabel/ImageButton, `Texture` d'un Decal, ou un Decal sur une Part). Code : `rbxupload.js`.
 
+**Bibliothèque en ligne (exploration continue)** : le workflow `roblox-crawler.yml` tourne ~52 min chaque heure. Il lit en profondeur (curseurs gardés d'un passage à l'autre) le DevForum (scripting/building/art/game design support, creations feedback, tutoriels, ressources, annonces), Bluesky, Reddit (souvent bloqué depuis GitHub), Sketchfab, dev.to, le Creator Store (images, meshes, modèles, plugins), YouTube et GitHub, et envoie ses trouvailles au fil de l'eau dans Supabase (`supabase/rovex-library.sql`, table `rovex.library`, clé `ROVEX_CRAWLER_KEY` en secret GitHub). Chaque app récupère les nouveautés toutes les 5 minutes (`rovex_lib_since`). Garde-fou : `library_max` (700 000 par défaut, pour rester dans les 500 Mo du plan gratuit). X/Twitter n'a pas d'accès gratuit en lecture : pas de collecte.
+
 **Connexion Claude** : ouverte aux membres pour brancher Claude Desktop / Claude Code sur leur PC ; les outils MCP et les consignes restent réservés aux admins.
 
 Conseil : fixe un plafond de dépense mensuel dans OpenAI (Settings → Limits), puisque toutes les générations des membres sont facturées sur ton compte.

@@ -208,7 +208,7 @@ const routes = [
   ['POST', /^\/api\/crawl$/, async (req) => crawler.start({ ...(await json(req)), apiKey: state.settings.youtubeApiKey, githubToken: state.settings.githubToken })],
   ['POST', /^\/api\/crawl\/stop$/, () => { crawler.stop(); return crawler.status; }],
   ['GET', /^\/api\/youtube$/, (req, m, url) => youtubeSearch(url.searchParams.get('q') || 'roblox studio', 2, state.settings.youtubeApiKey)],
-  ['GET', /^\/api\/settings$/, () => ({ youtubeApiKey: state.settings.youtubeApiKey ? '••••' + state.settings.youtubeApiKey.slice(-4) : '', hasKey: Boolean(state.settings.youtubeApiKey), hasGithub: Boolean(state.settings.githubToken), autoSyncHours: state.settings.autoSyncHours || 0, lastAutoSync: state.settings.lastAutoSync || null, cloudUrl: state.settings.cloudUrl ?? CLOUD_DEFAULT, lastCloudSync: state.settings.lastCloudSync || null, lastCloudAdded: state.settings.lastCloudAdded ?? null, cloudUpdatedAt: state.settings.cloudUpdatedAt || null })],
+  ['GET', /^\/api\/settings$/, () => ({ youtubeApiKey: state.settings.youtubeApiKey ? '••••' + state.settings.youtubeApiKey.slice(-4) : '', hasKey: Boolean(state.settings.youtubeApiKey), hasGithub: Boolean(state.settings.githubToken), autoSyncHours: state.settings.autoSyncHours || 0, lastAutoSync: state.settings.lastAutoSync || null, cloudUrl: state.settings.cloudUrl ?? CLOUD_DEFAULT, lastCloudSync: state.settings.lastCloudSync || null, lastCloudAdded: state.settings.lastCloudAdded ?? null, cloudUpdatedAt: state.settings.cloudUpdatedAt || null, lastLibSync: state.settings.lastLibSync || null, lastLibAdded: state.settings.lastLibAdded ?? null })],
   ['PUT', /^\/api\/settings$/, async (req) => {
     const b = await json(req);
     if (typeof b.youtubeApiKey === 'string') state.settings.youtubeApiKey = b.youtubeApiKey.trim();
@@ -262,7 +262,11 @@ const routes = [
   ['POST', /^\/api\/update\/check$/, () => { if (global.rovexCheckUpdates) global.rovexCheckUpdates(); return { ok: Boolean(global.rovexCheckUpdates) }; }],
   ['POST', /^\/api\/update\/install$/, () => { if (global.rovexInstallUpdate) global.rovexInstallUpdate(); return { ok: true }; }],
   ['GET', /^\/api\/export$/, () => ({ ...state, auth: undefined })],
-  ['POST', /^\/api\/cloud\/sync$/, () => cloudSync()],
+  ['POST', /^\/api\/cloud\/sync$/, async () => {
+    const lib = await librarySync().catch(() => ({ added: 0 }));
+    const old = await cloudSync().catch(() => ({ added: 0, channels: 0 }));
+    return { ...old, added: (lib.added || 0) + (old.added || 0) };
+  }],
   // Skills : un par catégorie.
   ['GET', /^\/api\/skills$/, () => ({
     codeInstalled: skills.codeInstalled(), codeDir: skills.CODE_SKILLS,
@@ -346,7 +350,7 @@ const routes = [
   }],
   // Connexion Claude : état, outils activés, consignes, journal et test.
   ['GET', /^\/api\/mcp$/, (req, m, url, session) => {
-    const log = state.mcpLog || [];
+    const log = mcp.activity().log || [];
     const last = log[0] ? Date.parse(log[0].t) : 0;
     const clients = mcp.clients();
     const base = {
@@ -371,7 +375,7 @@ const routes = [
   }],
   // Niveau de Claude (visible par tous les connectés).
   ['GET', /^\/api\/level$/, () => {
-    const lv = level.compute(state);
+    const lv = level.compute({ ...state, mcpStats: mcp.activity().stats });
     if (level.snapshot(state, lv)) persist();
     return { ...lv, history: state.levelHistory || [] };
   }],
@@ -461,6 +465,7 @@ async function authRoutes(req, res, url) {
       const s = await auth.login((await json(req)).code, clientIp(req));
       setSession(res, s.token, s.expiresAt);
       sharedPull().catch(() => {});
+      librarySync().catch(() => {});
       return send(res, 200, { role: s.role, label: s.label, expiresAt: s.expiresAt });
     } catch (e) { return send(res, e.code || 400, { error: e.message, key: e.key }); }
   }
@@ -618,6 +623,41 @@ function tombstone(kind, id) {
   state.sharedDeleted[kind] = state.sharedDeleted[kind] || {};
   state.sharedDeleted[kind][id] = Date.now();
 }
+// Bibliothèque en ligne : les nouveautés trouvées par l'exploration (toutes les 5 minutes, par paquets).
+let libBusy = false;
+async function librarySync() {
+  const c = auth.online && state.auth && state.auth.lastCred;
+  if (!c || libBusy) return { added: 0 };
+  libBusy = true;
+  try {
+    let since = Number(state.settings.libSeq || 0);
+    const urls = new Set(state.resources.map((r) => r.url).filter(Boolean));
+    let added = 0;
+    for (let i = 0; i < 500; i++) {
+      const out = cloud.must(await cloud.rpc('rovex_lib_since', { p_code: c.code, p_since: since, p_limit: 2000 }, 60000));
+      const items = out.items || [];
+      for (const r of items) {
+        since = Math.max(since, Number(r.seq) || 0);
+        if (!r.url || urls.has(r.url) || quality.isBanned(r)) continue;
+        urls.add(r.url);
+        const { seq, ...rest } = r;
+        state.resources.push(db.normalize({ ...rest, id: undefined, source: 'cloud', favorite: false }));
+        added++;
+      }
+      state.settings.libSeq = since;
+      if (items.length < 2000) break;
+      if (i % 20 === 19) persist(); // gros premier téléchargement : on enregistre en route
+    }
+    Object.assign(state.settings, { lastLibSync: new Date().toISOString(), lastLibAdded: added, libLast: since });
+    persist();
+    return { added, last: since };
+  } finally {
+    libBusy = false;
+  }
+}
+setInterval(() => librarySync().catch(() => {}), 5 * 60e3);
+setTimeout(() => librarySync().catch(() => {}), 15e3);
+
 async function sharedPull() {
   const c = auth.online && state.auth && state.auth.lastCred;
   if (!c) return false;

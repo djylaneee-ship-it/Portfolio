@@ -1707,7 +1707,7 @@ async function renderSettings() {
     </div>
     <div class="panel" data-spot>
       <h3>☁️ ${t('set.cloudTitle')}</h3>
-      <p>${t('set.cloudText')} ${s.lastCloudSync ? t('set.cloudLast', { date: dateTime(s.lastCloudSync), n: num(s.lastCloudAdded) }) + (s.cloudUpdatedAt ? ' ' + t('set.cloudFile', { date: dateTime(s.cloudUpdatedAt) }) : '') : t('set.cloudNever')}</p>
+      <p>${s.lastLibSync ? `<b>${t('set.libLast', { date: dateTime(s.lastLibSync), n: num(s.lastLibAdded) })}</b><br>` : ''}${t('set.cloudText')} ${s.lastCloudSync ? t('set.cloudLast', { date: dateTime(s.lastCloudSync), n: num(s.lastCloudAdded) }) + (s.cloudUpdatedAt ? ' ' + t('set.cloudFile', { date: dateTime(s.cloudUpdatedAt) }) : '') : t('set.cloudNever')}</p>
       <form class="row" id="cloud-form">
         <input class="input" id="cloud-url" style="flex:1;min-width:260px" value="${esc(s.cloudUrl)}" placeholder="${t('set.cloudPh')}">
         <button class="btn">${t('save')}</button>

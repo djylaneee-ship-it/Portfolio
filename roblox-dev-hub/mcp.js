@@ -25,7 +25,20 @@ function templates(st) {
 const CAT_IDS = db.CATEGORIES.map((c) => c.id);
 
 // Accès aux données : fichier en mode stdio, mémoire du serveur en mode HTTP (voir useStore).
-let store = { load: db.load, save: db.save };
+// En mode stdio, la base est relue seulement si le fichier a changé (elle peut peser des centaines de Mo).
+const DB_FILE = path.join(db.DATA_DIR, 'library.json');
+let cached = { key: '', st: null };
+const fileKey = () => { try { const s = fs.statSync(DB_FILE); return `${s.mtimeMs}:${s.size}`; } catch { return ''; } };
+let store = {
+  load: () => {
+    const k = fileKey();
+    if (k && k === cached.key && cached.st) return cached.st;
+    const st = db.load();
+    cached = { key: fileKey(), st };
+    return st;
+  },
+  save: (st) => { db.save(st); cached = { key: fileKey(), st }; },
+};
 const useStore = (s) => { store = s; };
 
 // Clients MCP vus récemment (Claude Desktop, Claude Code…), pour savoir s'ils sont vraiment branchés.
@@ -361,10 +374,18 @@ function enabledTools() {
   return TOOLS.filter((x) => off[x.name] !== false);
 }
 
-// Journal « Activité de Claude » : les 100 derniers appels d'outils.
-function logCall(tool, a, out) {
+// Journal « Activité de Claude » (les 100 derniers appels) et compteurs du niveau : dans un petit fichier à
+// part, pour ne pas réécrire toute la bibliothèque à chaque appel d'outil.
+const ACTIVITY_FILE = path.join(db.DATA_DIR, 'activity.json');
+function activity() {
+  try { return JSON.parse(fs.readFileSync(ACTIVITY_FILE, 'utf8')); } catch {}
+  // Première fois : reprise de l'ancien journal gardé dans la bibliothèque.
   const st = store.load();
-  st.mcpLog = st.mcpLog || [];
+  return { log: st.mcpLog || [], stats: st.mcpStats || { calls: 0, byTool: {}, byCat: {}, examples: 0 } };
+}
+function logCall(tool, a, out) {
+  const act = activity();
+  const st = { mcpLog: act.log, mcpStats: act.stats };
   st.mcpLog.unshift({
     t: new Date().toISOString(), tool,
     q: String(a.query || a.title || a.url || a.id || a.mode || '').slice(0, 80),
@@ -382,7 +403,11 @@ function logCall(tool, a, out) {
   if (out && Array.isArray(out.examples)) ms.examples += out.examples.length;
   if (out && Array.isArray(out.skills)) for (const sk of out.skills) ms.examples += (sk.examples || []).length;
   ms.firstCall = ms.firstCall || new Date().toISOString();
-  store.save(st);
+  try {
+    fs.mkdirSync(db.DATA_DIR, { recursive: true });
+    fs.writeFileSync(ACTIVITY_FILE + '.tmp', JSON.stringify({ log: st.mcpLog, stats: ms }));
+    fs.renameSync(ACTIVITY_FILE + '.tmp', ACTIVITY_FILE);
+  } catch {}
 }
 
 // Traite un message JSON-RPC MCP. Renvoie la réponse, ou null pour une notification.
@@ -474,7 +499,7 @@ async function handle(msg) {
   }
 }
 
-module.exports = { handle, call, useStore, clients, TOOLS, DEFAULT_INSTRUCTIONS };
+module.exports = { handle, call, useStore, clients, activity, TOOLS, DEFAULT_INSTRUCTIONS };
 
 // Mode stdio : `node mcp.js` (le client MCP lance ce fichier lui-même).
 if (require.main === module) {

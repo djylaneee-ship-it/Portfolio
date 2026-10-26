@@ -36,9 +36,9 @@ const STORE_PLUGINS = ['animation', 'building', 'terrain', 'ui', 'vfx', 'scripti
 const FORUM_RESOURCE_SEARCH = ['open source', 'open sourced', 'free system', 'module', 'framework', 'uncopylocked', 'free model', 'kit'];
 
 const INTENSITY = {
-  rapide: { ytPages: 1, forumPages: 1, redditLimit: 25, expandChannels: 0, browsePages: 2, ghPages: 1, storePages: 1 },
-  normal: { ytPages: 2, forumPages: 2, redditLimit: 50, expandChannels: 15, browsePages: 10, ghPages: 3, storePages: 2 },
-  massif: { ytPages: 5, forumPages: 4, redditLimit: 100, expandChannels: 60, browsePages: 40, ghPages: 10, storePages: 5 },
+  rapide: { ytPages: 1, forumPages: 1, redditLimit: 25, expandChannels: 0, browsePages: 2, ghPages: 1, storePages: 1, deepPages: 3 },
+  normal: { ytPages: 2, forumPages: 2, redditLimit: 50, expandChannels: 15, browsePages: 10, ghPages: 3, storePages: 2, deepPages: 10 },
+  massif: { ytPages: 5, forumPages: 4, redditLimit: 100, expandChannels: 60, browsePages: 40, ghPages: 10, storePages: 5, deepPages: 25 },
 };
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -294,18 +294,124 @@ async function storeSearch(keyword, kind, pages) {
   return out;
 }
 
+// --- Sources supplémentaires (exploration en profondeur) ---
+
+// Une page de la liste « latest » d'une catégorie du DevForum.
+async function forumPage(slug, page) {
+  const j = await (await http(`${FORUM}/c/${slug}/l/latest.json?page=${page}`, { headers: { Accept: 'application/json' } })).json();
+  return (j.topic_list?.topics || []).map(forumTopic);
+}
+
+// Bluesky : recherche publique de posts (images et vidéos de devs Roblox).
+async function blueskySearch(q, cursor) {
+  const u = `https://public.api.bsky.app/xrpc/app.bsky.feed.searchPosts?q=${encodeURIComponent(q)}&limit=100&sort=latest${cursor ? '&cursor=' + encodeURIComponent(cursor) : ''}`;
+  const j = await (await http(u, { headers: { Accept: 'application/json' } })).json();
+  const items = (j.posts || []).map((p) => {
+    const e = p.embed || {};
+    const media = e.media || e;
+    const img = (media.images || [])[0];
+    const thumb = img ? img.thumb || img.fullsize : media.thumbnail || (media.external && media.external.thumb) || '';
+    const handle = p.author?.handle || '';
+    const txt = String(p.record?.text || '').trim();
+    return {
+      title: (txt.split('\n')[0] || `${p.author?.displayName || handle} on Bluesky`).slice(0, 140),
+      url: `https://bsky.app/profile/${handle}/post/${String(p.uri || '').split('/').pop()}`,
+      thumbnail: thumb, author: p.author?.displayName || handle,
+      type: img ? 'image' : media.thumbnail ? 'video' : 'article',
+      description: txt.slice(0, 300), views: p.likeCount ? `${p.likeCount} likes` : '', published: p.record?.createdAt || '',
+    };
+  });
+  return { items, cursor: j.cursor || '' };
+}
+
+// Reddit (souvent bloqué depuis les serveurs : l'erreur est simplement notée).
+async function redditNew(sub, after) {
+  const j = await (await http(`https://www.reddit.com/r/${sub}/new.json?limit=100${after ? '&after=' + after : ''}`, { headers: { Accept: 'application/json' } })).json();
+  return { items: parseReddit(j), cursor: j.data?.after || '' };
+}
+
+// Sketchfab : modèles 3D Roblox (miniatures).
+async function sketchfabSearch(q, cursor) {
+  const j = await (await http(`https://api.sketchfab.com/v3/search?type=models&q=${encodeURIComponent(q)}&count=24${cursor ? '&cursor=' + encodeURIComponent(cursor) : ''}`, { headers: { Accept: 'application/json' } })).json();
+  const items = (j.results || []).map((m) => {
+    const imgs = (m.thumbnails?.images || []).sort((a, b) => Math.abs(a.width - 640) - Math.abs(b.width - 640));
+    return {
+      title: m.name, url: m.viewerUrl || `https://sketchfab.com/3d-models/${m.uid}`, thumbnail: imgs[0]?.url || '',
+      author: m.user?.displayName || m.user?.username || '', type: 'image',
+      description: String(m.description || '').replace(/\s+/g, ' ').slice(0, 300), views: m.likeCount ? `${m.likeCount} likes` : '',
+    };
+  });
+  return { items, cursor: j.cursors?.next || '' };
+}
+
+// dev.to : articles par tag.
+async function devtoTag(tag, page) {
+  const j = await (await http(`https://dev.to/api/articles?tag=${encodeURIComponent(tag)}&per_page=100&page=${page}`, { headers: { Accept: 'application/json' } })).json();
+  return (Array.isArray(j) ? j : []).map((a) => ({
+    title: a.title, url: a.url, thumbnail: a.cover_image || a.social_image || '', author: a.user?.name || '',
+    type: 'article', description: String(a.description || '').slice(0, 300), published: a.published_at || '',
+  }));
+}
+
+// Creator Store : images (decals) et meshes, page par page avec curseur.
+const STORE_KIND = { decal: 13, mesh: 40 };
+async function storePage(keyword, kind, cursor) {
+  const u = `https://apis.roblox.com/toolbox-service/v1/marketplace/${STORE_KIND[kind]}?keyword=${encodeURIComponent(keyword)}&limit=30${cursor ? '&cursor=' + encodeURIComponent(cursor) : ''}`;
+  const j = await (await http(u, { headers: { Accept: 'application/json' } })).json();
+  const ids = (j.data || []).map((d) => d.id);
+  if (!ids.length) return { items: [], cursor: '' };
+  const [details, thumbs] = await Promise.all([
+    http(`https://apis.roblox.com/toolbox-service/v1/items/details?assetIds=${ids.join(',')}`, { headers: { Accept: 'application/json' } }).then((r) => r.json()),
+    http(`https://thumbnails.roblox.com/v1/assets?assetIds=${ids.join(',')}&size=420x420&format=Png`, { headers: { Accept: 'application/json' } }).then((r) => r.json()).catch(() => ({ data: [] })),
+  ]);
+  const img = Object.fromEntries((thumbs.data || []).map((t) => [t.targetId, t.imageUrl]));
+  const items = (details.data || []).filter((d) => d.asset && d.asset.id).map((d) => ({
+    title: d.asset.name, url: `https://create.roblox.com/store/asset/${d.asset.id}`, thumbnail: img[d.asset.id] || '',
+    author: d.creator?.name || '', type: kind === 'decal' ? 'image' : 'asset',
+    description: [kind === 'decal' ? 'Image (Decal)' : 'Mesh', (d.asset.description || '').slice(0, 250)].filter(Boolean).join(' · '),
+    tags: [kind === 'decal' ? 'image' : 'mesh'],
+  }));
+  return { items, cursor: j.nextPageCursor || '' };
+}
+
+// Toutes les sources lues en profondeur : chacune a un curseur gardé d'un passage à l'autre.
+const FORUM_FEEDS = [
+  ['help-and-feedback/scripting-support', 'scripting', 'article'], ['help-and-feedback/building-support', 'building', 'article'],
+  ['help-and-feedback/art-design-support', 'gfx', 'article'], ['help-and-feedback/game-design-support', 'design', 'article'],
+  ['help-and-feedback/creations-feedback', '', 'article'], ['resources/community-tutorials', '', 'article'],
+  ['resources/community-resources', '', 'opensource'], ['updates/announcements', 'tools', 'article'],
+];
+const BSKY_QUERIES = ['roblox studio', 'robloxdev', 'roblox dev', 'roblox vfx', 'roblox ui design', 'roblox gfx', 'roblox animation', 'roblox build', 'roblox modeling', 'luau', 'roblox scripting', 'roblox game dev', 'roblox showcase'];
+const REDDIT_SUBS = ['robloxgamedev', 'RobloxDevelopers', 'ROBLOXStudio', 'RobloxGFX', 'robloxdev'];
+const SKETCH_QUERIES = ['roblox', 'roblox low poly', 'roblox ugc', 'roblox map', 'roblox weapon', 'roblox character', 'roblox building', 'roblox pet'];
+const DEVTO_TAGS = ['roblox', 'luau', 'robloxdev', 'gamedev'];
+const STORE_DEEP = [
+  ...['ui', 'icon', 'button', 'frame', 'background', 'texture', 'particle', 'vfx', 'slash', 'smoke', 'fire', 'glow', 'sparkle', 'aura', 'gradient', 'logo', 'emoji', 'sky', 'grass', 'stone', 'wood', 'brick', 'anime', 'cartoon'].map((k) => [k, 'decal']),
+  ...['sword', 'gun', 'tree', 'rock', 'house', 'car', 'pet', 'egg', 'crystal', 'chest', 'weapon', 'low poly', 'furniture'].map((k) => [k, 'mesh']),
+];
+const DEEP_FEEDS = [
+  ...FORUM_FEEDS.map(([slug, cat, type]) => ({ id: 'forum:' + slug, src: 'devforum', cat, type, label: 'DevForum ' + slug.split('/').pop(), page: (c) => forumPage(slug, c || 0).then((items) => ({ items, cursor: items.length ? (c || 0) + 1 : 0 })) })),
+  ...BSKY_QUERIES.map((q) => ({ id: 'bsky:' + q, src: 'bluesky', cat: '', type: 'article', label: 'Bluesky ' + q, social: true, page: (c) => blueskySearch(q, c) })),
+  ...REDDIT_SUBS.map((sub) => ({ id: 'reddit:' + sub, src: 'reddit', cat: '', type: 'article', label: 'r/' + sub, social: true, page: (c) => redditNew(sub, c) })),
+  ...SKETCH_QUERIES.map((q) => ({ id: 'sketchfab:' + q, src: 'sketchfab', cat: 'modeling', type: 'image', label: 'Sketchfab ' + q, page: (c) => sketchfabSearch(q, c) })),
+  ...DEVTO_TAGS.map((tag) => ({ id: 'devto:' + tag, src: 'devto', cat: '', type: 'article', label: 'dev.to #' + tag, social: tag === 'gamedev', page: (c) => devtoTag(tag, (c || 0) + 1).then((items) => ({ items, cursor: items.length ? (c || 0) + 1 : 0 })) })),
+  ...STORE_DEEP.map(([k, kind]) => ({ id: `store:${kind}:${k}`, src: 'store', cat: kind === 'decal' ? 'gui' : 'modeling', type: kind === 'decal' ? 'image' : 'asset', label: `Store ${kind} ${k}`, page: (c) => storePage(k, kind, c) })),
+];
+
 const LOG_EN = {
   stopping: 'Stopping…', error: 'Error: {msg}', done: 'Done: {added} new resources, {channels} new channels, {rejected} off-topic rejected.',
   chanQuery: '"{q}": {found} channels found, +{n} linked', query: '"{q}": +{n}', forumRes: 'DevForum resources page {page}: +{n}',
   storeModels: 'Store models "{q}": +{n}', storePlugins: 'Store plugins "{q}": +{n}', syncStart: 'Fetching videos from {n} channels…',
   chanVideos: '{name}: +{n} videos', fail: '{label}: {msg}', expandStart: 'Exploring {n} discovered Roblox channels…',
   forumTutStart: 'Browsing DevForum community tutorials…', forumTut: 'DevForum tutorials page {page}: +{n}',
+  feed: '{label}: +{n} ({pages} pages)', feedEnd: '{label}: end reached, starting over', feedSkip: '{label}: skipped ({msg})',
 };
 const fmt = (k, p = {}) => (LOG_EN[k] || k).replace(/\{(\w+)\}/g, (_, v) => p[v] ?? '');
 
 class Crawler {
-  constructor({ getState, persist, upsert, newId }) {
-    Object.assign(this, { getState, persist, upsert, newId });
+  // seen (facultatif) : ensemble { has, add } des adresses déjà connues, quand la base n'est pas en mémoire.
+  constructor({ getState, persist, upsert, newId, seen }) {
+    Object.assign(this, { getState, persist, upsert, newId, seen });
     this.status = { running: false };
   }
 
@@ -316,14 +422,14 @@ class Crawler {
     if (l.length > 80) l.length = 80;
   }
 
-  add(items, { category, type, source, tags }) {
+  add(items, { category, type, source, tags, social: forceSocial }) {
     let added = 0;
     for (const it of items) {
       if (!it.title || !it.url) continue;
       this.status.found++;
       if (this.urls.has(it.url)) continue;
       // Filtre qualité : YouTube et Reddit doivent parler de dev Roblox ; ailleurs on écarte la triche.
-      const social = source === 'youtube' || source === 'reddit';
+      const social = forceSocial ?? (source === 'youtube' || source === 'reddit');
       if (social ? !quality.check(it).ok : quality.isBanned(it)) { this.status.rejected++; continue; }
       this.urls.add(it.url);
       const cat = category || guessCategory(it.title);
@@ -381,7 +487,7 @@ class Crawler {
       running: true, cancel: false, mode, startedAt: new Date().toISOString(), finishedAt: null,
       intensity: opts.intensity || 'normal', step: 0, steps: 1, current: null, found: 0, added: 0, channels: 0, rejected: 0, errors: 0, log: [], progress: {},
     };
-    this.urls = new Set(this.getState().resources.map((r) => r.url).filter(Boolean));
+    this.urls = this.seen || new Set(this.getState().resources.map((r) => r.url).filter(Boolean));
     let job;
     if (mode === 'channels') {
       const queries = CHANNEL_QUERIES.dev.concat(opts.scope === 'all' ? CHANNEL_QUERIES.all : []);
@@ -400,6 +506,13 @@ class Crawler {
       job = this.openSource(src, level, opts.githubToken);
     } else if (mode === 'sync') {
       job = this.sync();
+    } else if (mode === 'deep' || mode === 'fresh') {
+      // deep : chaque source reprend à son curseur et avance de plusieurs pages ; fresh : la première page de tout.
+      const feeds = DEEP_FEEDS.filter((f) => !opts.sources || !opts.sources.length || opts.sources.includes(f.src));
+      this.status.sources = [...new Set(feeds.map((f) => f.src))];
+      this.status.steps = feeds.length;
+      for (const src of this.status.sources) this.plan(src, feeds.filter((f) => f.src === src).length);
+      job = this.deep(feeds, mode === 'fresh' ? 1 : opts.pages || level.deepPages, mode === 'fresh');
     } else {
       const cats = (opts.categories && opts.categories.length ? opts.categories : Object.keys(QUERIES)).filter((c) => QUERIES[c]);
       const sources = opts.sources && opts.sources.length ? opts.sources : ['youtube', 'devforum', 'reddit'];
@@ -539,6 +652,43 @@ class Crawler {
     this.persist();
   }
 
+  async deep(feeds, pages, fresh) {
+    const st = this.getState();
+    const cursors = (st.cursors = st.cursors || {});
+    const blocked = new Set(); // source qui refuse l'accès : ignorée pour la fin du passage
+    for (const f of feeds) {
+      if (this.status.cancel) return;
+      this.status.step++;
+      this.status.current = { k: 'query', p: { q: f.label } };
+      this.tick(f.src);
+      if (blocked.has(f.src)) continue;
+      let c = fresh ? undefined : cursors[f.id];
+      let n = 0;
+      let done = 0;
+      for (let i = 0; i < pages; i++) {
+        if (this.status.cancel) break;
+        let res;
+        try { res = await f.page(c); } catch (e) {
+          this.status.errors++;
+          if (/HTTP (401|403|451)/.test(e.message)) blocked.add(f.src);
+          this.log('feedSkip', { label: f.label, msg: e.message }, true);
+          break;
+        }
+        done++;
+        n += this.add(res.items, { category: f.cat, type: f.type, source: f.src, tags: [f.src], social: Boolean(f.social) });
+        if (!res.cursor || !res.items.length) {
+          if (!fresh) { delete cursors[f.id]; this.log('feedEnd', { label: f.label }); }
+          break;
+        }
+        c = res.cursor;
+        if (!fresh) cursors[f.id] = c;
+        await sleep(f.src === 'devforum' ? 900 : 600);
+      }
+      this.log('feed', { label: f.label, n, pages: done });
+      this.persist();
+    }
+  }
+
   async safe(label, fn) {
     try { return await fn(); }
     catch (e) { this.status.errors++; this.log('fail', { label, msg: e.message }, true); return null; }
@@ -626,4 +776,4 @@ class Crawler {
   }
 }
 
-module.exports = { githubRepo, githubSearch, storeSearch, Crawler, youtubeSearch, QUERIES, CHANNEL_QUERIES, INTENSITY, parseVideoRenderers, parseChannelRenderers, parseChannelFeed, parseReddit, forumTopic, extractInitialData };
+module.exports = { DEEP_FEEDS, blueskySearch, sketchfabSearch, devtoTag, storePage, forumPage, redditNew, githubRepo, githubSearch, storeSearch, Crawler, youtubeSearch, QUERIES, CHANNEL_QUERIES, INTENSITY, parseVideoRenderers, parseChannelRenderers, parseChannelFeed, parseReddit, forumTopic, extractInitialData };

@@ -5,14 +5,14 @@ const URL_ = process.env.ROVEX_SUPABASE_URL || 'https://owupuxmgxtjmslhhawaf.sup
 const KEY = process.env.ROVEX_SUPABASE_KEY || 'sb_publishable__eVSL4bz7tZOZmjkOlMy8Q_rmyr55sN';
 const enabled = !process.env.ROVEX_LOCAL_AUTH;
 
-async function rpc(fn, args = {}) {
+async function rpc(fn, args = {}, timeout = 12000) {
   let res;
   try {
     res = await fetch(`${URL_}/rest/v1/rpc/${fn}`, {
       method: 'POST',
       headers: { apikey: KEY, 'Content-Type': 'application/json' },
       body: JSON.stringify(args),
-      signal: AbortSignal.timeout(12000),
+      signal: AbortSignal.timeout(timeout),
     });
   } catch (e) {
     throw Object.assign(new Error('Cannot reach the Rovex server'), { key: 'cloudDown', offline: true });

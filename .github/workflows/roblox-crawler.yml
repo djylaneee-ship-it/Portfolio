@@ -1,5 +1,6 @@
-# Algo Roblox Dev Hub : cherche en continu (un passage chaque heure, en boucle)
-# et enregistre ses trouvailles dans roblox-dev-hub/cloud/library.json.
+# Algo Rovex Hub : cherche en continu (un passage de ~52 min chaque heure, en boucle). Les trouvailles
+# partent au fil de l'eau dans la bibliothèque en ligne (Supabase) ; la mémoire de l'algo (curseurs,
+# chaînes, adresses déjà vues) est gardée dans roblox-dev-hub/cloud/state.json et seen.txt.
 name: Roblox Dev Hub — exploration continue
 
 on:
@@ -9,7 +10,7 @@ on:
     inputs:
       minutes:
         description: 'Durée du passage en minutes'
-        default: '45'
+        default: '52'
 
 permissions:
   contents: write
@@ -41,14 +42,15 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
-        run: node cloud-crawl.js ${{ github.event.inputs.minutes || '45' }}
+          ROVEX_CRAWLER_KEY: ${{ secrets.ROVEX_CRAWLER_KEY }}
+        run: node cloud-crawl.js ${{ github.event.inputs.minutes || '52' }}
 
       - name: Enregistrer les trouvailles
         if: always()
         run: |
           git config user.name "roblox-dev-hub-bot"
           git config user.email "roblox-dev-hub-bot@users.noreply.github.com"
-          git add roblox-dev-hub/cloud/library.json
+          for f in library.json state.json seen.txt; do [ -f "roblox-dev-hub/cloud/$f" ] && git add "roblox-dev-hub/cloud/$f"; done
           git diff --cached --quiet && exit 0
           git commit -m "Exploration : $(date -u +'%Y-%m-%d %H:%M') UTC"
           for i in 1 2 3; do git pull --rebase -X theirs && git push && break; sleep 5; done
