@@ -509,7 +509,7 @@ const server = http.createServer(async (req, res) => {
       if (kick) return send(res, 401, { error: 'This ID is now used on another device', key: 'otherDevice', vars: { device: kick.device || '?' } });
       return send(res, 401, { error: 'Sign in with your access ID', key: 'loginRequired' });
     }
-    const genRoute = url.pathname === '/api/gen' || url.pathname.startsWith('/api/gen/');
+    const genRoute = url.pathname === '/api/gen' || url.pathname.startsWith('/api/gen/') || /^\/api\/update\/(check|install)$/.test(url.pathname);
     if (session.role !== 'admin' && !genRoute && !(req.method === 'GET' && USER_ROUTES.some((re) => re.test(url.pathname)))) {
       return send(res, 403, { error: 'Admin only', key: 'adminOnly' });
     }

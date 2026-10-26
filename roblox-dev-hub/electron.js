@@ -161,7 +161,7 @@ async function start() {
   buildTray();
   createMain(hidden);
   setTimeout(() => checkUpdates(false), 15e3);
-  setInterval(() => checkUpdates(false), 4 * 3600e3);
+  setInterval(() => checkUpdates(false), 3600e3);
 }
 
 app.on('before-quit', () => { quitting = true; });

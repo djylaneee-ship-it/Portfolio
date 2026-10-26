@@ -201,6 +201,7 @@ function renderSession() {
     <div class="row">${langSelect('side-lang')}<button class="icon-btn" id="logout" title="${t('session.logout')}" aria-label="${t('session.logout')}"><svg class="line" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg></button></div>`;
   $('#side-lang').onchange = (e) => setLang(e.target.value);
   api('/version').then((v) => { const el = $('#side-ver'); if (el) el.textContent = 'Rovex Hub v' + v.version; }).catch(() => {});
+  watchUpdates();
   $('#logout').onclick = async () => { await api('/logout', { method: 'POST' }); location.reload(); };
 }
 
@@ -1406,22 +1407,88 @@ function bindCopy(root = document) {
 // ---------- Réglages ----------
 // État de la mise à jour (app de bureau) en texte.
 function updState(u) {
-  if (!u || u.state === 'idle') return '';
+  if (!u || !u.state || u.state === 'idle') return '';
   if (u.state === 'downloading') return t('upd.downloading', { v: esc(u.version || ''), p: u.percent || 0 });
   if (u.state === 'error') return t('upd.error');
   return t('upd.' + u.state, { v: esc(u.version || '') });
+}
+
+// ---------- Mise à jour : ouverte à tous (admins et membres) ----------
+async function renderUpdate() {
+  const ver = await api('/version').catch(() => ({}));
+  const u = ver.update || {};
+  view.innerHTML = `
+    ${pageHead('ROVEX HUB', t('nav.update'), t('upd.sub'))}
+    <div class="panel upd-hero" data-spot>
+      <div class="upd-ver"><small>${t('upd.yours')}</small><b>v${esc(ver.version || '?')}</b></div>
+      <div class="upd-main">
+        <p id="upd-state" class="upd-state">${updState(u) || t('upd.idle')}</p>
+        <div class="upd-bar" id="upd-bar" ${u.state === 'downloading' ? '' : 'hidden'}><i style="width:${u.percent || 0}%"></i></div>
+        <div class="row">
+          <button class="btn primary" id="upd-check" ${ver.desktop ? '' : 'disabled'}>${t('upd.check')}</button>
+          <button class="btn primary" id="upd-install" ${u.state === 'ready' ? '' : 'hidden'}>${t('upd.install')}</button>
+        </div>
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="panel" data-spot><h3>🔄 ${t('upd.autoTitle')}</h3><p>${t('upd.autoText')}</p></div>
+      <div class="panel" data-spot><h3>⬇️ ${t('upd.manualTitle')}</h3><p>${t('upd.manualText')}</p>
+        <a class="btn" href="https://github.com/djylaneee-ship-it/Portfolio/releases/latest" target="_blank" rel="noopener">${t('upd.manualBtn')}</a></div>
+    </div>`;
+  const show = (v) => {
+    const st = v.update || {};
+    if (!$('#upd-state')) return false;
+    $('#upd-state').textContent = updState(st) || t('upd.idle');
+    $('#upd-bar').hidden = st.state !== 'downloading';
+    $('#upd-bar i').style.width = (st.percent || 0) + '%';
+    $('#upd-install').hidden = st.state !== 'ready';
+    return true;
+  };
+  $('#upd-check').onclick = async (e) => {
+    const b = e.currentTarget;
+    b.disabled = true;
+    await api('/update/check', { method: 'POST' });
+    // Suit l'état pendant le téléchargement (jusqu'à 5 minutes).
+    for (let i = 0; i < 150; i++) {
+      await sleep(2000);
+      const v = await api('/version').catch(() => null);
+      if (!v || !show(v)) break;
+      if (v.update && ['latest', 'ready', 'error', 'dev'].includes(v.update.state)) break;
+    }
+    b.disabled = false;
+  };
+  $('#upd-install').onclick = () => api('/update/install', { method: 'POST' });
+}
+
+// Prévient tout le monde quand une nouvelle version est téléchargée et prête.
+let updWatch = null;
+function watchUpdates() {
+  if (updWatch) return;
+  const tick = async () => {
+    const v = await api('/version').catch(() => null);
+    const st = v && v.update;
+    const ready = Boolean(st && st.state === 'ready');
+    const dot = $('#upd-dot');
+    if (dot) dot.hidden = !ready;
+    if (ready && !$('#upd-banner')) {
+      const el = document.createElement('div');
+      el.id = 'upd-banner';
+      el.className = 'upd-banner';
+      el.innerHTML = `<span>⬆️ ${t('upd.banner', { v: esc(st.version || '') })}</span><button class="btn primary">${t('upd.install')}</button><button class="icon-btn" aria-label="×">✕</button>`;
+      el.querySelector('.btn').onclick = () => api('/update/install', { method: 'POST' });
+      el.querySelector('.icon-btn').onclick = () => el.remove();
+      document.body.append(el);
+    }
+  };
+  tick();
+  updWatch = setInterval(tick, 60e3);
 }
 
 async function renderSettings() {
   const [s, ver] = await Promise.all([api('/settings'), api('/version').catch(() => ({}))]);
   view.innerHTML = `
     ${pageHead('ROVEX HUB', t('nav.settings'), t('set.sub'))}
-    <div class="panel" data-spot>
-      <h3>⬆️ ${t('upd.title')}</h3>
-      <p>${t('upd.current', { v: esc(ver.version || '?') })} <span id="upd-state">${updState(ver.update)}</span></p>
-      <div class="row"><button class="btn primary" id="upd-check" ${ver.desktop ? '' : 'disabled'}>${t('upd.check')}</button>
-        <button class="btn" id="upd-install" ${ver.update && ver.update.state === 'ready' ? '' : 'hidden'}>${t('upd.install')}</button></div>
-    </div>
+    <a class="panel upd-link" href="#/update" data-spot><h3>⬆️ ${t('upd.title')}</h3><p>${t('upd.current', { v: esc(ver.version || '?') })} ${updState(ver.update)}</p></a>
     <div class="two-col">
       <div class="panel" data-spot><h3>${t('set.langTitle')}</h3><p>${t('set.langText')}</p>${langSelect('set-lang')}</div>
       <div class="panel" data-spot><h3>${t('set.autoTitle')}</h3>
@@ -1460,21 +1527,6 @@ async function renderSettings() {
     </div>`;
   $('#set-lang').onchange = (e) => setLang(e.target.value);
   $('#key-form').onsubmit = async (e) => { e.preventDefault(); await api('/settings', { method: 'PUT', body: { youtubeApiKey: $('#key').value } }); toast(t('toast.saved')); route(); };
-  const uc = $('#upd-check');
-  if (uc) uc.onclick = async () => {
-    uc.disabled = true;
-    await api('/update/check', { method: 'POST' });
-    // Suit l'état pendant une minute.
-    for (let i = 0; i < 30 && $('#upd-state'); i++) {
-      await sleep(2000);
-      const v = await api('/version');
-      $('#upd-state').textContent = updState(v.update);
-      $('#upd-install').hidden = !(v.update && v.update.state === 'ready');
-      if (v.update && ['latest', 'ready', 'error'].includes(v.update.state)) break;
-    }
-    uc.disabled = false;
-  };
-  $('#upd-install').onclick = () => api('/update/install', { method: 'POST' });
   $('#cloud-form').onsubmit = async (e) => { e.preventDefault(); await api('/settings', { method: 'PUT', body: { cloudUrl: $('#cloud-url').value } }); toast(t('toast.saved')); };
   $('#cloud-sync').onclick = async (e) => {
     const b = e.currentTarget; b.disabled = true; b.innerHTML = `<span class="spinner"></span>${t('set.syncing')}`;
@@ -1669,7 +1721,7 @@ async function route() {
   const pages = {
     library: () => renderLibrary(params), favorites: () => renderLibrary(params, true), examples: renderExamples,
     youtube: () => renderYoutube(params), channels: () => renderChannels(params), explore: renderExplore,
-    connect: renderConnect, admin: renderAdmin, settings: renderSettings, level: renderLevel, opensource: renderOpenSource, skills: renderSkills, prompts: renderPrompts, studio: renderStudio,
+    connect: renderConnect, admin: renderAdmin, settings: renderSettings, update: renderUpdate, level: renderLevel, opensource: renderOpenSource, skills: renderSkills, prompts: renderPrompts, studio: renderStudio,
   };
   try {
     await transition(pages[path] || renderHome);
