@@ -579,3 +579,13 @@ body.desktop .modal, body.desktop .login { padding-top: 40px; }
 .panel h3 .st { margin-left: 8px; vertical-align: middle; }
 .lim { display: flex; align-items: center; gap: 10px; color: var(--muted2); font-size: 14px; }
 .lim .input { width: 110px; }
+
+/* ---------- Prompt Booster ---------- */
+.boost-in { width: 100%; min-height: 120px; resize: vertical; font: 15px/1.6 Inter, system-ui, sans-serif; padding: 14px 16px; }
+.boost-text { width: 100%; min-height: 380px; resize: vertical; font: 13.5px/1.7 var(--mono); padding: 16px 18px; background: #0B0814; }
+.boost-out { border-color: #3B2D5C; animation: pop .5s var(--spring) both; }
+.boost-list { display: grid; gap: 8px; }
+.boost-item { text-align: left; display: flex; justify-content: space-between; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 14px; border: 1px solid var(--line); background: var(--panel); color: var(--text); cursor: pointer; transition: transform .35s var(--spring), border-color .2s; animation: pop .45s var(--spring) both; animation-delay: calc(var(--i, 0) * 40ms); }
+.boost-item:hover { transform: translateX(5px); border-color: #3B2D5C; }
+.boost-item b { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.boost-item small { color: var(--muted); white-space: nowrap; }

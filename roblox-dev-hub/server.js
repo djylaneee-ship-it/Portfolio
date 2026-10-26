@@ -225,8 +225,20 @@ const routes = [
   ['PUT', /^\/api\/gen\/limits$/, async (req, m, url, session) => {
     if (session.role !== 'admin') throw Object.assign(new Error('Admin only'), { code: 403, key: 'adminOnly' });
     const b = await json(req);
-    cloud.must(await cloud.rpc('rovex_gen_set_limits', { p_key: session.cred, p_images: Number(b.images), p_sounds: null }));
+    const n = (v) => (v === undefined || v === '' ? null : Number(v));
+    cloud.must(await cloud.rpc('rovex_gen_set_limits', { p_key: session.cred, p_images: n(b.images), p_sounds: null, p_texts: n(b.texts) }));
     return { ok: true };
+  }],
+  // Prompt Booster : Gemini réécrit une demande en prompt détaillé pour Claude + Rovex.
+  ['GET', /^\/api\/gen\/boost$/, async () => {
+    await gen.refreshShared();
+    const q = await gen.quota(state);
+    return { ...gen.status(state).text, quota: q && q.text, history: state.boosts || [] };
+  }],
+  ['POST', /^\/api\/gen\/enhance$/, async (req) => {
+    const out = await gen.enhancePrompt(state, await json(req));
+    persist();
+    return out;
   }],
   ['POST', /^\/api\/gen\/image$/, async (req) => {
     const out = await gen.generateImage(state, await json(req));

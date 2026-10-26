@@ -547,21 +547,7 @@ async function openSkill(id) {
   };
 }
 
-// ---------- Prompts : modèles prêts à copier pour bien utiliser Rovex Hub ----------
-const PR_KINDS = ['', 'create', 'fix', 'learn', 'find', 'library', 'custom'];
-const PR_SLOT = /\[\[([^\]\n]{1,40})\]\]/g;
-const prF = { kind: '', cat: '' };
-let PROMPTS = [];
-const prText = (p) => (p.kind === 'custom' ? p.text : p.text[LANG] || p.text.en);
-const prTitle = (p) => (p.kind === 'custom' ? p.title : p.title[LANG] || p.title.en);
-const slotLabel = (s) => (PROMPT_SLOTS[s] && (PROMPT_SLOTS[s][LANG] || PROMPT_SLOTS[s].en)) || s;
-const slotsOf = (text) => [...new Set([...text.matchAll(PR_SLOT)].map((m) => m[1]))];
-// Texte du modèle en HTML : les champs deviennent des pastilles (remplies ou à remplir).
-const prHtml = (text, vals = {}) => esc(text).replace(PR_SLOT, (_, s) => {
-  const v = String(vals[s] || '').trim();
-  return v ? `<mark class="slot-fill">${esc(v)}</mark>` : `<span class="slot">${esc(slotLabel(s))}</span>`;
-});
-
+// ---------- Prompts : tu écris en vrac, Gemini en fait un prompt détaillé pour Claude + Rovex ----------
 async function copyText(text) {
   try { await navigator.clipboard.writeText(text); return true; } catch {}
   // Mode partagé en http : pas d'API presse-papiers, on passe par une zone de texte.
@@ -572,122 +558,91 @@ async function copyText(text) {
   return ok;
 }
 
+let BOOST = null; // dernier résultat affiché
+
+function boostResult(b) {
+  return `<div class="panel boost-out" data-spot id="pb-result">
+    <div class="section-head" style="margin-bottom:12px"><h3 style="margin:0">🚀 ${t('pb.result')}</h3>
+      <div class="row"><button class="btn primary" id="pb-copy">${t('pb.copy')}</button><button class="btn" id="pb-again">↻ ${t('pb.again')}</button></div></div>
+    <p class="sub" style="font-size:13px;margin:0 0 10px">${t('pb.from')} « ${esc(b.input.length > 140 ? b.input.slice(0, 137) + '…' : b.input)} »</p>
+    <textarea class="input boost-text" id="pb-out" spellcheck="false">${esc(b.output)}</textarea>
+    <p class="sub" style="font-size:13px;margin:10px 0 0">${t('pb.paste')}</p>
+  </div>`;
+}
+
 async function renderPrompts() {
-  const custom = await api('/prompts');
-  PROMPTS = [...custom, ...PROMPT_TEMPLATES.filter((p) => !p.admin || isAdmin())];
-  const kinds = PR_KINDS.filter((k) => (k !== 'custom' || custom.length) && (k !== 'library' || isAdmin()));
-  if (!kinds.includes(prF.kind)) prF.kind = '';
+  const g = await api('/gen/boost');
+  const q = g.quota;
+  const left = q && q.ok ? (q.unlimited ? t('st.unlimited') : t('st.left', { n: Math.max(0, q.limit - q.used), limit: q.limit })) : '';
   view.innerHTML = `
-    ${pageHead(t('pr.eyebrow'), t('pr.title'), t('pr.sub'), `<button class="btn primary admin-only" id="pr-new">${PLUS}${t('pr.new')}</button>`)}
+    ${pageHead(t('pb.eyebrow'), t('pb.title'), t('pb.sub'))}
     <div class="flow">
-      ${[['✍️', 'pr.tip1'], ['🧠', 'pr.tip2'], ['📋', 'pr.tip3']].map(([ico, k], i) => `<div class="flow-step" style="--i:${i}"><span>${ico}</span><b>${t(k + 't')}</b><small>${t(k)}</small></div>`).join('<i class="flow-arrow">→</i>')}
+      ${[['✍️', 'pb.f1'], ['🧠', 'pb.f2'], ['🚀', 'pb.f3']].map(([ico, k], i) => `<div class="flow-step" style="--i:${i}"><span>${ico}</span><b>${t(k + 't')}</b><small>${t(k)}</small></div>`).join('<i class="flow-arrow">→</i>')}
     </div>
-    <div class="toolbar">
-      ${kinds.map((k) => `<button class="chip solid ${prF.kind === k ? 'on' : ''}" data-prk="${k}">${t('pr.k.' + (k || 'all'))}</button>`).join('')}
-      <select class="select" id="pr-cat" style="padding:11px 14px;margin-left:auto"><option value="">${t('os2.allCats')}</option>${catOptions(prF.cat)}</select>
-    </div>
-    <div class="pr-grid stagger" id="pr-list"></div>`;
-  drawPrompts();
-  $$('[data-prk]').forEach((b) => b.onclick = () => {
-    prF.kind = b.dataset.prk;
-    $$('[data-prk]').forEach((x) => x.classList.toggle('on', x === b));
-    drawPrompts();
-  });
-  $('#pr-cat').onchange = (e) => { prF.cat = e.target.value; drawPrompts(); };
-  const nb = $('#pr-new');
-  if (nb) nb.onclick = () => newPrompt();
-}
-
-function drawPrompts() {
-  const list = PROMPTS.filter((p) => (!prF.kind || p.kind === prF.kind) && (!prF.cat || !p.cat || p.cat === prF.cat));
-  const box = $('#pr-list');
-  if (!box) return;
-  box.innerHTML = list.length ? list.map((p, i) => {
-    const c = p.cat ? cat(p.cat) : null;
-    return `<button class="pr-card" data-pr="${esc(p.id)}" style="--i:${i};--c:${c ? c.color : 'var(--accent)'}" data-spot>
-      <span class="pr-top"><span class="pr-ico">${p.icon || '💬'}</span><span class="pr-kind">${t('pr.k.' + p.kind)}</span>${c ? `<span class="pr-cat"><span class="dot" style="background:${c.color}"></span>${esc(c.label)}</span>` : ''}
-        ${p.kind === 'custom' && isAdmin() ? `<span class="pr-del" data-prdel="${esc(p.id)}" title="${t('delete')}">✕</span>` : ''}</span>
-      <h3>${esc(prTitle(p))}</h3>
-      <p class="pr-text">${prHtml(prText(p))}</p>
-      <span class="pr-go">${t('pr.use')} ${ARROW}</span>
-    </button>`;
-  }).join('') : `<div class="empty"><b>${t('empty.title')}</b>${t('pr.none')}</div>`;
-  stagger(box);
-  $$('[data-pr]', box).forEach((b) => b.onclick = () => openPrompt(PROMPTS.find((p) => p.id === b.dataset.pr)));
-  $$('[data-prdel]', box).forEach((b) => b.onclick = async (e) => {
-    e.stopPropagation();
-    if (!confirm(t('detail.confirmDelete', { title: prTitle(PROMPTS.find((p) => p.id === b.dataset.prdel)) }))) return;
-    await api('/prompts/' + b.dataset.prdel, { method: 'DELETE' });
-    toast(t('toast.deleted'));
-    transition(renderPrompts);
-  });
-}
-
-function openPrompt(p) {
-  const text = prText(p);
-  const slots = slotsOf(text);
-  const vals = {};
-  const c = p.cat ? cat(p.cat) : null;
-  openModal(`
-    <div class="card-cat"><span>${p.icon || '💬'}</span> ${t('pr.k.' + p.kind)}${c ? ` · <span class="dot" style="background:${c.color}"></span>${esc(c.label)}` : ''}</div>
-    <h2 class="detail-title" style="margin-top:8px">${esc(prTitle(p))}</h2>
-    <p class="sub" style="margin-bottom:18px">${t(slots.length ? 'pr.fill' : 'pr.noFill')}</p>
-    <div class="pr-compose">
-      <div>
-        ${slots.map((s, i) => `<div class="field"><label>${esc(slotLabel(s))}</label>${s === 'code'
-          ? `<textarea data-slot="code" spellcheck="false" placeholder="-- ${esc(slotLabel(s))}"></textarea>`
-          : `<input class="input" data-slot="${esc(s)}" placeholder="${esc(slotLabel(s))}" ${i ? '' : 'autofocus'}>`}</div>`).join('')}
-        <div class="field"><label>${t('pr.skillCat')}</label><select class="select" id="pr-skcat"><option value="">${t('pr.anyCat')}</option>${catOptions(prF.cat || p.cat)}</select></div>
-        <div class="row"><label class="switch"><input type="checkbox" id="pr-remind" checked><span></span></label><span>${t('pr.remind')}</span></div>
-      </div>
-      <div>
-        <p class="label" style="margin-top:0">${t('pr.preview')}</p>
-        <div class="pr-preview" id="pr-out"></div>
-        <div class="row" style="margin-top:14px">
-          <button class="btn primary" id="pr-copy">${t('pr.copy')}</button>
+    <div class="panel" data-spot>
+      <h3>✨ ${t('pb.boxTitle')} ${g.available ? `<span class="st validated">${t('st.ready')}</span>${left ? ` <span class="st review">${esc(left)}</span>` : ''}` : `<span class="st draft">${t('st.off')}</span>`}</h3>
+      ${g.available ? `<form id="pb-form">
+        <textarea class="input boost-in" id="pb-in" required placeholder="${t('pb.ph')}"></textarea>
+        <div class="row" style="margin-top:12px">
+          <select class="select" id="pb-cat" style="padding:11px 14px"><option value="">${t('pb.autoCat')}</option>${catOptions('')}</select>
+          <button class="btn primary" id="pb-go">✨ ${t('pb.go')}</button>
+          <span class="sub" style="font-size:13px">${t('pb.hint')}</span>
         </div>
-        <p class="sub" style="font-size:13px;margin-top:10px">${t('pr.pasteHint')}</p>
-      </div>
-    </div>`);
-  const opts = () => ({ lang: LANG, cat: $('#pr-skcat').value, remind: $('#pr-remind').checked });
-  const draw = () => {
-    const o = opts();
-    const tail = o.remind ? '\n\n' + fillPrompt('', {}, o).trim() : '';
-    $('#pr-out').innerHTML = prHtml(text, vals) + `<span class="pr-tail">${esc(tail)}</span>`;
+      </form>` : `<p>${t(isAdmin() ? 'pb.setup' : 'st.soon')}</p>`}
+    </div>
+    <div id="pb-slot">${BOOST ? boostResult(BOOST) : ''}</div>
+    ${isAdmin() && g.available ? `<div class="panel" data-spot><h3>👑 ${t('pb.limTitle')}</h3><p>${t('pb.limText')}</p>
+      <div class="row"><label class="lim">${t('pb.limLbl')} <input class="input" id="pb-lim" type="number" min="0" max="1000" value="${q && q.limit != null ? q.limit : 50}"></label>
+      <button class="btn primary" id="pb-lim-save">${t('save')}</button></div></div>` : ''}
+    ${g.history.length ? `<div class="section-head"><h2>${t('pb.history')}</h2></div>
+      <div class="boost-list">${g.history.map((h, i) => `<button class="boost-item" data-boost="${i}" style="--i:${i}"><b>${esc(h.input)}</b><small>${h.category ? esc(cat(h.category).label) + ' · ' : ''}${ago(h.at)}</small></button>`).join('')}</div>` : ''}`;
+  stagger($('.boost-list') || view);
+  const bindResult = () => {
+    const c = $('#pb-copy');
+    if (!c) return;
+    c.onclick = async () => {
+      const ok = await copyText($('#pb-out').value);
+      if (!ok) return toast(t('toast.copyFail'), true);
+      c.textContent = '✓ ' + t('copied');
+      setTimeout(() => (c.textContent = t('pb.copy')), 1600);
+      toast(t('pb.copied'));
+    };
+    $('#pb-again').onclick = () => {
+      $('#pb-in').value = BOOST.input;
+      $('#pb-cat').value = BOOST.category || '';
+      $('#pb-form').requestSubmit();
+    };
   };
-  $$('[data-slot]').forEach((el) => el.oninput = () => { vals[el.dataset.slot] = el.value; draw(); });
-  $('#pr-skcat').onchange = draw;
-  $('#pr-remind').onchange = draw;
-  draw();
-  const first = $('[data-slot]');
-  if (first) setTimeout(() => first.focus(), 350);
-  $('#pr-copy').onclick = async (e) => {
-    const b = e.currentTarget;
-    const missing = slots.filter((s) => !String(vals[s] || '').trim());
-    const ok = await copyText(fillPrompt(text, vals, opts()));
-    if (!ok) return toast(t('toast.copyFail'), true);
-    b.textContent = '✓ ' + t('copied');
-    setTimeout(() => (b.textContent = t('pr.copy')), 1600);
-    toast(missing.length ? t('pr.copiedMissing', { n: missing.length }) : t('pr.copied'));
+  const show = (b) => {
+    BOOST = b;
+    $('#pb-slot').innerHTML = boostResult(b);
+    bindResult();
+    $('#pb-result').scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
-}
-
-function newPrompt() {
-  openModal(`
-    <h2 class="detail-title">${t('pr.new')}</h2>
-    <p class="sub" style="margin-bottom:18px">${t('pr.newSub')}</p>
-    <div class="field"><label>${t('pr.fTitle')}</label><input class="input" id="np-title" placeholder="${t('pr.fTitlePh')}"></div>
-    <div class="field"><label>${t('pr.fText')}</label><textarea id="np-text" style="min-height:180px" placeholder="${t('pr.fTextPh')}"></textarea></div>
-    <div class="field"><label>${t('pr.skillCat')}</label><select class="select" id="np-cat"><option value="">${t('pr.anyCat')}</option>${catOptions('')}</select></div>
-    <button class="btn primary" id="np-save">${t('save')}</button>`);
-  $('#np-save').onclick = async () => {
+  bindResult();
+  const form = $('#pb-form');
+  if (form) form.onsubmit = async (e) => {
+    e.preventDefault();
+    const btn = $('#pb-go');
+    const input = $('#pb-in').value.trim();
+    if (!input) return;
+    btn.disabled = true;
+    btn.textContent = '⏳ ' + t('pb.working');
     try {
-      await api('/prompts', { method: 'POST', body: { title: $('#np-title').value, text: $('#np-text').value, cat: $('#np-cat').value } });
-      toast(t('toast.saved'));
-      prF.kind = 'custom';
-      await closeModal();
+      const out = await api('/gen/enhance', { method: 'POST', body: { text: input, category: $('#pb-cat').value || undefined } });
+      BOOST = { input, output: out.text, category: $('#pb-cat').value };
       transition(renderPrompts);
-    } catch (e) { toast(e.message, true); }
+    } catch (err) {
+      toast(err.message, true);
+      btn.disabled = false;
+      btn.textContent = '✨ ' + t('pb.go');
+    }
+  };
+  $$('[data-boost]').forEach((b) => b.onclick = () => show(g.history[Number(b.dataset.boost)]));
+  const ls = $('#pb-lim-save');
+  if (ls) ls.onclick = async () => {
+    try { await api('/gen/limits', { method: 'PUT', body: { texts: $('#pb-lim').value } }); toast(t('toast.saved')); }
+    catch (e) { toast(e.message, true); }
   };
 }
 
@@ -711,7 +666,7 @@ function quotaText(q) {
 
 async function renderStudio() {
   const g = await api('/gen');
-  const q = g.quota;
+  const q = g.quota && g.quota.image;
   view.innerHTML = `
     ${pageHead(t('st.eyebrow'), t('st.title'), t('st.sub'))}
     <div class="flow">

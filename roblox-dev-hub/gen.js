@@ -57,12 +57,15 @@ async function callShared(body) {
 async function quota(state) {
   const code = credOf(state);
   if (!code || !cloud.enabled) return null;
-  try { return (await cloud.rpc('rovex_gen_status', { p_code: code })).image || null; } catch { return null; }
+  try { return await cloud.rpc('rovex_gen_status', { p_code: code }); } catch { return null; }
 }
 
 function status(state) {
   const sh = shared.info || {};
-  return { ready: Boolean(sh.image && credOf(state)), available: Boolean(sh.image), model: sh.model || '' };
+  return {
+    ready: Boolean(sh.image && credOf(state)), available: Boolean(sh.image), model: sh.model || '',
+    text: { ready: Boolean(sh.text && credOf(state)), available: Boolean(sh.text), model: sh.textModel || '' },
+  };
 }
 
 // Réduit une image de référence avant de l'envoyer (dans l'app de bureau uniquement).
@@ -152,9 +155,62 @@ async function generateImage(state, a = {}) {
   };
 }
 
+// ---------- Prompt Booster : Gemini réécrit une demande en vrac en prompt détaillé pour Claude + Rovex ----------
+const BOOSTER_RULES = `You are Rovex Prompt Architect. You turn a short, rough request from a Roblox game developer into a complete, precise prompt for Claude.
+
+Claude is connected to Rovex Hub, an MCP server holding the user's Roblox development knowledge base. Tools Claude can call:
+- load_skill(category, query): the rules of a category + every validated code example + the best tutorials/docs + top open source projects. Categories: scripting, vfx, animation, gui, gfx, modeling, building, audio, design, tools.
+- search_resources(query, category): full-text search in tutorials, docs, videos and DevForum posts.
+- list_examples(category) / get_example(id): validated learning examples (request + correct Luau code + why it is correct).
+- search_opensource(query, category): GitHub repos, free models and plugins, sorted by stars.
+- generate_image(prompt, kind, category): generates icons, UI images, thumbnails, textures and VFX sprites in the user's art style and saves them in the library.
+
+Write the improved prompt so that Claude:
+1. Starts with Rovex Hub: calls load_skill for EVERY category the task touches (name them explicitly with good keywords, e.g. load_skill("scripting", "pet follow datastore")), then search_resources with precise keywords, reads the matching validated examples (mention their titles when they fit), and checks search_opensource before writing a big system from scratch.
+2. Knows exactly what to build: restate the goal clearly, infer the missing details sensibly (game genre, PC + mobile, R15, client/server split, data to save…) and list them as assumptions, then describe the features, behaviors, UI and edge cases.
+3. Follows the Roblox best practices of those categories (use the category rules given below: server authority and RemoteEvent validation, ModuleScripts, DataStore safety, Scale-based responsive UI, TweenService, task library, cleanup of connections, performance, mobile…).
+4. Calls generate_image for every icon, image or texture the feature needs, describing each one.
+5. Delivers: every script with its exact type (Script / LocalScript / ModuleScript) and location in the Explorer, the Instances to create with key properties, setup steps in Roblox Studio, how to test it, and a short explanation of the architecture.
+6. Cites the Rovex resources and examples it relied on.
+
+Rules for your answer:
+- Output ONLY the final prompt, ready to paste. No preamble, no comments, no code blocks of Luau.
+- Write it in the same language as the user's request. Start with "Using Rovex Hub," translated into that language (French: "En utilisant Rovex Hub,").
+- Use short sections with titles and bullet points. Be specific to this request: no generic filler.
+- If a focus category is given, center the prompt on it (other categories only if really needed).`;
+
+function boosterContext(state) {
+  const counts = {};
+  for (const r of state.resources) counts[r.category] = (counts[r.category] || 0) + 1;
+  const ex = (state.examples || []).filter((e) => e.status === 'validated');
+  const lines = skills.SKILL_CATS.map((c) => {
+    const titles = ex.filter((e) => e.category === c).slice(0, 8).map((e) => `"${e.title}"`).join(', ');
+    return `- ${c}: ${counts[c] || 0} resources${titles ? `; validated examples: ${titles}` : ''}`;
+  });
+  const rules = skills.SKILL_CATS.map((c) => `### ${c}\n${skills.getSkill(state, c).instructions}`).join('\n\n');
+  return `What this user's Rovex Hub contains:\n${lines.join('\n')}\n\nCategory rules (from the Rovex skills, written by the user):\n${rules}`;
+}
+
+async function enhancePrompt(state, a = {}) {
+  const request = String(a.text || '').trim();
+  if (!request) throw err('genPrompt', 'Describe what you want');
+  if (!credOf(state)) throw err('loginRequired', 'Sign in with your access ID');
+  if (!((await refreshShared()) && shared.info.text) && !((await refreshShared(true)) && shared.info.text)) {
+    throw err('genShared', 'Prompt improvement is not set up yet');
+  }
+  const category = skills.SKILL_CATS.includes(a.category) ? a.category : '';
+  const prompt = `${category ? `Focus category: ${category}\n\n` : ''}User request:\n${request.slice(0, 4000)}`;
+  const j = await callShared({ type: 'text', code: credOf(state), system: `${BOOSTER_RULES}\n\n${boosterContext(state)}`, prompt });
+  const text = String(j.text || '').replace(/^```[a-z]*\n?|```$/g, '').trim();
+  if (!text) throw err('genEmpty', 'No answer');
+  // Historique local des 15 derniers prompts améliorés.
+  state.boosts = [{ id: db.newId(), input: request, output: text, category, at: new Date().toISOString() }, ...(state.boosts || [])].slice(0, 15);
+  return { text, model: j.model, quota: j.quota };
+}
+
 // Les créations IA, les plus récentes d'abord.
 function items(state, limit = 60) {
   return state.resources.filter((r) => r.source === 'ai' && r.type === 'image').slice(0, limit);
 }
 
-module.exports = { status, refreshShared, quota, generateImage, items, IMAGE_KINDS, SIZES };
+module.exports = { status, refreshShared, quota, generateImage, enhancePrompt, items, IMAGE_KINDS, SIZES };
