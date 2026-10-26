@@ -64,6 +64,16 @@ begin
     'max', (select library_max from rovex.config where id = 1), 'size', pg_size_pretty(pg_total_relation_size('rovex.library')));
 end $$;
 
+-- Contenu partagé par les admins : en plus des exemples, skills et prompts, les textures VFX ajoutées.
+create or replace function public.rovex_put_shared(p_key text, p_name text, p_data jsonb) returns jsonb language plpgsql security definer set search_path = '' as $$
+begin
+  if not rovex.is_admin(p_key) then return jsonb_build_object('ok', false, 'err', 'adminOnly'); end if;
+  if p_name not in ('examples', 'skills', 'prompts', 'textures') then return jsonb_build_object('ok', false, 'err', 'badName'); end if;
+  insert into rovex.shared (name, data, updated_at) values (p_name, p_data, now())
+  on conflict (name) do update set data = excluded.data, updated_at = now();
+  return jsonb_build_object('ok', true);
+end $$;
+
 -- Nouvelle clé d'exploration : à copier dans GitHub (Settings → Secrets → Actions → ROVEX_CRAWLER_KEY).
 create or replace function rovex.new_crawler_key() returns text
 language plpgsql security definer set search_path = '' as $$

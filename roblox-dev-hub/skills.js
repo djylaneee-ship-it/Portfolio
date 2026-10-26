@@ -63,6 +63,13 @@ function context(state, cat, { query = '' } = {}) {
   };
 }
 
+// Pour les VFX : un résumé de la bibliothèque de textures (les IDs se récupèrent avec find_vfx_textures).
+function vfxTextures(state) {
+  const tx = require('./vfx-textures');
+  const list = tx.all(state);
+  return { total: list.length, groups: tx.groups(list).map((g) => `${g.label} (${g.kind}, ${g.count})`), how: 'Call find_vfx_textures with words like "toon fire", "slash", "smoke" to get the texture IDs and their flipbook settings.' };
+}
+
 const HOW_TO_USE = 'Follow the core rules (rovex-core) and the instructions of each skill. Reuse the structure of the validated examples first, cite the resources you rely on, and propose an open source module when one fits instead of rewriting it.';
 
 function skillPart(state, cat, opts) {
@@ -71,6 +78,7 @@ function skillPart(state, cat, opts) {
   return {
     skill: s.name, category: cat, description: s.description,
     instructions: s.instructions,
+    textures: cat === 'vfx' || cat === 'cutscenes' ? vfxTextures(state) : undefined,
     assets: cat === 'audio' ? undefined : { style: s.art, how: 'Need an image (icon, UI, thumbnail, texture, VFX sprite)? Call generate_image with this category: Rovex applies this style and the user\'s reference images, then saves the PNG in the library.' },
     ...context(state, cat, opts),
   };

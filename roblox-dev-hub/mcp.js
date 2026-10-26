@@ -10,6 +10,7 @@ const skills = require('./skills');
 const gen = require('./gen');
 const studio = require('./studio');
 const rbxupload = require('./rbxupload');
+const textures = require('./vfx-textures');
 const vm = require('vm');
 
 // Les modèles de prompts de la page « Prompts » (public/prompts.js), aussi proposés dans le menu + de Claude.
@@ -65,7 +66,7 @@ function clients() {
 // Toujours ajouté aux consignes : passer par le skill de la catégorie avant toute tâche Roblox.
 const SKILL_RULE = `
 
-Skills: for every Roblox task, first identify the domains it needs (scripting, vfx, animation, cutscenes, gui, gfx, modeling, building, audio, design, tools) and call load_skill once with only those categories and the task keywords (an attack = scripting + animation + vfx; a boss intro = cutscenes + animation + vfx, + audio if needed; a menu = gui + scripting). Read all of it before working: the core rules (rovex-core) apply to every task. Project art direction: VFX are built from custom-textured ParticleEmitters, never the Fire, Smoke or Sparkles classes.
+Skills: for every Roblox task, first identify the domains it needs (scripting, vfx, animation, cutscenes, gui, gfx, modeling, building, audio, design, tools) and call load_skill once with only those categories and the task keywords (an attack = scripting + animation + vfx; a boss intro = cutscenes + animation + vfx, + audio if needed; a menu = gui + scripting). Read all of it before working: the core rules (rovex-core) apply to every task. Project art direction: VFX are built from custom-textured ParticleEmitters, never the Fire, Smoke or Sparkles classes. Pick their textures with find_vfx_textures (the user's texture IDs, with flipbook grids); never invent texture IDs.
 
 Roblox Studio: when tools starting with studio_ are available, Rovex is connected to the place open in Roblox Studio. Before writing code for the user's game, use them to read the real scripts, the Explorer structure and the data, and follow the existing architecture. Only change the place (edit scripts, run code that modifies it, insert models) when the user asked for it, and say what you changed. To put an image in the game (icon, UI, decal), make or pick it (generate_image), then call upload_image_to_roblox with a target path: Rovex uploads it to Roblox and sets it in Studio.
 
@@ -125,6 +126,20 @@ const TOOLS = [
         title: { type: 'string', description: 'Name to save it under in the library.' },
       },
       required: ['prompt'],
+    },
+  },
+  {
+    name: 'find_vfx_textures',
+    description: 'Find Roblox texture IDs for VFX in the user\'s texture library (1000+ textures: particle flipbooks for fire, smoke, slash, burst, lightning, crack, water, ice, wind decals, glows, stars, gradients, fog…). Returns rbxassetid, name, group, kind (particle, flipbook, decal, texture), the flipbook grid (2x2, 4x4, 8x8) with the matching FlipbookLayout/FlipbookMode/framerate, and tips. ALWAYS use it to pick ParticleEmitter textures; never invent texture IDs. Call it with no query to list the groups.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        query: { type: 'string', description: 'Words to match, e.g. "toon fire", "slash", "smoke realistic", "lightning", "ripple", "glow", "star".' },
+        group: { type: 'string', description: 'Limit to one group (id or label from the groups list).' },
+        flipbook: { type: 'string', enum: ['2x2', '4x4', '8x8'], description: 'Only flipbooks with this grid.' },
+        kind: { type: 'string', enum: ['particle', 'flipbook', 'decal', 'texture'] },
+        limit: { type: 'number', description: 'Max results (default 40, max 200).' },
+      },
     },
   },
   {
@@ -273,6 +288,13 @@ async function call(name, a = {}) {
       const res = db.search(state, { q: a.query || '', category: a.category || '', type: a.type || '', favorite: Boolean(a.favorites_only), limit: a.limit || 15 });
       const examples = matchExamples(state, { query: a.query, category: a.category }).slice(0, 5).map(briefExample);
       return { count: res.length, examples, results: res.map(brief) };
+    }
+    case 'find_vfx_textures': {
+      const list = textures.all(state);
+      const groups = textures.groups(list).map((g) => ({ id: g.id, label: g.label, kind: g.kind, count: g.count }));
+      if (!a.query && !a.group && !a.flipbook && !a.kind) return { total: list.length, groups, how: 'Call again with a query (e.g. "toon fire") or a group id to get texture IDs.' };
+      const results = textures.search(list, a);
+      return { count: results.length, results, note: 'Flipbook textures need ParticleEmitter.FlipbookLayout set to their grid; for a one-shot burst use FlipbookMode OneShot and a framerate of frames / Lifetime. Ask the user to check the look in Studio.' };
     }
     case 'upload_image_to_roblox':
       return rbxupload.upload(state, a);

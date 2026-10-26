@@ -57,7 +57,7 @@ function mergeSkills(local = {}, remote = {}) {
 async function pull(state, cred) {
   const out = must(await rpc('rovex_get_shared', { p_code: cred }));
   const sh = out.shared || {};
-  const before = JSON.stringify([state.examples, state.skills, state.prompts]);
+  const before = JSON.stringify([state.examples, state.skills, state.prompts, state.textures]);
   const del = (state.sharedDeleted = state.sharedDeleted || { examples: {}, prompts: {} });
   if (sh.examples) {
     const m = mergeList(state.examples, sh.examples.data, del.examples);
@@ -70,7 +70,9 @@ async function pull(state, cred) {
     del.prompts = m.deleted;
   }
   if (sh.skills) state.skills = mergeSkills(state.skills, sh.skills.data);
-  return before !== JSON.stringify([state.examples, state.skills, state.prompts]);
+  // Textures VFX ajoutées par l'admin : la version la plus récente gagne.
+  if (sh.textures && sh.textures.data && (!state.textures || stamp(sh.textures.data) > stamp(state.textures))) state.textures = sh.textures.data;
+  return before !== JSON.stringify([state.examples, state.skills, state.prompts, state.textures]);
 }
 
 // Publie le contenu local (admins seulement) après l'avoir fusionné avec ce qui est en ligne.
@@ -80,6 +82,8 @@ async function push(state, cred) {
   must(await rpc('rovex_put_shared', { p_key: cred, p_name: 'examples', p_data: { items: state.examples || [], deleted: del.examples || {} } }));
   must(await rpc('rovex_put_shared', { p_key: cred, p_name: 'prompts', p_data: { items: state.prompts || [], deleted: del.prompts || {} } }));
   must(await rpc('rovex_put_shared', { p_key: cred, p_name: 'skills', p_data: state.skills || {} }));
+  // Textures : seulement si la base en ligne les accepte (supabase/rovex-library.sql lancé).
+  if (state.textures) { try { await rpc('rovex_put_shared', { p_key: cred, p_name: 'textures', p_data: state.textures }); } catch {} }
 }
 
 module.exports = { enabled, rpc, must, pull, push, mergeList, URL: URL_, KEY };

@@ -1363,6 +1363,106 @@ async function placeValues(s) {
   draw();
 }
 
+// ---------- Textures VFX : les IDs Roblox des textures de particules (Claude les récupère par find_vfx_textures) ----------
+let TEX = null;
+async function renderTextures(params) {
+  TEX = await api('/textures');
+  const { items, groups } = TEX;
+  const KIND = { particle: '✨', flipbook: '🎞️', decal: '🖼️', texture: '🧩' };
+  view.innerHTML = `
+    ${pageHead('VFX', t('nav.textures'), t('tx.sub', { n: num(items.length) }), `<button class="btn primary admin-only" id="tx-add">+ ${t('tx.add')}</button>`)}
+    <div class="row tx-tools">
+      <input class="input" id="tx-q" style="flex:1;min-width:220px" placeholder="${t('tx.search')}" value="${esc(params.get('q') || '')}">
+      <select class="select" id="tx-kind"><option value="">${t('tx.allKinds')}</option>${['particle', 'flipbook', 'decal', 'texture'].map((k) => `<option value="${k}">${KIND[k]} ${t('tx.kind.' + k)}</option>`).join('')}</select>
+      <select class="select" id="tx-grid"><option value="">${t('tx.allGrids')}</option>${['2x2', '4x4', '8x8'].map((g) => `<option value="${g}">Flipbook ${g}</option>`).join('')}</select>
+    </div>
+    <div class="chips tx-chips"><button class="chip on" data-g="">${t('tx.all')} · ${num(items.length)}</button>${groups.map((g) => `<button class="chip" data-g="${esc(g.id)}">${KIND[g.kind] || ''} ${esc(g.label)} · ${g.count}</button>`).join('')}</div>
+    <p class="sub" style="font-size:13px;margin:6px 0 14px">${t('tx.hint')}</p>
+    <div class="tx-grid" id="tx-grid-box"></div>
+    <div class="row" style="justify-content:center;margin-top:18px"><button class="btn" id="tx-more" hidden>${t('tx.more')}</button></div>`;
+  let group = params.get('g') || '';
+  let shown = 0;
+  let list = [];
+  const filter = () => {
+    const q = $('#tx-q').value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+    const kind = $('#tx-kind').value;
+    const grid = $('#tx-grid').value;
+    return items.filter((x) => (!group || x.groupId === group) && (!kind || x.kind === kind) && (!grid || x.flipbook === grid)
+      && q.every((w) => `${x.id} ${x.name} ${x.variant || ''} ${x.group} ${x.tip || ''}`.toLowerCase().replace(/_/g, ' ').includes(w)));
+  };
+  const card = (x) => `<button class="tx-card" data-id="${x.id}" title="rbxassetid://${x.id}">
+      <span class="tx-img" data-thumb="${x.id}" data-grid="${x.flipbook || ''}" ${x.thumb ? `style="background-image:url('${esc(x.thumb)}')"` : ''}></span>
+      ${x.flipbook ? `<span class="tx-badge">${x.flipbook}</span>` : ''}
+      <b>${esc(x.name || t('tx.noName'))}${x.variant ? ` <small>${esc(x.variant)}</small>` : ''}</b>
+      <span class="mono">${x.id}</span>${x.tip ? `<small class="tx-tip">${esc(x.tip)}</small>` : ''}
+    </button>`;
+  const loadThumbs = async (ids) => {
+    for (let i = 0; i < ids.length; i += 200) {
+      const map = await api('/textures/thumbs', { method: 'POST', body: { ids: ids.slice(i, i + 200) } }).catch(() => ({}));
+      for (const [id, url] of Object.entries(map)) {
+        const it = items.find((x) => x.id === id);
+        if (it) it.thumb = url;
+        $$(`[data-thumb="${id}"]`).forEach((el) => { if (url) el.style.backgroundImage = `url('${url}')`; else el.classList.add('none'); });
+      }
+    }
+  };
+  const more = () => {
+    const next = list.slice(shown, shown + 120);
+    $('#tx-grid-box').insertAdjacentHTML('beforeend', next.map(card).join(''));
+    shown += next.length;
+    $('#tx-more').hidden = shown >= list.length;
+    loadThumbs(next.filter((x) => !x.thumb).map((x) => x.id));
+  };
+  const draw = () => {
+    list = filter();
+    shown = 0;
+    $('#tx-grid-box').innerHTML = list.length ? '' : `<div class="empty"><b>${t('tx.none')}</b></div>`;
+    more();
+  };
+  $$('.tx-chips .chip').forEach((b) => { b.classList.toggle('on', b.dataset.g === group); b.onclick = () => { group = b.dataset.g; $$('.tx-chips .chip').forEach((c) => c.classList.toggle('on', c === b)); draw(); }; });
+  $('#tx-q').oninput = draw;
+  $('#tx-kind').onchange = draw;
+  $('#tx-grid').onchange = draw;
+  $('#tx-more').onclick = more;
+  // Clic : copie l'ID ; survol d'un flipbook : l'animation joue image par image.
+  $('#tx-grid-box').onclick = async (e) => {
+    const c = e.target.closest('.tx-card');
+    if (!c) return;
+    if (await copyText('rbxassetid://' + c.dataset.id)) toast(t('tx.copied', { id: c.dataset.id }));
+  };
+  let anim = null;
+  $('#tx-grid-box').onmouseover = (e) => {
+    const img = e.target.closest('.tx-card') && e.target.closest('.tx-card').querySelector('.tx-img');
+    if (!img || img === (anim && anim.el) || !img.dataset.grid || !img.style.backgroundImage) return;
+    if (anim) { clearInterval(anim.timer); anim.el.classList.remove('tx-anim'); anim.el.style.backgroundPosition = ''; anim.el.style.backgroundSize = ''; }
+    const n = Number(img.dataset.grid[0]);
+    let f = 0;
+    img.classList.add('tx-anim');
+    img.style.backgroundSize = `${n * 100}% ${n * 100}%`;
+    const step = () => { const x = f % n; const y = Math.floor(f / n) % n; img.style.backgroundPosition = `${(x / (n - 1)) * 100}% ${(y / (n - 1)) * 100}%`; f = (f + 1) % (n * n); };
+    step();
+    anim = { el: img, timer: setInterval(step, 70) };
+  };
+  $('#tx-grid-box').onmouseleave = () => { if (anim) { clearInterval(anim.timer); anim.el.classList.remove('tx-anim'); anim.el.style.backgroundPosition = ''; anim.el.style.backgroundSize = ''; anim = null; } };
+  const add = $('#tx-add');
+  if (add) add.onclick = () => {
+    openModal(`<h2 class="detail-title">${t('tx.add')}</h2><p class="sub" style="margin-bottom:14px">${t('tx.addText')}</p>
+      <div class="field"><label>${t('tx.section')}</label><input class="input" id="tx-sec" placeholder="${t('tx.sectionPh')}"></div>
+      <div class="field"><label>IDs</label><textarea class="input big" id="tx-text" spellcheck="false" style="min-height:220px;font-family:var(--mono);font-size:12.5px" placeholder="* 13800702582 — ToonBird (Misc) · 4x4&#10;4x4 : 14106379216, 14117822736&#10;Wind : 10352559573, 6863041721"></textarea></div>
+      <button class="btn primary" id="tx-save">${t('tx.import')}</button>`);
+    $('#tx-save').onclick = async () => {
+      try {
+        const r = await api('/textures/import', { method: 'POST', body: { text: $('#tx-text').value, section: $('#tx-sec').value } });
+        toast(t('tx.imported', { n: r.added }));
+        closeModal();
+        TEX = null;
+        transition(() => renderTextures(params));
+      } catch (err) { toast(err.message, true); }
+    };
+  };
+  draw();
+}
+
 // ---------- Niveau de Claude ----------
 const BADGE_ICONS = { firstCall: '🔌', calls50: '⚡', calls500: '🚀', examples5: '📘', examples25: '📚', resources1k: '🗂️', resources10k: '🌌', allRounder: '🧭', master: '👑' };
 
@@ -1932,7 +2032,7 @@ async function route() {
   const pages = {
     library: () => renderLibrary(params), favorites: () => renderLibrary(params, true), examples: renderExamples,
     youtube: () => renderYoutube(params), channels: () => renderChannels(params), explore: renderExplore,
-    connect: renderConnect, admin: renderAdmin, settings: renderSettings, update: renderUpdate, robloxstudio: renderRobloxStudio, place: () => renderPlace(params), level: renderLevel, opensource: renderOpenSource, skills: renderSkills, prompts: renderPrompts, studio: renderStudio,
+    connect: renderConnect, admin: renderAdmin, settings: renderSettings, update: renderUpdate, robloxstudio: renderRobloxStudio, textures: () => renderTextures(params), place: () => renderPlace(params), level: renderLevel, opensource: renderOpenSource, skills: renderSkills, prompts: renderPrompts, studio: renderStudio,
   };
   try {
     await transition(pages[path] || renderHome);

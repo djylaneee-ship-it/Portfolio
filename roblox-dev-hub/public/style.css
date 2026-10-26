@@ -662,3 +662,21 @@ body.desktop .modal, body.desktop .login { padding-top: 40px; }
 .pv-label b span { color: var(--muted2); font-weight: 500; }
 .pv-label small { color: var(--muted2); font-size: 12px; }
 .pv-in { width: 220px; max-width: 45%; }
+
+/* ---------- Textures VFX ---------- */
+.tx-tools { margin-bottom: 14px; }
+.tx-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.tx-chips .chip { min-height: 34px; font-size: 12.5px; padding: 0 12px; }
+.tx-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.tx-card { position: relative; display: grid; gap: 4px; padding: 10px; text-align: left; border-radius: 16px; border: 1px solid var(--line); background: var(--panel); color: var(--text); cursor: pointer; transition: transform .35s var(--spring), border-color .2s, box-shadow .3s; }
+.tx-card:hover { transform: translateY(-4px); border-color: color-mix(in srgb, var(--accent) 55%, var(--line)); box-shadow: 0 14px 30px rgba(124, 58, 237, .18); }
+.tx-img { display: block; aspect-ratio: 1; border-radius: 11px; margin-bottom: 4px; background-color: #0b0814; background-repeat: no-repeat; background-position: center; background-size: contain;
+  background-image: linear-gradient(45deg, rgba(255,255,255,.04) 25%, transparent 25%, transparent 75%, rgba(255,255,255,.04) 75%), linear-gradient(45deg, rgba(255,255,255,.04) 25%, transparent 25%, transparent 75%, rgba(255,255,255,.04) 75%); }
+.tx-img[style*="url"] { background-size: contain; }
+.tx-img.none::after { content: '?'; display: grid; place-items: center; height: 100%; color: var(--muted); font-size: 26px; }
+.tx-img.tx-anim { background-position: 0 0; }
+.tx-badge { position: absolute; top: 16px; right: 16px; padding: 2px 7px; border-radius: 8px; font: 700 11px var(--mono); background: rgba(7, 5, 12, .8); color: #c4b5fd; border: 1px solid rgba(196, 181, 253, .3); }
+.tx-card b { font-size: 13px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tx-card b small { color: var(--muted2); font-weight: 500; }
+.tx-card .mono { font-size: 11px; color: var(--muted); }
+.tx-tip { font-size: 11px; color: #fbbf24; }

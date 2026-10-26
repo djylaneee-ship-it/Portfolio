@@ -12,6 +12,7 @@ const claude = require('./claude');
 const studio = require('./studio');
 const place = require('./place');
 const rbxupload = require('./rbxupload');
+const textures = require('./vfx-textures');
 const level = require('./level');
 const quality = require('./quality');
 const skills = require('./skills');
@@ -420,6 +421,26 @@ const routes = [
     await studio.bridge.waitReady(10e3);
     return robloxStudioInfo();
   }],
+  // Textures VFX : la liste (de base + ajoutées par l'admin) et leurs miniatures Roblox.
+  ['GET', /^\/api\/textures$/, () => {
+    const list = textures.all(state);
+    const cache = readThumbs();
+    return { groups: textures.groups(list), items: list.map((t) => ({ ...t, thumb: (cache[t.id] || {}).url || '' })) };
+  }],
+  ['POST', /^\/api\/textures\/thumbs$/, async (req) => textureThumbs(((await json(req)).ids || []).map(String).slice(0, 400))],
+  ['POST', /^\/api\/textures\/import$/, async (req, m, url, session) => {
+    const b = await json(req);
+    const section = String(b.section || 'Ajoutées').slice(0, 60);
+    const found = textures.parse(String(b.text || ''), { source: 'custom', section });
+    if (!found.length) throw Object.assign(new Error('No texture ID found'), { key: 'txNone' });
+    const cur = (state.textures && state.textures.items) || [];
+    const known = new Set([...textures.BUILTIN, ...cur].map((t) => t.id));
+    const fresh = found.filter((t) => !known.has(t.id));
+    state.textures = { items: cur.concat(fresh), updatedAt: new Date().toISOString() };
+    persist();
+    sharedPush(session);
+    return { added: fresh.length, total: textures.all(state).length };
+  }],
   // La place ouverte dans Studio : scripts (lire / modifier) et réglages du jeu (valeurs du code).
   ['GET', /^\/api\/place\/studios$/, async (req, m, url) => ({ ready: studio.bridge.state === 'ready', studios: await place.studios(url.searchParams.get('force') === '1') })],
   ['GET', /^\/api\/place\/scripts$/, (req, m, url) => place.scripts(url.searchParams.get('s') || '')],
@@ -447,8 +468,8 @@ const routes = [
 // Routes accessibles à un ID d'accès simple (lecture seule). Tout le reste est réservé à l'admin.
 // Ce que les membres peuvent faire en plus de lire : brancher Claude sur leur PC, tester la recherche,
 // mettre à jour l'app, utiliser la génération IA.
-const MEMBER_ACTIONS = [/^\/api\/place\/(read|write|value)$/, /^\/api\/robloxstudio(\/restart)?$/, /^\/api\/claude\/(desktop|code)$/, /^\/api\/mcp\/test$/, /^\/api\/update\/(check|install)$/, /^\/api\/gen(\/.*)?$/];
-const USER_ROUTES = [/^\/api\/place\/(studios|scripts|values)$/, /^\/api\/robloxstudio$/, /^\/api\/claude$/, /^\/api\/version$/, /^\/api\/prompts$/, /^\/api\/skills$/, /^\/api\/skills\/\w+$/, /^\/api\/level$/, /^\/api\/meta$/, /^\/api\/stats$/, /^\/api\/resources$/, /^\/api\/channels$/, /^\/api\/youtube$/, /^\/api\/crawl$/, /^\/api\/examples$/, /^\/api\/mcp$/];
+const MEMBER_ACTIONS = [/^\/api\/textures\/thumbs$/, /^\/api\/place\/(read|write|value)$/, /^\/api\/robloxstudio(\/restart)?$/, /^\/api\/claude\/(desktop|code)$/, /^\/api\/mcp\/test$/, /^\/api\/update\/(check|install)$/, /^\/api\/gen(\/.*)?$/];
+const USER_ROUTES = [/^\/api\/textures$/, /^\/api\/place\/(studios|scripts|values)$/, /^\/api\/robloxstudio$/, /^\/api\/claude$/, /^\/api\/version$/, /^\/api\/prompts$/, /^\/api\/skills$/, /^\/api\/skills\/\w+$/, /^\/api\/level$/, /^\/api\/meta$/, /^\/api\/stats$/, /^\/api\/resources$/, /^\/api\/channels$/, /^\/api\/youtube$/, /^\/api\/crawl$/, /^\/api\/examples$/, /^\/api\/mcp$/];
 
 const cookies = (req) => Object.fromEntries(String(req.headers.cookie || '').split(';').map((c) => c.trim().split('=')).filter((p) => p[0]).map(([k, ...v]) => [k, decodeURIComponent(v.join('='))]));
 const clientIp = (req) => req.socket.remoteAddress || '';
@@ -682,6 +703,25 @@ function robloxStudioInfo() {
 }
 try { studio.sync(); } catch {}
 process.on('exit', () => studio.bridge.kill());
+
+// Miniatures des textures (API publique de Roblox), gardées 7 jours dans data/texture-thumbs.json.
+const THUMBS_FILE = path.join(db.DATA_DIR, 'texture-thumbs.json');
+const readThumbs = () => { try { return JSON.parse(fs.readFileSync(THUMBS_FILE, 'utf8')); } catch { return {}; } };
+async function textureThumbs(ids) {
+  const cache = readThumbs();
+  const week = 7 * 86400e3;
+  const missing = [...new Set(ids)].filter((id) => /^\d+$/.test(id) && !(cache[id] && cache[id].url && Date.now() - cache[id].at < week));
+  for (let i = 0; i < missing.length; i += 100) {
+    const chunk = missing.slice(i, i + 100);
+    try {
+      const r = await fetch(`https://thumbnails.roblox.com/v1/assets?assetIds=${chunk.join(',')}&returnPolicy=PlaceHolder&size=420x420&format=Png&isCircular=false`, { signal: AbortSignal.timeout(20000) });
+      const j = await r.json();
+      for (const d of j.data || []) cache[String(d.targetId)] = { url: d.state === 'Completed' ? d.imageUrl : '', state: d.state, at: Date.now() };
+    } catch {}
+  }
+  if (missing.length) { try { fs.writeFileSync(THUMBS_FILE, JSON.stringify(cache)); } catch {} }
+  return Object.fromEntries(ids.map((id) => [id, (cache[id] || {}).url || '']));
+}
 
 let pushTimer = null;
 function sharedPush(session) {
