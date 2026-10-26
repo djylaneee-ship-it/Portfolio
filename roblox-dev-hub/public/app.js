@@ -195,10 +195,13 @@ function renderSession() {
   $('#side-user').innerHTML = `
     <div class="who"><span class="avatar">${esc(initials)}</span>
       <span class="meta"><b>${esc(name)}</b><small>${isAdmin() ? t('session.admin') + ' · ' : ''}${SESSION.permanent ? t('session.permanent') : t('session.until', { date: date(SESSION.expiresAt) })}</small></span>
-      <a class="icon-btn admin-only" href="#/settings" aria-label="${t('nav.settings')}" title="${t('nav.settings')}"><svg class="line" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg></a>
+    </div>
+    <div class="side-actions">
+      <a class="btn small admin-only" href="#/settings"><svg class="line" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>${t('nav.settings')}</a>
+      <button class="btn small" id="logout"><svg class="line" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>${t('session.logout')}</button>
     </div>
     <div class="ver" id="side-ver"></div>
-    <div class="row">${langSelect('side-lang')}<button class="icon-btn" id="logout" title="${t('session.logout')}" aria-label="${t('session.logout')}"><svg class="line" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg></button></div>`;
+    <div class="row">${langSelect('side-lang')}</div>`;
   $('#side-lang').onchange = (e) => setLang(e.target.value);
   api('/version').then((v) => { const el = $('#side-ver'); if (el) el.textContent = 'Rovex Hub v' + v.version; }).catch(() => {});
   watchUpdates();
