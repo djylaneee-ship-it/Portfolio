@@ -62,22 +62,36 @@ async function image(b: Record<string, unknown>) {
   return { images: (j.data ?? []).map((d: { b64_json?: string }) => d.b64_json).filter(Boolean), model: IMAGE_MODEL };
 }
 
-// Texte : l'app envoie les consignes (system) et la demande ; Gemini répond.
+// Texte : l'app envoie les consignes (system) et la demande ; Gemini répond. Si un modèle est surchargé
+// (fréquent en gratuit), on réessaie puis on passe au modèle Gemini suivant.
+const TEXT_MODELS = [...new Set([TEXT_MODEL, 'gemini-2.5-flash', 'gemini-flash-lite-latest', 'gemini-2.5-flash-lite'])];
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 async function text(b: Record<string, unknown>) {
-  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(TEXT_MODEL)}:generateContent`, {
-    method: 'POST',
-    headers: { 'x-goog-api-key': GEMINI, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      system_instruction: { parts: [{ text: String(b.system || '').slice(0, 60000) }] },
-      contents: [{ role: 'user', parts: [{ text: String(b.prompt).slice(0, 8000) }] }],
-      generationConfig: { temperature: 0.5, maxOutputTokens: 8192 },
-    }),
+  const body = JSON.stringify({
+    system_instruction: { parts: [{ text: String(b.system || '').slice(0, 60000) }] },
+    contents: [{ role: 'user', parts: [{ text: String(b.prompt).slice(0, 8000) }] }],
+    generationConfig: { temperature: 0.5, maxOutputTokens: 8192 },
   });
-  if (!res.ok) return { error: await providerError(res, 'Gemini') };
-  const j = await res.json();
-  const out = (j.candidates?.[0]?.content?.parts ?? []).map((p: { text?: string }) => p.text ?? '').join('').trim();
-  if (!out) return { error: json({ error: 'Gemini returned nothing', key: 'genEmpty' }, 502) };
-  return { text: out, model: TEXT_MODEL };
+  let last: Response | null = null;
+  for (const model of TEXT_MODELS) {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
+        method: 'POST', headers: { 'x-goog-api-key': GEMINI, 'Content-Type': 'application/json' }, body,
+      });
+      if (res.ok) {
+        const j = await res.json();
+        const out = (j.candidates?.[0]?.content?.parts ?? []).map((p: { text?: string }) => p.text ?? '').join('').trim();
+        if (out) return { text: out, model };
+        break; // réponse vide : modèle suivant
+      }
+      last = res;
+      if (res.status === 404 || res.status === 400) break; // modèle inconnu ou refusé : modèle suivant
+      if (![429, 500, 503].includes(res.status)) return { error: await providerError(res, 'Gemini') };
+      await sleep(1500 * (attempt + 1)); // surcharge : on attend un peu et on réessaie
+    }
+  }
+  return { error: last ? await providerError(last, 'Gemini') : json({ error: 'Gemini returned nothing', key: 'genEmpty' }, 502) };
 }
 
 async function sound(b: Record<string, unknown>) {
