@@ -1541,6 +1541,8 @@ function saveCustom(now) {
   customTimer = setTimeout(go, 500);
 }
 
+window.addEventListener('rovex-bg-error', () => toast(t('cu.videoError'), true));
+
 async function renderCustom() {
   if (!CUSTOM) await loadCustom();
   CUSTOM = RovexTheme.merge(CUSTOM || {});
@@ -1608,15 +1610,29 @@ async function renderCustom() {
   if (file) file.onchange = async () => {
     const f = file.files[0];
     if (!f) return;
-    toast(t('cu.uploading'));
+    const note = $('.cu-media .sub');
     try {
-      const res = await fetch('/api/custom/background', { method: 'POST', headers: { 'Content-Type': f.type }, body: f });
-      const j = await res.json();
-      if (!res.ok) throw new Error(j.error || 'Upload failed');
+      // Envoi avec la progression affichée (une vidéo peut peser des centaines de Mo).
+      const j = await new Promise((resolve, reject) => {
+        const x = new XMLHttpRequest();
+        x.open('POST', '/api/custom/background');
+        x.setRequestHeader('Content-Type', f.type || 'application/octet-stream');
+        x.setRequestHeader('X-File-Name', encodeURIComponent(f.name));
+        x.upload.onprogress = (e) => { if (e.lengthComputable && note) note.textContent = t('cu.uploadingP', { p: Math.round((e.loaded / e.total) * 100) }); };
+        x.onload = () => {
+          let r = {};
+          try { r = JSON.parse(x.responseText); } catch {}
+          if (x.status >= 200 && x.status < 300) resolve(r);
+          else reject(new Error(r.key && has('err.' + r.key) ? t('err.' + r.key) : r.error || 'Upload failed'));
+        };
+        x.onerror = () => reject(new Error(f.size > 1024 ** 3 ? t('err.bgTooBig') : t('err.generic')));
+        x.send(f);
+      });
       Object.assign(c.bg, { type: j.type, src: j.src });
       await saveCustom(true);
+      toast(t('cu.uploaded'));
       redraw();
-    } catch (e) { toast(e.message, true); }
+    } catch (e) { if (note) note.textContent = e.message; toast(e.message, true); }
   };
   const urlOk = $('#cu-url-ok');
   if (urlOk) urlOk.onclick = () => {

@@ -460,13 +460,27 @@ const routes = [
   }],
   // Fond d'écran importé (image, GIF ou vidéo), servi depuis les médias de l'app.
   ['POST', /^\/api\/custom\/background$/, async (req) => {
-    const type = String(req.headers['content-type'] || '');
-    const ext = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/gif': 'gif', 'image/webp': 'webp', 'video/mp4': 'mp4', 'video/webm': 'webm' }[type.split(';')[0]];
-    if (!ext) throw Object.assign(new Error('Use a PNG, JPG, GIF, WEBP, MP4 or WEBM file'), { key: 'bgType' });
+    // Type d'après le fichier envoyé, sinon d'après son extension (Windows ne donne pas toujours le type).
+    const TYPES = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/gif': 'gif', 'image/webp': 'webp', 'video/mp4': 'mp4', 'video/webm': 'webm', 'video/quicktime': 'mov', 'video/x-m4v': 'mp4' };
+    const name = decodeURIComponent(String(req.headers['x-file-name'] || ''));
+    const byName = (name.match(/\.(png|jpe?g|gif|webp|mp4|m4v|webm|mov)$/i) || [])[1];
+    const ext = TYPES[String(req.headers['content-type'] || '').split(';')[0]] || (byName && byName.toLowerCase().replace('jpeg', 'jpg').replace('m4v', 'mp4'));
+    if (!ext) throw Object.assign(new Error('Use a PNG, JPG, GIF, WEBP, MP4, MOV or WEBM file'), { key: 'bgType' });
+    const max = 1024 * 1024 * 1024;
+    if (Number(req.headers['content-length']) > max) throw Object.assign(new Error('File too large (1 GB max)'), { key: 'bgTooBig' });
     const file = `bg-${Date.now()}.${ext}`;
     fs.mkdirSync(db.MEDIA_DIR, { recursive: true });
-    fs.writeFileSync(path.join(db.MEDIA_DIR, file), await readBody(req, 150 * 1024 * 1024));
-    return { src: `/media/${file}`, type: ext === 'mp4' || ext === 'webm' ? 'video' : 'image' };
+    // Écrit au fil de l'eau (une vidéo peut être lourde), sans tout garder en mémoire.
+    await new Promise((resolve, reject) => {
+      const out = fs.createWriteStream(path.join(db.MEDIA_DIR, file));
+      let size = 0;
+      req.on('data', (c) => { size += c.length; if (size > max) { req.destroy(); out.destroy(); reject(Object.assign(new Error('File too large (1 GB max)'), { key: 'bgTooBig' })); } });
+      req.on('error', reject);
+      out.on('error', reject);
+      out.on('finish', resolve);
+      req.pipe(out);
+    }).catch((e) => { try { fs.rmSync(path.join(db.MEDIA_DIR, file), { force: true }); } catch {} throw e; });
+    return { src: `/media/${file}`, type: ['mp4', 'webm', 'mov'].includes(ext) ? 'video' : 'image' };
   }],
   // Mode développeur (admins) : outils dev_* pour Claude et page Développeur.
   ['PUT', /^\/api\/devmode$/, async (req) => { state.settings.devMode = Boolean((await json(req)).on); persist(); return { devMode: state.settings.devMode }; }],

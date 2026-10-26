@@ -106,6 +106,8 @@
         const v = document.createElement('video');
         Object.assign(v, { src: c.bg.src, autoplay: true, loop: true, muted: true, playsInline: true });
         v.setAttribute('muted', '');
+        // Vidéo que le lecteur ne sait pas lire (souvent HEVC / H.265) : on prévient l'app.
+        v.addEventListener('error', () => window.dispatchEvent(new CustomEvent('rovex-bg-error')));
         L.append(v);
         v.play().catch(() => {});
       } else if (c.bg.type === 'gradient') {
