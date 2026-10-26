@@ -8,6 +8,7 @@ const db = require('./db');
 const web = require('./web');
 const skills = require('./skills');
 const gen = require('./gen');
+const studio = require('./studio');
 const vm = require('vm');
 
 // Les modèles de prompts de la page « Prompts » (public/prompts.js), aussi proposés dans le menu + de Claude.
@@ -51,6 +52,8 @@ function clients() {
 const SKILL_RULE = `
 
 Skills: for every Roblox task, first identify the domains it needs (scripting, vfx, animation, cutscenes, gui, gfx, modeling, building, audio, design, tools) and call load_skill once with only those categories and the task keywords (an attack = scripting + animation + vfx; a boss intro = cutscenes + animation + vfx, + audio if needed; a menu = gui + scripting). Read all of it before working: the core rules (rovex-core) apply to every task. Project art direction: VFX are built from custom-textured ParticleEmitters, never the Fire, Smoke or Sparkles classes.
+
+Roblox Studio: when tools starting with studio_ are available, Rovex is connected to the place open in Roblox Studio. Before writing code for the user's game, use them to read the real scripts, the Explorer structure and the data, and follow the existing architecture. Only change the place (edit scripts, run code that modifies it, insert models) when the user asked for it, and say what you changed.
 
 Images: you cannot draw yourself, but Rovex can. When the user asks for an icon, an image, a UI element, a thumbnail, a texture or a VFX sprite, load the skill of the category, then call generate_image. Describe only the subject: Rovex applies the skill's style and the user's reference images, and saves the PNG in the library. Give the user the file path, and remind them to upload it to Roblox (Creator Hub or Asset Manager) to get its rbxassetid.`;
 
@@ -379,13 +382,17 @@ async function handle(msg) {
       seen();
       return ok({
         protocolVersion: params.protocolVersion || '2025-06-18',
-        capabilities: { tools: {}, prompts: {} },
+        capabilities: { tools: { listChanged: true }, prompts: {} },
         serverInfo: { name: 'rovex-hub', version: '2.0.0' },
         instructions: ((store.load().settings || {}).mcpInstructions || DEFAULT_INSTRUCTIONS) + SKILL_RULE,
       });
     }
     if (method === 'ping') return ok({});
-    if (method === 'tools/list') return ok({ tools: enabledTools() });
+    if (method === 'tools/list') {
+      // Outils de Roblox Studio (si le pont est configuré) : on laisse quelques secondes à Studio pour répondre.
+      if (studio.bridge.state === 'starting') await studio.bridge.waitReady(4000);
+      return ok({ tools: [...enabledTools(), ...studio.bridge.exposedTools().map(({ _studio, ...t }) => t)] });
+    }
     // Chaque skill est aussi un « prompt » MCP, sélectionnable dans Claude Desktop.
     if (method === 'prompts/list') {
       const st = store.load();
@@ -420,6 +427,16 @@ async function handle(msg) {
         messages: [{ role: 'user', content: { type: 'text', text: `Use this Rovex Hub skill (Roblox ${cat}). Follow the instructions, reuse the validated examples and cite the resources.\n\n${JSON.stringify(data, null, 2)}${task ? `\n\nTask: ${task}` : ''}` } }],
       });
     }
+    if (method === 'tools/call' && studio.bridge.owns(params.name)) {
+      try {
+        const out = await studio.bridge.call(params.name, params.arguments);
+        logCall(params.name, params.arguments || {}, { category: '' });
+        seen();
+        return ok(out && Array.isArray(out.content) ? out : { content: [{ type: 'text', text: JSON.stringify(out, null, 2) }] });
+      } catch (e) {
+        return ok({ content: [{ type: 'text', text: 'Error: ' + e.message }], isError: true });
+      }
+    }
     if (method === 'tools/call') {
       try {
         if (!enabledTools().some((x) => x.name === params.name)) throw new Error('Tool disabled in Rovex Hub: ' + params.name);
@@ -447,6 +464,18 @@ module.exports = { handle, call, useStore, clients, TOOLS, DEFAULT_INSTRUCTIONS 
 if (require.main === module) {
   MODE = 'stdio';
   setInterval(seen, 60e3);
+  // Pont Roblox Studio : lancé avec Claude ; Claude est prévenu quand ses outils apparaissent ou changent.
+  let lastTools = '';
+  studio.bridge.onChange(() => {
+    const names = studio.bridge.exposedTools().map((t) => t.name).join(',');
+    if (names === lastTools) return;
+    lastTools = names;
+    if (CLIENT) process.stdout.write(JSON.stringify({ jsonrpc: '2.0', method: 'notifications/tools/list_changed' }) + '\n');
+  });
+  try { studio.sync(); } catch {}
+  // Réglage modifié dans l'app : on suit sans redémarrer Claude.
+  setInterval(() => { try { studio.sync(); } catch {} }, 15e3).unref();
+  process.on('exit', () => studio.bridge.kill());
   const rl = readline.createInterface({ input: process.stdin });
   // À la fermeture, on termine les requêtes en cours et on vide la sortie avant de quitter.
   let pending = 0;

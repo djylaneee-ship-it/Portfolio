@@ -58,6 +58,8 @@ Installation, une fois, dans ton projet Supabase :
 
 **Prompt Booster (Groq, gratuit)** : lance aussi `supabase/rovex-ai-text.sql` dans **SQL Editor**, recolle la nouvelle version de `supabase/functions/rovex-gen/index.ts` dans la fonction `rovex-gen` (**Deploy**), puis ajoute le secret `GROQ_API_KEY` (clé gratuite sur console.groq.com/keys ; facultatif : `GROQ_MODEL`, par défaut `openai/gpt-oss-120b`, avec repli automatique sur d'autres modèles Groq). Sans clé Groq, la fonction utilise `GEMINI_API_KEY` si elle existe. Limite par défaut : 50 prompts par jour et par ID, réglable sur la page Prompts.
 
+**Roblox Studio** (page **Roblox Studio**) : Rovex se branche sur le serveur MCP de Roblox Studio et repasse ses outils à Claude avec le préfixe `studio_` (lire les scripts et la structure de la place ouverte, lancer du Luau, tester…). Dans Studio : **Assistant → ⋯ → Manage MCP Servers → Enable Studio as MCP server**. Dans Rovex : la config officielle est pré-remplie (`cmd.exe /c %LOCALAPPDATA%\Roblox\mcp.bat` sur Windows, `StudioMCP` sur macOS) ; on peut coller n'importe quel JSON MCP en `command` + `args`. La config reste sur le PC (`data/studio.json`) ; le serveur MCP lancé par Claude la relit et prévient Claude quand les outils changent.
+
 **Connexion Claude** : ouverte aux membres pour brancher Claude Desktop / Claude Code sur leur PC ; les outils MCP et les consignes restent réservés aux admins.
 
 Conseil : fixe un plafond de dépense mensuel dans OpenAI (Settings → Limits), puisque toutes les générations des membres sont facturées sur ton compte.

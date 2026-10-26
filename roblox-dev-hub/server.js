@@ -9,6 +9,7 @@ const { Crawler, youtubeSearch } = require('./crawler');
 const { Auth, KEY_FILE } = require('./auth');
 const os = require('os');
 const claude = require('./claude');
+const studio = require('./studio');
 const level = require('./level');
 const quality = require('./quality');
 const skills = require('./skills');
@@ -385,6 +386,30 @@ const routes = [
   ['POST', /^\/api\/claude\/desktop$/, () => { state.settings.autoConnectClaude = true; persist(); return claude.linkDesktop(); }],
   ['DELETE', /^\/api\/claude\/desktop$/, () => { state.settings.autoConnectClaude = false; persist(); return claude.unlinkDesktop(); }],
   ['POST', /^\/api\/claude\/code$/, () => claude.linkCode(`http://localhost:${PORT}/mcp`)],
+  // Pont Roblox Studio : le JSON MCP de Studio, l'état de la connexion et les outils repassés à Claude.
+  ['GET', /^\/api\/robloxstudio$/, () => robloxStudioInfo()],
+  ['PUT', /^\/api\/robloxstudio$/, async (req) => {
+    const b = await json(req);
+    const cur = studio.readSettings();
+    const next = { ...cur };
+    if (typeof b.config === 'string') {
+      studio.parseConfig(b.config); // refuse un JSON invalide avant d'enregistrer
+      next.config = b.config.trim();
+    }
+    if (typeof b.enabled === 'boolean') next.enabled = b.enabled;
+    if (next.enabled && !next.config) next.config = JSON.stringify(studio.DEFAULT_CONFIG, null, 2);
+    next.updatedAt = new Date().toISOString();
+    studio.writeSettings(next);
+    studio.sync();
+    await studio.bridge.waitReady(10e3);
+    return robloxStudioInfo();
+  }],
+  ['POST', /^\/api\/robloxstudio\/restart$/, async () => {
+    studio.sync();
+    studio.bridge.restart();
+    await studio.bridge.waitReady(10e3);
+    return robloxStudioInfo();
+  }],
   ['POST', /^\/api\/mcp\/test$/, async (req) => {
     const q = String((await json(req)).query || '').slice(0, 200);
     return mcp.call('search_resources', { query: q, limit: 8 });
@@ -405,8 +430,8 @@ const routes = [
 // Routes accessibles à un ID d'accès simple (lecture seule). Tout le reste est réservé à l'admin.
 // Ce que les membres peuvent faire en plus de lire : brancher Claude sur leur PC, tester la recherche,
 // mettre à jour l'app, utiliser la génération IA.
-const MEMBER_ACTIONS = [/^\/api\/claude\/(desktop|code)$/, /^\/api\/mcp\/test$/, /^\/api\/update\/(check|install)$/, /^\/api\/gen(\/.*)?$/];
-const USER_ROUTES = [/^\/api\/claude$/, /^\/api\/version$/, /^\/api\/prompts$/, /^\/api\/skills$/, /^\/api\/skills\/\w+$/, /^\/api\/level$/, /^\/api\/meta$/, /^\/api\/stats$/, /^\/api\/resources$/, /^\/api\/channels$/, /^\/api\/youtube$/, /^\/api\/crawl$/, /^\/api\/examples$/, /^\/api\/mcp$/];
+const MEMBER_ACTIONS = [/^\/api\/robloxstudio(\/restart)?$/, /^\/api\/claude\/(desktop|code)$/, /^\/api\/mcp\/test$/, /^\/api\/update\/(check|install)$/, /^\/api\/gen(\/.*)?$/];
+const USER_ROUTES = [/^\/api\/robloxstudio$/, /^\/api\/claude$/, /^\/api\/version$/, /^\/api\/prompts$/, /^\/api\/skills$/, /^\/api\/skills\/\w+$/, /^\/api\/level$/, /^\/api\/meta$/, /^\/api\/stats$/, /^\/api\/resources$/, /^\/api\/channels$/, /^\/api\/youtube$/, /^\/api\/crawl$/, /^\/api\/examples$/, /^\/api\/mcp$/];
 
 const cookies = (req) => Object.fromEntries(String(req.headers.cookie || '').split(';').map((c) => c.trim().split('=')).filter((p) => p[0]).map(([k, ...v]) => [k, decodeURIComponent(v.join('='))]));
 const clientIp = (req) => req.socket.remoteAddress || '';
@@ -584,6 +609,19 @@ async function sharedPull() {
   if (changed) syncCodeSkills();
   return changed;
 }
+function robloxStudioInfo() {
+  const s = studio.readSettings();
+  return {
+    enabled: Boolean(s.enabled),
+    config: s.config || JSON.stringify(studio.DEFAULT_CONFIG, null, 2),
+    defaultConfig: JSON.stringify(studio.DEFAULT_CONFIG, null, 2),
+    status: studio.bridge.status(),
+    prefix: studio.PREFIX,
+  };
+}
+try { studio.sync(); } catch {}
+process.on('exit', () => studio.bridge.kill());
+
 let pushTimer = null;
 function sharedPush(session) {
   if (!auth.online || !session || session.role !== 'admin' || !session.cred) return;

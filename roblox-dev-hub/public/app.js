@@ -1151,6 +1151,43 @@ async function renderConnect() {
   };
 }
 
+// ---------- Roblox Studio : Rovex se branche sur le serveur MCP de Studio et repasse ses outils à Claude ----------
+async function renderRobloxStudio() {
+  const d = await api('/robloxstudio');
+  const st = d.status || {};
+  const state = d.enabled ? st.state : 'off';
+  const steps = [['rs.s1', 'rs.s1t'], ['rs.s2', 'rs.s2t'], ['rs.s3', 'rs.s3t']];
+  view.innerHTML = `
+    ${pageHead('MCP', t('nav.rstudio'), t('rs.sub'))}
+    <div class="panel rs-status ${esc(state)}" data-spot>
+      <span class="pulse"></span>
+      <div class="rs-main"><b>${t('rs.state.' + state)}</b>
+        <small>${state === 'ready' ? esc([st.server && st.server.name, st.server && st.server.version].filter(Boolean).join(' ')) + ' · ' + t('rs.nTools', { n: st.tools.length }) : state === 'error' ? esc(st.error) : t('rs.offText')}</small></div>
+      <label class="switch"><input type="checkbox" id="rs-on" ${d.enabled ? 'checked' : ''}><span></span></label>
+      <button class="btn" id="rs-retry" ${d.enabled ? '' : 'hidden'}>${t('rs.retry')}</button>
+    </div>
+    <div class="steps">${steps.map(([h, p], i) => `<div class="panel" data-spot><span class="num">${i + 1}</span><h3>${t(h)}</h3><p>${t(p)}</p></div>`).join('')}</div>
+    <div class="two-col">
+      <div class="panel" data-spot><h3>${t('rs.cfgTitle')}</h3><p>${t('rs.cfgText')}</p>
+        <textarea class="input big" id="rs-cfg" spellcheck="false" style="min-height:190px;font-family:var(--mono);font-size:12.5px">${esc(d.config)}</textarea>
+        <div class="row" style="margin-top:14px"><button class="btn primary" id="rs-save">${t('rs.save')}</button><button class="btn" id="rs-default">${t('cn.default')}</button></div></div>
+      <div class="panel" data-spot><h3>${t('rs.toolsTitle')}</h3><p>${t('rs.toolsText', { prefix: esc(d.prefix) })}</p>
+        ${st.tools && st.tools.length ? st.tools.map((x) => `<div class="tool"><div><b>${esc(d.prefix + x.name)}</b><small>${esc(x.description.slice(0, 160))}</small></div></div>`).join('') : `<p class="sub" style="font-size:13px">${t('rs.noTools')}</p>`}</div>
+    </div>`;
+  const run = async (b, fn) => {
+    b.disabled = true;
+    const old = b.innerHTML;
+    b.innerHTML = `<span class="spinner"></span>${t('rs.connecting')}`;
+    try { await fn(); transition(renderRobloxStudio); } catch (e) { toast(e.message, true); b.disabled = false; b.innerHTML = old; }
+  };
+  $('#rs-save').onclick = (e) => run(e.currentTarget, () => api('/robloxstudio', { method: 'PUT', body: { config: $('#rs-cfg').value, enabled: true } }));
+  $('#rs-retry').onclick = (e) => run(e.currentTarget, () => api('/robloxstudio/restart', { method: 'POST' }));
+  $('#rs-on').onchange = (e) => run($('#rs-retry'), () => api('/robloxstudio', { method: 'PUT', body: { enabled: e.target.checked } }));
+  $('#rs-default').onclick = () => { $('#rs-cfg').value = d.defaultConfig; };
+  const dot = $('#rs-dot');
+  if (dot) dot.hidden = state !== 'ready';
+}
+
 // ---------- Niveau de Claude ----------
 const BADGE_ICONS = { firstCall: '🔌', calls50: '⚡', calls500: '🚀', examples5: '📘', examples25: '📚', resources1k: '🗂️', resources10k: '🌌', allRounder: '🧭', master: '👑' };
 
@@ -1719,7 +1756,7 @@ async function route() {
   const pages = {
     library: () => renderLibrary(params), favorites: () => renderLibrary(params, true), examples: renderExamples,
     youtube: () => renderYoutube(params), channels: () => renderChannels(params), explore: renderExplore,
-    connect: renderConnect, admin: renderAdmin, settings: renderSettings, update: renderUpdate, level: renderLevel, opensource: renderOpenSource, skills: renderSkills, prompts: renderPrompts, studio: renderStudio,
+    connect: renderConnect, admin: renderAdmin, settings: renderSettings, update: renderUpdate, robloxstudio: renderRobloxStudio, level: renderLevel, opensource: renderOpenSource, skills: renderSkills, prompts: renderPrompts, studio: renderStudio,
   };
   try {
     await transition(pages[path] || renderHome);
