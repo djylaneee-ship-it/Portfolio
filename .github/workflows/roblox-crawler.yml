@@ -14,6 +14,7 @@ on:
 
 permissions:
   contents: write
+  actions: write   # pour relancer le passage suivant
 
 concurrency:
   group: roblox-crawler
@@ -54,3 +55,14 @@ jobs:
           git diff --cached --quiet && exit 0
           git commit -m "Exploration : $(date -u +'%Y-%m-%d %H:%M') UTC"
           for i in 1 2 3; do git pull --rebase -X theirs && git push && break; sleep 5; done
+
+      # Relance aussitôt le passage suivant (GitHub espace beaucoup les tâches programmées) : l'exploration
+      # tourne ainsi en continu. Seulement quand la bibliothèque en ligne est configurée.
+      - name: Passage suivant
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HAS_KEY: ${{ secrets.ROVEX_CRAWLER_KEY != '' }}
+        run: |
+          [ "$HAS_KEY" = "true" ] || exit 0
+          gh workflow run roblox-crawler.yml --ref "$GITHUB_REF_NAME"
