@@ -68,6 +68,12 @@ Installation, une fois, dans ton projet Supabase :
 
 **Textures VFX** (page **Textures VFX**) : plus de 1000 IDs Roblox de textures (flipbooks de particules feu, fumée, slash, burst, foudre, fissures, eau, glace ; decals de vent, étoiles, glows ; textures diverses), rangés par groupe avec leur grille de flipbook. La page affiche les miniatures (API thumbnails de Roblox, en cache 7 jours), joue les flipbooks au survol et copie `rbxassetid://ID` au clic. Claude les retrouve avec l'outil MCP `find_vfx_textures` (avec FlipbookLayout / FlipbookMode / FlipbookFramerate conseillés). Les admins peuvent coller d'autres listes (partagées avec les membres une fois `rovex-library.sql` lancé). Liste de base : `vfx-textures.js`.
 
+**Personnaliser** (icône palette en haut) : 9 thèmes, couleurs libres, fond d'écran animé (aurore, dégradé animé, image/GIF ou vidéo importée ou par lien), assombrir / flou / verre des panneaux, police, taille du texte, arrondis, animations, CSS libre ; export / import de thème en JSON. Gardé sur le PC (`settings.custom`) et appliqué sans flash (`public/custom.js`).
+
+**Deux espaces** (sélecteur en haut) : **Création** (exemples, textures VFX, skills, prompts, Studio IA, niveau, connexion Claude, Roblox Studio, développeur) et **Ressources** (bibliothèque, open source, chaînes, YouTube, favoris, exploration, catégories).
+
+**Mode développeur** (Réglages, admins) : page **Développeur** pour travailler à plusieurs sur Rovex (chaque dev avec son Claude Code, sur une branche, pull request, version publiée à la fusion) et outils MCP `dev_app_info` / `dev_set_custom` pour changer l'apparence en direct. Le guide pour tout Claude qui modifie le code : `CLAUDE.md`.
+
 **Connexion Claude** : ouverte aux membres pour brancher Claude Desktop / Claude Code sur leur PC ; les outils MCP et les consignes restent réservés aux admins.
 
 Conseil : fixe un plafond de dépense mensuel dans OpenAI (Settings → Limits), puisque toutes les générations des membres sont facturées sur ton compte.

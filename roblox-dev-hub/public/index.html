@@ -37,6 +37,7 @@
         <a href="#/channels" data-route="channels"><svg class="line" viewBox="0 0 24 24"><path d="M4 11a9 9 0 0 1 9 9M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg><span data-i18n="nav.channels"></span></a>
         <a href="#/youtube" data-route="youtube"><svg class="line" viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="4"/><path d="M10 9.5v5l4.5-2.5z"/></svg><span data-i18n="nav.youtube"></span></a>
         <a href="#/favorites" data-route="favorites" class="admin-only"><svg class="line" viewBox="0 0 24 24"><path d="M12 3l2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/></svg><span data-i18n="nav.favorites"></span></a>
+        <a href="#/dev" data-route="dev" class="admin-only dev-only"><svg class="line" viewBox="0 0 24 24"><path d="M8 8l-4 4 4 4M16 8l4 4-4 4M13.5 5l-3 14"/></svg><span data-i18n="nav.dev"></span></a>
         <a href="#/admin" data-route="admin" class="admin-only"><svg class="line" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.4 8.5-8 9.5-4.6-1-8-5-8-9.5V6z"/><path d="M9.5 12l2 2 3.5-4"/></svg><span data-i18n="nav.admin"></span></a>
       </nav>
 
@@ -57,11 +58,17 @@
     <main class="main">
       <header class="topbar">
         <button class="icon-btn menu-btn" id="menu-btn" aria-label="Menu" data-i18n-title="menu"><svg class="line" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+        <div class="space-switch" id="space-switch" role="tablist">
+          <span class="sw-pill" id="sw-pill"></span>
+          <button data-space="create" role="tab"><span>🎨</span><b data-i18n="space.create"></b></button>
+          <button data-space="resources" role="tab"><span>📚</span><b data-i18n="space.resources"></b></button>
+        </div>
         <label class="search">
           <svg class="line" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
           <input id="search" type="search" data-i18n-ph="search.ph" autocomplete="off">
           <kbd>Ctrl K</kbd>
         </label>
+        <a class="icon-btn" href="#/custom" id="custom-btn" data-i18n-title="nav.custom"><svg class="line" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.6-.9 1.2-1.8-.5-1.1.2-2.2 1.4-2.2H17a4 4 0 0 0 4-4c0-5.5-4-10-9-10z"/><circle cx="7.5" cy="11" r="1.2"/><circle cx="10.5" cy="7" r="1.2"/><circle cx="15" cy="7.5" r="1.2"/></svg></a>
         <a class="status-pill off" id="mcp-pill" href="#/connect"><span class="pulse"></span><span class="lbl" id="mcp-pill-text"></span></a>
         <button class="btn primary admin-only" id="add-btn"><svg class="line" viewBox="0 0 24 24" style="stroke-width:2.6"><path d="M12 5v14M5 12h14"/></svg><span data-i18n="add"></span></button>
       </header>
@@ -92,6 +99,7 @@
 
   <div class="dropzone" id="dropzone" hidden><div><span data-i18n="drop.title"></span><small data-i18n="drop.sub"></small></div></div>
   <div class="toasts" id="toasts"></div>
+  <script src="custom.js"></script>
   <script src="i18n.js"></script>
   <script src="app.js"></script>
 </body>

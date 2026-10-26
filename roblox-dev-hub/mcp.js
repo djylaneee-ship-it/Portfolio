@@ -129,6 +129,23 @@ const TOOLS = [
     },
   },
   {
+    name: 'dev_app_info',
+    description: 'Developer mode: how Rovex Hub itself is built (architecture, files, how to run, test and release it, GitHub repository) and its current customization. Read it before changing the Rovex Hub app.',
+    inputSchema: { type: 'object', properties: {} },
+  },
+  {
+    name: 'dev_set_custom',
+    description: 'Developer mode: change the look of the Rovex Hub app live. Any field is optional: theme (violet, ocean, sunset, emerald, crimson, gold, candy, midnight, mono), accent/accent2/accent3/bgColor (#hex, "" = theme color), bg { type: aurora|gradient|image|video|none, src: https URL of an image, GIF or MP4/WEBM, fit: cover|contain, dim 0-0.9, blur 0-30 }, glass (panel opacity 0.2-1), font (inter, poppins, nunito, grotesk, fredoka, mono, system), scale (0.85-1.25), radius (4-30), animations (bool), css (extra CSS for the whole app, replaces the previous one). The app updates within a few seconds.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        theme: { type: 'string' }, accent: { type: 'string' }, accent2: { type: 'string' }, accent3: { type: 'string' }, bgColor: { type: 'string' },
+        bg: { type: 'object' }, glass: { type: 'number' }, font: { type: 'string' }, scale: { type: 'number' }, radius: { type: 'number' },
+        animations: { type: 'boolean' }, css: { type: 'string' },
+      },
+    },
+  },
+  {
     name: 'find_vfx_textures',
     description: 'Find Roblox texture IDs for VFX in the user\'s texture library (1000+ textures: particle flipbooks for fire, smoke, slash, burst, lightning, crack, water, ice, wind decals, glows, stars, gradients, fog…). Returns rbxassetid, name, group, kind (particle, flipbook, decal, texture), the flipbook grid (2x2, 4x4, 8x8) with the matching FlipbookLayout/FlipbookMode/framerate, and tips. ALWAYS use it to pick ParticleEmitter textures; never invent texture IDs. Call it with no query to list the groups.',
     inputSchema: {
@@ -289,6 +306,28 @@ async function call(name, a = {}) {
       const examples = matchExamples(state, { query: a.query, category: a.category }).slice(0, 5).map(briefExample);
       return { count: res.length, examples, results: res.map(brief) };
     }
+    case 'dev_app_info': {
+      const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json'), 'utf8'));
+      let guide = '';
+      try { guide = fs.readFileSync(path.join(__dirname, 'CLAUDE.md'), 'utf8'); } catch {}
+      return {
+        app: 'Rovex Hub', version: pkg.version, repository: 'https://github.com/djylaneee-ship-it/Portfolio (folder roblox-dev-hub)',
+        liveChanges: 'Look and feel: dev_set_custom (theme, colors, animated background, font, CSS). Everything else (pages, features, MCP tools) is source code: clone the repository, follow the guide, open a pull request; merging a version bump publishes the update to every user.',
+        customization: (state.settings || {}).custom || null,
+        guide,
+      };
+    }
+    case 'dev_set_custom': {
+      state.settings = state.settings || {};
+      const cur = state.settings.custom || {};
+      const next = { ...cur };
+      for (const k of ['theme', 'accent', 'accent2', 'accent3', 'bgColor', 'glass', 'font', 'scale', 'radius', 'animations', 'css']) if (a[k] !== undefined) next[k] = a[k];
+      if (a.bg && typeof a.bg === 'object') next.bg = { ...(cur.bg || {}), ...a.bg };
+      if (typeof next.css === 'string') next.css = next.css.slice(0, 100000);
+      state.settings.custom = next;
+      store.save(state);
+      return { ok: true, custom: next, note: 'Applied: the open Rovex Hub window updates within a few seconds.' };
+    }
     case 'find_vfx_textures': {
       const list = textures.all(state);
       const groups = textures.groups(list).map((g) => ({ id: g.id, label: g.label, kind: g.kind, count: g.count }));
@@ -392,8 +431,10 @@ async function call(name, a = {}) {
 
 // Outils activés dans la page « Connexion Claude » (tous par défaut).
 function enabledTools() {
-  const off = ((store.load().settings || {}).mcpTools) || {};
-  return TOOLS.filter((x) => off[x.name] !== false);
+  const settings = store.load().settings || {};
+  const off = settings.mcpTools || {};
+  // Les outils dev_* n'existent qu'en mode développeur.
+  return TOOLS.filter((x) => off[x.name] !== false && (!x.name.startsWith('dev_') || settings.devMode));
 }
 
 // Journal « Activité de Claude » (les 100 derniers appels) et compteurs du niveau : dans un petit fichier à

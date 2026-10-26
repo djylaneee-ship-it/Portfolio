@@ -203,6 +203,8 @@ function renderSession() {
   api('/version').then((v) => { const el = $('#side-ver'); if (el) el.textContent = 'Rovex Hub v' + v.version; }).catch(() => {});
   watchUpdates();
   watchPlaces();
+  loadCustom();
+  applySpace(SPACE);
   $('#logout').onclick = async () => { await api('/logout', { method: 'POST' }); location.reload(); };
 }
 
@@ -1474,6 +1476,219 @@ async function renderTextures(params) {
   draw();
 }
 
+// ---------- Deux espaces : Création (skills, textures, prompts…) et Ressources (bibliothèque, open source…) ----------
+const SPACES = {
+  create: ['examples', 'textures', 'skills', 'prompts', 'studio', 'level', 'connect', 'robloxstudio', 'place', 'dev'],
+  resources: ['library', 'opensource', 'channels', 'youtube', 'favorites', 'explore'],
+};
+const spaceOf = (route) => Object.keys(SPACES).find((k) => SPACES[k].includes(route)) || null;
+let SPACE = (() => { try { return localStorage.getItem('rovex-space') || 'create'; } catch { return 'create'; } })();
+function applySpace(s) {
+  SPACE = SPACES[s] ? s : 'create';
+  try { localStorage.setItem('rovex-space', SPACE); } catch {}
+  $$('#nav a').forEach((a) => { const sp = spaceOf(a.dataset.route); a.classList.toggle('other-space', Boolean(sp) && sp !== SPACE); });
+  const cats = $('#side-cats');
+  if (cats) cats.parentElement.classList.toggle('other-space', SPACE !== 'resources');
+  const places = $('#side-places');
+  if (places) places.classList.toggle('other-space', SPACE !== 'create');
+  $$('#space-switch button').forEach((b) => b.classList.toggle('on', b.dataset.space === SPACE));
+  moveSpacePill();
+  movePill();
+}
+function moveSpacePill() {
+  const b = $('#space-switch button.on');
+  const pill = $('#sw-pill');
+  if (!b || !pill) return;
+  pill.style.width = b.offsetWidth + 'px';
+  pill.style.transform = `translateX(${b.offsetLeft - 4}px)`;
+}
+$$('#space-switch button').forEach((b) => b.onclick = () => {
+  const s = b.dataset.space;
+  applySpace(s);
+  const cur = (location.hash.slice(2).split('?')[0]) || 'home';
+  const sp = spaceOf(cur);
+  if (sp && sp !== s) location.hash = s === 'create' ? '#/skills' : '#/library';
+});
+window.addEventListener('resize', moveSpacePill);
+
+// ---------- Personnaliser : thème, fond d'écran animé, police, CSS libre ----------
+let CUSTOM = null;
+let DEVMODE = false;
+let devWatch = null;
+function watchDev() {
+  clearInterval(devWatch);
+  if (!DEVMODE) return;
+  devWatch = setInterval(async () => {
+    const d = await api('/custom').catch(() => null);
+    if (d && d.custom && JSON.stringify(d.custom) !== JSON.stringify(CUSTOM)) { CUSTOM = RovexTheme.merge(d.custom); RovexTheme.apply(CUSTOM); }
+  }, 4000);
+}
+async function loadCustom() {
+  const d = await api('/custom').catch(() => null);
+  if (!d) return;
+  DEVMODE = Boolean(d.devMode);
+  document.body.classList.toggle('dev-on', DEVMODE);
+  CUSTOM = RovexTheme.merge(d.custom || RovexTheme.cached() || {});
+  RovexTheme.apply(CUSTOM);
+  watchDev();
+}
+let customTimer = null;
+function saveCustom(now) {
+  RovexTheme.apply(CUSTOM);
+  clearTimeout(customTimer);
+  const go = () => api('/custom', { method: 'PUT', body: { custom: CUSTOM } }).catch((e) => toast(e.message, true));
+  if (now) return go();
+  customTimer = setTimeout(go, 500);
+}
+
+async function renderCustom() {
+  if (!CUSTOM) await loadCustom();
+  CUSTOM = RovexTheme.merge(CUSTOM || {});
+  const c = CUSTOM;
+  const P = RovexTheme.PRESETS;
+  const bgTypes = [['aurora', '🌌'], ['gradient', '🌈'], ['image', '🖼️'], ['video', '🎬'], ['none', '⬛']];
+  const slider = (id, label, min, max, step, val, fmt) => `<label class="cu-slider"><span>${label} <b id="${id}-v">${fmt(val)}</b></span><input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${val}"></label>`;
+  const color = (k, label) => `<label class="cu-color"><input type="color" data-color="${k}" value="${c[k] || (P[c.theme] || P.violet)[k === 'bgColor' ? 'bg' : k]}"><span>${label}</span>${c[k] ? `<button class="btn small" data-uncolor="${k}">${t('cu.auto')}</button>` : `<small>${t('cu.auto')}</small>`}</label>`;
+  view.innerHTML = `
+    ${pageHead('ROVEX HUB', t('nav.custom'), t('cu.sub'), `<button class="btn" id="cu-export">⬇ ${t('cu.export')}</button><label class="btn">⬆ ${t('cu.import')}<input type="file" id="cu-import" accept="application/json,.json" hidden></label><button class="btn danger" id="cu-reset">${t('cu.reset')}</button>`)}
+    <div class="panel" data-spot><h3>🎨 ${t('cu.theme')}</h3>
+      <div class="cu-themes">${Object.entries(P).map(([k, p]) => `<button class="cu-theme ${c.theme === k ? 'on' : ''}" data-theme="${k}" style="--a:${p.accent};--b:${p.accent2};--c:${p.aurora[1]};--bg:${p.bg}"><i></i><b>${esc(p.label)}</b></button>`).join('')}</div>
+      <div class="cu-colors">${color('accent', t('cu.accent'))}${color('accent2', t('cu.accent2'))}${color('accent3', t('cu.accent3'))}${color('bgColor', t('cu.bgColor'))}</div>
+    </div>
+    <div class="panel" data-spot><h3>🖼️ ${t('cu.bg')}</h3><p>${t('cu.bgText')}</p>
+      <div class="chips">${bgTypes.map(([k, ico]) => `<button class="chip ${c.bg.type === k ? 'on' : ''}" data-bg="${k}">${ico} ${t('cu.bg.' + k)}</button>`).join('')}</div>
+      <div class="cu-media" ${['image', 'video'].includes(c.bg.type) ? '' : 'hidden'}>
+        <div class="row" style="margin-top:14px">
+          <label class="btn primary">⬆ ${t('cu.upload')}<input type="file" id="cu-file" accept="image/png,image/jpeg,image/gif,image/webp,video/mp4,video/webm" hidden></label>
+          <input class="input" id="cu-url" style="flex:1;min-width:220px" placeholder="${t('cu.urlPh')}" value="${esc(c.bg.src && !c.bg.src.startsWith('/media/') ? c.bg.src : '')}">
+          <button class="btn" id="cu-url-ok">${t('cu.useUrl')}</button>
+        </div>
+        <p class="sub" style="font-size:12.5px;margin-top:8px">${c.bg.src ? esc(t('cu.current', { src: c.bg.src.split('/').pop().slice(0, 60) })) : t('cu.noFile')}</p>
+        <div class="row"><select class="select" id="cu-fit"><option value="cover" ${c.bg.fit !== 'contain' ? 'selected' : ''}>${t('cu.fitCover')}</option><option value="contain" ${c.bg.fit === 'contain' ? 'selected' : ''}>${t('cu.fitContain')}</option></select></div>
+      </div>
+      <div class="cu-sliders">
+        ${slider('cu-dim', t('cu.dim'), 0, 0.9, 0.05, c.bg.dim, (v) => Math.round(v * 100) + '%')}
+        ${slider('cu-blur', t('cu.blur'), 0, 30, 1, c.bg.blur, (v) => v + 'px')}
+        ${slider('cu-glass', t('cu.glass'), 0.2, 1, 0.02, c.glass, (v) => Math.round(v * 100) + '%')}
+      </div>
+    </div>
+    <div class="panel" data-spot><h3>🔤 ${t('cu.text')}</h3>
+      <div class="row"><select class="select" id="cu-font">${Object.entries(RovexTheme.FONTS).map(([k, f]) => `<option value="${k}" ${c.font === k ? 'selected' : ''}>${esc(f.label)}</option>`).join('')}</select>
+        <label class="switch"><input type="checkbox" id="cu-anim" ${c.animations !== false ? 'checked' : ''}><span></span></label><span>${t('cu.anim')}</span></div>
+      <div class="cu-sliders">
+        ${slider('cu-scale', t('cu.scale'), 0.85, 1.25, 0.05, c.scale, (v) => Math.round(v * 100) + '%')}
+        ${slider('cu-radius', t('cu.radius'), 4, 30, 1, c.radius, (v) => v + 'px')}
+      </div>
+    </div>
+    <div class="panel" data-spot><h3>🧩 ${t('cu.css')}</h3><p>${t('cu.cssText')}</p>
+      <textarea class="input big" id="cu-css" spellcheck="false" style="min-height:160px;font-family:var(--mono);font-size:12.5px" placeholder=".sidebar { border-right-color: hotpink; }">${esc(c.css || '')}</textarea>
+      <div class="row" style="margin-top:12px"><button class="btn primary" id="cu-css-ok">${t('save')}</button></div>
+    </div>`;
+  const redraw = () => transition(renderCustom);
+  $$('[data-theme]').forEach((b) => b.onclick = () => { Object.assign(c, { theme: b.dataset.theme, accent: '', accent2: '', accent3: '', bgColor: '' }); saveCustom(); redraw(); });
+  $$('[data-color]').forEach((i) => i.oninput = () => { c[i.dataset.color] = i.value; saveCustom(); });
+  $$('[data-uncolor]').forEach((b) => b.onclick = () => { c[b.dataset.uncolor] = ''; saveCustom(); redraw(); });
+  $$('[data-bg]').forEach((b) => b.onclick = () => { c.bg.type = b.dataset.bg; saveCustom(); redraw(); });
+  const sl = (id, fn) => { const el = $('#' + id); el.oninput = () => { fn(Number(el.value)); saveCustom(); }; };
+  sl('cu-dim', (v) => { c.bg.dim = v; });
+  sl('cu-blur', (v) => { c.bg.blur = v; });
+  sl('cu-glass', (v) => { c.glass = v; });
+  sl('cu-scale', (v) => { c.scale = v; });
+  sl('cu-radius', (v) => { c.radius = v; });
+  // Les valeurs affichées des curseurs.
+  for (const [id, f] of [['cu-dim', (v) => Math.round(v * 100) + '%'], ['cu-blur', (v) => v + 'px'], ['cu-glass', (v) => Math.round(v * 100) + '%'], ['cu-scale', (v) => Math.round(v * 100) + '%'], ['cu-radius', (v) => v + 'px']]) {
+    const el = $('#' + id);
+    el.addEventListener('input', () => { $(`#${id}-v`).textContent = f(Number(el.value)); });
+  }
+  $('#cu-font').onchange = (e) => { c.font = e.target.value; saveCustom(); };
+  $('#cu-anim').onchange = (e) => { c.animations = e.target.checked; saveCustom(); };
+  const fit = $('#cu-fit');
+  if (fit) fit.onchange = (e) => { c.bg.fit = e.target.value; saveCustom(); };
+  const file = $('#cu-file');
+  if (file) file.onchange = async () => {
+    const f = file.files[0];
+    if (!f) return;
+    toast(t('cu.uploading'));
+    try {
+      const res = await fetch('/api/custom/background', { method: 'POST', headers: { 'Content-Type': f.type }, body: f });
+      const j = await res.json();
+      if (!res.ok) throw new Error(j.error || 'Upload failed');
+      Object.assign(c.bg, { type: j.type, src: j.src });
+      await saveCustom(true);
+      redraw();
+    } catch (e) { toast(e.message, true); }
+  };
+  const urlOk = $('#cu-url-ok');
+  if (urlOk) urlOk.onclick = () => {
+    const u = $('#cu-url').value.trim();
+    if (!/^https?:\/\//i.test(u)) return toast(t('cu.badUrl'), true);
+    c.bg.src = u;
+    c.bg.type = /\.(mp4|webm)(\?|$)/i.test(u) ? 'video' : 'image';
+    saveCustom(true);
+    redraw();
+  };
+  $('#cu-css-ok').onclick = () => { c.css = $('#cu-css').value; saveCustom(true); toast(t('toast.saved')); };
+  $('#cu-reset').onclick = async () => {
+    if (!confirm(t('cu.resetAsk'))) return;
+    CUSTOM = RovexTheme.merge({});
+    await api('/custom', { method: 'PUT', body: { reset: true } });
+    RovexTheme.apply(CUSTOM);
+    redraw();
+  };
+  $('#cu-export').onclick = () => {
+    const blob = new Blob([JSON.stringify({ rovexTheme: 1, ...c, bg: { ...c.bg, src: c.bg.src && c.bg.src.startsWith('/media/') ? '' : c.bg.src } }, null, 2)], { type: 'application/json' });
+    const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: 'rovex-theme.json' });
+    a.click();
+  };
+  $('#cu-import').onchange = async (e) => {
+    try {
+      const j = JSON.parse(await e.target.files[0].text());
+      delete j.rovexTheme;
+      CUSTOM = RovexTheme.merge(j);
+      await saveCustom(true);
+      redraw();
+    } catch { toast(t('cu.badFile'), true); }
+  };
+}
+
+// ---------- Mode développeur : modifier Rovex avec son Claude, à plusieurs ----------
+const REPO = 'https://github.com/djylaneee-ship-it/Portfolio';
+async function renderDev() {
+  const v = await api('/version').catch(() => ({}));
+  const cmds = `git clone ${REPO}.git\ncd Portfolio/roblox-dev-hub\nnpm install\nnpm run app`;
+  const prompt = t('dev.prompt', { repo: REPO });
+  view.innerHTML = `
+    ${pageHead(t('dev.eyebrow'), t('nav.dev'), t('dev.sub', { v: esc(v.version || '?') }))}
+    <div class="two-col">
+      <div class="panel" data-spot><h3>⚡ ${t('dev.liveTitle')}</h3><p>${t('dev.liveText')}</p>
+        <div class="row"><a class="btn primary" href="#/custom">🎨 ${t('nav.custom')}</a><a class="btn" href="#/connect">🔌 ${t('nav.connect')}</a></div></div>
+      <div class="panel" data-spot><h3>🤝 ${t('dev.teamTitle')}</h3><p>${t('dev.teamText')}</p>
+        <div class="row"><a class="btn" href="${REPO}/settings/access" target="_blank" rel="noopener">👥 ${t('dev.invite')}</a><a class="btn" href="${REPO}/pulls" target="_blank" rel="noopener">🔀 ${t('dev.prs')}</a></div></div>
+    </div>
+    <div class="steps">
+      <div class="panel" data-spot><span class="num">1</span><h3>${t('dev.s1')}</h3><p>${t('dev.s1t')}</p>
+        <div class="row"><button class="btn primary" id="dev-code">⌨️ ${t('dev.openCode')}</button><a class="btn" href="https://claude.ai/code" target="_blank" rel="noopener">🌐 ${t('dev.openWeb')}</a></div></div>
+      <div class="panel" data-spot><span class="num">2</span><h3>${t('dev.s2')}</h3><p>${t('dev.s2t')}</p>
+        <div class="codebox"><code>${esc(cmds.replace(/\\n/g, '\n'))}</code></div>
+        <button class="btn" style="margin-top:10px" data-copy="${esc(cmds.replace(/\\n/g, '\n'))}">${t('copy')}</button></div>
+      <div class="panel" data-spot><span class="num">3</span><h3>${t('dev.s3')}</h3><p>${t('dev.s3t')}</p></div>
+    </div>
+    <div class="panel" data-spot><h3>🧠 ${t('dev.promptTitle')}</h3><p>${t('dev.promptText')}</p>
+      <textarea class="input big" id="dev-prompt" spellcheck="false" style="min-height:150px">${esc(prompt)}</textarea>
+      <div class="row" style="margin-top:12px"><button class="btn primary" id="dev-send">🚀 ${t('dev.sendCode')}</button><button class="btn" id="dev-copy">${t('copy')}</button></div></div>`;
+  bindCopy(view);
+  const send = async () => {
+    const text = $('#dev-prompt').value;
+    await copyText(text);
+    const r = await api('/claude/send', { method: 'POST', body: { text, target: 'code' } }).catch((e) => toast(e.message, true));
+    if (r && !r.opened) window.location.href = r.link;
+    if (r) toast(t('dev.sent'));
+  };
+  $('#dev-code').onclick = send;
+  $('#dev-send').onclick = send;
+  $('#dev-copy').onclick = async () => { if (await copyText($('#dev-prompt').value)) toast(t('pb.copied')); };
+}
+
 // ---------- Niveau de Claude ----------
 const BADGE_ICONS = { firstCall: '🔌', calls50: '⚡', calls500: '🚀', examples5: '📘', examples25: '📚', resources1k: '🗂️', resources10k: '🌌', allRounder: '🧭', master: '👑' };
 
@@ -1843,10 +2058,22 @@ async function renderSettings() {
       </div>
     </div>
     <div class="panel" data-spot>
+      <h3>🛠️ ${t('dev.toggleTitle')}</h3><p>${t('dev.toggleText')}</p>
+      <div class="row"><label class="switch"><input type="checkbox" id="dev-on" ${DEVMODE ? 'checked' : ''}><span></span></label><span>${t('dev.toggle')}</span></div>
+    </div>
+    <div class="panel" data-spot>
       <h3>${t('set.backupTitle')}</h3><p>${t('set.backupText')}</p>
       <a class="btn" href="/api/export" download="rovex-hub.json">${t('set.export')}</a>
     </div>`;
   $('#set-lang').onchange = (e) => setLang(e.target.value);
+  $('#dev-on').onchange = async (e) => {
+    const r = await api('/devmode', { method: 'PUT', body: { on: e.target.checked } });
+    DEVMODE = r.devMode;
+    document.body.classList.toggle('dev-on', DEVMODE);
+    applySpace(SPACE);
+    watchDev();
+    toast(t(DEVMODE ? 'dev.on' : 'dev.off'));
+  };
   $('#key-form').onsubmit = async (e) => { e.preventDefault(); await api('/settings', { method: 'PUT', body: { youtubeApiKey: $('#key').value } }); toast(t('toast.saved')); route(); };
   $('#cloud-form').onsubmit = async (e) => { e.preventDefault(); await api('/settings', { method: 'PUT', body: { cloudUrl: $('#cloud-url').value } }); toast(t('toast.saved')); };
   $('#cloud-sync').onclick = async (e) => {
@@ -2026,13 +2253,15 @@ async function refreshStats() {
     <a href="#/library?cat=${c.id}" class="${active === c.id ? 'active' : ''}"><span class="dot" style="background:${c.color}"></span>${esc(c.label)}<span class="n">${num((STATS.learnByCategory || STATS.byCategory)[c.id])}</span></a>`).join('');
 }
 
-const ADMIN_PAGES = ['explore', 'settings', 'admin', 'favorites'];
+const ADMIN_PAGES = ['explore', 'settings', 'admin', 'favorites', 'dev'];
 async function route() {
   const [p, qs] = location.hash.slice(1).split('?');
   let path = (p || '/').replace(/^\//, '') || 'home';
   if (path === 'mcp') path = 'connect';
   const params = new URLSearchParams(qs || '');
   const name = path === 'library' && params.get('cat') ? '' : path;
+  const sp = spaceOf(path);
+  if (sp && sp !== SPACE) applySpace(sp);
   $$('#nav a').forEach((a) => a.classList.toggle('active', a.dataset.route === name));
   $$('#side-cats a').forEach((a) => a.classList.toggle('active', a.getAttribute('href') === '#/library?cat=' + params.get('cat')));
   $$('#side-places-list a').forEach((a) => a.classList.toggle('active', path === 'place' && a.dataset.s === (params.get('s') || '')));
@@ -2043,7 +2272,7 @@ async function route() {
   const pages = {
     library: () => renderLibrary(params), favorites: () => renderLibrary(params, true), examples: renderExamples,
     youtube: () => renderYoutube(params), channels: () => renderChannels(params), explore: renderExplore,
-    connect: renderConnect, admin: renderAdmin, settings: renderSettings, update: renderUpdate, robloxstudio: renderRobloxStudio, textures: () => renderTextures(params), place: () => renderPlace(params), level: renderLevel, opensource: renderOpenSource, skills: renderSkills, prompts: renderPrompts, studio: renderStudio,
+    connect: renderConnect, admin: renderAdmin, settings: renderSettings, update: renderUpdate, robloxstudio: renderRobloxStudio, custom: renderCustom, dev: renderDev, textures: () => renderTextures(params), place: () => renderPlace(params), level: renderLevel, opensource: renderOpenSource, skills: renderSkills, prompts: renderPrompts, studio: renderStudio,
   };
   try {
     await transition(pages[path] || renderHome);

@@ -442,6 +442,34 @@ const routes = [
     await studio.bridge.waitReady(10e3);
     return robloxStudioInfo();
   }],
+  // Personnalisation de l'app (gardée sur ce PC) : thème, fond d'écran, police, CSS libre.
+  ['GET', /^\/api\/custom$/, () => ({ custom: state.settings.custom || null, devMode: Boolean(state.settings.devMode) })],
+  ['PUT', /^\/api\/custom$/, async (req) => {
+    const b = await json(req);
+    if (b.custom && typeof b.custom === 'object') {
+      const c = JSON.parse(JSON.stringify(b.custom));
+      c.css = String(c.css || '').slice(0, 100000);
+      // L'ancien fond importé est supprimé quand on en choisit un autre.
+      const old = state.settings.custom && state.settings.custom.bg && state.settings.custom.bg.src;
+      if (old && old.startsWith('/media/bg-') && (!c.bg || c.bg.src !== old)) { try { fs.rmSync(path.join(db.MEDIA_DIR, path.basename(old)), { force: true }); } catch {} }
+      state.settings.custom = c;
+    }
+    if (b.reset) state.settings.custom = null;
+    persist();
+    return { custom: state.settings.custom || null };
+  }],
+  // Fond d'écran importé (image, GIF ou vidéo), servi depuis les médias de l'app.
+  ['POST', /^\/api\/custom\/background$/, async (req) => {
+    const type = String(req.headers['content-type'] || '');
+    const ext = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/gif': 'gif', 'image/webp': 'webp', 'video/mp4': 'mp4', 'video/webm': 'webm' }[type.split(';')[0]];
+    if (!ext) throw Object.assign(new Error('Use a PNG, JPG, GIF, WEBP, MP4 or WEBM file'), { key: 'bgType' });
+    const file = `bg-${Date.now()}.${ext}`;
+    fs.mkdirSync(db.MEDIA_DIR, { recursive: true });
+    fs.writeFileSync(path.join(db.MEDIA_DIR, file), await readBody(req, 150 * 1024 * 1024));
+    return { src: `/media/${file}`, type: ext === 'mp4' || ext === 'webm' ? 'video' : 'image' };
+  }],
+  // Mode développeur (admins) : outils dev_* pour Claude et page Développeur.
+  ['PUT', /^\/api\/devmode$/, async (req) => { state.settings.devMode = Boolean((await json(req)).on); persist(); return { devMode: state.settings.devMode }; }],
   // Textures VFX : la liste (de base + ajoutées par l'admin) et leurs miniatures Roblox.
   ['GET', /^\/api\/textures$/, () => {
     const list = textures.all(state);
@@ -489,8 +517,8 @@ const routes = [
 // Routes accessibles à un ID d'accès simple (lecture seule). Tout le reste est réservé à l'admin.
 // Ce que les membres peuvent faire en plus de lire : brancher Claude sur leur PC, tester la recherche,
 // mettre à jour l'app, utiliser la génération IA.
-const MEMBER_ACTIONS = [/^\/api\/textures\/thumbs$/, /^\/api\/place\/(read|write|value)$/, /^\/api\/robloxstudio(\/restart)?$/, /^\/api\/claude\/(desktop|code|send)$/, /^\/api\/mcp\/test$/, /^\/api\/update\/(check|install)$/, /^\/api\/gen(\/.*)?$/];
-const USER_ROUTES = [/^\/api\/textures$/, /^\/api\/place\/(studios|scripts|values)$/, /^\/api\/robloxstudio$/, /^\/api\/claude$/, /^\/api\/version$/, /^\/api\/prompts$/, /^\/api\/skills$/, /^\/api\/skills\/\w+$/, /^\/api\/level$/, /^\/api\/meta$/, /^\/api\/stats$/, /^\/api\/resources$/, /^\/api\/channels$/, /^\/api\/youtube$/, /^\/api\/crawl$/, /^\/api\/examples$/, /^\/api\/mcp$/];
+const MEMBER_ACTIONS = [/^\/api\/custom(\/background)?$/, /^\/api\/textures\/thumbs$/, /^\/api\/place\/(read|write|value)$/, /^\/api\/robloxstudio(\/restart)?$/, /^\/api\/claude\/(desktop|code|send)$/, /^\/api\/mcp\/test$/, /^\/api\/update\/(check|install)$/, /^\/api\/gen(\/.*)?$/];
+const USER_ROUTES = [/^\/api\/custom$/, /^\/api\/textures$/, /^\/api\/place\/(studios|scripts|values)$/, /^\/api\/robloxstudio$/, /^\/api\/claude$/, /^\/api\/version$/, /^\/api\/prompts$/, /^\/api\/skills$/, /^\/api\/skills\/\w+$/, /^\/api\/level$/, /^\/api\/meta$/, /^\/api\/stats$/, /^\/api\/resources$/, /^\/api\/channels$/, /^\/api\/youtube$/, /^\/api\/crawl$/, /^\/api\/examples$/, /^\/api\/mcp$/];
 
 const cookies = (req) => Object.fromEntries(String(req.headers.cookie || '').split(';').map((c) => c.trim().split('=')).filter((p) => p[0]).map(([k, ...v]) => [k, decodeURIComponent(v.join('='))]));
 const clientIp = (req) => req.socket.remoteAddress || '';
