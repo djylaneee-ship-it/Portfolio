@@ -35,6 +35,30 @@ function prepareData() {
   }
 }
 
+// Supprime les raccourcis des anciennes versions (installées avec le .bat, ouvertes dans le navigateur) :
+// « Roblox Dev Hub » et les « Rovex Hub » qui pointent encore vers l'ancien dossier RobloxDevHub.
+function cleanLegacyShortcuts() {
+  if (process.platform !== 'win32') return;
+  const roaming = process.env.APPDATA || '';
+  const dirs = [
+    app.getPath('desktop'),
+    path.join(roaming, 'Microsoft', 'Windows', 'Start Menu', 'Programs'),
+    path.join(roaming, 'Microsoft', 'Windows', 'Start Menu', 'Programs', 'Startup'),
+    path.join(roaming, 'Microsoft', 'Internet Explorer', 'Quick Launch', 'User Pinned', 'TaskBar'),
+  ];
+  for (const dir of dirs) {
+    for (const name of ['Roblox Dev Hub.lnk', 'Rovex Hub.lnk']) {
+      const file = path.join(dir, name);
+      try {
+        if (!fs.existsSync(file)) continue;
+        let target = '';
+        try { const l = shell.readShortcutLink(file); target = `${l.target} ${l.args || ''} ${l.cwd || ''}`; } catch {}
+        if (name === 'Roblox Dev Hub.lnk' || /RobloxDevHub|\.bat|\.vbs|wscript|node\.exe/i.test(target)) fs.rmSync(file, { force: true });
+      } catch {}
+    }
+  }
+}
+
 // Ferme l'ancienne version (node.exe) si elle occupe encore le port.
 function freePort(port) {
   if (process.platform !== 'win32') return Promise.resolve();
@@ -146,6 +170,7 @@ async function start() {
   const hidden = process.argv.includes('--hidden');
   if (!hidden) showSplash();
   prepareData();
+  cleanLegacyShortcuts();
   await freePort(Number(process.env.PORT) || 4747);
   try {
     const srv = require('./server.js');
