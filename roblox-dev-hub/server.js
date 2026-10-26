@@ -263,17 +263,22 @@ const routes = [
   // Skills : un par catégorie.
   ['GET', /^\/api\/skills$/, () => ({
     codeInstalled: skills.codeInstalled(), codeDir: skills.CODE_SKILLS,
+    core: skills.getSkill(state, skills.CORE_ID),
     skills: skills.SKILL_CATS.map((c) => ({ ...skills.getSkill(state, c), totals: skills.context(state, c).totals })),
   })],
   ['GET', /^\/api\/skills\/(\w+)$/, (req, m) => {
+    if (m[1] === skills.CORE_ID) return { ...skills.getSkill(state, m[1]), defaultInstructions: skills.DEFAULTS[m[1]], defaultArt: '' };
     if (!skills.SKILL_CATS.includes(m[1])) throw Object.assign(new Error('Not found'), { code: 404, key: 'notFound' });
     return { ...skills.getSkill(state, m[1]), defaultInstructions: skills.DEFAULTS[m[1]], defaultArt: skills.ART[m[1]] || '', context: skills.context(state, m[1]), skillMd: skills.skillMd(state, m[1]) };
   }],
   ['PUT', /^\/api\/skills\/(\w+)$/, async (req, m, url, session) => {
-    if (!skills.SKILL_CATS.includes(m[1])) throw Object.assign(new Error('Not found'), { code: 404, key: 'notFound' });
+    if (!skills.SKILL_CATS.includes(m[1]) && m[1] !== skills.CORE_ID) throw Object.assign(new Error('Not found'), { code: 404, key: 'notFound' });
     const b = await json(req);
     state.skills = state.skills || {};
     const cur = state.skills[m[1]] || {};
+    // Consignes écrites pour une ancienne version des skills : remplacées par les nouveaux textes.
+    if ((cur.v || 1) < skills.VERSION) delete cur.instructions;
+    cur.v = skills.VERSION;
     if (b.reset) delete cur.instructions;
     if (typeof b.instructions === 'string') cur.instructions = b.instructions.trim() === skills.DEFAULTS[m[1]].trim() ? undefined : b.instructions;
     if (typeof b.enabled === 'boolean') cur.enabled = b.enabled;

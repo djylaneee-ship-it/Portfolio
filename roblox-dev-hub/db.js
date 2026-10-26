@@ -15,6 +15,7 @@ const CATEGORIES = [
   { id: 'scripting', label: 'Scripting', color: '#4f8cff', desc: 'Luau, services, RemoteEvents, DataStores, OOP' },
   { id: 'vfx', label: 'VFX', color: '#ff4fd8', desc: 'Particles, beams, trails, slashes, explosions' },
   { id: 'animation', label: 'Animation', color: '#ffb02e', desc: 'Animation Editor, Moon Animator, R6/R15 rigs' },
+  { id: 'cutscenes', label: 'Cutscenes', color: '#ff5d73', desc: 'Cinematics, camera, timelines, anime scenes' },
   { id: 'gui', label: 'GUI / UI', color: '#2ee6a6', desc: 'Interfaces, HUD, shops, UI tweens' },
   { id: 'gfx', label: 'GFX', color: '#a970ff', desc: 'Thumbnails, icons, Blender renders' },
   { id: 'modeling', label: 'Modeling', color: '#ff6b4a', desc: 'Blender, meshes, textures, UVs' },

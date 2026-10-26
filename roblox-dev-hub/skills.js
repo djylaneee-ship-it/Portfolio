@@ -9,70 +9,19 @@ const { CATEGORIES, search } = require('./db');
 
 const SKILL_CATS = CATEGORIES.map((c) => c.id).filter((id) => id !== 'gameplay');
 
-const DEFAULTS = {
-  scripting: `You are writing Roblox Luau code.
-- Server is the authority: validate every RemoteEvent/RemoteFunction argument on the server (type, range, cooldown, ownership). Never trust the client.
-- Put reusable logic in ModuleScripts (ReplicatedStorage for shared, ServerScriptService/ServerStorage for server-only). Scripts stay thin.
-- Use game:GetService(), typed Luau (--!strict where possible), task.spawn/task.delay/task.wait (never wait/spawn/delay).
-- Wrap DataStore calls in pcall, prefer UpdateAsync, never overwrite data that failed to load, save on PlayerRemoving and BindToClose.
-- Disconnect connections you create; clean up per-player state on PlayerRemoving.
-- Prefer events over polling loops; when looping use RunService.Heartbeat with dt.
-- Name things clearly, keep functions short, and explain where each script goes in the Explorer.`,
-  vfx: `You are making Roblox visual effects.
-- Build effects from Attachments + ParticleEmitter, Beam and Trail; use ParticleEmitter:Emit(n) for bursts, Enabled for streams.
-- Keep effects in ReplicatedStorage templates and clone them; clean up with Debris:AddItem or by destroying after the effect.
-- Play cosmetic effects on the clients (FireAllClients) so the server never lags; the server only decides that the effect happens.
-- Tween Size/Transparency/CFrame with TweenService for motion; use LightEmission/LightInfluence for glow; keep particle counts reasonable for mobile.
-- Describe the textures needed (flipbook, slash, spark) and the exact property values used.`,
-  animation: `You are animating Roblox characters.
-- Load animations through Animator:LoadAnimation (Humanoid:LoadAnimation is deprecated); rigs without Humanoid need AnimationController + Animator.
-- Set AnimationPriority correctly (Idle < Movement < Action) and Looped where needed; stop tracks you no longer use.
-- Play character animations from the client that owns the character so they replicate; use GetMarkerReachedSignal for hit frames and sounds.
-- Respect R6 vs R15 joint names; mention when an animation must be uploaded and owned by the experience owner/group.
-- For Moon Animator / Blender workflows, give clear export/import steps.`,
-  gui: `You are building Roblox user interfaces.
-- Use Scale (not Offset) for responsive layouts, plus UIAspectRatioConstraint, UIListLayout/UIGridLayout, UIPadding, UICorner, UIStroke, UIGradient.
-- UI logic runs in LocalScripts under StarterGui or StarterPlayerScripts; purchases and rewards are validated on the server.
-- Animate with TweenService (UIScale for pop-in, Position for slides); handle quick re-clicks without breaking state.
-- Use GuiButton.Activated (works on mouse, touch and gamepad); test on phone screen sizes and respect the top bar safe area.
-- Keep a clear hierarchy (ScreenGui > Frames > components) and explain the Explorer structure.`,
-  gfx: `You are making Roblox GFX (thumbnails, icons, renders).
-- Respect sizes: game icon 512x512, thumbnails 1920x1080 (16:9); keep text big and readable when scaled down.
-- Explain the Blender workflow: import the character/map, lighting (three-point or HDRI), camera, Cycles/Eevee settings, compositing.
-- Strong focal point, contrast and color story; the first second decides the click.
-- Remind that images must follow Roblox moderation rules.`,
-  modeling: `You are modeling 3D assets for Roblox.
-- Keep triangle counts reasonable (MeshPart limit 20k tris, aim much lower for props), clean topology, applied transforms and correct scale (1 stud ≈ 0.28 m).
-- UV unwrap cleanly; use SurfaceAppearance for PBR (ColorMap, NormalMap OpenGL, Roughness, Metalness).
-- Export FBX/OBJ with the correct orientation; set CollisionFidelity and RenderFidelity appropriately in Studio.
-- For low poly styles, use flat shading and palettes; group and name parts so they are easy to script.`,
-  building: `You are building Roblox maps and environments.
-- Plan the layout first (spawn, paths, landmarks, sight lines); keep scale consistent with characters.
-- Use Terrain for natural areas, MeshParts/Parts for structures; anchor static parts, turn off CanCollide/CastShadow/CanTouch on decorative parts.
-- Lighting: choose Technology (Future for quality), Atmosphere, ColorCorrection, Bloom; consistent mood.
-- Optimize: StreamingEnabled for big maps, reuse meshes, limit dynamic lights and unions; group with Models and clear names.`,
-  audio: `You are adding sound to a Roblox experience.
-- Parent positional sounds to the part/attachment that emits them; UI and music sounds in SoundService or the client.
-- Use SoundGroups for volume categories (music, SFX, UI) and let players change volumes.
-- Play gameplay sounds on the clients when possible; preload important sounds with ContentProvider:PreloadAsync.
-- Only use audio the experience is allowed to use.`,
-  design: `You are designing a Roblox game.
-- Define the core loop (what the player does every 30 seconds, every session, every week) before features.
-- First-time user experience: fun within the first minute, clear goal, no wall of text.
-- Retention: progression, daily rewards, social features, updates; measure with Analytics/funnels.
-- Monetization must feel fair: game passes for permanent perks, developer products for consumables, no pay-to-win frustration.
-- Give concrete numbers (prices, timings, drop rates) and explain the reasoning.`,
-  tools: `You are helping with Roblox development tools and workflow.
-- Recommend proven tools (Rojo + VS Code, Wally, StyLua, Selene, Moon Animator, Archimedes, etc.) and explain setup steps.
-- For plugins, use the plugin API correctly (toolbar buttons, DockWidgetPluginGui, ChangeHistoryService for undo).
-- Prefer version control (Git) and reproducible project structure.`,
-};
+// Textes des skills (socle commun + un par catégorie) : voir skill-texts.js.
+const TEXTS = require('./skill-texts');
+const { DEFAULTS, DESCRIPTIONS } = TEXTS;
+const CORE_ID = 'core';
+DEFAULTS[CORE_ID] = TEXTS.CORE;
+DESCRIPTIONS[CORE_ID] = 'Socle commun de tous les skills Rovex : utiliser les références et outils de Rovex Hub, règles de production et de livraison.';
 
 // Style appliqué aux images et aux sons générés par IA pour cette catégorie (modifiable dans Skills).
 const ART = {
   scripting: 'Clean Roblox-style illustration, bold shapes, saturated colors, soft studio lighting.',
   vfx: 'Stylized game VFX: glowing core, bright saturated colors fading to transparent edges, anime / simulator energy, high contrast.',
   animation: 'Expressive Roblox character pose, clear silhouette, dynamic motion, bright colors.',
+  cutscenes: 'Cinematic anime-style Roblox shot: dynamic camera angle, strong pose, rim light, bold contrast, particle energy, speed and depth.',
   gui: 'Roblox simulator UI style: thick dark outline, bright saturated colors, soft glossy highlights and a light top gradient, slight 3D bevel, cartoony and readable at small size.',
   gfx: 'Polished Roblox GFX render: vibrant colors, cinematic rim lighting, soft depth of field, Blender-render look, characters with Roblox proportions.',
   modeling: 'Low poly stylized asset, clean flat shading with subtle gradients, Roblox-friendly proportions, bright palette.',
@@ -81,15 +30,19 @@ const ART = {
   tools: 'Clean flat app icon style, simple shapes, Roblox Studio color palette.',
 };
 
+// Les consignes modifiées avant la version actuelle des skills sont remplacées par les nouveaux textes
+// (le style d'image modifié est gardé).
 function getSkill(state, cat) {
   const saved = ((state.skills || {})[cat]) || {};
+  const instructions = (saved.v || 1) >= TEXTS.VERSION ? saved.instructions : '';
   return {
     id: cat,
     name: `rovex-${cat}`,
-    enabled: saved.enabled !== false,
-    instructions: saved.instructions || DEFAULTS[cat] || '',
-    custom: Boolean(saved.instructions || saved.art),
-    art: saved.art || ART[cat] || '',
+    description: DESCRIPTIONS[cat] || '',
+    enabled: cat === CORE_ID || saved.enabled !== false,
+    instructions: instructions || DEFAULTS[cat] || '',
+    custom: Boolean(instructions || saved.art),
+    art: cat === CORE_ID ? '' : saved.art || ART[cat] || '',
     updatedAt: saved.updatedAt || null,
   };
 }
@@ -110,17 +63,29 @@ function context(state, cat, { query = '' } = {}) {
   };
 }
 
-function load(state, cat, opts) {
+const HOW_TO_USE = 'Follow the core rules (rovex-core) and the instructions of each skill. Reuse the structure of the validated examples first, cite the resources you rely on, and propose an open source module when one fits instead of rewriting it.';
+
+function skillPart(state, cat, opts) {
   const s = getSkill(state, cat);
   if (!s.enabled) throw new Error(`Skill ${s.name} is disabled in Rovex Hub`);
-  const c = context(state, cat, opts);
   return {
-    skill: s.name, category: cat,
+    skill: s.name, category: cat, description: s.description,
     instructions: s.instructions,
-    howToUse: 'Follow the instructions. Reuse the structure of the validated examples first, cite the resources you rely on, and propose an open source module when one fits instead of rewriting it.',
     assets: cat === 'audio' ? undefined : { style: s.art, how: 'Need an image (icon, UI, thumbnail, texture, VFX sprite)? Call generate_image with this category: Rovex applies this style and the user\'s reference images, then saves the PNG in the library.' },
-    ...c,
+    ...context(state, cat, opts),
   };
+}
+
+// Un skill, avec le socle commun.
+function load(state, cat, opts) {
+  return { core: getSkill(state, CORE_ID).instructions, howToUse: HOW_TO_USE, ...skillPart(state, cat, opts) };
+}
+
+// Plusieurs skills pour une même tâche (ex. scripting + animation + vfx) : le socle n'est envoyé qu'une fois.
+function loadMany(state, cats, opts) {
+  const list = [...new Set(cats)].filter((c) => SKILL_CATS.includes(c));
+  if (list.length === 1) return load(state, list[0], opts);
+  return { core: getSkill(state, CORE_ID).instructions, howToUse: HOW_TO_USE, skills: list.map((c) => skillPart(state, c, opts)) };
 }
 
 // --- Export au format Claude Skills (dossier avec SKILL.md) ---
@@ -131,7 +96,7 @@ function skillMd(state, cat) {
   const c = LABELS[cat];
   return `---
 name: ${s.name}
-description: Roblox ${c.label} (${c.desc}). Use for any Roblox ${c.label.toLowerCase()} task: loads the user's validated examples, docs, videos and open source references from Rovex Hub before working.
+description: ${s.description} Roblox ${c.label} (${c.desc}). Use for any Roblox ${c.label.toLowerCase()} task: loads the user's validated examples, docs, videos and open source references from Rovex Hub before working.
 ---
 
 # Rovex Hub — ${c.label}
@@ -145,6 +110,10 @@ Before starting a Roblox ${c.label.toLowerCase()} task:
 ## Instructions
 
 ${s.instructions}
+
+## Socle Rovex (rovex-core, commun à tous les skills)
+
+${getSkill(state, CORE_ID).instructions}
 ${cat === 'audio' ? '' : `
 ## Image generation
 
@@ -217,4 +186,4 @@ function codeInstalled() {
   return SKILL_CATS.filter((cat) => fs.existsSync(path.join(CODE_SKILLS, `rovex-${cat}`, 'SKILL.md'))).length;
 }
 
-module.exports = { SKILL_CATS, DEFAULTS, ART, getSkill, context, load, skillMd, skillZip, installForClaudeCode, codeInstalled, CODE_SKILLS };
+module.exports = { SKILL_CATS, CORE_ID, VERSION: TEXTS.VERSION, DEFAULTS, ART, getSkill, context, load, loadMany, skillMd, skillZip, installForClaudeCode, codeInstalled, CODE_SKILLS };

@@ -524,6 +524,14 @@ a.stat { display: block; }
 .sk-card .top { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
 .sk-card code { font: 12px var(--mono); color: var(--accent3); }
 .sk-card h3 { font-family: var(--display); font-weight: 700; font-size: 17px; margin: 0; }
+.sk-core { --c: #a970ff; width: 100%; display: flex; gap: 16px; align-items: center; text-align: left; margin-bottom: 14px; padding: 20px 22px; border-radius: 20px; color: var(--text); cursor: pointer;
+  background: linear-gradient(120deg, color-mix(in srgb, var(--c) 16%, var(--panel)), var(--panel) 60%); border: 1px solid color-mix(in srgb, var(--c) 40%, var(--line)); transition: transform .45s var(--spring), box-shadow .4s; }
+.sk-core:hover { transform: translateY(-3px); box-shadow: 0 18px 40px color-mix(in srgb, var(--c) 18%, transparent); }
+.sk-core:active { transform: scale(.99); }
+.sk-core .badge-ico { flex: none; font-size: 16px; }
+.sk-core code { font: 12px var(--mono); color: var(--accent3); }
+.sk-core h3 { font-family: var(--display); font-weight: 700; font-size: 17px; margin: 2px 0 4px; }
+.sk-core small { color: var(--muted2); font-size: 13px; line-height: 1.45; }
 .sk-counts { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; font-size: 12.5px; color: var(--muted2); }
 .sk-list { margin: 8px 0 0; padding-left: 18px; display: grid; gap: 4px; font-size: 13px; color: var(--soft); }
 .sk-list .mono { font-size: 11px; color: var(--muted); }

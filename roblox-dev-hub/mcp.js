@@ -50,7 +50,7 @@ function clients() {
 // Toujours ajouté aux consignes : passer par le skill de la catégorie avant toute tâche Roblox.
 const SKILL_RULE = `
 
-Skills: for every Roblox task, first identify its category (scripting, vfx, animation, gui, gfx, modeling, building, audio, design, tools) and call load_skill with that category and the task keywords. Read all of it before working.
+Skills: for every Roblox task, first identify the domains it needs (scripting, vfx, animation, cutscenes, gui, gfx, modeling, building, audio, design, tools) and call load_skill once with only those categories and the task keywords (an attack = scripting + animation + vfx; a boss intro = cutscenes + animation + vfx, + audio if needed; a menu = gui + scripting). Read all of it before working: the core rules (rovex-core) apply to every task. Project art direction: VFX are built from custom-textured ParticleEmitters, never the Fire, Smoke or Sparkles classes.
 
 Images: you cannot draw yourself, but Rovex can. When the user asks for an icon, an image, a UI element, a thumbnail, a texture or a VFX sprite, load the skill of the category, then call generate_image. Describe only the subject: Rovex applies the skill's style and the user's reference images, and saves the PNG in the library. Give the user the file path, and remind them to upload it to Roblox (Creator Hub or Asset Manager) to get its rbxassetid.`;
 
@@ -77,14 +77,14 @@ const TOOLS = [
   },
   {
     name: 'load_skill',
-    description: 'START HERE for any Roblox task. Loads the Rovex skill of a category (scripting, vfx, animation, gui, gfx, modeling, building, audio, design, tools): instructions to follow, every validated example with full code, the best docs/videos (with the user\'s notes) and open source modules. Call it with the task category before writing anything.',
+    description: 'START HERE for any Roblox task. Loads the Rovex core rules plus the skill of each category the task needs (scripting, vfx, animation, cutscenes, gui, gfx, modeling, building, audio, design, tools): instructions to follow, every validated example with full code, the best docs/videos (with the user\'s notes) and open source modules. Pass only the useful categories (e.g. ["scripting", "animation", "vfx"] for an attack) before writing anything.',
     inputSchema: {
       type: 'object',
       properties: {
-        category: { type: 'string', enum: skills.SKILL_CATS },
+        categories: { type: 'array', items: { type: 'string', enum: skills.SKILL_CATS }, description: 'The domains the task needs (1 to 4)' },
+        category: { type: 'string', enum: skills.SKILL_CATS, description: 'Single domain (same as categories with one item)' },
         query: { type: 'string', description: 'Task keywords to focus the resources (optional)' },
       },
-      required: ['category'],
     },
   },
   {
@@ -249,8 +249,11 @@ async function call(name, a = {}) {
       store.save(state);
       return out;
     }
-    case 'load_skill':
-      return skills.load(state, a.category, { query: a.query || '' });
+    case 'load_skill': {
+      const cats = [...(Array.isArray(a.categories) ? a.categories : []), ...(a.category ? [a.category] : [])].filter((c) => skills.SKILL_CATS.includes(c)).slice(0, 4);
+      if (!cats.length) throw new Error('Give one or more categories: ' + skills.SKILL_CATS.join(', '));
+      return skills.loadMany(state, cats, { query: a.query || '' });
+    }
     case 'list_skills':
       return skills.SKILL_CATS.map((c) => {
         const sk = skills.getSkill(state, c);
@@ -346,18 +349,19 @@ function logCall(tool, a, out) {
   st.mcpLog.unshift({
     t: new Date().toISOString(), tool,
     q: String(a.query || a.title || a.url || a.id || a.mode || '').slice(0, 80),
-    category: a.category || (out && out.category) || '',
+    category: a.category || (Array.isArray(a.categories) ? a.categories.join(' + ') : '') || (out && out.category) || '',
     count: out && typeof out.count === 'number' ? out.count : undefined,
   });
   st.mcpLog.length = Math.min(st.mcpLog.length, 100);
   // Compteurs cumulés pour le niveau de Claude.
   const ms = (st.mcpStats = st.mcpStats || { calls: 0, byTool: {}, byCat: {}, examples: 0 });
-  const cat = a.category || (out && out.category) || '';
+  const cats = [...new Set([a.category, ...(Array.isArray(a.categories) ? a.categories : []), out && out.category].filter((c) => typeof c === 'string' && c))];
   ms.calls++;
   ms.byTool[tool] = (ms.byTool[tool] || 0) + 1;
-  if (cat) ms.byCat[cat] = (ms.byCat[cat] || 0) + 1;
+  for (const cat of cats) ms.byCat[cat] = (ms.byCat[cat] || 0) + 1;
   if (tool === 'get_example') ms.examples++;
   if (out && Array.isArray(out.examples)) ms.examples += out.examples.length;
+  if (out && Array.isArray(out.skills)) for (const sk of out.skills) ms.examples += (sk.examples || []).length;
   ms.firstCall = ms.firstCall || new Date().toISOString();
   store.save(st);
 }
@@ -444,14 +448,24 @@ if (require.main === module) {
   MODE = 'stdio';
   setInterval(seen, 60e3);
   const rl = readline.createInterface({ input: process.stdin });
-  rl.on('close', () => process.exit(0));
+  // À la fermeture, on termine les requêtes en cours et on vide la sortie avant de quitter.
+  let pending = 0;
+  let closed = false;
+  const maybeExit = () => { if (closed && !pending) process.stdout.write('', () => process.exit(0)); };
+  rl.on('close', () => { closed = true; maybeExit(); });
   rl.on('line', async (line) => {
     if (!line.trim()) return;
     let msg;
     try { msg = JSON.parse(line); } catch {
       return process.stdout.write(JSON.stringify({ jsonrpc: '2.0', id: null, error: { code: -32700, message: 'Parse error' } }) + '\n');
     }
-    const out = await handle(msg);
-    if (out) process.stdout.write(JSON.stringify(out) + '\n');
+    pending++;
+    try {
+      const out = await handle(msg);
+      if (out) process.stdout.write(JSON.stringify(out) + '\n');
+    } finally {
+      pending--;
+      maybeExit();
+    }
   });
 }

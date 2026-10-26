@@ -7,7 +7,7 @@ const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // Badges et couleurs des catégories (style Rovex).
 const CAT_STYLE = {
-  scripting: ['</>', '#A78BFA'], vfx: ['FX', '#F0ABFC'], animation: ['AN', '#FCD34D'], gui: ['UI', '#6EE7B7'], gfx: ['GX', '#C4B5FD'],
+  scripting: ['</>', '#A78BFA'], vfx: ['FX', '#F0ABFC'], animation: ['AN', '#FCD34D'], cutscenes: ['CS', '#FDA4AF'], gui: ['UI', '#6EE7B7'], gfx: ['GX', '#C4B5FD'],
   modeling: ['3D', '#FDBA74'], building: ['MP', '#7DD3FC'], audio: ['♪', '#FDE68A'], design: ['GD', '#F9A8D4'], gameplay: ['GP', '#FCA5A5'], tools: ['TL', '#CBD5E1'],
 };
 const TYPE_ICONS = {
@@ -488,6 +488,10 @@ async function renderSkills() {
     <div class="flow">
       ${[['🎯', 'sk.f1'], ['📥', 'sk.f2'], ['📚', 'sk.f3'], ['⚙️', 'sk.f4']].map(([ico, k], i) => `<div class="flow-step" style="--i:${i}"><span>${ico}</span><b>${t(k + 't')}</b><small>${t(k)}</small></div>`).join('<i class="flow-arrow">→</i>')}
     </div>
+    <button class="sk-core" data-sk="core" data-spot>
+      <span class="badge-ico">◆</span>
+      <span><code>${esc(data.core.name)}</code>${data.core.custom ? ` <span class="st review">${t('sk.custom')}</span>` : ''}<h3>${t('sk.core')}</h3><small>${t('sk.coreDesc')}</small></span>
+    </button>
     <div class="sk-grid">${data.skills.map((x) => {
       const c = cat(x.id);
       return `<button class="sk-card ${x.enabled ? '' : 'off'}" style="--c:${c.color}" data-sk="${x.id}" data-spot>
@@ -509,7 +513,27 @@ async function renderSkills() {
   };
 }
 
+async function openCore() {
+  const sk = await api('/skills/core');
+  openModal(`
+    <div class="card-cat"><span class="dot" style="background:#a970ff"></span><span class="mono">${esc(sk.name)}</span></div>
+    <h2 class="detail-title" style="margin-top:8px">${t('sk.core')}</h2>
+    <p class="sub" style="margin-bottom:18px">${t('sk.coreDesc')}</p>
+    <div class="field"><label>${t('sk.instr')}</label><textarea id="sk-instr" style="min-height:420px" spellcheck="false" ${isAdmin() ? '' : 'readonly'}>${esc(sk.instructions)}</textarea></div>
+    <div class="row admin-only">
+      <button class="btn primary" id="sk-save">${t('save')}</button>
+      <button class="btn" id="sk-reset">${t('cn.default')}</button>
+    </div>`);
+  if (!isAdmin()) return;
+  $('#sk-save').onclick = async () => { await api('/skills/core', { method: 'PUT', body: { instructions: $('#sk-instr').value } }); toast(t('toast.saved')); closeModal(); transition(renderSkills); };
+  $('#sk-reset').onclick = () => {
+    $('#sk-instr').value = sk.defaultInstructions;
+    $('#sk-instr').animate([{ background: 'rgba(124,58,237,.25)' }, { background: 'transparent' }], { duration: 700 });
+  };
+}
+
 async function openSkill(id) {
+  if (id === 'core') return openCore();
   const sk = await api('/skills/' + id);
   const c = cat(id);
   const ctx = sk.context;
@@ -517,11 +541,12 @@ async function openSkill(id) {
   openModal(`
     <div class="card-cat"><span class="dot" style="background:${c.color}"></span>${esc(c.label)} · <span class="mono">${esc(sk.name)}</span></div>
     <h2 class="detail-title" style="margin-top:8px">${t('sk.skillOf', { cat: esc(c.label) })}</h2>
+    <p class="sub" style="margin-bottom:6px">${esc(sk.description || '')}</p>
     <p class="sub" style="margin-bottom:18px">${t('sk.modalSub')}</p>
     <div class="row admin-only" style="margin-bottom:18px">
       <label class="switch"><input type="checkbox" id="sk-on" ${sk.enabled ? 'checked' : ''}><span></span></label><span>${t('sk.enabled')}</span>
     </div>
-    <div class="field"><label>${t('sk.instr')}</label><textarea id="sk-instr" style="min-height:220px" spellcheck="false" ${isAdmin() ? '' : 'readonly'}>${esc(sk.instructions)}</textarea></div>
+    <div class="field"><label>${t('sk.instr')}</label><textarea id="sk-instr" style="min-height:320px" spellcheck="false" ${isAdmin() ? '' : 'readonly'}>${esc(sk.instructions)}</textarea></div>
     <div class="field" ${id === 'audio' ? 'hidden' : ''}><label>${t('sk.art')}</label><textarea id="sk-art" style="min-height:80px" spellcheck="false" ${isAdmin() ? '' : 'readonly'}>${esc(sk.art || '')}</textarea></div>
     <div class="row admin-only" style="margin-bottom:22px">
       <button class="btn primary" id="sk-save">${t('save')}</button>

@@ -30,6 +30,7 @@ function meta(html, name) {
 // Devine une catégorie à partir du texte (utilisé à l'import).
 const GUESS = [
   ['vfx', /vfx|particle|particule|beam|trail|slash|explosion|aura|effect|effet/i],
+  ['cutscenes', /cutscene|cinematic|cin[ée]matique|camera shot|plan cam[ée]ra/i],
   ['animation', /anim|moon animator|rig|r6|r15|keyframe|emote/i],
   ['gui', /\bgui\b|\bui\b|interface|hud|menu|button|bouton|screengui/i],
   ['gfx', /gfx|thumbnail|miniature|render|icon|icône|poster/i],
