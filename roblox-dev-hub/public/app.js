@@ -65,7 +65,7 @@ async function api(path, opts = {}) {
     body: opts.body && !(opts.body instanceof Blob) ? JSON.stringify(opts.body) : opts.body,
   });
   const data = await res.json();
-  if (res.status === 401 && path !== '/login') showLogin();
+  if (res.status === 401 && path !== '/login') showLogin(data.key === 'otherDevice' ? t('err.otherDevice', data.vars) : '');
   if (!res.ok) throw new Error(data.key && has('err.' + data.key) ? t('err.' + data.key, data.vars) : data.error || t('err.generic'));
   return data;
 }
@@ -1271,6 +1271,16 @@ async function loadClaudeApps() {
 }
 
 // ---------- Admin ----------
+// Appareils d'un ID : celui connecté en ce moment, et tous ceux qui ont essayé de s'y connecter.
+function devicesHtml(c) {
+  if (!Array.isArray(c.devices)) return '';
+  const list = c.devices;
+  const now = c.activeDevice ? `<span class="dev-on">● ${t('admin.devOn', { name: esc(c.activeDevice), when: c.activeSince ? ago(c.activeSince) : '' })}</span>` : `<span class="dev-off">○ ${t('admin.devNone')}</span>`;
+  if (!list.length) return `<small class="devs-line">${now}</small>`;
+  return `<details class="devs"><summary><small class="devs-line">${now} · <b>${t('admin.devCount', { n: list.length })}</b></small></summary>
+    <ul>${list.map((d) => `<li>${d.active ? '🟢' : '⚪'} <b>${esc(d.name || t('admin.devUnknown'))}</b> · ${t('admin.devLogins', { n: d.logins })} · ${t('admin.devLast', { when: ago(d.lastSeen) })}</li>`).join('')}</ul></details>`;
+}
+
 async function renderAdmin() {
   let [codes, info] = await Promise.all([api('/admin/codes').catch((e) => ({ error: e.message })), api('/admin/info')]);
   const codesErr = codes.error;
@@ -1295,10 +1305,12 @@ async function renderAdmin() {
     <div class="codes">${codes.map((c) => `
       <div class="code-row ${c.status}">
         <div class="code-main"><code>${esc(c.code)}</code><b>${c.admin ? '👑 ' : ''}${esc(c.label || t('admin.noName'))}</b>
-          <small>${c.admin ? t('session.admin') + ' · ' : ''}${!c.expiresAt ? t('admin.never') : t(c.status === 'expired' ? 'admin.expiredOn' : 'admin.expiresOn', { date: date(c.expiresAt) })} · ${t('admin.logins', { n: c.uses })}${c.lastUsed ? ' · ' + t('admin.lastLogin', { date: dateTime(c.lastUsed) }) : ''}</small></div>
+          <small>${c.admin ? t('session.admin') + ' · ' : ''}${!c.expiresAt ? t('admin.never') : t(c.status === 'expired' ? 'admin.expiredOn' : 'admin.expiresOn', { date: date(c.expiresAt) })} · ${t('admin.logins', { n: c.uses })}${c.lastUsed ? ' · ' + t('admin.lastLogin', { date: dateTime(c.lastUsed) }) : ''}</small>
+          ${devicesHtml(c)}</div>
         <span class="status ${c.status}">${t('status.' + c.status)}</span>
         <div class="row">
           <button class="btn small" data-copy="${esc(c.code)}">${t('copy')}</button>
+          ${c.activeDevice ? `<button class="btn small" data-kick="${c.id}">${t('admin.kick')}</button>` : ''}
           ${c.expiresAt ? `<button class="btn small" data-extend="${c.id}">+30 ${t('admin.daysShort')}</button><button class="btn small" data-forever="${c.id}">∞ ${t('admin.makeForever')}</button>` : ''}
           <button class="btn small" data-block="${c.id}" data-v="${!c.revoked}">${c.revoked ? t('admin.unblock') : t('admin.block')}</button>
           <button class="btn small danger" data-remove="${c.id}">${t('delete')}</button>
@@ -1341,6 +1353,7 @@ async function renderAdmin() {
   $$('[data-extend]').forEach((b) => b.onclick = async () => { await api('/admin/codes/' + b.dataset.extend, { method: 'PUT', body: { addDays: 30 } }); toast(t('admin.extended')); renderAdmin(); });
   $$('[data-forever]').forEach((b) => b.onclick = async () => { await api('/admin/codes/' + b.dataset.forever, { method: 'PUT', body: { permanent: true } }); toast(t('admin.nowForever')); renderAdmin(); });
   $$('[data-block]').forEach((b) => b.onclick = async () => { await api('/admin/codes/' + b.dataset.block, { method: 'PUT', body: { revoked: b.dataset.v === 'true' } }); renderAdmin(); });
+  $$('[data-kick]').forEach((b) => b.onclick = async () => { await api('/admin/codes/' + b.dataset.kick + '/kick', { method: 'POST' }); toast(t('admin.kicked')); renderAdmin(); });
   $$('[data-remove]').forEach((b) => b.onclick = async () => { if (!confirm(t('admin.confirmDelete'))) return; await api('/admin/codes/' + b.dataset.remove, { method: 'DELETE' }); renderAdmin(); });
   if ($('#reset-key')) $('#reset-key').onclick = async () => {
     if (!confirm(t('admin.confirmReset'))) return;
@@ -1680,7 +1693,7 @@ window.addEventListener('hashchange', route);
     view.innerHTML = `<div class="empty"><b>${t('err.oldTitle')}</b>${t('err.oldText')}</div>`;
     return;
   }
-  if (!SESSION.loggedIn) return showLogin();
+  if (!SESSION.loggedIn) return showLogin(SESSION.kicked ? t('err.otherDevice', { device: SESSION.kicked.device || '?' }) : '');
   renderSession();
   META = await api('/meta');
   await Promise.all([refreshStats(), refreshMcp()]);

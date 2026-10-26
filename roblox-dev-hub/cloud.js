@@ -17,7 +17,7 @@ async function rpc(fn, args = {}) {
   } catch (e) {
     throw Object.assign(new Error('Cannot reach the Rovex server'), { key: 'cloudDown', offline: true });
   }
-  if (!res.ok) throw Object.assign(new Error(`Rovex server error (HTTP ${res.status})`), { key: 'cloudDown', offline: res.status >= 500 || res.status === 404 });
+  if (!res.ok) throw Object.assign(new Error(`Rovex server error (HTTP ${res.status})`), { key: 'cloudDown', status: res.status, offline: res.status >= 500 || res.status === 404 });
   return res.json();
 }
 

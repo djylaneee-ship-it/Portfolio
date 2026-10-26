@@ -386,6 +386,7 @@ const routes = [
   ['GET', /^\/api\/admin\/codes$/, (req, m, url, session) => auth.list(session)],
   ['POST', /^\/api\/admin\/codes$/, async (req, m, url, session) => auth.create(await json(req), session)],
   ['PUT', /^\/api\/admin\/codes\/(\w+)$/, async (req, m, url, session) => auth.update(m[1], await json(req), session)],
+  ['POST', /^\/api\/admin\/codes\/(\w+)\/kick$/, (req, m, url, session) => auth.kick(m[1], session)],
   ['DELETE', /^\/api\/admin\/codes\/(\w+)$/, async (req, m, url, session) => { await auth.remove(m[1], session); return { ok: true }; }],
   ['GET', /^\/api\/admin\/info$/, (req, m, url, session) => ({
     host: HOST, port: PORT, shared: HOST !== '127.0.0.1', online: auth.online, offline: Boolean(session.offline), master: Boolean(session.master),
@@ -423,7 +424,8 @@ async function authRoutes(req, res, url) {
   }
   if (url.pathname === '/api/session') {
     const s = auth.check(cookies(req).rdh_session);
-    return send(res, 200, s ? { loggedIn: true, role: s.role, label: s.label, expiresAt: s.expiresAt, permanent: Boolean(s.permanent || !s.codeId), master: Boolean(s.master), offline: Boolean(s.offline) } : { loggedIn: false });
+    const kick = !s && auth.kickReason(cookies(req).rdh_session);
+    return send(res, 200, s ? { loggedIn: true, role: s.role, label: s.label, expiresAt: s.expiresAt, permanent: Boolean(s.permanent || !s.codeId), master: Boolean(s.master), offline: Boolean(s.offline) } : { loggedIn: false, kicked: kick || undefined });
   }
   return false;
 }
@@ -496,7 +498,12 @@ const server = http.createServer(async (req, res) => {
     const bearer = String(req.headers.authorization || '').replace(/^Bearer\s+/i, '');
     const session = auth.check(cookies(req).rdh_session) || auth.checkCode(bearer);
     if (session && url.pathname === '/api/admin/reset-key' && session.codeId) return send(res, 403, { error: 'Only the main admin key can do this', key: 'masterOnly' });
-    if (!session) return send(res, 401, { error: 'Sign in with your access ID', key: 'loginRequired' });
+    if (!session) {
+      // Session fermée parce que l'ID s'est connecté sur un autre appareil : on le dit à l'écran de connexion.
+      const kick = auth.kickReason(cookies(req).rdh_session);
+      if (kick) return send(res, 401, { error: 'This ID is now used on another device', key: 'otherDevice', vars: { device: kick.device || '?' } });
+      return send(res, 401, { error: 'Sign in with your access ID', key: 'loginRequired' });
+    }
     const genRoute = url.pathname === '/api/gen' || url.pathname.startsWith('/api/gen/');
     if (session.role !== 'admin' && !genRoute && !(req.method === 'GET' && USER_ROUTES.some((re) => re.test(url.pathname)))) {
       return send(res, 403, { error: 'Admin only', key: 'adminOnly' });

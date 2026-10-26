@@ -589,3 +589,12 @@ body.desktop .modal, body.desktop .login { padding-top: 40px; }
 .boost-item:hover { transform: translateX(5px); border-color: #3B2D5C; }
 .boost-item b { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .boost-item small { color: var(--muted); white-space: nowrap; }
+
+/* Appareils d'un ID (panneau Admin) */
+.devs-line { color: var(--muted); }
+.dev-on { color: var(--ok2); font-weight: 600; }
+.dev-off { color: var(--muted); }
+.devs summary { list-style: none; cursor: pointer; }
+.devs summary::-webkit-details-marker { display: none; }
+.devs summary:hover .devs-line b { color: var(--accent2); }
+.devs ul { margin: 8px 0 2px; padding: 10px 14px; list-style: none; border-radius: 12px; background: var(--bg2, #0D0A16); border: 1px solid var(--line); display: grid; gap: 6px; font-size: 13px; color: var(--muted2); }

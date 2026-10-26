@@ -2,6 +2,7 @@
 // Les IDs sont gardés en ligne (cloud.js) : un ID créé sur le PC de l'admin marche sur n'importe
 // quel PC. Sans internet, on retombe sur la clé admin de ce PC et les IDs déjà connus ici.
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 const crypto = require('crypto');
 const { DATA_DIR } = require('./db');
@@ -11,6 +12,29 @@ const KEY_FILE = path.join(DATA_DIR, 'CLE-ADMIN.txt');
 const ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // sans O/0 ni I/1 pour éviter les confusions
 const DAY = 86400e3;
 const RECHECK = 10 * 60e3; // une session en ligne est revérifiée toutes les 10 minutes (ID bloqué, expiré…)
+const RECHECK_ID = 60e3; // un ID (pas la clé admin) toutes les minutes : un seul appareil connecté à la fois
+const DEVICE_FILE = path.join(DATA_DIR, 'device.json');
+
+// Identifiant de cet appareil (créé une fois) et nom du PC, pour « un ID = un appareil ».
+function device() {
+  try {
+    const d = JSON.parse(fs.readFileSync(DEVICE_FILE, 'utf8'));
+    if (d.id) return { id: d.id, name: os.hostname() || d.name || '' };
+  } catch {}
+  const d = { id: crypto.randomBytes(16).toString('hex'), name: os.hostname() || '' };
+  try { fs.mkdirSync(DATA_DIR, { recursive: true }); fs.writeFileSync(DEVICE_FILE, JSON.stringify(d)); } catch {}
+  return d;
+}
+
+// Appel avec l'appareil ; si la base en ligne n'a pas encore la version « appareils », on rappelle sans.
+async function rpcDevice(fn, args, dev) {
+  try {
+    return await cloud.rpc(fn, { ...args, ...dev });
+  } catch (e) {
+    if (e.status === 404) return cloud.rpc(fn, args);
+    throw e;
+  }
+}
 
 function randomCode(prefix, groups = 3) {
   const bytes = crypto.randomBytes(groups * 4);
@@ -39,6 +63,8 @@ class Auth {
     this.fails = new Map(); // ip -> { n, until }
     this.cache = new Map(); // code -> { role, until } (jetons Bearer vérifiés en ligne)
     this.checking = new Set();
+    this.kicked = new Map(); // jeton → appareil qui a pris la place (pour le message à l'écran de connexion)
+    this.device = device();
     this.online = cloud.enabled;
   }
 
@@ -86,6 +112,7 @@ class Auth {
       }
     }
     this.fails.delete(ip);
+    this.kicked.clear();
     const token = crypto.randomBytes(32).toString('hex');
     const d = this.data;
     d.sessions[hash(token)] = { ...session, createdAt: new Date().toISOString(), checkedAt: Date.now() };
@@ -104,7 +131,7 @@ class Auth {
         return { role: 'admin', codeId: null, label: 'Admin', master: true, cloud: true, cred: code, expiresAt: yearFromNow(), permanent: true };
       }
     }
-    const out = await cloud.rpc('rovex_login', { p_code: code });
+    const out = await rpcDevice('rovex_login', { p_code: code }, { p_device: this.device.id, p_name: this.device.name });
     if (!out.ok) throw err(out.err || 'unknownId');
     // Connexion avec la clé principale depuis un autre PC (co-admin) : elle devient la clé de ce PC.
     if (out.master && code !== this.masterKey()) this.saveKey(code);
@@ -161,20 +188,22 @@ class Auth {
   // Revérifie en ligne, en arrière-plan, qu'un ID n'a pas été bloqué ou supprimé entre-temps.
   // Une session ouverte hors ligne est réessayée toutes les 30 secondes jusqu'à ce que la base réponde.
   recheck(key, s) {
-    const wait = s.offline ? 30e3 : RECHECK;
+    const wait = s.offline ? 30e3 : s.master ? RECHECK : RECHECK_ID;
     if (!s.cred || Date.now() - (s.checkedAt || 0) < wait || this.checking.has(key)) return;
     this.checking.add(key);
     // Clé admin de ce PC : on l'enregistre en ligne si ce n'est pas encore fait (comme à la connexion).
     const ask = s.master && s.cred === this.masterKey()
       ? cloud.rpc('rovex_claim', { p_key: s.cred }).then(async (c) => {
-        if (!c.ok) return cloud.rpc('rovex_check', { p_code: s.cred });
+        if (!c.ok) return rpcDevice('rovex_check', { p_code: s.cred }, { p_device: this.device.id });
         if (c.claimed || !this.data.imported) await this.importLocal(s.cred);
         return { ok: true, role: 'admin', label: 'Admin' };
       })
-      : cloud.rpc('rovex_check', { p_code: s.cred });
+      : rpcDevice('rovex_check', { p_code: s.cred }, { p_device: this.device.id });
     ask.then((out) => {
       const d = this.data;
       if (!d.sessions[key]) return;
+      // ID connecté sur un autre appareil : cette session est fermée, l'écran de connexion dira pourquoi.
+      if (!out.ok && out.err === 'otherDevice') this.kicked.set(key, { device: out.device || '' });
       if (!out.ok) delete d.sessions[key];
       else {
         Object.assign(d.sessions[key], { checkedAt: Date.now(), role: out.role, label: out.label || d.sessions[key].label, offline: false, cloud: true });
@@ -206,6 +235,17 @@ class Auth {
     }
     const c = this.data.codes.find((x) => x.code === code);
     return c && !c.revoked && !(c.expiresAt && Date.now() > Date.parse(c.expiresAt)) ? { role: c.admin ? 'admin' : 'user' } : null;
+  }
+
+  // Pourquoi une session a été fermée (connexion sur un autre appareil), gardé jusqu'à la prochaine connexion.
+  kickReason(token) {
+    return (token && this.kicked.get(hash(token))) || null;
+  }
+
+  // L'admin déconnecte un ID de son appareil.
+  async kick(id, session) {
+    cloud.must(await cloud.rpc('rovex_kick', { p_key: session.cred, p_id: id }));
+    return { ok: true };
   }
 
   logout(token) {
