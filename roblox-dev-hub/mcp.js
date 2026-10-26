@@ -66,7 +66,7 @@ function clients() {
 // Toujours ajouté aux consignes : passer par le skill de la catégorie avant toute tâche Roblox.
 const SKILL_RULE = `
 
-Skills: for every Roblox task, first identify the domains it needs (scripting, vfx, animation, cutscenes, gui, gfx, modeling, building, audio, design, tools) and call load_skill once with only those categories and the task keywords (an attack = scripting + animation + vfx; a boss intro = cutscenes + animation + vfx, + audio if needed; a menu = gui + scripting). Read all of it before working: the core rules (rovex-core) apply to every task. Project art direction: VFX are built from custom-textured ParticleEmitters, never the Fire, Smoke or Sparkles classes. Pick their textures with find_vfx_textures (the user's texture IDs, with flipbook grids); never invent texture IDs.
+Skills: for every Roblox task, first identify the domains it needs (scripting, vfx, animation, cutscenes, gui, gfx, modeling, building, audio, design, tools) and call load_skill once with only those categories and the task keywords (an attack = scripting + animation + vfx; a boss intro = cutscenes + animation + vfx, + audio if needed; a menu = gui + scripting). Read all of it before working: the core rules (rovex-core) apply to every task. Project art direction: VFX are built from custom-textured ParticleEmitters, never the Fire, Smoke or Sparkles classes. Their textures MUST come from the Rovex VFX textures (find_vfx_textures): no other texture ID is allowed, never from memory, never invented; if nothing fits after several searches, tell the user instead of using another texture.
 
 Roblox Studio: when tools starting with studio_ are available, Rovex is connected to the place open in Roblox Studio. Before writing code for the user's game, use them to read the real scripts, the Explorer structure and the data, and follow the existing architecture. Only change the place (edit scripts, run code that modifies it, insert models) when the user asked for it, and say what you changed. To put an image in the game (icon, UI, decal), make or pick it (generate_image), then call upload_image_to_roblox with a target path: Rovex uploads it to Roblox and sets it in Studio.
 
@@ -147,7 +147,7 @@ const TOOLS = [
   },
   {
     name: 'find_vfx_textures',
-    description: 'Find Roblox texture IDs for VFX in the user\'s texture library (1000+ textures: particle flipbooks for fire, smoke, slash, burst, lightning, crack, water, ice, wind decals, glows, stars, gradients, fog…). Returns rbxassetid, name, group, kind (particle, flipbook, decal, texture), the flipbook grid (2x2, 4x4, 8x8) with the matching FlipbookLayout/FlipbookMode/framerate, and tips. ALWAYS use it to pick ParticleEmitter textures; never invent texture IDs. Call it with no query to list the groups.',
+    description: 'Find Roblox texture IDs for VFX in the user\'s texture library (1000+ textures: particle flipbooks for fire, smoke, slash, burst, lightning, crack, water, ice, wind decals, glows, stars, gradients, fog…). Returns rbxassetid, name, group, kind (particle, flipbook, decal, texture), the flipbook grid (2x2, 4x4, 8x8) with the matching FlipbookLayout/FlipbookMode/framerate, and tips. MANDATORY for every ParticleEmitter, Beam or Trail texture: textures must come from here, no other texture ID is allowed and none may be invented. Call it with no query to list the groups.',
     inputSchema: {
       type: 'object',
       properties: {

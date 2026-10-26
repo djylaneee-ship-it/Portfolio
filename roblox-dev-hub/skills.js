@@ -64,10 +64,15 @@ function context(state, cat, { query = '' } = {}) {
 }
 
 // Pour les VFX : un résumé de la bibliothèque de textures (les IDs se récupèrent avec find_vfx_textures).
+// Règle fixe (même si l'admin a modifié le texte du skill) : textures uniquement depuis Rovex.
 function vfxTextures(state) {
   const tx = require('./vfx-textures');
   const list = tx.all(state);
-  return { total: list.length, groups: tx.groups(list).map((g) => `${g.label} (${g.kind}, ${g.count})`), how: 'Call find_vfx_textures with words like "toon fire", "slash", "smoke" to get the texture IDs and their flipbook settings.' };
+  return {
+    mandatory: 'MANDATORY: every ParticleEmitter / Beam / Trail texture must come from the Rovex VFX textures (find_vfx_textures). No other texture ID is allowed (not from memory, not Roblox defaults, never invented). State the chosen ID, name and group for each layer. If nothing fits after several searches, tell the user and suggest adding one in the VFX textures page; never swap in another texture silently.',
+    total: list.length, groups: tx.groups(list).map((g) => `${g.label} (${g.kind}, ${g.count})`),
+    how: 'Call find_vfx_textures with words like "toon fire", "slash", "smoke" to get the texture IDs and their flipbook settings.',
+  };
 }
 
 const HOW_TO_USE = 'Follow the core rules (rovex-core) and the instructions of each skill. Reuse the structure of the validated examples first, cite the resources you rely on, and propose an open source module when one fits instead of rewriting it.';
