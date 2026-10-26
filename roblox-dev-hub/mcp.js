@@ -9,6 +9,7 @@ const web = require('./web');
 const skills = require('./skills');
 const gen = require('./gen');
 const studio = require('./studio');
+const rbxupload = require('./rbxupload');
 const vm = require('vm');
 
 // Les modèles de prompts de la page « Prompts » (public/prompts.js), aussi proposés dans le menu + de Claude.
@@ -53,7 +54,7 @@ const SKILL_RULE = `
 
 Skills: for every Roblox task, first identify the domains it needs (scripting, vfx, animation, cutscenes, gui, gfx, modeling, building, audio, design, tools) and call load_skill once with only those categories and the task keywords (an attack = scripting + animation + vfx; a boss intro = cutscenes + animation + vfx, + audio if needed; a menu = gui + scripting). Read all of it before working: the core rules (rovex-core) apply to every task. Project art direction: VFX are built from custom-textured ParticleEmitters, never the Fire, Smoke or Sparkles classes.
 
-Roblox Studio: when tools starting with studio_ are available, Rovex is connected to the place open in Roblox Studio. Before writing code for the user's game, use them to read the real scripts, the Explorer structure and the data, and follow the existing architecture. Only change the place (edit scripts, run code that modifies it, insert models) when the user asked for it, and say what you changed.
+Roblox Studio: when tools starting with studio_ are available, Rovex is connected to the place open in Roblox Studio. Before writing code for the user's game, use them to read the real scripts, the Explorer structure and the data, and follow the existing architecture. Only change the place (edit scripts, run code that modifies it, insert models) when the user asked for it, and say what you changed. To put an image in the game (icon, UI, decal), make or pick it (generate_image), then call upload_image_to_roblox with a target path: Rovex uploads it to Roblox and sets it in Studio.
 
 Images: you cannot draw yourself, but Rovex can. When the user asks for an icon, an image, a UI element, a thumbnail, a texture or a VFX sprite, load the skill of the category, then call generate_image. Describe only the subject: Rovex applies the skill's style and the user's reference images, and saves the PNG in the library. Give the user the file path, and remind them to upload it to Roblox (Creator Hub or Asset Manager) to get its rbxassetid.`;
 
@@ -111,6 +112,19 @@ const TOOLS = [
         title: { type: 'string', description: 'Name to save it under in the library.' },
       },
       required: ['prompt'],
+    },
+  },
+  {
+    name: 'upload_image_to_roblox',
+    description: 'Upload an image to Roblox so it can be used in the game (returns rbxassetid://…), and optionally put it in the place open in Roblox Studio: sets ImageLabel/ImageButton.Image or Decal.Texture, or adds a Decal on a Part. Works with an image from generate_image (its library id or file path), any library image, or an http(s) URL. Uses the connected Roblox Studio, or the user\'s Roblox Open Cloud key.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        image: { type: 'string', description: 'Library image id, file path returned by generate_image, or http(s) URL.' },
+        target: { type: 'string', description: 'Optional: dot path in the place to put the image on, e.g. game.StarterGui.Shop.Frame.Icon or game.Workspace.Sign.' },
+        face: { type: 'string', enum: ['Front', 'Back', 'Top', 'Bottom', 'Left', 'Right'], description: 'Face for a Decal added on a Part. Default Front.' },
+      },
+      required: ['image'],
     },
   },
   {
@@ -247,6 +261,8 @@ async function call(name, a = {}) {
       const examples = matchExamples(state, { query: a.query, category: a.category }).slice(0, 5).map(briefExample);
       return { count: res.length, examples, results: res.map(brief) };
     }
+    case 'upload_image_to_roblox':
+      return rbxupload.upload(state, a);
     case 'generate_image': {
       const out = await gen.generateImage(state, a);
       store.save(state);

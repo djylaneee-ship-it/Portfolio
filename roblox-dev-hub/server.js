@@ -10,6 +10,8 @@ const { Auth, KEY_FILE } = require('./auth');
 const os = require('os');
 const claude = require('./claude');
 const studio = require('./studio');
+const place = require('./place');
+const rbxupload = require('./rbxupload');
 const level = require('./level');
 const quality = require('./quality');
 const skills = require('./skills');
@@ -397,6 +399,10 @@ const routes = [
       next.config = b.config.trim();
     }
     if (typeof b.enabled === 'boolean') next.enabled = b.enabled;
+    // Envoi d'images par Open Cloud (facultatif) : clé API Roblox et créateur (utilisateur ou groupe).
+    if (typeof b.openCloudKey === 'string') next.openCloudKey = b.openCloudKey.trim() || undefined;
+    if (b.creatorType === 'user' || b.creatorType === 'group') next.creatorType = b.creatorType;
+    if (b.creatorId !== undefined) next.creatorId = String(b.creatorId).replace(/\D/g, '') || undefined;
     if (next.enabled && !next.config) next.config = JSON.stringify(studio.DEFAULT_CONFIG, null, 2);
     next.updatedAt = new Date().toISOString();
     studio.writeSettings(next);
@@ -410,6 +416,13 @@ const routes = [
     await studio.bridge.waitReady(10e3);
     return robloxStudioInfo();
   }],
+  // La place ouverte dans Studio : scripts (lire / modifier) et réglages du jeu (valeurs du code).
+  ['GET', /^\/api\/place\/studios$/, async (req, m, url) => ({ ready: studio.bridge.state === 'ready', studios: await place.studios(url.searchParams.get('force') === '1') })],
+  ['GET', /^\/api\/place\/scripts$/, (req, m, url) => place.scripts(url.searchParams.get('s') || '')],
+  ['POST', /^\/api\/place\/read$/, async (req) => { const b = await json(req); return place.readScript(b.s || '', b.path); }],
+  ['POST', /^\/api\/place\/write$/, async (req) => { const b = await json(req); return place.writeScript(b.s || '', b.path, b.source); }],
+  ['GET', /^\/api\/place\/values$/, (req, m, url) => place.values(url.searchParams.get('s') || '', url.searchParams.get('force') === '1')],
+  ['POST', /^\/api\/place\/value$/, async (req) => { const b = await json(req); return place.setValue(b.s || '', b); }],
   ['POST', /^\/api\/mcp\/test$/, async (req) => {
     const q = String((await json(req)).query || '').slice(0, 200);
     return mcp.call('search_resources', { query: q, limit: 8 });
@@ -430,8 +443,8 @@ const routes = [
 // Routes accessibles à un ID d'accès simple (lecture seule). Tout le reste est réservé à l'admin.
 // Ce que les membres peuvent faire en plus de lire : brancher Claude sur leur PC, tester la recherche,
 // mettre à jour l'app, utiliser la génération IA.
-const MEMBER_ACTIONS = [/^\/api\/robloxstudio(\/restart)?$/, /^\/api\/claude\/(desktop|code)$/, /^\/api\/mcp\/test$/, /^\/api\/update\/(check|install)$/, /^\/api\/gen(\/.*)?$/];
-const USER_ROUTES = [/^\/api\/robloxstudio$/, /^\/api\/claude$/, /^\/api\/version$/, /^\/api\/prompts$/, /^\/api\/skills$/, /^\/api\/skills\/\w+$/, /^\/api\/level$/, /^\/api\/meta$/, /^\/api\/stats$/, /^\/api\/resources$/, /^\/api\/channels$/, /^\/api\/youtube$/, /^\/api\/crawl$/, /^\/api\/examples$/, /^\/api\/mcp$/];
+const MEMBER_ACTIONS = [/^\/api\/place\/(read|write|value)$/, /^\/api\/robloxstudio(\/restart)?$/, /^\/api\/claude\/(desktop|code)$/, /^\/api\/mcp\/test$/, /^\/api\/update\/(check|install)$/, /^\/api\/gen(\/.*)?$/];
+const USER_ROUTES = [/^\/api\/place\/(studios|scripts|values)$/, /^\/api\/robloxstudio$/, /^\/api\/claude$/, /^\/api\/version$/, /^\/api\/prompts$/, /^\/api\/skills$/, /^\/api\/skills\/\w+$/, /^\/api\/level$/, /^\/api\/meta$/, /^\/api\/stats$/, /^\/api\/resources$/, /^\/api\/channels$/, /^\/api\/youtube$/, /^\/api\/crawl$/, /^\/api\/examples$/, /^\/api\/mcp$/];
 
 const cookies = (req) => Object.fromEntries(String(req.headers.cookie || '').split(';').map((c) => c.trim().split('=')).filter((p) => p[0]).map(([k, ...v]) => [k, decodeURIComponent(v.join('='))]));
 const clientIp = (req) => req.socket.remoteAddress || '';
@@ -556,6 +569,11 @@ const server = http.createServer(async (req, res) => {
     }
     return send(res, 404, { error: 'Unknown route', key: 'notFound' });
   }
+  // Lien temporaire vers une image, pour que Roblox Studio (sur ce PC) puisse l'envoyer sur Roblox.
+  if (url.pathname.startsWith('/share/')) {
+    const f = isLoopback(req) && rbxupload.sharedFile(url.pathname.split('/')[2] || '');
+    return f && fs.existsSync(f) ? serveFile(req, res, f) : send(res, 404, { error: 'Not found', key: 'notFound' });
+  }
   if (url.pathname.startsWith('/media/')) {
     if (!auth.check(cookies(req).rdh_session)) return send(res, 401, { error: 'Sign-in required', key: 'loginRequired' });
     const f = safeJoin(db.MEDIA_DIR, url.pathname.slice(7));
@@ -617,6 +635,9 @@ function robloxStudioInfo() {
     defaultConfig: JSON.stringify(studio.DEFAULT_CONFIG, null, 2),
     status: studio.bridge.status(),
     prefix: studio.PREFIX,
+    hasOpenCloud: Boolean(s.openCloudKey),
+    creatorType: s.creatorType || 'user',
+    creatorId: s.creatorId || '',
   };
 }
 try { studio.sync(); } catch {}

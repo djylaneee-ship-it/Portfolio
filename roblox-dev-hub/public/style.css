@@ -630,3 +630,35 @@ body.desktop .modal, body.desktop .login { padding-top: 40px; }
 .rs-status.off .pulse, .rs-status.error .pulse { background: #9aa4b8; box-shadow: none; animation: none; }
 .rs-status.error .pulse { background: #ff6b6b; }
 .rs-status.starting .pulse { background: #fbbf24; }
+
+/* ---------- Place Roblox Studio : scripts et réglages ---------- */
+.pl-tabs a { position: relative; z-index: 1; padding: 9px 16px; border-radius: 10px; font-weight: 600; color: var(--muted2); text-decoration: none; transition: color .2s, background .3s; }
+.pl-tabs a.active { background: var(--accent-bg); color: var(--text); box-shadow: inset 0 0 0 1px var(--line2); }
+.pl-grid { display: grid; grid-template-columns: minmax(240px, 320px) 1fr; gap: 16px; align-items: start; }
+@media (max-width: 1100px) { .pl-grid { grid-template-columns: 1fr; } }
+.pl-list { display: grid; gap: 12px; max-height: calc(100vh - 260px); overflow: auto; position: sticky; top: 16px; }
+.pl-group { display: grid; gap: 2px; }
+.pl-group > small { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; color: var(--muted); text-transform: uppercase; padding: 6px 8px 4px; }
+.pl-item { display: flex; gap: 10px; align-items: center; width: 100%; text-align: left; padding: 7px 10px; border: 0; border-radius: 10px; background: none; color: var(--soft); cursor: pointer; transition: background .2s, transform .25s var(--spring); }
+.pl-item:hover { background: var(--panel2, rgba(255,255,255,.04)); transform: translateX(3px); }
+.pl-item.active { background: var(--accent-bg); color: var(--text); }
+.pl-name { display: grid; min-width: 0; }
+.pl-name b { font-weight: 600; font-size: 13.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pl-name small { font-size: 11.5px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pl-editor { min-width: 0; display: grid; gap: 12px; }
+.pl-head { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.pl-head > div:first-child { display: grid; gap: 2px; min-width: 0; }
+.pl-head small { color: var(--muted); font-size: 11.5px; overflow-wrap: anywhere; }
+.pl-dirty { color: #fbbf24; font-size: 12.5px; font-weight: 600; }
+.code-ed { display: flex; height: calc(100vh - 330px); min-height: 360px; border-radius: 14px; border: 1px solid var(--line); background: #05040a; overflow: hidden; }
+.code-ed .gutter { margin: 0; padding: 14px 10px 14px 14px; min-width: 46px; text-align: right; color: #5b5470; background: rgba(255,255,255,.02); border-right: 1px solid var(--line); overflow: hidden; user-select: none; }
+.code-ed .gutter, .code-ed textarea { font: 12.5px/1.6 var(--mono); tab-size: 4; }
+.code-ed textarea { flex: 1; resize: none; border: 0; outline: 0; padding: 14px; background: transparent; color: #e9e3ff; white-space: pre; overflow: auto; }
+.pv-card { display: grid; gap: 4px; margin-bottom: 14px; }
+.pv-card .pl-head { margin-bottom: 8px; }
+.pv-row { display: flex; gap: 12px; align-items: center; padding: 10px 0; border-top: 1px solid var(--line); }
+.pv-label { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.pv-label b { font-weight: 600; }
+.pv-label b span { color: var(--muted2); font-weight: 500; }
+.pv-label small { color: var(--muted2); font-size: 12px; }
+.pv-in { width: 220px; max-width: 45%; }

@@ -202,6 +202,7 @@ function renderSession() {
   $('#side-lang').onchange = (e) => setLang(e.target.value);
   api('/version').then((v) => { const el = $('#side-ver'); if (el) el.textContent = 'Rovex Hub v' + v.version; }).catch(() => {});
   watchUpdates();
+  watchPlaces();
   $('#logout').onclick = async () => { await api('/logout', { method: 'POST' }); location.reload(); };
 }
 
@@ -1173,7 +1174,14 @@ async function renderRobloxStudio() {
         <div class="row" style="margin-top:14px"><button class="btn primary" id="rs-save">${t('rs.save')}</button><button class="btn" id="rs-default">${t('cn.default')}</button></div></div>
       <div class="panel" data-spot><h3>${t('rs.toolsTitle')}</h3><p>${t('rs.toolsText', { prefix: esc(d.prefix) })}</p>
         ${st.tools && st.tools.length ? st.tools.map((x) => `<div class="tool"><div><b>${esc(d.prefix + x.name)}</b><small>${esc(x.description.slice(0, 160))}</small></div></div>`).join('') : `<p class="sub" style="font-size:13px">${t('rs.noTools')}</p>`}</div>
-    </div>`;
+    </div>
+    <div class="panel" data-spot><h3>🖼️ ${t('rs.ocTitle')}</h3><p>${t('rs.ocText')}</p>
+      <form class="row" id="rs-oc">
+        <input class="input" id="rs-oc-key" type="password" style="flex:2;min-width:220px" placeholder="${d.hasOpenCloud ? t('rs.ocSaved') : t('rs.ocKey')}" autocomplete="off">
+        <select class="select" id="rs-oc-type"><option value="user" ${d.creatorType === 'user' ? 'selected' : ''}>${t('rs.ocUser')}</option><option value="group" ${d.creatorType === 'group' ? 'selected' : ''}>${t('rs.ocGroup')}</option></select>
+        <input class="input" id="rs-oc-id" style="flex:1;min-width:140px" inputmode="numeric" placeholder="${t('rs.ocId')}" value="${esc(d.creatorId)}">
+        <button class="btn primary">${t('save')}</button>
+      </form></div>`;
   const run = async (b, fn) => {
     b.disabled = true;
     const old = b.innerHTML;
@@ -1184,8 +1192,175 @@ async function renderRobloxStudio() {
   $('#rs-retry').onclick = (e) => run(e.currentTarget, () => api('/robloxstudio/restart', { method: 'POST' }));
   $('#rs-on').onchange = (e) => run($('#rs-retry'), () => api('/robloxstudio', { method: 'PUT', body: { enabled: e.target.checked } }));
   $('#rs-default').onclick = () => { $('#rs-cfg').value = d.defaultConfig; };
+  $('#rs-oc').onsubmit = async (e) => {
+    e.preventDefault();
+    const body = { creatorType: $('#rs-oc-type').value, creatorId: $('#rs-oc-id').value };
+    if ($('#rs-oc-key').value.trim()) body.openCloudKey = $('#rs-oc-key').value.trim();
+    try { await api('/robloxstudio', { method: 'PUT', body }); toast(t('toast.saved')); $('#rs-oc-key').value = ''; } catch (err) { toast(err.message, true); }
+  };
   const dot = $('#rs-dot');
   if (dot) dot.hidden = state !== 'ready';
+  refreshPlaces(true);
+}
+
+// ---------- La place ouverte dans Studio : scripts et réglages du jeu ----------
+// Les Studio connectés apparaissent dans le menu, sous « Roblox Studio ».
+let placesWatch = null;
+let PLACES = [];
+async function refreshPlaces(force) {
+  const d = await api('/place/studios' + (force ? '?force=1' : '')).catch(() => null);
+  PLACES = (d && d.studios) || [];
+  const box = $('#side-places');
+  if (!box) return;
+  box.hidden = !PLACES.length;
+  const cur = new URLSearchParams(location.hash.split('?')[1] || '').get('s') || '';
+  $('#side-places-list').innerHTML = PLACES.map((p) => `<a href="#/place?s=${encodeURIComponent(p.id)}" data-s="${esc(p.id)}" class="${location.hash.startsWith('#/place') && cur === p.id ? 'active' : ''}"><span class="dot" style="background:#34d399;border-radius:50%"></span><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(p.name)}</span></a>`).join('');
+}
+function watchPlaces() {
+  if (placesWatch) return;
+  refreshPlaces();
+  placesWatch = setInterval(refreshPlaces, 20e3);
+}
+
+const SCRIPT_ICON = { Script: '📜', LocalScript: '💻', ModuleScript: '📦' };
+const segKey = (segs) => JSON.stringify(segs);
+
+async function renderPlace(params) {
+  const s = params.get('s') || '';
+  const tab = params.get('tab') === 'values' ? 'values' : 'scripts';
+  const p = PLACES.find((x) => x.id === s) || { name: 'Roblox Studio' };
+  const link = (t2) => `#/place?s=${encodeURIComponent(s)}${t2 === 'values' ? '&tab=values' : ''}`;
+  view.innerHTML = `
+    ${pageHead('ROBLOX STUDIO', esc(p.name), t('pl.sub'), `<button class="btn" id="pl-refresh">↻ ${t('pl.refresh')}</button>`)}
+    <div class="tabs pl-tabs"><a href="${link('scripts')}" class="${tab === 'scripts' ? 'active' : ''}">📜 ${t('pl.scripts')}</a><a href="${link('values')}" class="${tab === 'values' ? 'active' : ''}">🎛️ ${t('pl.values')}</a></div>
+    <div id="pl-body"><div class="skel" style="min-height:320px"></div></div>`;
+  $('#pl-refresh').onclick = () => transition(() => renderPlace(params));
+  try {
+    if (tab === 'values') await placeValues(s, params);
+    else await placeScripts(s, params);
+  } catch (e) {
+    $('#pl-body').innerHTML = `<div class="empty"><b>${t('pl.error')}</b>${esc(e.message)}<br><a href="#/robloxstudio">${t('nav.rstudio')} →</a></div>`;
+  }
+}
+
+async function placeScripts(s, params) {
+  const d = await api('/place/scripts?s=' + encodeURIComponent(s));
+  const list = d.scripts || [];
+  if (d.name && $('.page-head .h1')) $('.page-head .h1').textContent = d.name;
+  const body = $('#pl-body');
+  body.innerHTML = `
+    <div class="pl-grid">
+      <div class="panel pl-list">
+        <input class="input" id="pl-q" placeholder="${t('pl.search', { n: list.length })}">
+        <div id="pl-items"></div>
+      </div>
+      <div class="panel pl-editor" id="pl-editor"><div class="empty" style="margin:0"><b>${t('pl.pick')}</b>${t('pl.pickText')}</div></div>
+    </div>`;
+  let open = null; // { item, source, dirty }
+  const draw = () => {
+    const q = $('#pl-q').value.trim().toLowerCase();
+    const items = list.map((x, i) => ({ ...x, i })).filter((x) => !q || x.full.toLowerCase().includes(q));
+    const groups = {};
+    for (const x of items) (groups[x.path[0][0]] = groups[x.path[0][0]] || []).push(x);
+    $('#pl-items').innerHTML = Object.entries(groups).map(([svc, xs]) => `<div class="pl-group"><small>${esc(svc)} · ${xs.length}</small>${xs.map((x) => `
+      <button class="pl-item ${open && segKey(open.item.path) === segKey(x.path) ? 'active' : ''}" data-i="${x.i}" title="${esc(x.full)}">
+        <span>${SCRIPT_ICON[x.class] || '📄'}</span><span class="pl-name"><b>${esc(x.path[x.path.length - 1][0])}</b><small>${esc(x.path.slice(1, -1).map((z) => z[0]).join(' › '))}</small></span>
+      </button>`).join('')}</div>`).join('') || `<p class="sub" style="font-size:13px">${t('pl.none')}</p>`;
+    $$('[data-i]', $('#pl-items')).forEach((b) => b.onclick = () => openScript(list[Number(b.dataset.i)]));
+  };
+  const openScript = async (item) => {
+    if (open && open.dirty && !confirm(t('pl.discard'))) return;
+    const ed = $('#pl-editor');
+    ed.innerHTML = '<div class="skel" style="min-height:300px"></div>';
+    try {
+      const r = await api('/place/read', { method: 'POST', body: { s, path: item.path } });
+      open = { item, source: r.source, dirty: false };
+      draw();
+      ed.innerHTML = `
+        <div class="pl-head"><div><b>${SCRIPT_ICON[r.class] || '📄'} ${esc(item.path[item.path.length - 1][0])}</b><small class="mono">${esc(r.full)}</small></div>
+          <div class="row"><span class="pl-dirty" id="pl-dirty" hidden>● ${t('pl.unsaved')}</span><button class="btn" id="pl-reload">↻</button><button class="btn primary" id="pl-save">${t('pl.save')}</button></div></div>
+        <div class="code-ed"><pre class="gutter" id="pl-gutter"></pre><textarea id="pl-code" spellcheck="false" wrap="off"></textarea></div>`;
+      const ta = $('#pl-code');
+      ta.value = r.source;
+      const gutter = () => { $('#pl-gutter').textContent = Array.from({ length: ta.value.split('\n').length }, (_, i) => i + 1).join('\n'); };
+      gutter();
+      ta.onscroll = () => { $('#pl-gutter').scrollTop = ta.scrollTop; };
+      ta.oninput = () => { open.dirty = ta.value !== open.source; $('#pl-dirty').hidden = !open.dirty; gutter(); };
+      ta.onkeydown = (e) => {
+        if (e.key === 'Tab') { e.preventDefault(); const a = ta.selectionStart; ta.setRangeText('\t', a, ta.selectionEnd, 'end'); ta.oninput(); }
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') { e.preventDefault(); save(); }
+      };
+      const save = async () => {
+        const b = $('#pl-save');
+        b.disabled = true;
+        try {
+          await api('/place/write', { method: 'POST', body: { s, path: item.path, source: ta.value } });
+          open.source = ta.value; open.dirty = false; $('#pl-dirty').hidden = true;
+          toast(t('pl.saved'));
+        } catch (e) { toast(e.message, true); }
+        b.disabled = false;
+      };
+      $('#pl-save').onclick = save;
+      $('#pl-reload').onclick = () => { open.dirty = false; openScript(item); };
+    } catch (e) { ed.innerHTML = `<div class="empty" style="margin:0"><b>${t('pl.error')}</b>${esc(e.message)}</div>`; }
+  };
+  $('#pl-q').oninput = draw;
+  draw();
+  const want = params.get('path');
+  if (want) { const it = list.find((x) => x.full === want); if (it) openScript(it); }
+}
+
+async function placeValues(s) {
+  const d = await api('/place/values?s=' + encodeURIComponent(s) + '&force=1');
+  if (d.name && $('.page-head .h1')) $('.page-head .h1').textContent = d.name;
+  const body = $('#pl-body');
+  const total = d.groups.reduce((n, g) => n + g.values.length, 0);
+  body.innerHTML = `
+    <div class="row" style="margin-bottom:16px"><input class="input" id="pv-q" style="flex:1;min-width:220px" placeholder="${t('pv.search', { n: total })}"></div>
+    <div id="pv-groups"></div>`;
+  const input = (v, gi, vi) => {
+    const id = `pv-${gi}-${vi}`;
+    if (v.kind === 'bool') return `<label class="switch"><input type="checkbox" id="${id}" ${v.value ? 'checked' : ''}><span></span></label>`;
+    return `<input class="input pv-in" id="${id}" type="${v.kind === 'number' ? 'number' : 'text'}" step="any" value="${esc(String(v.value))}">`;
+  };
+  const draw = () => {
+    const q = $('#pv-q').value.trim().toLowerCase();
+    $('#pv-groups').innerHTML = d.groups.map((g, gi) => {
+      const rows = g.values.map((v, vi) => ({ v, vi })).filter(({ v }) => !q || `${g.full} ${v.group} ${v.name} ${v.comment}`.toLowerCase().includes(q));
+      if (!rows.length) return '';
+      return `<div class="panel pv-card" data-spot>
+        <div class="pl-head"><div><b>${SCRIPT_ICON[g.class] || '📄'} ${esc(g.path[g.path.length - 1][0])}</b><small class="mono">${esc(g.full)}</small></div>
+          <a class="btn small" href="#/place?s=${encodeURIComponent(s)}&path=${encodeURIComponent(g.full)}">${t('pv.code')}</a></div>
+        ${rows.map(({ v, vi }) => `<div class="pv-row">
+          <div class="pv-label"><b>${v.group ? `<span>${esc(v.group)} › </span>` : ''}${esc(v.name)}</b>${v.comment ? `<small>${esc(v.comment)}</small>` : ''}<small class="mono">${t('pv.line', { n: v.line })}</small></div>
+          ${input(v, gi, vi)}<button class="btn small primary" data-save="${gi}-${vi}" hidden>${t('save')}</button></div>`).join('')}
+      </div>`;
+    }).join('') || `<div class="empty"><b>${t('pv.none')}</b>${t('pv.noneText')}</div>`;
+    $$('.pv-row').forEach((row) => {
+      const btn = row.querySelector('[data-save]');
+      const [gi, vi] = btn.dataset.save.split('-').map(Number);
+      const v = d.groups[gi].values[vi];
+      const el = row.querySelector(`#pv-${gi}-${vi}`);
+      const val = () => (v.kind === 'bool' ? el.checked : v.kind === 'number' ? Number(el.value) : el.value);
+      const save = async () => {
+        btn.disabled = true;
+        try {
+          const r = await api('/place/value', { method: 'POST', body: { s, path: d.groups[gi].path, line: v.line, text: v.text, kind: v.kind, value: val() } });
+          v.text = r.text; v.value = val(); btn.hidden = true;
+          toast(t('pv.saved', { name: v.name }));
+        } catch (e) { toast(e.message, true); }
+        btn.disabled = false;
+      };
+      if (v.kind === 'bool') el.onchange = save;
+      else {
+        el.oninput = () => { btn.hidden = String(val()) === String(v.value); };
+        el.onkeydown = (e) => { if (e.key === 'Enter') save(); };
+        btn.onclick = save;
+      }
+    });
+  };
+  $('#pv-q').oninput = draw;
+  draw();
 }
 
 // ---------- Niveau de Claude ----------
@@ -1749,6 +1924,7 @@ async function route() {
   const name = path === 'library' && params.get('cat') ? '' : path;
   $$('#nav a').forEach((a) => a.classList.toggle('active', a.dataset.route === name));
   $$('#side-cats a').forEach((a) => a.classList.toggle('active', a.getAttribute('href') === '#/library?cat=' + params.get('cat')));
+  $$('#side-places-list a').forEach((a) => a.classList.toggle('active', path === 'place' && a.dataset.s === (params.get('s') || '')));
   movePill();
   document.body.classList.remove('menu');
   if (!SESSION || !SESSION.loggedIn) return;
@@ -1756,7 +1932,7 @@ async function route() {
   const pages = {
     library: () => renderLibrary(params), favorites: () => renderLibrary(params, true), examples: renderExamples,
     youtube: () => renderYoutube(params), channels: () => renderChannels(params), explore: renderExplore,
-    connect: renderConnect, admin: renderAdmin, settings: renderSettings, update: renderUpdate, robloxstudio: renderRobloxStudio, level: renderLevel, opensource: renderOpenSource, skills: renderSkills, prompts: renderPrompts, studio: renderStudio,
+    connect: renderConnect, admin: renderAdmin, settings: renderSettings, update: renderUpdate, robloxstudio: renderRobloxStudio, place: () => renderPlace(params), level: renderLevel, opensource: renderOpenSource, skills: renderSkills, prompts: renderPrompts, studio: renderStudio,
   };
   try {
     await transition(pages[path] || renderHome);

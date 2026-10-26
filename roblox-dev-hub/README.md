@@ -60,6 +60,10 @@ Installation, une fois, dans ton projet Supabase :
 
 **Roblox Studio** (page **Roblox Studio**) : Rovex se branche sur le serveur MCP de Roblox Studio et repasse ses outils à Claude avec le préfixe `studio_` (lire les scripts et la structure de la place ouverte, lancer du Luau, tester…). Dans Studio : **Assistant → ⋯ → Manage MCP Servers → Enable Studio as MCP server**. Dans Rovex : la config officielle est pré-remplie (`cmd.exe /c %LOCALAPPDATA%\Roblox\mcp.bat` sur Windows, `StudioMCP` sur macOS) ; on peut coller n'importe quel JSON MCP en `command` + `args`. La config reste sur le PC (`data/studio.json`) ; le serveur MCP lancé par Claude la relit et prévient Claude quand les outils changent.
 
+**La place dans Rovex** : quand Studio est connecté, chaque place ouverte apparaît dans le menu (section **Roblox Studio**, via `list_roblox_studios`). Sa page a deux onglets : **Scripts** (tous les scripts du jeu ; on clique, on lit, on modifie et on enregistre, ça change dans Studio par `execute_luau` + `ScriptEditorService:UpdateSourceAsync`, annulable par Ctrl+Z dans Studio) et **Réglages du jeu** (les valeurs simples écrites dans le code, `local swordDamage = 5`, `Config = { Sword = { Damage = 25 } }`, modifiables en un champ sans ouvrir le script). Code : `place.js`.
+
+**Images en jeu** : l'outil MCP `upload_image_to_roblox` envoie une image (de `generate_image`, de la bibliothèque ou une URL) sur Roblox par l'outil `upload_image` de Studio (lien local temporaire `/share/…`, servi seulement à ce PC), ou sinon par Open Cloud avec la clé de l'utilisateur (page Roblox Studio), puis la pose dans la place (`Image` d'un ImageLabel/ImageButton, `Texture` d'un Decal, ou un Decal sur une Part). Code : `rbxupload.js`.
+
 **Connexion Claude** : ouverte aux membres pour brancher Claude Desktop / Claude Code sur leur PC ; les outils MCP et les consignes restent réservés aux admins.
 
 Conseil : fixe un plafond de dépense mensuel dans OpenAI (Settings → Limits), puisque toutes les générations des membres sont facturées sur ton compte.
