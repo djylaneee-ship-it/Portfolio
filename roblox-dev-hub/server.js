@@ -392,6 +392,27 @@ const routes = [
   }],
   ['POST', /^\/api\/claude\/desktop$/, () => { state.settings.autoConnectClaude = true; persist(); return claude.linkDesktop(); }],
   ['DELETE', /^\/api\/claude\/desktop$/, () => { state.settings.autoConnectClaude = false; persist(); return claude.unlinkDesktop(); }],
+  // Envoie un texte à Claude : nouvelle conversation pré-remplie (Claude Desktop, Claude Code ou claude.ai).
+  ['POST', /^\/api\/claude\/send$/, async (req) => {
+    const b = await json(req);
+    const target = ['desktop', 'code', 'web'].includes(b.target) ? b.target : 'desktop';
+    const max = target === 'code' ? 5000 : 14000; // au-delà, Claude coupe le texte pré-rempli
+    const text = String(b.text || '').trim();
+    if (!text) throw Object.assign(new Error('Nothing to send'), { key: 'genPrompt' });
+    const q = encodeURIComponent(text.slice(0, max));
+    const link = target === 'code' ? `claude-cli://open?q=${q}` : target === 'web' ? `https://claude.ai/new?q=${q}` : `claude://claude.ai/new?q=${q}`;
+    let opened = false;
+    let plain = false;
+    if (process.versions.electron) {
+      const { shell } = require('electron');
+      try { await shell.openExternal(link); opened = true; } catch {
+        // Lien refusé (trop long pour Windows) : on ouvre Claude sans texte, le prompt est dans le presse-papiers.
+        const bare = target === 'code' ? 'claude-cli://open' : target === 'web' ? 'https://claude.ai/new' : 'claude://claude.ai/new';
+        try { await shell.openExternal(bare); opened = true; plain = true; } catch {}
+      }
+    }
+    return { opened, plain, link, truncated: text.length > max };
+  }],
   ['POST', /^\/api\/claude\/code$/, () => claude.linkCode(`http://localhost:${PORT}/mcp`)],
   // Pont Roblox Studio : le JSON MCP de Studio, l'état de la connexion et les outils repassés à Claude.
   ['GET', /^\/api\/robloxstudio$/, () => robloxStudioInfo()],
@@ -468,7 +489,7 @@ const routes = [
 // Routes accessibles à un ID d'accès simple (lecture seule). Tout le reste est réservé à l'admin.
 // Ce que les membres peuvent faire en plus de lire : brancher Claude sur leur PC, tester la recherche,
 // mettre à jour l'app, utiliser la génération IA.
-const MEMBER_ACTIONS = [/^\/api\/textures\/thumbs$/, /^\/api\/place\/(read|write|value)$/, /^\/api\/robloxstudio(\/restart)?$/, /^\/api\/claude\/(desktop|code)$/, /^\/api\/mcp\/test$/, /^\/api\/update\/(check|install)$/, /^\/api\/gen(\/.*)?$/];
+const MEMBER_ACTIONS = [/^\/api\/textures\/thumbs$/, /^\/api\/place\/(read|write|value)$/, /^\/api\/robloxstudio(\/restart)?$/, /^\/api\/claude\/(desktop|code|send)$/, /^\/api\/mcp\/test$/, /^\/api\/update\/(check|install)$/, /^\/api\/gen(\/.*)?$/];
 const USER_ROUTES = [/^\/api\/textures$/, /^\/api\/place\/(studios|scripts|values)$/, /^\/api\/robloxstudio$/, /^\/api\/claude$/, /^\/api\/version$/, /^\/api\/prompts$/, /^\/api\/skills$/, /^\/api\/skills\/\w+$/, /^\/api\/level$/, /^\/api\/meta$/, /^\/api\/stats$/, /^\/api\/resources$/, /^\/api\/channels$/, /^\/api\/youtube$/, /^\/api\/crawl$/, /^\/api\/examples$/, /^\/api\/mcp$/];
 
 const cookies = (req) => Object.fromEntries(String(req.headers.cookie || '').split(';').map((c) => c.trim().split('=')).filter((p) => p[0]).map(([k, ...v]) => [k, decodeURIComponent(v.join('='))]));

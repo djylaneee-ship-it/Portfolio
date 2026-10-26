@@ -590,9 +590,10 @@ let BOOST = null; // dernier résultat affiché
 function boostResult(b) {
   return `<div class="panel boost-out" data-spot id="pb-result">
     <div class="section-head" style="margin-bottom:12px"><h3 style="margin:0">🚀 ${t('pb.result')}</h3>
-      <div class="row"><button class="btn primary" id="pb-copy">${t('pb.copy')}</button><button class="btn" id="pb-again">↻ ${t('pb.again')}</button></div></div>
+      <div class="row"><button class="btn primary" data-send="desktop">🚀 ${t('pb.send')}</button><button class="btn" id="pb-copy">${t('pb.copy')}</button><button class="btn" id="pb-again">↻ ${t('pb.again')}</button></div></div>
     <p class="sub" style="font-size:13px;margin:0 0 10px">${t('pb.from')} « ${esc(b.input.length > 140 ? b.input.slice(0, 137) + '…' : b.input)} »</p>
     <textarea class="input boost-text" id="pb-out" spellcheck="false">${esc(b.output)}</textarea>
+    <div class="row pb-send-row"><span class="sub" style="font-size:13px">${t('pb.sendOther')}</span><button class="btn small" data-send="code">⌨️ Claude Code</button><button class="btn small" data-send="web">🌐 claude.ai</button></div>
     <p class="sub" style="font-size:13px;margin:10px 0 0">${t('pb.paste')}</p>
   </div>`;
 }
@@ -634,6 +635,16 @@ async function renderPrompts() {
       setTimeout(() => (c.textContent = t('pb.copy')), 1600);
       toast(t('pb.copied'));
     };
+    // Envoi à Claude : le prompt est copié, puis Claude s'ouvre avec une nouvelle conversation pré-remplie.
+    $$('[data-send]').forEach((b) => b.onclick = async () => {
+      const text = $('#pb-out').value;
+      await copyText(text);
+      try {
+        const r = await api('/claude/send', { method: 'POST', body: { text, target: b.dataset.send } });
+        if (!r.opened) window.location.href = r.link;
+        toast(t(r.plain ? 'pb.sentPaste' : r.truncated ? 'pb.sentLong' : 'pb.sent'));
+      } catch (err) { toast(err.message, true); }
+    });
     $('#pb-again').onclick = () => {
       $('#pb-in').value = BOOST.input;
       $('#pb-cat').value = BOOST.category || '';

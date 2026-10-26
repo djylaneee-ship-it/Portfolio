@@ -680,3 +680,5 @@ body.desktop .modal, body.desktop .login { padding-top: 40px; }
 .tx-card b small { color: var(--muted2); font-weight: 500; }
 .tx-card .mono { font-size: 11px; color: var(--muted); }
 .tx-tip { font-size: 11px; color: #fbbf24; }
+
+.pb-send-row { margin-top: 10px; gap: 8px; align-items: center; }
