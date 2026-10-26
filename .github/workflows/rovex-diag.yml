@@ -26,6 +26,10 @@ jobs:
           call rovex_put_shared '{"p_key":"x","p_name":"examples","p_data":{}}'
           call rovex_reset_master '{"p_key":"x","p_new":"x"}'
           call rovex_gen_status '{"p_code":"RDH-AAAA-BBBB-CCCC"}'
+          echo "== rovex_gen_allow (type text, faux ID)"
+          curl -s -w "  [HTTP %{http_code}]\n" -X POST "$U/rovex_gen_allow" -H "apikey: $K" -H "Content-Type: application/json" -d '{"p_code":"RDH-AAAA-BBBB-CCCC","p_kind":"text","p_n":1}'
+          echo "== fonction rovex-gen (POST texte avec un faux ID : doit refuser l'ID)"
+          curl -s -w "  [HTTP %{http_code}]\n" -X POST "https://owupuxmgxtjmslhhawaf.supabase.co/functions/v1/rovex-gen" -H "apikey: $K" -H "Content-Type: application/json" -d '{"type":"text","code":"RDH-AAAA-BBBB-CCCC","prompt":"test","system":"test"}'
           echo "== fonction rovex-gen (GET)"
           curl -s -w "  [HTTP %{http_code}]\n" "https://owupuxmgxtjmslhhawaf.supabase.co/functions/v1/rovex-gen" -H "apikey: $K"
           echo "== fonction rovex-gen (POST avec un faux ID : doit refuser l'ID, sans rien générer)"
