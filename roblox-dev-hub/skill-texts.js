@@ -1,4 +1,4 @@
-// Textes des skills Rovex (version 2) : le socle commun « rovex-core » et un skill par catégorie.
+// Textes des skills Rovex (version 2, et 3 pour les skills refaits : voir skill-pack/) : le socle commun « rovex-core » et un skill par catégorie.
 // Base : le pack Rovex de l'admin (26/10/2026), complété par des rappels API Roblox concrets et
 // par la façon d'utiliser les outils Rovex Hub. Modifiables depuis la page Skills de l'app.
 const VERSION = 2;
@@ -49,13 +49,13 @@ Mauvaise réponse : inventer un asset ID, ajouter des effets par défaut et dire
 
 const DESCRIPTIONS = {
   scripting: 'Créer, corriger et intégrer des systèmes Roblox en Luau : gameplay, architecture client/serveur, états, interactions et données.',
-  vfx: 'Concevoir des VFX Roblox personnalisés à base de ParticleEmitter : impacts, auras, feu stylisé, fumée, pouvoirs, charges, explosions et effets synchronisés.',
-  animation: 'Créer, adapter et intégrer des animations Roblox R6/R15 lisibles : locomotion, combat, emotes, interactions et acteurs de cutscenes.',
+  vfx: "Concevoir et régler dans Roblox Studio des VFX anime exclusivement constitués de ParticleEmitter personnalisés. Reproduire le langage visuel des références : énergie violet/magenta/cyan avec encrage noir et papillons, ou impacts blanc crème/orange doré avec anneaux de vent translucides. Travail visuel dans les propriétés, textures, séquences et éditeurs disponibles ; aucun code.",
+  animation: "Concevoir et créer dans un éditeur visuel des animations Roblox expressives : attaques armées, combat rapproché, gardes, enchaînements, réactions et personnages de cutscenes. Analyser poses, appuis, trajectoires, rythme, rotations, décalages et récupérations à partir des références. Produire de vraies clés d'animation adaptées au rig, sans code de substitution.",
   cutscenes: 'Concevoir et intégrer des cutscenes Roblox dynamiques de style anime : acteurs R6/R15, caméra, timeline, VFX, audio et retour au gameplay.',
-  gui: 'Concevoir et intégrer des interfaces Roblox lisibles, réactives et adaptées aux entrées PC, tactile et manette.',
+  gui: "Concevoir puis intégrer des interfaces Roblox détaillées à partir de références : HUD, inventaires, menus radiaux, personnalisation, upgrades, hotbars et menus de jeu. Utiliser Claude Design lorsqu'il est accessible pour le travail visuel, préparer des composants et assets séparés, puis les importer et reconstruire dans une vraie hiérarchie UI Roblox. Maîtriser les styles fantasy sur parchemin, sombre/gothique inspiré Souls, pixel art, stud/cartoon et anime graphique sans les mélanger arbitrairement.",
   gfx: 'Concevoir des visuels Roblox de présentation : miniatures, icônes, compositions de personnages, rendus et éléments graphiques.',
-  modeling: 'Concevoir et préparer des modèles Roblox : props, armes, éléments modulaires, meshes et composants de personnages.',
-  building: 'Concevoir et construire des maps Roblox : espaces de combat, parcours, hubs, environnements modulaires et mise en scène.',
+  modeling: "Créer des modèles 3D stylisés de qualité jeu : créatures, armes, armures, accessoires et vêtements Roblox R6. Utiliser obligatoirement Blender lorsqu'il est réellement utilisable pour la tâche, travailler substantiellement la géométrie en Edit Mode, préparer des UV propres et peindre des textures détaillées selon les sept références fournies, avec une priorité au langage pictural de l'image 1.",
+  building: "Concevoir et construire des maps Roblox jouables et soignées : stud, build en Parts, low poly, mid poly, high poly et stylisé. Analyser les quatorze références, choisir une grammaire de formes cohérente, organiser les parcours, produire les kits et assets adaptés dans Studio et Blender, travailler textures, végétation, lumière, collisions et performances, puis vérifier la map à hauteur de joueur.",
   audio: "Concevoir et intégrer l'audio Roblox : bruitages, ambiances, musique, transitions et synchronisation avec animations et cutscenes.",
   design: 'Concevoir et équilibrer des mécaniques Roblox : boucle de jeu, combat, compétences, progression, récompenses et expérience joueur.',
   tools: 'Choisir et utiliser les outils et plugins accessibles pour inspecter, créer, importer, corriger et vérifier un projet Roblox.',
@@ -509,4 +509,38 @@ LIVRAISON
 Résumer les modifications concrètes, les vérifications réalisées et la seule action utilisateur restante si une dépendance ne peut pas être résolue avec les outils disponibles.`,
 };
 
-module.exports = { VERSION, CORE, DESCRIPTIONS, DEFAULTS };
+// ---------- Skills refaits en version détaillée (pack de l'admin, 27/10/2026) ----------
+// Les textes complets sont dans skill-pack/*.txt (tels que fournis) ; Rovex ajoute à la fin comment utiliser ses outils.
+// Version par skill : les consignes enregistrées pour une version plus ancienne sont remplacées.
+const SKILL_VERSIONS = { vfx: 3, animation: 3, gui: 3, modeling: 3, building: 3 };
+const ROVEX_NOTES = {
+  vfx: `OUTILS ROVEX HUB (complément de ce skill)
+- Textures : toutes les textures des ParticleEmitter viennent OBLIGATOIREMENT de la catégorie Textures VFX de Rovex (outil find_vfx_textures) : pour chaque couche, indiquer l'ID, le nom, le groupe et la grille de flipbook. Aucune autre texture : ni ID trouvé ailleurs, ni ID de mémoire, ni ID inventé. Si rien ne convient après plusieurs recherches, le dire et proposer d'en ajouter dans la page Textures VFX.
+- Modèles prêts : ReplicatedStorage.RovexAssets.VFX (Combat_001…, Fire_001… ; outil rovex_assets) peut servir de point de départ ; n'en garder que les ParticleEmitter (les Beam et Trail sont exclus par ce skill).
+- Roblox Studio : utiliser un outil studio_* seulement s'il édite les instances sans écrire de code ; sinon livrer la fiche d'assemblage complète, propriété par propriété (règle 8).`,
+  animation: `OUTILS ROVEX HUB (complément de ce skill)
+- Blender connecté à Rovex (outils r6_*) : pour un rig R6, poser de vraies clés avec r6_inspect_rig, r6_list_presets, r6_create_animation ou r6_apply_clip (poses en valeurs), contrôler avec r6_preview (grille et pelure d'oignon, deux vues) et r6_analyze, corriger avec r6_get_pose / r6_set_keys, puis r6_export ; demander l'accord de l'utilisateur avant d'envoyer l'animation dans Roblox Studio.
+- Sinon : Animation Editor ou Moon Animator dans Studio, avec des étapes précises. Ne jamais prétendre qu'une animation est publiée ou qu'un AnimationId existe.
+- Charger aussi cutscenes, vfx ou audio (load_skill) seulement si la demande les implique.`,
+  gui: `OUTILS ROVEX HUB (complément de ce skill)
+- UI stud prête dans chaque place : ReplicatedStorage.RovexAssets.UI.StudUI (HUD, Overlays, Windows ; outil rovex_assets). Base à réutiliser pour le profil stud/cartoon ; ses scripts sont désactivés : les réactiver après l'avoir placée dans StarterGui.
+- Images : icônes et éléments graphiques avec generate_image (catégorie gui ; les icônes sortent détourées), puis upload_image_to_roblox pour obtenir l'ID et le poser dans Studio. Ne jamais inventer d'Image ID.
+- Roblox Studio : lire l'UI existante avec les outils studio_* avant de construire, et dire ce qui a été modifié.`,
+  modeling: `OUTILS ROVEX HUB (complément de ce skill)
+- Blender se pilote depuis Rovex : blender_execute_python (bpy ; passer en Edit Mode avec bpy.ops.object.mode_set(mode='EDIT') et travailler la géométrie avec bmesh et les opérateurs d'édition), blender_viewport_screenshot pour regarder le résultat à chaque étape, blender_scene_info / blender_object_info pour vérifier, export FBX dans le dossier indiqué par l'outil, blender_save_file seulement avec l'accord de l'utilisateur.
+- Si les outils blender_* ne sont pas disponibles, dire que Blender n'est pas connecté (page Blender de Rovex) avant de proposer un autre flux.
+- Textures peintes : generate_image (catégorie modeling) peut fournir une base à retravailler. Ne jamais inventer d'asset ID.
+- Environnement prêt : ReplicatedStorage.RovexAssets.Environment (outil rovex_assets) contient déjà des arbres, plantes et rochers stylisés.`,
+  building: `OUTILS ROVEX HUB (complément de ce skill)
+- Kit d'environnement prêt dans chaque place : ReplicatedStorage.RovexAssets.Environment (arbres, palmiers, buissons, plantes, rochers, nuages, rayons, eau ; outil rovex_assets). Les cloner et les varier avant de modéliser de nouveaux éléments ; VFX d'ambiance dans RovexAssets.VFX.
+- Nouveaux assets : Blender avec les outils blender_* (voir le skill modeling, Edit Mode obligatoire) ; assemblage de la map dans Studio avec les outils studio_*.
+- Lire la place existante (outils studio_*) avant de construire, et dire ce qui a été ajouté ou modifié.`,
+};
+const fs = require('fs');
+const path = require('path');
+for (const cat of Object.keys(SKILL_VERSIONS)) {
+  DEFAULTS[cat] = `${fs.readFileSync(path.join(__dirname, 'skill-pack', cat + '.txt'), 'utf8').trim()}\n\n${ROVEX_NOTES[cat]}`;
+}
+const versionOf = (cat) => SKILL_VERSIONS[cat] || VERSION;
+
+module.exports = { VERSION, CORE, DESCRIPTIONS, DEFAULTS, versionOf };

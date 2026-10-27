@@ -34,7 +34,7 @@ const ART = {
 // (le style d'image modifié est gardé).
 function getSkill(state, cat) {
   const saved = ((state.skills || {})[cat]) || {};
-  const instructions = (saved.v || 1) >= TEXTS.VERSION ? saved.instructions : '';
+  const instructions = (saved.v || 1) >= TEXTS.versionOf(cat) ? saved.instructions : '';
   return {
     id: cat,
     name: `rovex-${cat}`,
@@ -199,4 +199,4 @@ function codeInstalled() {
   return SKILL_CATS.filter((cat) => fs.existsSync(path.join(CODE_SKILLS, `rovex-${cat}`, 'SKILL.md'))).length;
 }
 
-module.exports = { SKILL_CATS, CORE_ID, VERSION: TEXTS.VERSION, DEFAULTS, ART, getSkill, context, load, loadMany, skillMd, skillZip, installForClaudeCode, codeInstalled, CODE_SKILLS };
+module.exports = { SKILL_CATS, CORE_ID, VERSION: TEXTS.VERSION, versionOf: TEXTS.versionOf, DEFAULTS, ART, getSkill, context, load, loadMany, skillMd, skillZip, installForClaudeCode, codeInstalled, CODE_SKILLS };

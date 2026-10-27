@@ -292,8 +292,8 @@ const routes = [
     state.skills = state.skills || {};
     const cur = state.skills[m[1]] || {};
     // Consignes écrites pour une ancienne version des skills : remplacées par les nouveaux textes.
-    if ((cur.v || 1) < skills.VERSION) delete cur.instructions;
-    cur.v = skills.VERSION;
+    if ((cur.v || 1) < skills.versionOf(m[1])) delete cur.instructions;
+    cur.v = skills.versionOf(m[1]);
     if (b.reset) delete cur.instructions;
     if (typeof b.instructions === 'string') cur.instructions = b.instructions.trim() === skills.DEFAULTS[m[1]].trim() ? undefined : b.instructions;
     if (typeof b.enabled === 'boolean') cur.enabled = b.enabled;

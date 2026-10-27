@@ -38,7 +38,7 @@ Travail à plusieurs : une branche par dev (`dev/<pseudo>-<sujet>`), une PR, rel
 | `mcp.js` | Serveur MCP (stdio pour Claude Desktop, HTTP via le serveur) : outils, prompts, journal d'activité (`data/activity.json`). |
 | `db.js` | Bibliothèque locale : `data/library.json` (ressources de l'utilisateur, réglages) + `data/cloud-library.json` (bibliothèque en ligne, écrite en arrière-plan ; appelle `db.markCloudDirty()` quand tu modifies une ressource `source: 'cloud'`), catégories, recherche (textes normalisés en cache). |
 | `auth.js` / `cloud.js` | IDs d'accès en ligne (Supabase, RPC `rovex_*`), un appareil par ID, contenu partagé par les admins. |
-| `skills.js` / `skill-texts.js` | Skills Claude (socle `rovex-core` + un par catégorie). |
+| `skills.js` / `skill-texts.js` / `skill-pack/` | Skills Claude (socle `rovex-core` + un par catégorie). Les skills VFX, Animation, GUI, Modeling et Building sont les textes complets de `skill-pack/*.txt` + une courte note d'outils Rovex (`ROVEX_NOTES`) ; monter leur numéro dans `SKILL_VERSIONS` quand le texte change. |
 | `agents.js` | Chat Claude par MCP : une conversation de Claude Desktop écoute le chat (outils `chat_listen` / `chat_reply` / `chat_status` de `mcp.js`) ; `agents.js` garde la conversation et les messages en attente, `/agent/*` (clé locale) et `/api/agents/*`. |
 | `gen.js` | Studio IA (images gratuites : Cloudflare FLUX, sinon Pollinations ; détourage des icônes avec `nativeImage`) et Prompt Booster (texte), par la fonction Supabase `rovex-gen`. |
 | `crawler.js` / `cloud-crawl.js` | Exploration (YouTube, DevForum, Bluesky, Reddit, Sketchfab, dev.to, Creator Store, GitHub) ; `cloud-crawl.js` tourne en continu sur GitHub Actions et remplit la bibliothèque en ligne. |
