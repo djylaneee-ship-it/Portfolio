@@ -82,7 +82,7 @@ Images: you cannot draw yourself, but Rovex can. When the user asks for an icon,
 
 // Consigne qui branche une conversation de Claude Desktop sur le Chat Claude de Rovex (écouter → travailler → répondre).
 const CHAT_PROMPT = `Connect to the Claude chat of the Rovex Hub app and stay connected.
-Loop: call chat_listen. When it returns messages, do what the user asks with the Rovex and Roblox Studio tools (load_skill first for Roblox work; chat_status with one short sentence for each long step), then answer with chat_reply in the user's language, short and clear. Then call chat_listen again. When it returns no message, call chat_listen again immediately, without writing anything.
+Loop: call chat_listen. When it returns messages, look at the reference images and video key frames the user attached (they show the result wanted), do what the user asks with the Rovex and Roblox Studio tools (load_skill first for Roblox work; chat_status with one short sentence for each long step), then answer with chat_reply in the user's language, short and clear. Then call chat_listen again. When it returns no message, call chat_listen again immediately, without writing anything.
 The user reads only the Rovex chat, never this conversation: do not write text here, only call the tools. Stop only if the user writes "stop" in Rovex.`;
 
 const DEFAULT_INSTRUCTIONS = `Before writing any Luau, search Rovex Hub.
@@ -187,8 +187,14 @@ const TOOLS = [
   },
   {
     name: 'chat_listen',
-    description: 'Rovex chat (the user talks to you inside the Rovex Hub app): wait for the next messages the user writes in the Claude chat of Rovex. Returns them, or an empty list after the wait: then call chat_listen again right away. Use this loop only when the user asked you to connect to the Rovex chat.',
+    description: 'Rovex chat (the user talks to you inside the Rovex Hub app): wait for the next messages the user writes in the Claude chat of Rovex. Returns them, with the reference images and video key frames the user attached (study them: they show what the user wants), or an empty list after the wait: then call chat_listen again right away. Use this loop only when the user asked you to connect to the Rovex chat.',
     inputSchema: { type: 'object', properties: {} },
+    annotations: { readOnlyHint: true, openWorldHint: false },
+  },
+  {
+    name: 'chat_attachment',
+    description: 'Rovex chat: see one reference image (or one key frame of a reference video) the user attached in the Rovex chat, by its id from chat_listen. chat_listen already shows the first ones; use this for the ones it lists as not shown.',
+    inputSchema: { type: 'object', properties: { id: { type: 'string', description: 'Attachment id from chat_listen (e.g. 3fa1c2d4e5b6a798.jpg)' } }, required: ['id'] },
     annotations: { readOnlyHint: true, openWorldHint: false },
   },
   {
@@ -329,6 +335,34 @@ function matchExamples(state, { query = '', category = '', drafts = false } = {}
 }
 const briefExample = (e) => ({ id: e.id, title: e.title, category: e.category, status: e.status, request: e.prompt, file: e.filename });
 
+// Pièces jointes du chat : décrites dans le texte (id, nom, instants des images clés d'une vidéo) et envoyées
+// en images jusqu'à ~700 Ko ; Claude demande le reste avec chat_attachment.
+function chatRefs(items) {
+  const images = [];
+  const more = [];
+  let budget = 700 * 1024;
+  const messages = items.map((i) => {
+    const files = i.files || [];
+    if (!files.length) return i.text;
+    const lines = files.map((f, n) => {
+      const ids = f.frames.map((fr) => {
+        const id = path.basename(fr);
+        let buf = null;
+        try { buf = fs.readFileSync(path.join(db.MEDIA_DIR, fr)); } catch {}
+        if (buf && buf.length <= budget) { images.push(buf); budget -= buf.length; } else if (buf) more.push(id);
+        return id;
+      });
+      if (f.kind === 'video') {
+        const at = (f.times || []).map((x) => x + ' s').join(', ');
+        return `${n + 1}. video "${f.name}" (${f.duration || '?'} s), ${ids.length} key frames${at ? ' at ' + at : ''}: ${ids.join(', ')}`;
+      }
+      return `${n + 1}. image "${f.name}": ${ids[0]}`;
+    });
+    return `${i.text || '(no text: look at the attached references)'}\n\n[Reference files attached by the user]\n${lines.join('\n')}`;
+  });
+  return { messages, images, more };
+}
+
 // Chat Claude de Rovex depuis Claude Desktop : on passe par le serveur local de l'app (clé de data/agent.json).
 async function agentApi(pathname, { method = 'GET', body, timeout = 15e3 } = {}) {
   let link = null;
@@ -384,9 +418,22 @@ async function call(name, a = {}) {
       return rbxupload.upload(state, a);
     case 'chat_listen': {
       const r = await agentApi('/agent/inbox?wait=40', { timeout: 55e3 });
-      const messages = (r.items || []).map((i) => i.text);
+      const items = r.items || [];
       // Réponse courte quand rien n'arrive : la conversation de Claude grossit le moins possible.
-      return messages.length ? { messages, next: 'Do the work (chat_status for long steps), answer with chat_reply, then call chat_listen again.' } : { messages: [], next: 'call chat_listen again' };
+      if (!items.length) return { messages: [], next: 'call chat_listen again' };
+      const { messages, images, more } = chatRefs(items);
+      return {
+        messages,
+        ...(images.length && { attachments: `The ${images.length} image(s) below are the user's references, in the order listed in the messages: study them before working.` }),
+        ...(more.length && { moreAttachments: `Not shown to keep this answer small: ${more.join(', ')}. Call chat_attachment with each id to see them.` }),
+        next: 'Do the work (chat_status for long steps), answer with chat_reply, then call chat_listen again.',
+        images,
+      };
+    }
+    case 'chat_attachment': {
+      const file = path.join(db.MEDIA_DIR, 'chat', path.basename(String(a.id || '')));
+      if (!a.id || !fs.existsSync(file)) throw new Error('Attachment not found');
+      return { id: a.id, images: [fs.readFileSync(file)] };
     }
     case 'chat_reply':
       await agentApi('/agent/reply', { method: 'POST', body: { text: String(a.text || '') } });

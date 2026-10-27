@@ -1594,7 +1594,11 @@ function agClose() {
 }
 
 function agMsgHtml(m) {
-  if (m.role === 'user') return `<div class="msg user" data-m="${m.id}"><div class="bubble">${esc(m.text).replace(/\n/g, '<br>')}</div></div>`;
+  if (m.role === 'user') {
+    const files = m.files || [];
+    const atts = files.length ? `<div class="msg-atts">${files.map((f, i) => `<button type="button" class="msg-att" data-f="${i}" title="${esc(f.name)}"><img src="/media/${esc(f.frames[0])}" alt="" loading="lazy">${f.kind === 'video' ? `<span class="att-tag">▶ ${t('ag.frames', { n: f.frames.length })}</span>` : ''}</button>`).join('')}</div>` : '';
+    return `<div class="msg user" data-m="${m.id}"><div class="msg-col">${atts}${m.text ? `<div class="bubble">${esc(m.text).replace(/\n/g, '<br>')}</div>` : ''}</div></div>`;
+  }
   if (m.role === 'claude') return `<div class="msg bot" data-m="${m.id}"><span class="bot-av"><img src="logo.png" alt=""></span><div class="bot-body"><div class="md">${md(m.text)}</div></div></div>`;
   if (m.role === 'status') return `<div class="chat-step" data-m="${m.id}"><i class="tool-st ok"></i>${esc(m.text)}</div>`;
   return '';
@@ -1692,12 +1696,112 @@ function agListen() {
   };
 }
 
+// ---------- Références pour Claude : images et vidéos jointes au message ----------
+// Tout est préparé ici, dans l'interface : images réduites, et quelques images clés pour une vidéo
+// (Claude ne lit pas les vidéos, il regarde la suite d'images avec leur instant).
+const AG_MAX_FILES = 6;
+let agFiles = [];
+
+function agEncode(src, w, h, max, png) {
+  const k = Math.min(1, max / Math.max(w, h));
+  const c = document.createElement('canvas');
+  c.width = Math.max(1, Math.round(w * k));
+  c.height = Math.max(1, Math.round(h * k));
+  const x = c.getContext('2d');
+  if (png) {
+    x.drawImage(src, 0, 0, c.width, c.height);
+    const d = c.toDataURL('image/png');
+    if (d.length < 900e3) return d; // PNG léger (icône, sprite) : on garde la transparence
+    x.clearRect(0, 0, c.width, c.height);
+  }
+  x.fillStyle = '#fff'; // JPEG : fond blanc derrière la transparence
+  x.fillRect(0, 0, c.width, c.height);
+  x.drawImage(src, 0, 0, c.width, c.height);
+  return c.toDataURL('image/jpeg', max > 1000 ? 0.85 : 0.78);
+}
+
+async function agImage(file) {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await new Promise((ok, ko) => { const i = new Image(); i.onload = () => ok(i); i.onerror = ko; i.src = url; });
+    return { kind: 'image', frames: [agEncode(img, img.naturalWidth, img.naturalHeight, 1280, /png|gif|webp/.test(file.type))] };
+  } finally { URL.revokeObjectURL(url); }
+}
+
+const agSeek = (v, time) => new Promise((ok, ko) => {
+  const to = setTimeout(() => ko(new Error('seek')), 8000);
+  v.onseeked = () => { clearTimeout(to); ok(); };
+  v.currentTime = time;
+});
+
+async function agVideo(file) {
+  const url = URL.createObjectURL(file);
+  const v = Object.assign(document.createElement('video'), { muted: true, preload: 'auto', playsInline: true, src: url });
+  try {
+    await new Promise((ok, ko) => { v.onloadeddata = ok; v.onerror = () => ko(new Error('video')); });
+    const d = v.duration;
+    if (!isFinite(d) || !v.videoWidth) throw new Error('video');
+    // Une image toutes les ~1,5 s, de 3 à 8 (une seule pour un clip très court).
+    const n = d < 0.5 ? 1 : Math.max(3, Math.min(8, Math.round(d / 1.5) + 1));
+    const frames = [];
+    const times = [];
+    for (let i = 0; i < n; i++) {
+      const at = n === 1 ? 0 : d * (i + 0.5) / n;
+      await agSeek(v, at);
+      frames.push(agEncode(v, v.videoWidth, v.videoHeight, 768));
+      times.push(Math.round(at * 10) / 10);
+    }
+    return { kind: 'video', duration: Math.round(d * 10) / 10, frames, times };
+  } finally {
+    v.removeAttribute('src');
+    v.load();
+    URL.revokeObjectURL(url);
+  }
+}
+
+function agFilesDraw() {
+  const box = $('#chat-att');
+  if (!box) return;
+  box.hidden = !agFiles.length;
+  box.innerHTML = agFiles.map((f, i) => `<div class="att ${f.busy ? 'busy' : ''}" title="${esc(f.name)}">
+    ${f.busy ? '<i class="spinner"></i>' : `<img src="${f.frames[0]}" alt="">`}
+    ${f.kind === 'video' && !f.busy ? `<span class="att-tag">▶ ${t('ag.frames', { n: f.frames.length })}</span>` : ''}
+    <button type="button" class="att-x" data-i="${i}" aria-label="×">×</button></div>`).join('');
+  $$('.att-x', box).forEach((b) => b.onclick = () => { agFiles.splice(Number(b.dataset.i), 1); agFilesDraw(); });
+}
+
+async function agAddFiles(list) {
+  for (const file of [...list]) {
+    const video = /^video\//.test(file.type);
+    if (!video && !/^image\//.test(file.type)) { toast(t('ag.attachBad', { name: file.name }), true); continue; }
+    if (agFiles.length >= AG_MAX_FILES) { toast(t('ag.attachMax', { n: AG_MAX_FILES }), true); break; }
+    const item = { name: file.name || 'image.png', kind: video ? 'video' : 'image', busy: true };
+    agFiles.push(item);
+    agFilesDraw();
+    try {
+      Object.assign(item, video ? await agVideo(file) : await agImage(file), { busy: false });
+    } catch {
+      agFiles = agFiles.filter((x) => x !== item);
+      toast(t('ag.attachBad', { name: file.name }), true);
+    }
+    agFilesDraw();
+  }
+}
+
+// Aperçu en grand d'une pièce jointe (toutes les images clés pour une vidéo).
+function agOpenFile(m, i) {
+  const f = m && (m.files || [])[i];
+  if (!f) return;
+  openModal(`<h2 class="att-title">${esc(f.name || '')}</h2><div class="att-view ${f.frames.length > 1 ? 'multi' : ''}">${f.frames.map((src, n) => `<figure><img src="/media/${esc(src)}" alt="">${f.times ? `<figcaption>${f.times[n]} s</figcaption>` : ''}</figure>`).join('')}</div>`);
+}
+
 // « Améliorer puis envoyer » : Groq (Prompt Booster) réécrit le message en prompt précis, puis il part tout seul.
 async function agBoostSend() {
   const ta = $('#chat-text');
   const text = ta.value.trim();
   const b = $('#chat-boost');
-  if (!text || b.disabled) return;
+  if (!text) return agSend(); // seulement des images : rien à améliorer
+  if (b.disabled) return;
   b.disabled = true;
   ta.disabled = true;
   b.innerHTML = `<i class="spinner"></i> <span>${t('ag.boosting')}</span>`;
@@ -1720,12 +1824,16 @@ async function agBoostSend() {
 async function agSend() {
   const ta = $('#chat-text');
   const text = ta.value.trim();
-  if (!text) return;
+  if (agFiles.some((f) => f.busy)) return; // une vidéo est encore en préparation
+  const files = agFiles.map(({ kind, name, frames, times, duration }) => ({ kind, name, frames, times, duration }));
+  if (!text && !files.length) return;
   $('#chat-send').disabled = true;
   try {
-    await api('/agents/send', { method: 'POST', body: { text } });
+    await api('/agents/send', { method: 'POST', body: { text, files } });
     ta.value = '';
     ta.style.height = '';
+    agFiles = [];
+    agFilesDraw();
   } catch (e) { toast(e.message, true); }
   $('#chat-send').disabled = false;
 }
@@ -1745,9 +1853,13 @@ async function renderChat() {
           <button class="icon-btn" id="chat-side-btn" title="${t('ag.activity')}"><svg class="line" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M15 4v16"/></svg></button></div>
         <div class="chat-msgs" id="chat-msgs"></div>
         <div class="ag-offbar" id="ag-offbar" hidden>${t('ag.offbar')} <button class="btn small" data-connect>${t('ag.connectDesktop')}</button></div>
+        <div class="chat-drop" id="chat-drop" hidden><span>${t('ag.dropHere')}</span></div>
         <form class="chat-input" id="chat-form">
+          <div class="chat-att" id="chat-att" hidden></div>
           <textarea id="chat-text" rows="1" placeholder="${t('ag.ph', { name: 'Claude' })}"></textarea>
-          <div class="chat-input-row"><small class="muted">${t('ag.hint2')}</small>
+          <div class="chat-input-row">
+            <label class="icon-btn chat-attach" title="${t('ag.attach')}"><input type="file" id="chat-file" accept="image/*,video/*" multiple hidden><svg class="line" viewBox="0 0 24 24"><path d="M21 11.5l-8.6 8.6a5.5 5.5 0 0 1-7.8-7.8l8.6-8.6a3.7 3.7 0 0 1 5.2 5.2l-8.6 8.6a1.8 1.8 0 0 1-2.6-2.6l7.9-7.9"/></svg></label>
+            <small class="muted">${t('ag.hint2')}</small>
             <button class="btn chat-boost" type="button" id="chat-boost" title="${t('ag.boostTitle')}">✨ <span>${t('ag.boost')}</span></button>
             <button class="btn primary chat-send" id="chat-send" title="${t('ag.send')}"><svg class="line" viewBox="0 0 24 24" style="stroke-width:2.4"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button></div>
         </form>
@@ -1767,6 +1879,18 @@ async function renderChat() {
   };
   $('#chat-form').onsubmit = (e) => { e.preventDefault(); agSend(); };
   $('#chat-boost').onclick = agBoostSend;
+  $('#chat-file').onchange = (e) => { agAddFiles(e.target.files); e.target.value = ''; };
+  // Coller une capture d'écran directement dans le message.
+  ta.onpaste = (e) => {
+    const files = [...(e.clipboardData && e.clipboardData.files || [])];
+    if (files.length) { e.preventDefault(); agAddFiles(files); }
+  };
+  $('#chat-msgs').onclick = (e) => {
+    const b = e.target.closest('.msg-att');
+    if (!b) return;
+    agOpenFile(AG.messages.find((m) => m.id === b.closest('[data-m]').dataset.m), Number(b.dataset.f));
+  };
+  agFilesDraw();
   $('#ag-connect').onclick = agConnect;
   $$('#ag-offbar [data-connect]').forEach((b) => b.onclick = agConnect);
   $('#ag-clear').onclick = async () => {
@@ -2628,13 +2752,19 @@ window.addEventListener('resize', movePill);
 
 // Glisser-déposer des fichiers n'importe où sur la page.
 let dragDepth = 0;
-window.addEventListener('dragenter', (e) => { if (isAdmin() && e.dataTransfer.types.includes('Files') && $('#modal').hidden) { dragDepth++; $('#dropzone').hidden = false; } });
-window.addEventListener('dragleave', () => { if (--dragDepth <= 0) { dragDepth = 0; $('#dropzone').hidden = true; } });
+// Dans le Chat Claude, ils deviennent des références jointes au message (pour tous les membres).
+const dropZone = () => ($('#chat-drop') || (isAdmin() ? $('#dropzone') : null));
+window.addEventListener('dragenter', (e) => { const z = dropZone(); if (z && e.dataTransfer.types.includes('Files') && $('#modal').hidden) { dragDepth++; z.hidden = false; } });
+window.addEventListener('dragleave', () => { if (--dragDepth <= 0) { dragDepth = 0; const z = dropZone(); if (z) z.hidden = true; } });
 window.addEventListener('dragover', (e) => e.preventDefault());
 window.addEventListener('drop', (e) => {
   e.preventDefault();
-  dragDepth = 0; $('#dropzone').hidden = true;
-  if (isAdmin() && $('#modal').hidden && e.dataTransfer.files.length) upload(e.dataTransfer.files);
+  dragDepth = 0;
+  const z = dropZone();
+  if (z) z.hidden = true;
+  if (!$('#modal').hidden || !e.dataTransfer.files.length) return;
+  if ($('#chat')) agAddFiles(e.dataTransfer.files);
+  else if (isAdmin()) upload(e.dataTransfer.files);
 });
 
 window.addEventListener('hashchange', route);

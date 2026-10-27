@@ -545,7 +545,8 @@ const agentLocal = (req) => {
 routes.push(
   ['GET', /^\/api\/agents$/, (req) => { agentLocal(req); return agents.view(); }],
   ['GET', /^\/api\/agents\/prompt$/, (req) => { agentLocal(req); return { text: mcp.CHAT_PROMPT }; }],
-  ['POST', /^\/api\/agents\/send$/, async (req) => { agentLocal(req); return agents.send(await json(req)); }],
+  // Avec les images de référence (et les images clés des vidéos), le message peut peser plusieurs Mo.
+  ['POST', /^\/api\/agents\/send$/, async (req) => { agentLocal(req); return agents.send(JSON.parse((await readBody(req, 40 * 1024 * 1024)).toString('utf8') || '{}')); }],
   // Blender (add-on Claude Blender MCP sur ce PC).
   ['GET', /^\/api\/blender$/, async (req) => { agentLocal(req); return blender.status(); }],
   ['PUT', /^\/api\/blender$/, async (req) => { agentLocal(req); blender.writeSettings(await json(req)); return blender.status(); }],
