@@ -53,10 +53,10 @@ async function providerError(res: Response, name: string) {
 type Ref = { b64: string; mime: string; name: string };
 
 // Images gratuites : une image par appel, fond uni (l'app détoure les icônes elle-même).
-async function cloudflareImage(prompt: string, seed: number) {
+async function cloudflareImage(prompt: string) {
   const res = await fetch(`https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT}/ai/run/${CF_MODEL}`, {
     method: 'POST', headers: { Authorization: `Bearer ${CF_TOKEN}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ prompt: prompt.slice(0, 2000), steps: 8, seed }),
+    body: JSON.stringify({ prompt: prompt.slice(0, 2000), steps: 8 }), // ce modèle refuse « seed » : chaque image est déjà différente
   });
   if (!res.ok) return { error: await providerError(res, 'Cloudflare') };
   const j = await res.json();
@@ -86,7 +86,7 @@ async function freeImages(b: Record<string, unknown>) {
   const images: string[] = [];
   for (let i = 0; i < n; i++) {
     const seed = Math.floor(Math.random() * 1e9);
-    const out = PROVIDER === 'cloudflare' ? await cloudflareImage(String(b.prompt), seed) : await pollinationsImage(String(b.prompt), seed, size);
+    const out = PROVIDER === 'cloudflare' ? await cloudflareImage(String(b.prompt)) : await pollinationsImage(String(b.prompt), seed, size);
     if ('error' in out) { if (images.length) break; return out; }
     images.push(out.image);
   }
