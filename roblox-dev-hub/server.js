@@ -18,6 +18,7 @@ const quality = require('./quality');
 const skills = require('./skills');
 const cloud = require('./cloud');
 const gen = require('./gen');
+const agents = require('./agents');
 const APP_VERSION = require('./package.json').version;
 
 const PORT = Number(process.env.PORT) || 4747;
@@ -533,7 +534,21 @@ const routes = [
 // Routes accessibles à un ID d'accès simple (lecture seule). Tout le reste est réservé à l'admin.
 // Ce que les membres peuvent faire en plus de lire : brancher Claude sur leur PC, tester la recherche,
 // mettre à jour l'app, utiliser la génération IA.
-const MEMBER_ACTIONS = [/^\/api\/custom(\/background)?$/, /^\/api\/textures\/thumbs$/, /^\/api\/place\/(read|write|value)$/, /^\/api\/robloxstudio(\/restart)?$/, /^\/api\/claude\/(desktop|code|send)$/, /^\/api\/mcp\/test$/, /^\/api\/update\/(check|install)$/, /^\/api\/gen(\/.*)?$/];
+// ---------- Chat Claude (Claude Code relié par le channel, abonnement de l'utilisateur) ----------
+// Seulement depuis ce PC : en mode partagé, un autre appareil ne parle pas au Claude d'ici.
+const agentLocal = (req) => {
+  if (!isLoopback(req)) throw Object.assign(new Error('Only on this PC'), { key: 'chatLocalOnly', code: 403 });
+};
+routes.push(
+  ['GET', /^\/api\/agents$/, (req) => { agentLocal(req); return agents.view(); }],
+  ['GET', /^\/api\/agents\/setup$/, (req) => { agentLocal(req); return agents.setup(); }],
+  ['POST', /^\/api\/agents\/send$/, async (req) => { agentLocal(req); return agents.send(await json(req)); }],
+  ['POST', /^\/api\/agents\/verdict$/, async (req) => { agentLocal(req); return agents.verdict(await json(req)); }],
+  ['POST', /^\/api\/agents\/launch$/, async (req) => { agentLocal(req); return agents.launch(await json(req)); }],
+  ['POST', /^\/api\/agents\/clear$/, async (req) => { agentLocal(req); return agents.clear((await json(req)).agent); }],
+);
+
+const MEMBER_ACTIONS = [/^\/api\/agents(\/[\w-]+)?$/, /^\/api\/custom(\/background)?$/, /^\/api\/textures\/thumbs$/, /^\/api\/place\/(read|write|value)$/, /^\/api\/robloxstudio(\/restart)?$/, /^\/api\/claude\/(desktop|code|send)$/, /^\/api\/mcp\/test$/, /^\/api\/update\/(check|install)$/, /^\/api\/gen(\/.*)?$/];
 const USER_ROUTES = [/^\/api\/custom$/, /^\/api\/textures$/, /^\/api\/place\/(studios|scripts|values)$/, /^\/api\/robloxstudio$/, /^\/api\/claude$/, /^\/api\/version$/, /^\/api\/prompts$/, /^\/api\/skills$/, /^\/api\/skills\/\w+$/, /^\/api\/level$/, /^\/api\/meta$/, /^\/api\/stats$/, /^\/api\/resources$/, /^\/api\/channels$/, /^\/api\/youtube$/, /^\/api\/crawl$/, /^\/api\/examples$/, /^\/api\/mcp$/];
 
 const cookies = (req) => Object.fromEntries(String(req.headers.cookie || '').split(';').map((c) => c.trim().split('=')).filter((p) => p[0]).map(([k, ...v]) => [k, decodeURIComponent(v.join('='))]));
@@ -630,6 +645,14 @@ const server = http.createServer(async (req, res) => {
     if (!out || (Array.isArray(out) && !out.length)) { res.writeHead(202); return res.end(); }
     return send(res, 200, out);
   }
+  // channel.js (Claude Code sur ce PC) : clé du dossier des données, jamais depuis un autre appareil.
+  if (url.pathname.startsWith('/agent/')) {
+    if (!isLoopback(req) || !agents.keyOk(req.headers['x-rovex-agent-key'])) return send(res, 403, { error: 'Forbidden', key: 'forbidden' });
+    if (req.method === 'GET' && url.pathname === '/agent/inbox') return agents.inbox(url.searchParams, res);
+    const fn = { '/agent/reply': agents.reply, '/agent/status': agents.status, '/agent/permission': agents.permission, '/agent/bye': agents.bye }[url.pathname];
+    if (!fn || req.method !== 'POST') return send(res, 404, { error: 'Unknown route', key: 'notFound' });
+    try { return send(res, 200, fn(await json(req))); } catch (e) { return send(res, e.code || 400, { error: e.message, key: e.key }); }
+  }
   if (url.pathname.startsWith('/api/')) {
     refresh();
     if (await authRoutes(req, res, url) !== false) return;
@@ -645,6 +668,16 @@ const server = http.createServer(async (req, res) => {
     const memberAction = MEMBER_ACTIONS.some((re) => re.test(url.pathname));
     if (session.role !== 'admin' && !memberAction && !(req.method === 'GET' && USER_ROUTES.some((re) => re.test(url.pathname)))) {
       return send(res, 403, { error: 'Admin only', key: 'adminOnly' });
+    }
+    // Flux en direct du Chat Claude (messages, Claudes connectés, autorisations).
+    if (req.method === 'GET' && url.pathname === '/api/agents/events') {
+      if (!isLoopback(req)) return send(res, 403, { error: 'Only on this PC', key: 'chatLocalOnly' });
+      res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-store', Connection: 'keep-alive' });
+      res.write(`data: ${JSON.stringify({ type: 'agents', agents: agents.list() })}\n\n`);
+      const off = agents.subscribe((ev) => res.write(`data: ${JSON.stringify(ev)}\n\n`));
+      const ping = setInterval(() => res.write(': ping\n\n'), 15e3);
+      req.on('close', () => { clearInterval(ping); off(); });
+      return;
     }
     const zipM = url.pathname.match(/^\/api\/skills\/(\w+)\/zip$/);
     if (zipM && session.role === 'admin' && skills.SKILL_CATS.includes(zipM[1])) {
@@ -697,6 +730,7 @@ server.listen(PORT, HOST, () => {
   console.log(`\n  Admin key (permanent) / Clé admin : ${auth.masterKey()}`);
   console.log(`  (saved in ${KEY_FILE})\n  Ctrl+C to stop\n`);
   readyOk(PORT);
+  try { agents.init(PORT); } catch (e) { console.log('  Claude chat: ' + e.message); }
   autoConnectClaude();
   sharedPull().catch(() => {});
 });

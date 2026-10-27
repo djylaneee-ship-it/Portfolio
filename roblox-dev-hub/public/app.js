@@ -1125,6 +1125,7 @@ async function renderConnect() {
     ${pageHead(t('cn.eyebrow'), t('nav.connect'), t('cn.sub'), `
       <div class="server-card ${m.connected ? '' : 'off'}"><span class="pulse"></span><div><b>${m.connected ? t('cn.statusOn') : t('cn.statusOff')}</b><small>${esc(m.url.replace('http://', ''))}${m.lastCall ? ' · ' + ago(m.lastCall) : ''}</small></div>
       <button class="btn small" data-copy="${esc(m.url)}">${t('copy')}</button></div>`)}
+    <a class="panel cn-chat" href="#/chat" data-spot><span>💬</span><div><b>${t('cn.chatTitle')}</b><p>${t('cn.chatText')}</p></div>${ARROW}</a>
     <div class="claude-apps" id="claude-apps"><div class="skel" style="min-height:150px"></div><div class="skel" style="min-height:150px"></div></div>
     <div class="steps">
       <div class="panel" data-spot><span class="num">1</span><h3>${t('cn.s1')}</h3><p>${t('cn.s1t')}</p></div>
@@ -1477,6 +1478,313 @@ async function renderTextures(params) {
     };
   };
   draw();
+}
+
+// Petit Markdown sûr (tout est échappé) : titres, listes, citations, tableaux, code, gras, liens.
+function mdInline(raw) {
+  return String(raw).split(/(`[^`\n]+`)/g).map((part, i) => (i % 2 ? `<code>${esc(part.slice(1, -1))}</code>` : esc(part)
+    .replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
+    .replace(/(^|[\s(])\*(?!\s)(.+?)\*(?=[\s).,!?:;]|$)/g, '$1<i>$2</i>')
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>'))).join('');
+}
+function md(src) {
+  const lines = String(src || '').replace(/\r/g, '').split('\n');
+  const out = [];
+  const LIST = /^\s*([-*+]|\d+[.)])\s+/;
+  const cells = (l) => l.trim().replace(/^\||\|$/g, '').split('|').map((x) => x.trim());
+  let i = 0;
+  while (i < lines.length) {
+    const l = lines[i];
+    const fence = l.match(/^\s*```\s*([\w+-]*)/);
+    if (fence) {
+      const buf = [];
+      i++;
+      while (i < lines.length && !/^\s*```/.test(lines[i])) buf.push(lines[i++]);
+      i++;
+      const code = buf.join('\n');
+      const lua = /^(lua|luau)?$/i.test(fence[1]);
+      out.push(`<div class="code md-code"><div class="md-code-bar"><span>${esc(fence[1] || 'code')}</span><button class="btn small" data-copy="${esc(code)}">${t('copy')}</button></div><pre>${lua ? highlight(code) : esc(code)}</pre></div>`);
+      continue;
+    }
+    const h = l.match(/^(#{1,4})\s+(.*)/);
+    if (h) { out.push(`<h${h[1].length + 2}>${mdInline(h[2])}</h${h[1].length + 2}>`); i++; continue; }
+    if (LIST.test(l)) {
+      const ordered = /^\s*\d/.test(l);
+      const items = [];
+      while (i < lines.length && LIST.test(lines[i])) items.push(lines[i++].replace(LIST, ''));
+      out.push(`<${ordered ? 'ol' : 'ul'}>${items.map((x) => `<li>${mdInline(x)}</li>`).join('')}</${ordered ? 'ol' : 'ul'}>`);
+      continue;
+    }
+    if (/^\s*>/.test(l)) {
+      const q = [];
+      while (i < lines.length && /^\s*>/.test(lines[i])) q.push(lines[i++].replace(/^\s*>\s?/, ''));
+      out.push(`<blockquote>${q.map(mdInline).join('<br>')}</blockquote>`);
+      continue;
+    }
+    if (/^\s*(---+|\*\*\*+)\s*$/.test(l)) { out.push('<hr>'); i++; continue; }
+    if (/^\s*\|.*\|\s*$/.test(l)) {
+      const rows = [];
+      while (i < lines.length && /^\s*\|.*\|\s*$/.test(lines[i])) rows.push(lines[i++]);
+      const body = rows.filter((r) => !/^[\s|:-]+$/.test(r)).map(cells);
+      out.push(`<div class="md-table"><table><thead><tr>${(body.shift() || []).map((c) => `<th>${mdInline(c)}</th>`).join('')}</tr></thead><tbody>${body.map((r) => `<tr>${r.map((c) => `<td>${mdInline(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`);
+      continue;
+    }
+    if (!l.trim()) { i++; continue; }
+    const para = [];
+    while (i < lines.length && lines[i].trim() && !/^\s*(```|#{1,4}\s|>|\|)/.test(lines[i]) && !LIST.test(lines[i])) para.push(lines[i++]);
+    if (!para.length) para.push(lines[i++]);
+    out.push(`<p>${para.map(mdInline).join('<br>')}</p>`);
+  }
+  return out.join('');
+}
+
+// ---------- Chat Claude : tes Claude Code (ton abonnement) reliés à Rovex, qui tournent en arrière-plan ----------
+const AG = { list: [], messages: [], cur: '', es: null, unread: {}, setup: null };
+const agentName = (id) => (AG.list.find((a) => a.id === id) || {}).name || id;
+
+function agClose() {
+  if (AG.es) { AG.es.close(); AG.es = null; }
+}
+
+function agMsgHtml(m) {
+  if (m.role === 'user') return `<div class="msg user" data-m="${m.id}"><div class="bubble">${esc(m.text).replace(/\n/g, '<br>')}</div></div>`;
+  if (m.role === 'claude') return `<div class="msg bot" data-m="${m.id}"><span class="bot-av"><img src="logo.png" alt=""></span><div class="bot-body"><div class="md">${md(m.text)}</div></div></div>`;
+  if (m.role === 'status') return `<div class="chat-step" data-m="${m.id}"><i class="tool-st ok"></i>${esc(m.text)}</div>`;
+  if (m.role === 'system') return `<div class="chat-sys" data-m="${m.id}">${t('ag.' + m.key, { name: esc(m.name || '') })} · ${ago(m.t)}</div>`;
+  if (m.role === 'perm') {
+    const open = m.state === 'open';
+    return `<div class="perm ${esc(m.state)}" data-m="${m.id}"><div class="perm-head">🔐 <b>${t('ag.permTitle', { tool: esc(m.tool) })}</b></div>
+      <p>${esc(m.text)}</p>${m.preview ? `<pre>${esc(m.preview)}</pre>` : ''}
+      <div class="row">${open ? `<button class="btn primary small" data-allow="${m.id}">✓ ${t('ag.allow')}</button><button class="btn small danger" data-deny="${m.id}">✕ ${t('ag.deny')}</button>`
+        : `<span class="perm-state">${t(m.state === 'allowed' ? 'ag.allowed' : 'ag.denied')}</span>`}</div></div>`;
+  }
+  return '';
+}
+
+function agBind(root) {
+  bindCopy(root);
+  $$('[data-allow],[data-deny]', root).forEach((b) => b.onclick = async () => {
+    const id = b.dataset.allow || b.dataset.deny;
+    $$(`[data-m="${id}"] button`).forEach((x) => (x.disabled = true));
+    try { await api('/agents/verdict', { method: 'POST', body: { msg: id, behavior: b.dataset.allow ? 'allow' : 'deny' } }); }
+    catch (e) { toast(e.message, true); $$(`[data-m="${id}"] button`).forEach((x) => (x.disabled = false)); }
+  });
+}
+
+function agList() {
+  const box = $('#ag-list');
+  if (!box) return;
+  box.innerHTML = AG.list.length ? AG.list.map((a) => `<a class="chat-conv ag ${a.id === AG.cur ? 'active' : ''} ${a.online ? 'on' : 'off'}" href="#/chat?a=${encodeURIComponent(a.id)}" data-id="${esc(a.id)}">
+      <span><i class="ag-dot"></i>${esc(a.name)}${AG.unread[a.id] ? `<em class="ag-unread">${AG.unread[a.id]}</em>` : ''}</span>
+      <small>${a.online ? (a.typing ? t('ag.working') : t('ag.online')) : t('ag.offline')}</small></a>`).join('')
+    : `<p class="muted small">${t('ag.none')}</p>`;
+  const dot = $('#chat-dot');
+  if (dot) dot.hidden = !AG.list.some((a) => a.online);
+}
+
+function agHead() {
+  const a = AG.list.find((x) => x.id === AG.cur);
+  if (!$('#chat-title')) return;
+  $('#chat-title').textContent = a ? a.name : t('ag.title');
+  $('#chat-model-tag').textContent = a ? (a.online ? (a.typing ? t('ag.working') : t('ag.online')) : t('ag.offline')) : '';
+  $('#chat-live').hidden = !(a && a.online);
+  const ta = $('#chat-text');
+  if (ta) { ta.disabled = !(a && a.online); ta.placeholder = a && a.online ? t('ag.ph', { name: a.name }) : t('ag.phOff'); }
+  $('#chat-send').disabled = !(a && a.online);
+  const typing = $('#ag-typing');
+  if (typing) typing.hidden = !(a && a.online && a.typing);
+}
+
+// Panneau de droite : les étapes annoncées par Claude, les autorisations en attente, les outils Rovex utilisés.
+function agSide() {
+  const box = $('#chat-steps');
+  if (!box) return;
+  const mine = AG.messages.filter((m) => m.agent === AG.cur);
+  const steps = mine.filter((m) => m.role === 'status').slice(-12).reverse();
+  const busy = (AG.list.find((a) => a.id === AG.cur) || {}).typing;
+  const perms = mine.filter((m) => m.role === 'perm' && m.state === 'open');
+  const tools = (MCP.log || []).slice(0, 8);
+  box.innerHTML = `${perms.length ? `<div class="side-step perm-wait"><i class="tool-st"></i><div><b>${t('ag.permWait', { n: perms.length })}</b></div></div>` : ''}
+    ${steps.map((m, i) => `<div class="side-step act ${i || !busy ? 'ok' : ''}"><i class="tool-st"></i><div><b>${esc(m.text)}</b><small>${ago(m.t)}</small></div></div>`).join('')}
+    ${tools.length ? `<h4 class="side-sub">${t('ag.tools')}</h4>${tools.map((l) => `<div class="side-step tool ok"><i class="tool-st"></i><div><b>${esc(l.tool)}</b><small>${esc([l.category, l.q].filter(Boolean).join(' · '))} · ${ago(l.t)}</small></div></div>`).join('')}` : ''}
+    ${!steps.length && !perms.length && !tools.length ? `<p class="muted small chat-side-empty">${t('ag.sideEmpty')}</p>` : ''}`;
+}
+
+const agNear = () => { const b = $('#chat-msgs'); return !b || b.scrollHeight - b.scrollTop - b.clientHeight < 160; };
+const agScroll = () => { const b = $('#chat-msgs'); if (b) b.scrollTop = b.scrollHeight; };
+
+function agThread() {
+  const box = $('#chat-msgs');
+  if (!box) return;
+  const mine = AG.messages.filter((m) => m.agent === AG.cur);
+  box.innerHTML = AG.cur
+    ? (mine.length ? mine.map(agMsgHtml).join('') : `<div class="chat-welcome"><h2>${t('ag.hello', { name: esc(agentName(AG.cur)) })}</h2><p>${t('ag.helloSub')}</p></div>`)
+      + `<div class="msg bot" id="ag-typing" hidden><span class="bot-av"><img src="logo.png" alt=""></span><div class="bot-body"><div class="typing"><i></i><i></i><i></i></div></div></div>`
+    : agSetupHtml();
+  agBind(box);
+  if (!AG.cur) agSetupBind();
+  AG.unread[AG.cur] = 0;
+  agList();
+  agHead();
+  agSide();
+  agScroll();
+}
+
+function agSetupHtml() {
+  const s = AG.setup || {};
+  const win = s.platform === 'win32';
+  const install = win ? 'irm https://claude.ai/install.ps1 | iex' : 'curl -fsSL https://claude.ai/install.sh | bash';
+  return `<div class="ag-setup">
+    <h2>${t('ag.setupTitle')}</h2><p class="muted">${t('ag.setupSub')}</p>
+    <div class="ag-steps">
+      <div class="ag-step ${s.code && s.code.installed ? 'done' : ''}"><span class="num">1</span><div><b>${t('ag.s1')}</b>
+        ${s.code && s.code.installed ? `<p>✓ ${t('ag.s1ok', { v: esc(s.code.version || '') })}</p>` : `<p>${t(win ? 'ag.s1win' : 'ag.s1mac')}</p>${codeBox(install)}<p>${t('ag.s1login')}</p>`}</div></div>
+      <div class="ag-step"><span class="num">2</span><div><b>${t('ag.s2')}</b><p>${t('ag.s2t')}</p><button class="btn primary" data-launch>${t('ag.launch')}</button></div></div>
+      <div class="ag-step"><span class="num">3</span><div><b>${t('ag.s3')}</b><p>${t('ag.s3t')}</p></div></div>
+    </div>
+    <div class="ag-note">⚠️ ${t('ag.preview')}</div>
+  </div>`;
+}
+function agSetupBind() {
+  bindCopy($('#chat-msgs'));
+  $$('[data-launch]').forEach((b) => b.onclick = agLaunchModal);
+}
+
+function agLaunchModal() {
+  const taken = new Set(AG.list.filter((a) => a.online).map((a) => a.name.toLowerCase()));
+  const names = ['Claude', 'Scripteur', 'VFX', 'UI', 'Builder', 'Animateur'];
+  const first = names.find((n) => !taken.has(n.toLowerCase())) || 'Claude 2';
+  openModal(`<h2>🚀 ${t('ag.launchTitle')}</h2><p>${t('ag.launchSub')}</p>
+    <div class="field"><label>${t('ag.name')}</label><input class="input" id="al-name" value="${esc(first)}" maxlength="30"></div>
+    <div class="chips" style="margin-bottom:14px">${names.map((n) => `<button class="chip" data-n="${n}">${n}</button>`).join('')}</div>
+    <div class="ag-note">${t('ag.launchHelp')}</div>
+    <div class="row" style="margin-top:14px"><button class="btn primary" id="al-go">${t('ag.launch')}</button></div>
+    <div id="al-out"></div>`);
+  $$('[data-n]').forEach((b) => b.onclick = () => ($('#al-name').value = b.dataset.n));
+  $('#al-go').onclick = async (e) => {
+    const b = e.currentTarget;
+    b.disabled = true;
+    try {
+      const r = await api('/agents/launch', { method: 'POST', body: { name: $('#al-name').value } });
+      $('#al-out').innerHTML = r.opened
+        ? `<p class="ok-line">✓ ${t('ag.launched', { name: esc(r.name) })}</p>`
+        : `<p>${t('ag.manual')}</p>${codeBox(`cd "${r.dir}"`)}${codeBox(r.command)}`;
+      bindCopy($('#al-out'));
+    } catch (er) {
+      $('#al-out').innerHTML = `<p class="chat-err">⚠️ ${esc(er.message)}</p>`;
+    }
+    b.disabled = false;
+  };
+}
+
+function agListen() {
+  agClose();
+  const es = new EventSource('/api/agents/events');
+  AG.es = es;
+  es.onmessage = (e) => {
+    const ev = JSON.parse(e.data);
+    if (ev.type === 'agents') {
+      const first = !AG.list.length && ev.agents.length;
+      AG.list = ev.agents;
+      if (!AG.cur && first) { const on = AG.list.find((a) => a.online); if (on) return agSelect(on.id); }
+      agList(); agHead(); agSide();
+    } else if (ev.type === 'msg') {
+      AG.messages.push(ev.msg);
+      if (ev.msg.agent !== AG.cur) {
+        if (ev.msg.role === 'claude') AG.unread[ev.msg.agent] = (AG.unread[ev.msg.agent] || 0) + 1;
+        return agList();
+      }
+      const stick = agNear();
+      const box = $('#chat-msgs');
+      $('.chat-welcome', box)?.remove();
+      $('#ag-typing').insertAdjacentHTML('beforebegin', agMsgHtml(ev.msg));
+      agBind(box.querySelector(`[data-m="${ev.msg.id}"]`).parentElement);
+      if (stick || ev.msg.role === 'user') agScroll();
+      agSide();
+    } else if (ev.type === 'perm') {
+      const i = AG.messages.findIndex((m) => m.id === ev.msg.id);
+      if (i >= 0) AG.messages[i] = ev.msg;
+      const el = $(`[data-m="${ev.msg.id}"]`);
+      if (el) { el.outerHTML = agMsgHtml(ev.msg); }
+      agSide();
+    } else if (ev.type === 'reset') {
+      api('/agents').then((v) => { AG.messages = v.messages; agThread(); }).catch(() => {});
+    }
+  };
+}
+
+function agSelect(id) {
+  AG.cur = id || '';
+  try { localStorage.setItem('rovex-agent', AG.cur); } catch {}
+  if (location.hash !== '#/chat' + (id ? '?a=' + encodeURIComponent(id) : '')) history.replaceState(null, '', '#/chat' + (id ? '?a=' + encodeURIComponent(id) : ''));
+  agThread();
+  $('#chat-text')?.focus();
+}
+
+async function agSend() {
+  const ta = $('#chat-text');
+  const text = ta.value.trim();
+  if (!text || !AG.cur) return;
+  $('#chat-send').disabled = true;
+  try {
+    await api('/agents/send', { method: 'POST', body: { agent: AG.cur, text } });
+    ta.value = '';
+    ta.style.height = '';
+  } catch (e) { toast(e.message, true); }
+  agHead();
+}
+
+async function renderChat(params) {
+  document.body.classList.add('chat-mode');
+  const [v, s] = await Promise.all([api('/agents'), api('/agents/setup').catch(() => ({}))]);
+  AG.list = v.agents;
+  AG.messages = v.messages;
+  AG.setup = s;
+  let saved = '';
+  try { saved = localStorage.getItem('rovex-agent') || ''; } catch {}
+  const want = params.get('a') || saved;
+  AG.cur = AG.list.some((a) => a.id === want) ? want : (AG.list.find((a) => a.online) || AG.list[0] || {}).id || '';
+  view.innerHTML = `
+    <div class="chat ${AG.hideSide ? 'no-side' : ''}" id="chat">
+      <aside class="chat-list">
+        <button class="btn primary" data-launch>${PLUS}<span>${t('ag.launch')}</span></button>
+        <div class="chat-convs" id="ag-list"></div>
+        <div class="chat-cfg"><a class="btn small" href="#/chat?a=" id="ag-help">❔ ${t('ag.how')}</a></div>
+      </aside>
+      <section class="chat-main">
+        <div class="chat-head"><div><b id="chat-title"></b><small id="chat-model-tag"></small></div><i class="chat-live" id="chat-live" hidden></i>
+          <button class="icon-btn" id="ag-clear" title="${t('ag.clear')}"><svg class="line" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button>
+          <button class="icon-btn" id="chat-side-btn" title="${t('ag.activity')}"><svg class="line" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M15 4v16"/></svg></button></div>
+        <div class="chat-msgs" id="chat-msgs"></div>
+        <form class="chat-input" id="chat-form">
+          <textarea id="chat-text" rows="1"></textarea>
+          <div class="chat-input-row"><small class="muted">${t('ag.hint')}</small>
+            <button class="btn primary chat-send" id="chat-send" title="${t('ag.send')}"><svg class="line" viewBox="0 0 24 24" style="stroke-width:2.4"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button></div>
+        </form>
+      </section>
+      <aside class="chat-side">
+        <h3>${t('ag.activity')}</h3>
+        <p class="muted small">${t('ag.activitySub')}</p>
+        <div class="chat-steps" id="chat-steps"></div>
+      </aside>
+    </div>`;
+  const ta = $('#chat-text');
+  ta.oninput = () => { ta.style.height = ''; ta.style.height = Math.min(ta.scrollHeight, 260) + 'px'; };
+  ta.onkeydown = (e) => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); agSend(); } };
+  $('#chat-form').onsubmit = (e) => { e.preventDefault(); agSend(); };
+  $$('[data-launch]').forEach((b) => b.onclick = agLaunchModal);
+  $('#ag-help').onclick = (e) => { e.preventDefault(); agSelect(''); };
+  $('#ag-clear').onclick = async () => {
+    if (!AG.cur || !confirm(t('ag.clearAsk'))) return;
+    await api('/agents/clear', { method: 'POST', body: { agent: AG.cur } }).catch((er) => toast(er.message, true));
+  };
+  $('#chat-side-btn').onclick = () => {
+    if (innerWidth <= 1250) return $('#chat').classList.toggle('side-open');
+    AG.hideSide = !AG.hideSide;
+    $('#chat').classList.toggle('no-side', AG.hideSide);
+  };
+  agThread();
+  agListen();
 }
 
 // ---------- Deux espaces : Création (skills, textures, prompts…) et Ressources (bibliothèque, open source…) ----------
@@ -2286,13 +2594,17 @@ async function route() {
   $$('#side-places-list a').forEach((a) => a.classList.toggle('active', path === 'place' && a.dataset.s === (params.get('s') || '')));
   movePill();
   document.body.classList.remove('menu');
+  // En quittant le chat, les Claudes continuent : on arrête seulement de suivre le flux.
+  if (path !== 'chat') { agClose(); document.body.classList.remove('chat-mode'); }
   if (!SESSION || !SESSION.loggedIn) return;
   if (!isAdmin() && ADMIN_PAGES.includes(path)) { location.hash = '#/'; return; }
   const pages = {
     library: () => renderLibrary(params), favorites: () => renderLibrary(params, true), examples: renderExamples,
     youtube: () => renderYoutube(params), channels: () => renderChannels(params), explore: renderExplore,
-    connect: renderConnect, admin: renderAdmin, settings: renderSettings, update: renderUpdate, robloxstudio: renderRobloxStudio, custom: renderCustom, dev: renderDev, textures: () => renderTextures(params), place: () => renderPlace(params), level: renderLevel, opensource: renderOpenSource, skills: renderSkills, prompts: renderPrompts, studio: renderStudio,
+    chat: () => renderChat(params), connect: renderConnect, admin: renderAdmin, settings: renderSettings, update: renderUpdate, robloxstudio: renderRobloxStudio, custom: renderCustom, dev: renderDev, textures: () => renderTextures(params), place: () => renderPlace(params), level: renderLevel, opensource: renderOpenSource, skills: renderSkills, prompts: renderPrompts, studio: renderStudio,
   };
+  // Changer de Claude sans recharger la page du chat.
+  if (path === 'chat' && $('#chat')) return agSelect(params.get('a') || '');
   try {
     await transition(pages[path] || renderHome);
   } catch (e) {
@@ -2350,5 +2662,8 @@ window.addEventListener('hashchange', route);
     await refreshMcp();
     const list = $('#act-list') || $('#cn-log');
     if (list) list.innerHTML = activityList(MCP.log || []);
+    if ($('#chat')) agSide();
+    // Point vert sur « Chat Claude » quand un Claude est connecté (hors de la page du chat).
+    else api('/agents').then((v) => { const d = $('#chat-dot'); if (d) d.hidden = !v.agents.some((a) => a.online); }).catch(() => {});
   }, 20000);
 })();

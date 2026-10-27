@@ -93,6 +93,16 @@ L'app récupère ce fichier toutes les 30 minutes (**Réglages → Source cloud*
 - Optionnel : un secret `YOUTUBE_API_KEY` (Settings → Secrets → Actions) pour la recherche de vidéos YouTube.
 - GitHub désactive les tâches planifiées d'un dépôt public après 60 jours sans activité : les commits de l'algo comptent comme activité, mais s'il s'arrête, réactive-le dans l'onglet Actions.
 
+## Chat Claude (ton Claude Code relié à Rovex)
+
+La page **Chat Claude** permet de parler à Claude **dans Rovex, avec ton abonnement Claude** (Pro ou Max), sans clé API : Rovex se branche sur **Claude Code** par un *channel* (fonction officielle de Claude Code, en test chez Anthropic). Claude Code tourne dans une petite fenêtre qu'on réduit ; on discute dans Rovex.
+
+- **Lancer un Claude** : Rovex prépare un dossier de travail (`data/claude-workspace` : `.mcp.json` avec `rovex-chat` + `rovex-hub`, outils Rovex pré-autorisés, `CLAUDE.md`) et ouvre un terminal avec `claude --dangerously-load-development-channels server:rovex-chat`. Au lancement, choisir « I am using this for local development » (écran normal pendant la phase de test des channels).
+- **Plusieurs Claudes** : chaque Claude a un nom (Scripteur, VFX, UI…) et sa conversation ; ils travaillent en parallèle.
+- **Ce que fait Claude** : les étapes qu'il annonce (outil `status`), les autorisations en attente et les outils Rovex utilisés. Les demandes d'autorisation de Claude Code (Bash, fichiers…) s'affichent dans le chat avec **Autoriser / Refuser**.
+- Code : `channel.js` (serveur MCP stdio lancé par Claude Code, notifications `claude/channel`, outils `reply` et `status`, relais des autorisations) et `agents.js` (Claudes connectés, messages, requête longue `/agent/inbox`, clé locale `data/agent.json`). Le chat ne marche que sur le PC où Rovex est installé.
+- Il faut Claude Code installé et connecté au compte Claude (Windows : `irm https://claude.ai/install.ps1 | iex` dans PowerShell, puis `claude` une fois pour se connecter).
+
 ## Relier en MCP
 
 L'app expose un serveur MCP (`rovex-hub`), à brancher dans Claude ou tout autre client MCP. La page **Connexion Claude** affiche la config exacte, prête à copier, et la commande Claude Code : `claude mcp add --transport http rovex-hub http://localhost:4747/mcp`.
