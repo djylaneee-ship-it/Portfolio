@@ -8,6 +8,7 @@ const db = require('./db');
 const skills = require('./skills');
 const cloud = require('./cloud');
 const blender = require('./blender');
+const directives = require('./directives');
 
 const SIZES = ['1024x1024', '1536x1024', '1024x1536'];
 
@@ -220,6 +221,7 @@ Claude is connected to Rovex Hub, an MCP server holding the user's Roblox develo
 - list_examples(category) / get_example(id): validated learning examples (request + correct Luau code + why it is correct).
 - search_opensource(query, category): GitHub repos, free models and plugins, sorted by stars.
 - generate_image(prompt, kind, category): generates icons, UI images, thumbnails, textures and VFX sprites in the user's art style and saves them in the library.
+- rovex_folder(path): the user's own folders of references in Rovex (images, video key frames, VFX textures, saved resources), e.g. rovex_folder("library/Swords/").
 - Blender tools (when the user connected Blender): blender_execute_python (builds meshes with bpy / bmesh and exports FBX), blender_viewport_screenshot (to check the model), blender_scene_info, and r6_* tools for R6 animations.
 
 Write the improved prompt so that Claude:
@@ -259,11 +261,16 @@ async function enhancePrompt(state, a = {}) {
   if (!((await refreshShared()) && shared.info.text) && !((await refreshShared(true)) && shared.info.text)) {
     throw err('genShared', 'Prompt improvement is not set up yet');
   }
-  const category = skills.SKILL_CATS.includes(a.category) ? a.category : '';
+  // Directives de l'utilisateur (!reference, !skill, !software) : Groq doit les respecter et les garder.
+  const dir = directives.parse(request);
+  const res = directives.resolve(dir);
+  const forced = res.skills.map((x) => x.id).filter((x) => skills.SKILL_CATS.includes(x));
+  const category = skills.SKILL_CATS.includes(a.category) ? a.category : forced.length === 1 ? forced[0] : '';
   const prompt = `${category ? `Focus category: ${category}\n\n` : ''}User request:\n${request.slice(0, 4000)}`;
-  const j = await callShared({ type: 'text', code: credOf(state), system: `${BOOSTER_RULES}\n\n${boosterContext(state, category)}`, prompt });
-  const text = String(j.text || '').replace(/^```[a-z]*\n?|```$/g, '').trim();
+  const j = await callShared({ type: 'text', code: credOf(state), system: `${BOOSTER_RULES}\n\n${boosterContext(state, category)}${directives.forBooster(dir, res)}`, prompt });
+  let text = String(j.text || '').replace(/^```[a-z]*\n?|```$/g, '').trim();
   if (!text) throw err('genEmpty', 'No answer');
+  text = directives.ensure(text, dir, res);
   // Historique local des 15 derniers prompts améliorés.
   state.boosts = [{ id: db.newId(), input: request, output: text, category, at: new Date().toISOString() }, ...(state.boosts || [])].slice(0, 15);
   return { text, model: j.model, quota: j.quota };

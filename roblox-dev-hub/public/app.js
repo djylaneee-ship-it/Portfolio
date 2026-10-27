@@ -624,6 +624,7 @@ async function renderPrompts() {
       <h3>✨ ${t('pb.boxTitle')} ${g.available ? `<span class="st validated">${t('st.ready')}</span>${left ? ` <span class="st review">${esc(left)}</span>` : ''}` : `<span class="st draft">${t('st.off')}</span>`}</h3>
       ${g.available ? `<form id="pb-form">
         <textarea class="input boost-in" id="pb-in" required placeholder="${t('pb.ph')}"></textarea>
+        ${dirBar()}
         <div class="row" style="margin-top:12px">
           <select class="select" id="pb-cat" style="padding:11px 14px"><option value="">${t('pb.autoCat')}</option>${catOptions('')}</select>
           <button class="btn primary" id="pb-go">✨ ${t('pb.go')}</button>
@@ -671,6 +672,7 @@ async function renderPrompts() {
     $('#pb-result').scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
   bindResult();
+  if ($('#pb-in')) bindDirBar($('#pb-form'), $('#pb-in'));
   const form = $('#pb-form');
   if (form) form.onsubmit = async (e) => {
     e.preventDefault();
@@ -1478,6 +1480,7 @@ async function renderTextures(params) {
       ${x.flipbook ? `<span class="tx-badge">${x.flipbook}</span>` : ''}
       <b>${esc(x.name || t('tx.noName'))}${x.variant ? ` <small>${esc(x.variant)}</small>` : ''}</b>
       <span class="mono">${x.id}</span>${x.tip ? `<small class="tx-tip">${esc(x.tip)}</small>` : ''}
+      <span class="tx-fd" data-fd="${x.id}" title="${t('fd.addTo')}">📁</span>
     </button>`;
   const loadThumbs = async (ids) => {
     for (let i = 0; i < ids.length; i += 200) {
@@ -1509,6 +1512,11 @@ async function renderTextures(params) {
   $('#tx-more').onclick = more;
   // Clic : copie l'ID ; survol d'un flipbook : l'animation joue image par image.
   $('#tx-grid-box').onclick = async (e) => {
+    const fd = e.target.closest('[data-fd]');
+    if (fd) {
+      const x = items.find((it) => it.id === fd.dataset.fd);
+      return addToFolder({ kind: 'texture', ref: x.id, name: [x.name, x.variant].filter(Boolean).join(' '), flipbook: x.flipbook || '', group: x.group || '', thumbnail: x.thumb || '' });
+    }
     const c = e.target.closest('.tx-card');
     if (!c) return;
     if (await copyText('rbxassetid://' + c.dataset.id)) toast(t('tx.copied', { id: c.dataset.id }));
@@ -1875,6 +1883,7 @@ async function renderChat() {
         <div class="chat-drop" id="chat-drop" hidden><span>${t('ag.dropHere')}</span></div>
         <form class="chat-input" id="chat-form">
           <div class="chat-att" id="chat-att" hidden></div>
+          ${dirBar()}
           <textarea id="chat-text" rows="1" placeholder="${t('ag.ph', { name: 'Claude' })}"></textarea>
           <div class="chat-input-row">
             <label class="icon-btn chat-attach" title="${t('ag.attach')}"><input type="file" id="chat-file" accept="image/*,video/*" multiple hidden><svg class="line" viewBox="0 0 24 24"><path d="M21 11.5l-8.6 8.6a5.5 5.5 0 0 1-7.8-7.8l8.6-8.6a3.7 3.7 0 0 1 5.2 5.2l-8.6 8.6a1.8 1.8 0 0 1-2.6-2.6l7.9-7.9"/></svg></label>
@@ -1890,6 +1899,7 @@ async function renderChat() {
       </aside>
     </div>`;
   const ta = $('#chat-text');
+  bindDirBar($('#chat-form'), ta);
   ta.oninput = () => { ta.style.height = ''; ta.style.height = Math.min(ta.scrollHeight, 260) + 'px'; };
   ta.onkeydown = (e) => {
     if (e.key !== 'Enter' || e.shiftKey || e.isComposing) return;
@@ -1929,7 +1939,7 @@ async function renderChat() {
 // ---------- Deux espaces : Création (skills, textures, prompts…) et Ressources (bibliothèque, open source…) ----------
 const SPACES = {
   create: ['examples', 'textures', 'skills', 'prompts', 'studio', 'level', 'connect', 'robloxstudio', 'blender', 'place', 'dev'],
-  resources: ['library', 'opensource', 'channels', 'youtube', 'favorites', 'explore'],
+  resources: ['library', 'folders', 'opensource', 'channels', 'youtube', 'favorites', 'explore'],
 };
 const spaceOf = (route) => Object.keys(SPACES).find((k) => SPACES[k].includes(route)) || null;
 let SPACE = (() => { try { return localStorage.getItem('rovex-space') || 'create'; } catch { return 'create'; } })();
@@ -2573,6 +2583,7 @@ function openDetail(r) {
     <p class="sub" style="margin-bottom:20px">${esc(r.author || '')}${r.description ? (r.author ? ' — ' : '') + esc(r.description) : ''}</p>
     <div class="row" style="margin-bottom:22px">
       ${link ? `<a class="btn primary" href="${esc(link)}" target="_blank" ${r.file ? 'download' : ''}>${r.file ? t('detail.download') : t('detail.open')} ${ARROW}</a>` : ''}
+      <button class="btn" id="d-folder">📁 ${t('fd.addTo')}</button>
       <span class="admin-only row"><button class="btn" id="d-fav">${STAR}${r.favorite ? t('detail.unfav') : t('card.favorite')}</button>
       <button class="btn danger" id="d-del">${t('delete')}</button></span>
     </div>
@@ -2592,6 +2603,7 @@ function openDetail(r) {
     await api('/resources/' + r.id, { method: 'PUT', body: Object.fromEntries(new FormData(e.target)) });
     toast(t('toast.saved')); closeModal(); refreshStats(); route();
   };
+  $('#d-folder').onclick = async () => { await closeModal(); addToFolder({ kind: 'resource', ref: r.id }); };
   $('#d-fav').onclick = async () => { await api('/resources/' + r.id, { method: 'PUT', body: { favorite: !r.favorite } }); closeModal(); refreshStats(); route(); };
   $('#d-del').onclick = async () => {
     if (!confirm(t('detail.confirmDelete', { title: r.title }))) return;
@@ -2693,6 +2705,256 @@ async function upload(files, category = '') {
   refreshStats(); route();
 }
 
+// ---------- Mes dossiers : ressources, textures VFX et fichiers importés, appelés dans un prompt par « !reference: » ----------
+let FD_OPEN = '';
+const fdTree = (list) => {
+  const kids = (pid) => list.filter((f) => (f.parent || '') === pid);
+  const walk = (pid, depth) => kids(pid).map((f) => `<button class="fd-node ${f.id === FD_OPEN ? 'on' : ''}" data-f="${f.id}" style="--d:${depth}">
+      <span>📁 ${esc(f.name)}</span><small>${f.count}</small></button>${walk(f.id, depth + 1)}`).join('');
+  return walk('', 0);
+};
+function fdThumb(i) {
+  const bg = (u) => `<span class="fd-img" style="background-image:url('${esc(u)}')"></span>`;
+  if (i.kind === 'texture') return i.thumbnail ? bg(i.thumbnail) : `<span class="fd-img ph">✨</span>`;
+  if (i.kind === 'resource') return i.thumbnail ? bg(i.thumbnail) : `<span class="fd-img ph">${svgPath(TYPE_ICONS[i.type] || TYPE_ICONS.article)}</span>`;
+  const p = (i.previews || [])[0] || (i.media === 'image' ? i.file : '');
+  return p ? bg('/media/' + p) : `<span class="fd-img ph">${svgPath(TYPE_ICONS.fichier)}</span>`;
+}
+function fdKind(i) {
+  if (i.kind === 'texture') return `✨ ${t('fd.k.texture')}${i.flipbook ? ' · ' + esc(i.flipbook) : ''}`;
+  if (i.kind === 'resource') return `📚 ${typeLabel(i.type || 'article')}`;
+  if (i.media === 'video') return `▶ ${t('fd.k.video')}${i.duration ? ' · ' + i.duration + ' s' : ''}`;
+  return i.media === 'image' ? `🖼️ ${t('fd.k.image')}` : `📄 ${t('fd.k.file')}`;
+}
+
+// Images et vidéos importées : un aperçu léger pour Claude (images clés d'une vidéo), fait ici comme dans le chat.
+async function fdUpload(fid, files) {
+  let ok = 0;
+  for (const file of [...files]) {
+    toast(t('fd.uploading', { name: file.name }));
+    try {
+      const it = await api(`/folders/${fid}/upload?${new URLSearchParams({ name: file.name || 'file' })}`, { method: 'POST', body: file });
+      ok++;
+      const video = /^video\//.test(file.type);
+      if (video || /^image\/(png|jpe?g|gif|webp|bmp)/.test(file.type)) {
+        const pv = await (video ? agVideo(file) : agImage(file)).catch(() => null);
+        if (pv) await api(`/folder-items/${it.id}/previews`, { method: 'PUT', body: { frames: pv.frames, times: pv.times, duration: pv.duration } }).catch(() => {});
+      }
+    } catch (e) { toast(`${file.name} : ${e.message}`, true); }
+  }
+  if (ok) toast(t('fd.uploaded', { n: ok }));
+  return ok;
+}
+
+// Choisir un dossier (ou en créer un) : renvoie son id, ou null.
+async function pickFolder() {
+  const list = await fdList();
+  return new Promise((done) => {
+    openModal(`<h2 class="detail-title">📁 ${t('fd.pickTitle')}</h2>
+      <div class="fd-pick">${list.length ? list.map((f) => `<button class="fd-pick-row" data-f="${f.id}"><code>${esc(f.path)}</code><small>${f.count}</small></button>`).join('') : `<p class="sub">${t('fd.none')}</p>`}</div>
+      <form class="row" id="fd-pick-new" style="margin-top:16px"><input class="input" name="name" placeholder="${t('fd.newPh')}" style="flex:1" required><button class="btn primary">+ ${t('fd.new')}</button></form>`);
+    let chosen = null;
+    $$('.fd-pick-row').forEach((b) => b.onclick = () => { chosen = b.dataset.f; closeModal(); });
+    $('#fd-pick-new').onsubmit = async (e) => {
+      e.preventDefault();
+      try { chosen = (await api('/folders', { method: 'POST', body: { name: e.target.name.value } })).id; closeModal(); } catch (er) { toast(er.message, true); }
+    };
+    const watch = setInterval(() => { if ($('#modal').hidden) { clearInterval(watch); done(chosen); } }, 150);
+  });
+}
+async function fdList() { return (await api('/folders')).folders; }
+async function addToFolder(body) {
+  const fid = await pickFolder();
+  if (!fid) return;
+  try { await api(`/folders/${fid}/items`, { method: 'POST', body }); toast(t('fd.added')); } catch (e) { toast(e.message, true); }
+}
+
+// Fenêtre de choix : ressources de la bibliothèque ou textures VFX à ranger dans le dossier ouvert.
+function fdPicker(fid, kind) {
+  openModal(`<h2 class="detail-title">${kind === 'texture' ? '✨ ' + t('fd.fromTex') : '📚 ' + t('fd.fromLib')}</h2>
+    <input class="input" id="fdp-q" placeholder="${t(kind === 'texture' ? 'tx.search' : 'fd.searchLib')}" style="width:100%;margin-bottom:14px">
+    <div class="fdp-grid" id="fdp-res"></div>`);
+  const added = new Set();
+  let tex = null;
+  let timer = 0;
+  const draw = async () => {
+    const q = $('#fdp-q').value.trim();
+    let rows;
+    if (kind === 'texture') {
+      tex = tex || (await api('/textures')).items;
+      const w = q.toLowerCase().split(/\s+/).filter(Boolean);
+      rows = tex.filter((x) => w.every((k) => `${x.id} ${x.name} ${x.variant || ''} ${x.group}`.toLowerCase().includes(k))).slice(0, 60)
+        .map((x) => ({ ref: x.id, title: x.name || x.id, sub: `${x.group}${x.flipbook ? ' · ' + x.flipbook : ''}`, thumb: x.thumb, body: { kind: 'texture', ref: x.id, name: [x.name, x.variant].filter(Boolean).join(' '), flipbook: x.flipbook || '', group: x.group || '' } }));
+    } else {
+      const r = await api(`/resources?${new URLSearchParams({ q, limit: 40 })}`);
+      rows = r.items.map((x) => ({ ref: x.id, title: x.title, sub: `${typeLabel(x.type)} · ${cat(x.category).label}`, thumb: x.thumbnail, body: { kind: 'resource', ref: x.id } }));
+    }
+    if (!$('#fdp-res')) return;
+    $('#fdp-res').innerHTML = rows.length ? rows.map((x, n) => `<button class="fdp-row ${added.has(x.ref) ? 'on' : ''}" data-n="${n}">
+        <span class="fd-img ${x.thumb ? '' : 'ph'}" ${x.thumb ? `style="background-image:url('${esc(x.thumb)}')"` : ''} data-thumb="${kind === 'texture' ? esc(x.ref) : ''}">${x.thumb ? '' : kind === 'texture' ? '✨' : '📄'}</span>
+        <span><b>${esc(x.title)}</b><small>${esc(x.sub)}</small></span><i>${added.has(x.ref) ? '✓' : '+'}</i></button>`).join('') : `<p class="sub">${t('tx.none')}</p>`;
+    $$('.fdp-row').forEach((b) => b.onclick = async () => {
+      const x = rows[Number(b.dataset.n)];
+      if (added.has(x.ref)) return;
+      try {
+        await api(`/folders/${fid}/items`, { method: 'POST', body: { ...x.body, thumbnail: x.body.kind === 'texture' ? (x.thumb || '') : undefined } });
+        added.add(x.ref);
+        b.classList.add('on');
+        b.querySelector('i').textContent = '✓';
+      } catch (e) { toast(e.message, true); }
+    });
+    if (kind === 'texture') {
+      const ids = rows.filter((x) => !x.thumb).map((x) => x.ref);
+      if (ids.length) {
+        const map = await api('/textures/thumbs', { method: 'POST', body: { ids } }).catch(() => ({}));
+        for (const x of rows) if (map[x.ref]) { x.thumb = map[x.ref]; const el = $(`.fdp-row [data-thumb="${x.ref}"]`); if (el) { el.style.backgroundImage = `url('${map[x.ref]}')`; el.classList.remove('ph'); el.textContent = ''; } }
+        for (const it of tex || []) if (map[it.id]) it.thumb = map[it.id];
+      }
+    }
+  };
+  $('#fdp-q').oninput = () => { clearTimeout(timer); timer = setTimeout(draw, 250); };
+  draw();
+  const watch = setInterval(() => { if ($('#modal').hidden) { clearInterval(watch); if (added.size) renderFolders(new URLSearchParams({ f: fid })); } }, 200);
+}
+
+function fdOpenItem(i) {
+  if (i.kind === 'texture') return copyText('rbxassetid://' + i.ref).then((ok) => ok && toast(t('tx.copied', { id: i.ref })));
+  if (i.kind === 'resource') return i.url && window.open(i.url, '_blank');
+  const src = '/media/' + i.file;
+  if (i.media === 'image') return openModal(`<h2 class="att-title">${esc(i.name)}</h2><div class="att-view"><figure><img src="${esc(src)}" alt=""></figure></div>`);
+  if (i.media === 'video') return openModal(`<h2 class="att-title">${esc(i.name)}</h2><div class="media"><video src="${esc(src)}" controls autoplay></video></div>`);
+  window.open(src, '_blank');
+}
+
+async function renderFolders(params) {
+  const list = await fdList();
+  FD_OPEN = list.some((f) => f.id === params.get('f')) ? params.get('f') : list.some((f) => f.id === FD_OPEN) ? FD_OPEN : (list[0] || {}).id || '';
+  const cur = list.find((f) => f.id === FD_OPEN);
+  const items = cur ? (await api(`/folders/${cur.id}/items`)).items : [];
+  const dir = cur ? `!reference: ${cur.path}` : '';
+  view.innerHTML = `
+    ${pageHead(t('lib.eyebrow'), t('nav.folders'), t('fd.sub'), `<button class="btn primary" id="fd-new">+ ${t('fd.new')}</button>`)}
+    ${list.length ? `<div class="fd-layout">
+      <aside class="panel fd-tree" data-spot>${fdTree(list)}</aside>
+      <section class="fd-main">
+        <div class="panel fd-head" data-spot>
+          <div class="fd-title"><h2>📁 ${esc(cur.name)}</h2>
+            <div class="fd-path"><code>${esc(dir)}</code><button class="btn small" data-copy="${esc(dir)}">${t('fd.copy')}</button></div>
+            <small class="sub">${t('fd.pathHelp')}</small></div>
+          <div class="row fd-tools">
+            <button class="btn small" id="fd-sub">+ ${t('fd.sub2')}</button>
+            <button class="btn small" id="fd-ren">${t('fd.rename')}</button>
+            <button class="btn small danger" id="fd-del">${t('delete')}</button></div>
+        </div>
+        <div class="row fd-actions">
+          <label class="btn primary">⬆ ${t('fd.import')}<input type="file" id="fd-file" multiple hidden></label>
+          <button class="btn" id="fd-lib">📚 ${t('fd.fromLib')}</button>
+          <button class="btn" id="fd-tex">✨ ${t('fd.fromTex')}</button>
+        </div>
+        <div class="fd-drop" id="fd-drop">
+          ${items.length ? `<div class="fd-grid">${items.map((i) => `<div class="fd-item" data-i="${i.id}">
+              <button class="fd-open" data-open="${i.id}">${fdThumb(i)}</button>
+              <b title="${esc(i.name)}">${esc(i.name || i.ref)}</b><small>${fdKind(i)}</small>
+              <button class="fd-x" data-x="${i.id}" title="${t('delete')}">×</button></div>`).join('')}</div>`
+            : `<div class="empty"><b>${t('fd.emptyTitle')}</b>${t('fd.emptyText')}</div>`}
+          <div class="fd-drop-hint">${t('fd.drop')}</div>
+        </div>
+      </section></div>`
+    : `<div class="empty"><b>${t('fd.noneTitle')}</b>${t('fd.noneText')}<div class="row"><button class="btn primary" id="fd-new2">+ ${t('fd.new')}</button></div></div>`}
+    <div class="panel fd-howto" data-spot><h3>💡 ${t('fd.howTitle')}</h3><p>${t('fd.howText')}</p>
+      <pre class="fd-ex">fais une épée de feu comme mes références
+!reference: library/Épées/Feu/
+!skill: vfx, modeling
+!software: Blender, Roblox Studio</pre></div>`;
+  bindCopy(view);
+  const create = async (parent) => {
+    const name = prompt(t(parent ? 'fd.subPh' : 'fd.newPh'));
+    if (!name) return;
+    try { const f = await api('/folders', { method: 'POST', body: { name, parent } }); FD_OPEN = f.id; renderFolders(new URLSearchParams({ f: f.id })); } catch (e) { toast(e.message, true); }
+  };
+  $('#fd-new').onclick = () => create(null);
+  if ($('#fd-new2')) $('#fd-new2').onclick = () => create(null);
+  $$('.fd-node').forEach((b) => b.onclick = () => { FD_OPEN = b.dataset.f; renderFolders(new URLSearchParams({ f: b.dataset.f })); });
+  if (!cur) return;
+  $('#fd-sub').onclick = () => create(cur.id);
+  $('#fd-ren').onclick = async () => {
+    const name = prompt(t('fd.rename'), cur.name);
+    if (!name || name === cur.name) return;
+    try { await api('/folders/' + cur.id, { method: 'PUT', body: { name } }); renderFolders(params); } catch (e) { toast(e.message, true); }
+  };
+  $('#fd-del').onclick = async () => {
+    if (!confirm(t('fd.confirmDel', { name: cur.name }))) return;
+    await api('/folders/' + cur.id, { method: 'DELETE' }).catch((e) => toast(e.message, true));
+    FD_OPEN = '';
+    renderFolders(new URLSearchParams());
+  };
+  $('#fd-file').onchange = async (e) => { const fl = [...e.target.files]; e.target.value = ''; if (await fdUpload(cur.id, fl)) renderFolders(params); };
+  $('#fd-lib').onclick = () => fdPicker(cur.id, 'resource');
+  $('#fd-tex').onclick = () => fdPicker(cur.id, 'texture');
+  const drop = $('#fd-drop');
+  drop.ondragover = (e) => { e.preventDefault(); drop.classList.add('over'); };
+  drop.ondragleave = () => drop.classList.remove('over');
+  drop.ondrop = async (e) => { e.preventDefault(); drop.classList.remove('over'); if (await fdUpload(cur.id, e.dataTransfer.files)) renderFolders(params); };
+  drop.onclick = async (e) => {
+    const x = e.target.closest('[data-x]');
+    if (x) {
+      await api('/folder-items/' + x.dataset.x, { method: 'DELETE' }).catch((er) => toast(er.message, true));
+      return renderFolders(params);
+    }
+    const o = e.target.closest('[data-open]');
+    if (o) fdOpenItem(items.find((i) => i.id === o.dataset.open));
+  };
+}
+
+// ---------- Directives des prompts : !reference / !skill / !software, insérées par des boutons ----------
+const SOFTWARES = ['Roblox Studio', 'Blender'];
+const dirBar = () => `<div class="dir-bar"><span class="sub">${t('dir.label')}</span>
+  <button type="button" class="chip" data-dir="reference">📁 ${t('dir.ref')}</button>
+  <button type="button" class="chip" data-dir="skill">🧠 ${t('dir.skill')}</button>
+  <button type="button" class="chip" data-dir="software">🛠 ${t('dir.soft')}</button></div>`;
+
+// Ajoute une valeur : nouvelle ligne pour une référence, à la suite de la ligne existante pour skill / software.
+function dirInsert(ta, kind, value) {
+  const lines = ta.value.split('\n');
+  const i = kind === 'reference' ? -1 : lines.findIndex((l) => l.trim().toLowerCase().startsWith(`!${kind}:`));
+  if (i >= 0) {
+    const vals = lines[i].slice(lines[i].indexOf(':') + 1).split(',').map((s) => s.trim()).filter(Boolean);
+    if (!vals.some((v) => v.toLowerCase() === value.toLowerCase())) vals.push(value);
+    lines[i] = `!${kind}: ${vals.join(', ')}`;
+    ta.value = lines.join('\n');
+  } else {
+    ta.value = `${ta.value.replace(/\s+$/, '')}${ta.value.trim() ? '\n' : ''}!${kind}: ${value}`;
+  }
+  ta.dispatchEvent(new Event('input'));
+  ta.focus();
+}
+
+function bindDirBar(root, ta) {
+  $$('[data-dir]', root).forEach((b) => b.onclick = async (e) => {
+    e.stopPropagation();
+    $$('.dir-menu').forEach((m) => m.remove());
+    const kind = b.dataset.dir;
+    let opts = [];
+    if (kind === 'reference') opts = (await fdList()).map((f) => ({ v: f.path, label: `📁 ${f.path}`, sub: f.count }));
+    if (kind === 'skill') opts = META.categories.filter((c) => c.id !== 'gameplay').map((c) => ({ v: c.id, label: c.label }));
+    if (kind === 'software') opts = SOFTWARES.map((s) => ({ v: s, label: s })).concat([{ v: '', label: t('dir.other') }]);
+    const menu = document.createElement('div');
+    menu.className = 'dir-menu';
+    menu.innerHTML = opts.length ? opts.map((o, n) => `<button type="button" data-n="${n}">${esc(o.label)}${o.sub !== undefined ? `<small>${o.sub}</small>` : ''}</button>`).join('')
+      : `<p>${t('fd.none')} <a href="#/folders">${t('nav.folders')} →</a></p>`;
+    b.parentElement.appendChild(menu);
+    menu.style.left = b.offsetLeft + 'px';
+    $$('button', menu).forEach((x) => x.onclick = (ev) => {
+      ev.stopPropagation();
+      const o = opts[Number(x.dataset.n)];
+      const v = o.v || (prompt(t('dir.otherPh')) || '').trim();
+      menu.remove();
+      if (v) dirInsert(ta, kind, v);
+    });
+    setTimeout(() => document.addEventListener('click', () => menu.remove(), { once: true }), 0);
+  });
+}
+
 // ---------- Fenêtre ----------
 function openModal(html) {
   $('#modal-body').innerHTML = html;
@@ -2740,7 +3002,7 @@ async function route() {
   const pages = {
     library: () => renderLibrary(params), favorites: () => renderLibrary(params, true), examples: renderExamples,
     youtube: () => renderYoutube(params), channels: () => renderChannels(params), explore: renderExplore,
-    chat: renderChat, connect: renderConnect, admin: renderAdmin, settings: renderSettings, update: renderUpdate, robloxstudio: renderRobloxStudio, blender: renderBlender, custom: renderCustom, dev: renderDev, textures: () => renderTextures(params), place: () => renderPlace(params), level: renderLevel, opensource: renderOpenSource, skills: renderSkills, prompts: renderPrompts, studio: renderStudio,
+    chat: renderChat, connect: renderConnect, admin: renderAdmin, settings: renderSettings, update: renderUpdate, robloxstudio: renderRobloxStudio, blender: renderBlender, custom: renderCustom, dev: renderDev, textures: () => renderTextures(params), place: () => renderPlace(params), level: renderLevel, opensource: renderOpenSource, skills: renderSkills, prompts: renderPrompts, studio: renderStudio, folders: () => renderFolders(params),
   };
   if (path === 'chat' && $('#chat')) return;
   try {

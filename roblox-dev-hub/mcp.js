@@ -12,6 +12,8 @@ const studio = require('./studio');
 const blender = require('./blender');
 const rbxupload = require('./rbxupload');
 const rbxassets = require('./rbxassets');
+const folders = require('./folders');
+const directives = require('./directives');
 const textures = require('./vfx-textures');
 const vm = require('vm');
 
@@ -79,6 +81,8 @@ Skills: for every Roblox task, first identify the domains it needs (scripting, v
 
 Roblox Studio: when tools starting with studio_ are available, Rovex is connected to the place open in Roblox Studio. Before writing code for the user's game, use them to read the real scripts, the Explorer structure and the data, and follow the existing architecture. Only change the place (edit scripts, run code that modifies it, insert models) when the user asked for it, and say what you changed. To put an image in the game (icon, UI, decal), make or pick it (generate_image), then call upload_image_to_roblox with a target path: Rovex uploads it to Roblox and sets it in Studio.
 Rovex assets: every place connected to Rovex gets ReplicatedStorage.RovexAssets (Environment = stylized trees, plants, rocks, clouds, water; VFX/Combat and VFX/Fire = 130+ ready VFX templates; UI/StudUI = a stud-style HUD and windows). Call rovex_assets (with keywords) to see what is there and reuse these assets (Clone them) before building from scratch.
+
+User directives: a message or prompt can contain "!reference: library/<folder>/" (the user's reference folder: call rovex_folder with that path first and follow those references), "!skill: <names>" (load exactly these skills with load_skill, no others) and "!software: <names>" (work only in these software, e.g. Roblox Studio = studio_* tools, Blender = blender_* tools). They are mandatory and override your own choices.
 
 Images: you cannot draw yourself, but Rovex can. When the user asks for an icon, an image, a UI element, a thumbnail, a texture or a VFX sprite, load the skill of the category, then call generate_image. Describe only the subject: Rovex applies the skill's style and the user's reference images, and saves the PNG in the library. Give the user the file path, and remind them to upload it to Roblox (Creator Hub or Asset Manager) to get its rbxassetid.`;
 
@@ -210,6 +214,12 @@ const TOOLS = [
     description: 'Rovex chat: show what you are doing right now (one short sentence) in the Rovex chat, during a long task.',
     inputSchema: { type: 'object', properties: { text: { type: 'string' } }, required: ['text'] },
     annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false },
+  },
+  {
+    name: 'rovex_folder',
+    description: 'Open one of the user\'s Rovex folders of references (library folders the user made: imported images, videos as key frames, VFX textures, saved tutorials and resources). Use it when a prompt contains "!reference: library/<path>/" (call it FIRST with that path) or when the user mentions their references. Returns the items (with file paths on this PC, VFX texture IDs, resource links) and shows the images. No path: lists every folder.',
+    inputSchema: { type: 'object', properties: { path: { type: 'string', description: 'Folder path, e.g. "library/Swords/Fire/" (case and accents ignored). Empty = list the folders.' } } },
+    annotations: { readOnlyHint: true, openWorldHint: false },
   },
   {
     name: 'rovex_assets',
@@ -372,8 +382,47 @@ function chatRefs(items) {
       return `${n + 1}. image "${f.name}": ${ids[0]}`;
     });
     return `${i.text || '(no text: look at the attached references)'}\n\n[Reference files attached by the user]\n${lines.join('\n')}`;
+  }).map((text) => {
+    // Directives (!reference, !skill, !software) : déjà vérifiées et traduites en consignes pour Claude.
+    const extra = directives.forClaude(directives.parse(text));
+    return extra ? `${text}\n\n${extra}` : text;
   });
   return { messages, images, more };
+}
+
+// Dossier de références pour Claude : la liste, et les images (aperçus des fichiers) jusqu'à ~700 Ko.
+function folderView(p) {
+  if (!String(p || '').trim()) {
+    const all = folders.list();
+    return { folders: all.map((f) => ({ path: f.path, items: f.count })), how: all.length ? 'Call rovex_folder with one of these paths.' : 'The user has no folder yet (Rovex > Library > My folders).' };
+  }
+  const d = folders.describe(p);
+  if (!d) throw new Error(`Folder "${p}" not found. Folders: ${folders.list().map((f) => f.path).join(', ') || 'none'}`);
+  const images = [];
+  let budget = 700 * 1024;
+  const take = (rel) => {
+    let buf = null;
+    try { buf = fs.readFileSync(path.join(db.MEDIA_DIR, rel)); } catch {}
+    const known = buf && ((buf[0] === 0xff && buf[1] === 0xd8) || (buf[0] === 0x89 && buf[1] === 0x50));
+    if (known && buf.length <= budget) { images.push(buf); budget -= buf.length; return true; }
+    return false;
+  };
+  const items = d.items.map((i) => {
+    const base = { folder: i.path, name: i.name, ...(i.note && { note: i.note }) };
+    if (i.kind === 'texture') return { ...base, kind: 'vfx_texture', id: `rbxassetid://${i.ref}`, ...(i.flipbook && { flipbook: i.flipbook }) };
+    if (i.kind === 'resource') return { ...base, kind: i.type || 'resource', category: i.category, url: i.url, description: i.description };
+    const shown = (i.previews || []).filter(take).length || (i.media === 'image' && take(i.file) ? 1 : 0);
+    return {
+      ...base, kind: i.media, file: path.join(db.MEDIA_DIR, i.file), size: i.size,
+      ...(i.media === 'video' && { duration: i.duration, keyFrames: (i.times || []).map((x) => x + ' s') }),
+      shownBelow: shown,
+    };
+  });
+  return {
+    path: d.path, subfolders: d.subfolders, count: items.length, items,
+    ...(images.length && { note: `The ${images.length} image(s) below are these references in order (video files appear as key frames): study them, they show what the user wants.` }),
+    images,
+  };
 }
 
 // Chat Claude de Rovex depuis Claude Desktop : on passe par le serveur local de l'app (clé de data/agent.json).
@@ -429,6 +478,8 @@ async function call(name, a = {}) {
     }
     case 'rovex_assets':
       return rbxassets.list(a.query, a.limit);
+    case 'rovex_folder':
+      return folderView(a.path);
     case 'upload_image_to_roblox':
       return rbxupload.upload(state, a);
     case 'chat_listen': {

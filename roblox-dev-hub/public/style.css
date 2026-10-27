@@ -892,3 +892,66 @@ body.chat-mode .view { gap: 0; }
 @media (max-width: 700px) { .chat-boost span { display: none; } }
 .ra-packs { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 12px; } .ra-packs code { font: 11.5px var(--mono); padding: 4px 8px; border-radius: 8px; background: var(--panel2); border: 1px solid var(--line2); }
 .ra-places { display: flex; flex-direction: column; gap: 6px; } .ra-place { font-size: 13px; } .ra-place small { color: var(--muted2); margin-left: 6px; } .ra-place.err small { color: var(--danger); }
+
+/* ---------- Mes dossiers ---------- */
+.fd-layout { display: grid; grid-template-columns: 260px 1fr; gap: 18px; align-items: start; }
+@media (max-width: 900px) { .fd-layout { grid-template-columns: 1fr; } }
+.fd-tree { padding: 10px; display: grid; gap: 2px; max-height: 70vh; overflow: auto; }
+.fd-node { display: flex; align-items: center; gap: 8px; padding: 8px 10px 8px calc(10px + var(--d, 0) * 16px); border: 0; border-radius: 10px; background: transparent; color: var(--soft); text-align: left; cursor: pointer; }
+.fd-node span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fd-node small { color: var(--muted); font: 600 11px var(--mono); }
+.fd-node:hover { background: var(--panel2); }
+.fd-node.on { background: var(--accent-bg); color: var(--text); box-shadow: inset 2px 0 0 var(--accent2); }
+.fd-main { display: grid; gap: 14px; min-width: 0; }
+.fd-head { display: flex; gap: 16px; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; }
+.fd-title h2 { margin: 0 0 8px; font-size: 20px; }
+.fd-path { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 6px; }
+.fd-path code { font: 600 13px var(--mono); color: var(--accent3); background: var(--panel2); border: 1px solid var(--line2); padding: 6px 10px; border-radius: 9px; }
+.fd-title small { font-size: 12.5px; }
+.fd-tools { gap: 8px; }
+.fd-actions { gap: 10px; }
+.fd-drop { position: relative; min-height: 180px; border: 2px dashed transparent; border-radius: 18px; transition: border-color .2s, background .2s; }
+.fd-drop.over { border-color: var(--accent); background: rgba(124, 58, 237, .06); }
+.fd-drop-hint { text-align: center; color: var(--muted); font-size: 12.5px; padding: 10px; }
+.fd-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.fd-item { position: relative; display: grid; gap: 3px; padding: 8px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); min-width: 0; transition: transform .3s var(--spring), border-color .2s; }
+.fd-item:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--accent) 50%, var(--line)); }
+.fd-item b { font-size: 12.5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fd-item small { font-size: 11.5px; color: var(--muted2); }
+.fd-open { padding: 0; border: 0; background: none; cursor: pointer; }
+.fd-img { display: grid; place-items: center; aspect-ratio: 4 / 3; border-radius: 10px; background: #0b0814 center / cover no-repeat; color: var(--muted); font-size: 24px; }
+.fd-img.ph svg { width: 28px; height: 28px; }
+.fd-x { position: absolute; top: 12px; right: 12px; width: 22px; height: 22px; border: 0; border-radius: 50%; background: rgba(9, 7, 15, .85); color: #fff; cursor: pointer; opacity: 0; transition: opacity .2s; }
+.fd-item:hover .fd-x { opacity: 1; }
+.fd-x:hover { background: var(--danger); }
+.fd-howto { margin-top: 18px; }
+.fd-ex { margin: 10px 0 0; padding: 12px 14px; border-radius: 12px; background: var(--panel2); border: 1px solid var(--line2); font: 12.5px/1.6 var(--mono); color: var(--accent3); white-space: pre-wrap; }
+.fd-pick { display: grid; gap: 6px; max-height: 50vh; overflow: auto; }
+.fd-pick-row { display: flex; justify-content: space-between; gap: 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 11px; background: var(--panel2); color: var(--text); cursor: pointer; text-align: left; }
+.fd-pick-row:hover { border-color: var(--accent); }
+.fd-pick-row code { font: 600 12.5px var(--mono); color: var(--accent3); }
+.fdp-grid { display: grid; gap: 6px; max-height: 58vh; overflow: auto; }
+.fdp-row { display: grid; grid-template-columns: 64px 1fr 26px; gap: 12px; align-items: center; padding: 6px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel2); color: var(--text); cursor: pointer; text-align: left; }
+.fdp-row .fd-img { aspect-ratio: 1; font-size: 18px; background-size: contain; }
+.fdp-row b { display: block; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fdp-row small { color: var(--muted); font-size: 11.5px; }
+.fdp-row i { font-style: normal; font-weight: 800; color: var(--accent2); text-align: center; }
+.fdp-row:hover { border-color: var(--accent); }
+.fdp-row.on { border-color: var(--ok); }
+.fdp-row.on i { color: var(--ok); }
+.tx-fd { position: absolute; top: 16px; left: 16px; width: 28px; height: 28px; display: grid; place-items: center; border-radius: 9px; background: rgba(7, 5, 12, .8); border: 1px solid var(--line2); font-size: 14px; opacity: 0; transition: opacity .2s; }
+.tx-card:hover .tx-fd { opacity: 1; }
+.tx-fd:hover { border-color: var(--accent2); }
+
+/* Directives des prompts */
+.dir-bar { position: relative; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 8px 0 2px; }
+.dir-bar .sub { font-size: 12px; margin-right: 2px; }
+.dir-bar .chip { padding: 4px 10px; font-size: 12px; }
+.chat-input .dir-bar { margin: 0 0 6px; }
+.dir-menu { position: absolute; top: calc(100% + 4px); z-index: 30; min-width: 220px; max-width: 360px; max-height: 280px; overflow: auto; padding: 6px; border: 1px solid var(--line2); border-radius: 12px; background: var(--panel2); box-shadow: 0 18px 40px rgba(0, 0, 0, .45); }
+.chat-input .dir-menu { top: auto; bottom: calc(100% + 4px); }
+.dir-menu button { display: flex; justify-content: space-between; gap: 10px; width: 100%; padding: 8px 10px; border: 0; border-radius: 8px; background: none; color: var(--text); text-align: left; cursor: pointer; font-size: 13px; }
+.dir-menu button:hover { background: var(--accent-bg); }
+.dir-menu small { color: var(--muted); font-family: var(--mono); }
+.dir-menu p { margin: 6px 8px; font-size: 13px; color: var(--muted2); }
+.dir-menu a { color: var(--accent2); }

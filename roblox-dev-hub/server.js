@@ -21,6 +21,7 @@ const cloud = require('./cloud');
 const gen = require('./gen');
 const agents = require('./agents');
 const blender = require('./blender');
+const folders = require('./folders');
 const APP_VERSION = require('./package.json').version;
 
 const PORT = Number(process.env.PORT) || 4747;
@@ -187,6 +188,17 @@ const routes = [
     persist();
     return r.resource;
   }],
+  // Dossiers de l'utilisateur (ressources, textures VFX et fichiers importés), pour les « !reference: » des prompts.
+  ['GET', /^\/api\/folders$/, () => ({ folders: folders.list() })],
+  ['POST', /^\/api\/folders$/, async (req) => folders.create(await json(req))],
+  ['PUT', /^\/api\/folders\/([\w-]+)$/, async (req, m) => folders.update(m[1], await json(req))],
+  ['DELETE', /^\/api\/folders\/([\w-]+)$/, (req, m) => folders.remove(m[1])],
+  ['GET', /^\/api\/folders\/([\w-]+)\/items$/, (req, m) => ({ items: folders.items(m[1]) })],
+  ['POST', /^\/api\/folders\/([\w-]+)\/items$/, async (req, m) => folders.addRef(m[1], await json(req), state)],
+  ['POST', /^\/api\/folders\/([\w-]+)\/upload$/, async (req, m, url) => folders.addFile(m[1], url.searchParams.get('name'), await readBody(req, 500 * 1024 * 1024))],
+  ['PUT', /^\/api\/folder-items\/([\w-]+)\/previews$/, async (req, m) => folders.setPreviews(m[1], await json(req))],
+  ['PUT', /^\/api\/folder-items\/([\w-]+)$/, async (req, m) => folders.updateItem(m[1], await json(req))],
+  ['DELETE', /^\/api\/folder-items\/([\w-]+)$/, (req, m) => folders.removeItem(m[1])],
   ['GET', /^\/api\/channels$/, (req, m, url) => {
     const p = url.searchParams;
     const q = (p.get('q') || '').toLowerCase();
@@ -575,7 +587,7 @@ routes.push(
   ['POST', /^\/api\/agents\/clear$/, (req) => { agentLocal(req); return agents.clear(); }],
 );
 
-const MEMBER_ACTIONS = [/^\/api\/agents(\/[\w-]+)?$/, /^\/api\/blender(\/addon)?$/, /^\/api\/custom(\/background)?$/, /^\/api\/textures\/thumbs$/, /^\/api\/place\/(read|write|value)$/, /^\/api\/robloxstudio(\/restart|\/assets)?$/, /^\/api\/claude\/(desktop|code|send)$/, /^\/api\/mcp\/test$/, /^\/api\/update\/(check|install)$/, /^\/api\/gen(\/.*)?$/];
+const MEMBER_ACTIONS = [/^\/api\/folders(\/[\w-]+(\/(items|upload))?)?$/, /^\/api\/folder-items\/[\w-]+(\/previews)?$/, /^\/api\/agents(\/[\w-]+)?$/, /^\/api\/blender(\/addon)?$/, /^\/api\/custom(\/background)?$/, /^\/api\/textures\/thumbs$/, /^\/api\/place\/(read|write|value)$/, /^\/api\/robloxstudio(\/restart|\/assets)?$/, /^\/api\/claude\/(desktop|code|send)$/, /^\/api\/mcp\/test$/, /^\/api\/update\/(check|install)$/, /^\/api\/gen(\/.*)?$/];
 const USER_ROUTES = [/^\/api\/custom$/, /^\/api\/textures$/, /^\/api\/place\/(studios|scripts|values)$/, /^\/api\/robloxstudio(\/assets)?$/, /^\/api\/claude$/, /^\/api\/version$/, /^\/api\/prompts$/, /^\/api\/skills$/, /^\/api\/skills\/\w+$/, /^\/api\/level$/, /^\/api\/meta$/, /^\/api\/stats$/, /^\/api\/resources$/, /^\/api\/channels$/, /^\/api\/youtube$/, /^\/api\/crawl$/, /^\/api\/examples$/, /^\/api\/mcp$/];
 
 const cookies = (req) => Object.fromEntries(String(req.headers.cookie || '').split(';').map((c) => c.trim().split('=')).filter((p) => p[0]).map(([k, ...v]) => [k, decodeURIComponent(v.join('='))]));
