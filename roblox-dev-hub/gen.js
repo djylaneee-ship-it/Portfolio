@@ -7,6 +7,7 @@ const path = require('path');
 const db = require('./db');
 const skills = require('./skills');
 const cloud = require('./cloud');
+const blender = require('./blender');
 
 const SIZES = ['1024x1024', '1536x1024', '1024x1536'];
 
@@ -219,18 +220,20 @@ Claude is connected to Rovex Hub, an MCP server holding the user's Roblox develo
 - list_examples(category) / get_example(id): validated learning examples (request + correct Luau code + why it is correct).
 - search_opensource(query, category): GitHub repos, free models and plugins, sorted by stars.
 - generate_image(prompt, kind, category): generates icons, UI images, thumbnails, textures and VFX sprites in the user's art style and saves them in the library.
+- Blender tools (when the user connected Blender): blender_execute_python (builds meshes with bpy / bmesh and exports FBX), blender_viewport_screenshot (to check the model), blender_scene_info, and r6_* tools for R6 animations.
 
 Write the improved prompt so that Claude:
 1. Starts with Rovex Hub: calls load_skill once with EVERY category the task touches and only those (name them explicitly with good keywords, e.g. load_skill(["scripting", "gui"], "pet shop datastore")), then search_resources with precise keywords, reads the matching validated examples (mention their titles when they fit), and checks search_opensource before writing a big system from scratch.
 2. Knows exactly what to build: restate the goal clearly, infer the missing details sensibly (game genre, PC + mobile, R15, client/server split, data to save…) and list them as assumptions, then describe the features, behaviors, UI and edge cases.
 3. Follows the Roblox best practices of those categories (use the category rules given below: server authority and RemoteEvent validation, ModuleScripts, DataStore safety, Scale-based responsive UI, TweenService, task library, cleanup of connections, performance, mobile…). Project art direction: VFX are made of custom-textured ParticleEmitters, never the Fire, Smoke or Sparkles classes, and every texture MUST come from the Rovex VFX textures (find_vfx_textures), no other texture ID. No invented asset IDs: missing assets are listed as placeholders to provide.
 4. Calls generate_image for every icon, image or texture the feature needs, describing each one.
-5. Delivers: every script with its exact type (Script / LocalScript / ModuleScript) and location in the Explorer, the Instances to create with key properties, setup steps in Roblox Studio, how to test it, and a short explanation of the architecture.
-6. Cites the Rovex resources and examples it relied on.
+5. For ANY 3D modeling request (a model, mesh, weapon, pet, prop, character, building piece, low poly asset…), the prompt MUST contain this rule, stated firmly: "If the Blender tools are available (blender_execute_python), you MUST model it in Blender with them: build the mesh with bpy / bmesh, check it with blender_viewport_screenshot, iterate, then export it as FBX for Roblox. Only if Blender is not connected, build it in Roblox Studio instead and say so."
+6. Delivers: every script with its exact type (Script / LocalScript / ModuleScript) and location in the Explorer, the Instances to create with key properties, setup steps in Roblox Studio, how to test it, and a short explanation of the architecture.
+7. Cites the Rovex resources and examples it relied on.
 
 Rules for your answer:
 - Output ONLY the final prompt, ready to paste. No preamble, no comments, no code blocks of Luau.
-- Write it in the same language as the user's request. Start with "Using Rovex Hub," translated into that language (French: "En utilisant Rovex Hub,").
+- ALWAYS write the prompt in English, whatever the language of the request (translate it). Start with "Using Rovex Hub,". If the request is not in English, end the prompt with one line asking Claude to answer in the user's language, e.g. "Reply to me in French."
 - Use short sections with titles and bullet points. Be specific to this request: no generic filler.
 - If a focus category is given, center the prompt on it (other categories only if really needed).`;
 
@@ -245,7 +248,8 @@ function boosterContext(state, focus) {
   // Les skills complets sont longs : le résumé de chacun, et les consignes entières de la catégorie visée.
   const rules = skills.SKILL_CATS.map((c) => `- ${c}: ${skills.getSkill(state, c).description}`).join('\n');
   const full = focus && skills.SKILL_CATS.includes(focus) ? `\n\nFull rules of the focus category (${focus}):\n${skills.getSkill(state, focus).instructions.slice(0, 9000)}` : '';
-  return `What this user's Rovex Hub contains:\n${lines.join('\n')}\n\nRovex skills (Claude loads them with load_skill):\n${rules}${full}`;
+  const bl = blender.enabled() ? 'Blender: CONNECTED (the Blender tools are available to Claude).' : 'Blender: not connected right now (keep the conditional Blender rule anyway).';
+  return `What this user's Rovex Hub contains:\n${lines.join('\n')}\n${bl}\n\nRovex skills (Claude loads them with load_skill):\n${rules}${full}`;
 }
 
 async function enhancePrompt(state, a = {}) {

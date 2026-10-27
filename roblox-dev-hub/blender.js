@@ -137,6 +137,6 @@ async function status() {
   return { ...s, connected: Boolean(ping), blender: ping && ping.blender, file: ping && ping.file, addon: ping && ping.addon_version, error, tools: SPEC.tools.length, exportDir: EXPORT_DIR, addonZip: ADDON_ZIP };
 }
 
-const INSTRUCTIONS = `\n\nBlender (connected through Rovex): build 3D models with blender_execute_python (bpy / bmesh, low poly Roblox style), check them with blender_viewport_screenshot, and export FBX for Roblox. For Roblox R6 animations: ${SPEC.instructions || ''}`;
+const INSTRUCTIONS = `\n\nBlender is connected through Rovex: for ANY 3D modeling task (model, mesh, weapon, pet, prop…) you MUST model it in Blender with blender_execute_python (bpy / bmesh, low poly Roblox style), check it with blender_viewport_screenshot, iterate, and export FBX for Roblox; do not build it from Roblox parts instead. For Roblox R6 animations: ${SPEC.instructions || ''}`;
 
 module.exports = { readSettings, writeSettings, enabled, owns, tools, call, status, ADDON_ZIP, EXPORT_DIR, INSTRUCTIONS, SETTINGS_FILE };
