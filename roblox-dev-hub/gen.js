@@ -1,5 +1,5 @@
 // Génération d'images par IA. Claude ne sait pas dessiner : Rovex le fait pour lui, via la fonction Supabase
-// « rovex-gen » qui garde la clé OpenAI de l'admin en secret et applique une limite par ID et par jour.
+// « rovex-gen » (générateur gratuit : Cloudflare FLUX ou Pollinations) qui applique une limite par ID et par jour.
 // Le prompt envoyé reprend le style du skill de la catégorie et les images de référence de la bibliothèque ;
 // le résultat est rangé dans la bibliothèque (tag « ai »).
 const fs = require('fs');
@@ -12,7 +12,7 @@ const SIZES = ['1024x1024', '1536x1024', '1024x1536'];
 
 // Ce que l'on veut obtenir, et la catégorie dont on prend le style par défaut.
 const IMAGE_KINDS = {
-  icon: { cat: 'gui', format: 'A single game icon, centered, filling about 80% of the frame, readable at 64 px, no text, no frame, no background scene.', transparent: true },
+  icon: { cat: 'gui', format: 'A single Roblox simulator game icon, centered, filling about 80% of the frame, readable at 64 px: chunky bold shapes, a very thick dark navy outline around the whole silhouette, vibrant saturated gradient fills, cel-shaded highlights and shadows, slight 3D bevel, glossy. No text, no frame, no background scene.', transparent: true },
   ui: { cat: 'gui', format: 'A game UI element (button, panel or frame), flat front view, clean edges, no text unless asked, usable as a Roblox ImageLabel.', transparent: true },
   thumbnail: { cat: 'gfx', format: 'A Roblox game thumbnail / GFX, dynamic composition, strong lighting, high contrast, 16:9 friendly framing.', transparent: false },
   texture: { cat: 'building', format: 'A seamless tileable texture, flat lighting, viewed straight on, no perspective, no shadows baked in.', transparent: false },
@@ -102,15 +102,68 @@ function imagePrompt(state, { prompt, kind, category, transparent, refs }) {
   const k = IMAGE_KINDS[kind] || IMAGE_KINDS.icon;
   const art = skills.getSkill(state, category).art;
   const parts = [String(prompt).trim(), '', `Style (Rovex ${category} skill): ${art}`, `Format: ${k.format}`];
-  if (transparent) parts.push('Background: fully transparent (PNG with alpha).');
+  // Fond uni blanc : les générateurs gratuits ne font pas la transparence, Rovex détoure ensuite.
+  if (transparent) parts.push('Background: the subject isolated on a plain flat pure white background, nothing else around it, no shadow on the ground.');
   if (refs.length) parts.push(`Match the art style of the ${refs.length} reference image(s) provided (${refs.map((r) => r.title + (r.notes ? ` — ${r.notes}` : '')).join('; ')}), but draw a new subject.`);
   return parts.join('\n');
 }
 
+// Les générateurs gratuits ne savent pas faire de fond transparent : on demande un fond blanc uni, puis on
+// l'efface (remplissage depuis les bords, bord adouci). Seulement dans l'app de bureau (nativeImage d'Electron).
+function cutout(buf) {
+  let ni;
+  try { ni = require('electron').nativeImage; } catch {}
+  if (!ni || typeof ni.createFromBuffer !== 'function') return null;
+  const img = ni.createFromBuffer(buf);
+  const { width: w, height: h } = img.getSize();
+  if (!w || !h) return null;
+  const px = Buffer.from(img.toBitmap()); // BGRA
+  const at = (i) => [px[i * 4], px[i * 4 + 1], px[i * 4 + 2]];
+  // Couleur du fond : moyenne des quatre coins.
+  const corners = [0, w - 1, (h - 1) * w, h * w - 1].map(at);
+  const bg = [0, 1, 2].map((c) => corners.reduce((a, x) => a + x[c], 0) / 4);
+  const dist = (i) => Math.max(Math.abs(px[i * 4] - bg[0]), Math.abs(px[i * 4 + 1] - bg[1]), Math.abs(px[i * 4 + 2] - bg[2]));
+  const NEAR = 48;
+  const FAR = 200;
+  const gone = new Uint8Array(w * h);
+  const stack = [];
+  for (let x = 0; x < w; x++) stack.push(x, (h - 1) * w + x);
+  for (let y = 0; y < h; y++) stack.push(y * w, y * w + w - 1);
+  while (stack.length) {
+    const i = stack.pop();
+    if (gone[i] || dist(i) > NEAR) continue;
+    gone[i] = 1;
+    const x = i % w;
+    if (x > 0) stack.push(i - 1);
+    if (x < w - 1) stack.push(i + 1);
+    if (i >= w) stack.push(i - w);
+    if (i < w * (h - 1)) stack.push(i + w);
+  }
+  // Bord de l'objet (3 pixels) : un peu transparent s'il ressemble encore au fond, et sans le liseré blanc.
+  const ring = new Uint8Array(w * h);
+  const near = (i, m, v) => { const x = i % w; return (x > 0 && m[i - 1] === v) || (x < w - 1 && m[i + 1] === v) || (i >= w && m[i - w] === v) || (i < w * (h - 1) && m[i + w] === v); };
+  for (let i = 0; i < w * h; i++) if (!gone[i] && near(i, gone, 1)) ring[i] = 1;
+  for (let pass = 2; pass <= 3; pass++) for (let i = 0; i < w * h; i++) if (!gone[i] && !ring[i] && near(i, ring, pass - 1)) ring[i] = pass;
+  let removed = 0;
+  for (let i = 0; i < w * h; i++) {
+    if (gone[i]) { px[i * 4 + 3] = 0; removed++; continue; }
+    if (!ring[i]) continue;
+    const a = Math.min(1, Math.max(0.2, (dist(i) - NEAR) / (FAR - NEAR)));
+    if (a >= 1) continue;
+    for (let c = 0; c < 3; c++) px[i * 4 + c] = Math.max(0, Math.min(255, Math.round((px[i * 4 + c] - (1 - a) * bg[c]) / a)));
+    px[i * 4 + 3] = Math.round(255 * a);
+  }
+  // Fond pas uni (rien ou presque tout effacé) : on garde l'image telle quelle.
+  if (removed < w * h * 0.05 || removed > w * h * 0.97) return null;
+  return ni.createFromBitmap(px, { width: w, height: h }).toPNG();
+}
+
+const isJpeg = (buf) => buf[0] === 0xff && buf[1] === 0xd8;
+
 function save(state, buf, meta) {
   fs.mkdirSync(db.MEDIA_DIR, { recursive: true });
   const slug = String(meta.title).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) || 'asset';
-  const file = `ai-${Date.now()}-${Math.random().toString(36).slice(2, 6)}-${slug}.png`;
+  const file = `ai-${Date.now()}-${Math.random().toString(36).slice(2, 6)}-${slug}.${isJpeg(buf) ? 'jpg' : 'png'}`;
   fs.writeFileSync(path.join(db.MEDIA_DIR, file), buf);
   const { resource } = db.upsert(state, {
     title: meta.title, type: 'image', category: meta.category,
@@ -138,13 +191,15 @@ async function generateImage(state, a = {}) {
   if (!((await refreshShared()) && shared.info.image) && !((await refreshShared(true)) && shared.info.image)) {
     throw err('genShared', 'Image generation is not set up yet');
   }
-  const refs = a.use_references === false ? [] : references(state, { category, ids: Array.isArray(a.reference_ids) ? a.reference_ids : [] });
+  // Images de référence : seulement si le générateur sait les lire (OpenAI) ; sinon leur description suffit.
+  const refs = a.use_references === false || !shared.info.refs ? [] : references(state, { category, ids: Array.isArray(a.reference_ids) ? a.reference_ids : [] });
   const finalPrompt = imagePrompt(state, { prompt, kind, category, transparent, refs });
   const j = await callShared({
     type: 'image', code: credOf(state), prompt: finalPrompt, n, size, transparent,
     refs: refs.map((r) => ({ b64: r.data.toString('base64'), mime: r.mime, name: r.title.replace(/[^\w.-]+/g, '_') + '.' + r.ext })),
   });
-  const images = (j.images || []).map((b) => Buffer.from(b, 'base64'));
+  let images = (j.images || []).map((b) => Buffer.from(b, 'base64'));
+  if (transparent && !j.transparent) images = images.map((b) => cutout(b) || b);
   if (!images.length) throw err('genEmpty', 'No image returned');
   const title = a.title ? String(a.title).slice(0, 80) : titleOf(prompt);
   const items = images.map((buf, i) => save(state, buf, { title: images.length > 1 ? `${title} (${i + 1})` : title, category, kind, prompt }));
@@ -215,4 +270,4 @@ function items(state, limit = 60) {
   return state.resources.filter((r) => r.source === 'ai' && r.type === 'image').slice(0, limit);
 }
 
-module.exports = { status, refreshShared, quota, generateImage, enhancePrompt, items, IMAGE_KINDS, SIZES };
+module.exports = { status, refreshShared, quota, generateImage, enhancePrompt, items, cutout, IMAGE_KINDS, SIZES };

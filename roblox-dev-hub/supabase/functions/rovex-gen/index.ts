@@ -1,8 +1,10 @@
 // Rovex Hub : génération d'images (OpenAI), de texte (Groq, ou Gemini en secours, pour améliorer les prompts) et de sons
 // (ElevenLabs) pour tous les membres, avec les clés de l'admin gardées en secrets Supabase. L'app envoie
 // l'ID d'accès du membre ; on vérifie l'ID et sa limite du jour avant d'appeler le service, puis on décompte.
-// Secrets : OPENAI_API_KEY (images), GROQ_API_KEY (prompts améliorés ; GEMINI_API_KEY en secours),
-// ELEVENLABS_API_KEY (sons, facultatif). GROQ_MODEL facultatif pour choisir le modèle Groq.
+// Secrets : GROQ_API_KEY (prompts améliorés ; GEMINI_API_KEY en secours), ELEVENLABS_API_KEY (sons, facultatif).
+// Images GRATUITES : Cloudflare Workers AI (FLUX) si CF_ACCOUNT_ID + CF_API_TOKEN, sinon Pollinations (sans clé ;
+// POLLINATIONS_KEY facultatif, gratuit, enlève la limite). OpenAI (payant) seulement avec IMAGE_PROVIDER=openai.
+// GROQ_MODEL facultatif pour choisir le modèle Groq.
 import { decodeBase64, encodeBase64 } from 'jsr:@std/encoding@1/base64';
 
 const OPENAI = Deno.env.get('OPENAI_API_KEY') ?? '';
@@ -15,6 +17,14 @@ const TEXT_MODEL = GROQ ? GROQ_MODEL : GEMINI_MODEL;
 const DB = Deno.env.get('SUPABASE_URL') ?? '';
 const DB_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? Deno.env.get('SUPABASE_ANON_KEY') ?? '';
 const IMAGE_MODEL = Deno.env.get('OPENAI_IMAGE_MODEL') ?? 'gpt-image-1';
+const CF_ACCOUNT = Deno.env.get('CF_ACCOUNT_ID') ?? '';
+const CF_TOKEN = Deno.env.get('CF_API_TOKEN') ?? '';
+const CF_MODEL = Deno.env.get('CF_IMAGE_MODEL') ?? '@cf/black-forest-labs/flux-1-schnell';
+const POLL_KEY = Deno.env.get('POLLINATIONS_KEY') ?? '';
+const POLL_MODEL = Deno.env.get('POLLINATIONS_MODEL') ?? '';
+// Qui fait les images : OpenAI seulement si on le demande (payant), sinon Cloudflare (gratuit, avec compte), sinon Pollinations.
+const PROVIDER = Deno.env.get('IMAGE_PROVIDER') === 'openai' && OPENAI ? 'openai' : CF_ACCOUNT && CF_TOKEN ? 'cloudflare' : 'pollinations';
+const PROVIDER_MODEL = PROVIDER === 'openai' ? IMAGE_MODEL : PROVIDER === 'cloudflare' ? CF_MODEL.split('/').pop() : `pollinations${POLL_MODEL ? '/' + POLL_MODEL : ''}`;
 
 const cors = {
   'Access-Control-Allow-Origin': '*',
@@ -40,7 +50,49 @@ async function providerError(res: Response, name: string) {
 
 type Ref = { b64: string; mime: string; name: string };
 
+// Images gratuites : une image par appel, fond uni (l'app détoure les icônes elle-même).
+async function cloudflareImage(prompt: string, seed: number) {
+  const res = await fetch(`https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT}/ai/run/${CF_MODEL}`, {
+    method: 'POST', headers: { Authorization: `Bearer ${CF_TOKEN}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prompt: prompt.slice(0, 2000), steps: 8, seed }),
+  });
+  if (!res.ok) return { error: await providerError(res, 'Cloudflare') };
+  const j = await res.json();
+  const img = j?.result?.image;
+  return img ? { image: String(img) } : { error: json({ error: 'Cloudflare returned no image', key: 'genEmpty' }, 502) };
+}
+
+async function pollinationsImage(prompt: string, seed: number, size: string) {
+  const [w, h] = size.split('x').map(Number);
+  const q = new URLSearchParams({ width: String(w), height: String(h), seed: String(seed), nologo: 'true', private: 'true', enhance: 'false', ...(POLL_MODEL ? { model: POLL_MODEL } : {}) });
+  const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt.slice(0, 1500))}?${q}`;
+  let res: Response | null = null;
+  // Sans clé : service gratuit souvent saturé (« Classic API at its limit »). On attend et on réessaie.
+  for (let attempt = 0; attempt < 4; attempt++) {
+    res = await fetch(url, { headers: POLL_KEY ? { Authorization: `Bearer ${POLL_KEY}` } : {} });
+    if (res.ok && (res.headers.get('content-type') ?? '').startsWith('image/')) return { image: encodeBase64(new Uint8Array(await res.arrayBuffer())) };
+    if (![429, 500, 502, 503].includes(res.status)) break;
+    await res.body?.cancel();
+    await sleep(8000 * (attempt + 1));
+  }
+  return { error: await providerError(res!, 'Pollinations') };
+}
+
+async function freeImages(b: Record<string, unknown>) {
+  const n = Math.max(1, Math.min(4, Number(b.n) || 1));
+  const size = ['1024x1024', '1536x1024', '1024x1536'].includes(String(b.size)) ? String(b.size) : '1024x1024';
+  const images: string[] = [];
+  for (let i = 0; i < n; i++) {
+    const seed = Math.floor(Math.random() * 1e9);
+    const out = PROVIDER === 'cloudflare' ? await cloudflareImage(String(b.prompt), seed) : await pollinationsImage(String(b.prompt), seed, size);
+    if ('error' in out) { if (images.length) break; return out; }
+    images.push(out.image);
+  }
+  return { images, model: PROVIDER_MODEL, transparent: false };
+}
+
 async function image(b: Record<string, unknown>) {
+  if (PROVIDER !== 'openai') return freeImages(b);
   const n = Math.max(1, Math.min(4, Number(b.n) || 1));
   const size = ['1024x1024', '1536x1024', '1024x1536'].includes(String(b.size)) ? String(b.size) : '1024x1024';
   const refs = (Array.isArray(b.refs) ? b.refs : []).slice(0, 3) as Ref[];
@@ -63,7 +115,7 @@ async function image(b: Record<string, unknown>) {
   }
   if (!res.ok) return { error: await providerError(res, 'OpenAI') };
   const j = await res.json();
-  return { images: (j.data ?? []).map((d: { b64_json?: string }) => d.b64_json).filter(Boolean), model: IMAGE_MODEL };
+  return { images: (j.data ?? []).map((d: { b64_json?: string }) => d.b64_json).filter(Boolean), model: IMAGE_MODEL, transparent: Boolean(b.transparent) };
 }
 
 // Texte : l'app envoie les consignes (system) et la demande. Groq d'abord (gratuit et rapide), Gemini si
@@ -158,12 +210,11 @@ async function sound(b: Record<string, unknown>) {
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
   // L'app demande ce qui est disponible.
-  if (req.method === 'GET') return json({ image: Boolean(OPENAI), sound: Boolean(ELEVEN), text: Boolean(GROQ || GEMINI), model: IMAGE_MODEL, textModel: TEXT_MODEL });
+  if (req.method === 'GET') return json({ image: true, imageProvider: PROVIDER, refs: PROVIDER === 'openai', sound: Boolean(ELEVEN), text: Boolean(GROQ || GEMINI), model: PROVIDER_MODEL, textModel: TEXT_MODEL });
   if (req.method !== 'POST') return json({ error: 'Method not allowed' }, 405);
   try {
     const b = await req.json();
     const what = b.type === 'sound' ? 'sound' : b.type === 'text' ? 'text' : 'image';
-    if (what === 'image' && !OPENAI) return json({ error: 'Shared image generation is not set up', key: 'genShared' }, 503);
     if (what === 'sound' && !ELEVEN) return json({ error: 'Shared sound generation is not set up', key: 'genShared' }, 503);
     if (what === 'text' && !GROQ && !GEMINI) return json({ error: 'Prompt improvement is not set up', key: 'genShared' }, 503);
     if (!String(b.prompt || '').trim()) return json({ error: 'Describe what to generate', key: 'genPrompt' }, 400);

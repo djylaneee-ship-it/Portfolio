@@ -550,7 +550,7 @@ async function handle(msg) {
         if (out && out.images) delete out.images;
         logCall(params.name, params.arguments || {}, out);
         seen();
-        const previews = images.filter((b) => b.length < 900 * 1024).map((b) => ({ type: 'image', data: b.toString('base64'), mimeType: 'image/png' }));
+        const previews = images.filter((b) => b.length < 900 * 1024).map((b) => ({ type: 'image', data: b.toString('base64'), mimeType: b[0] === 0xff && b[1] === 0xd8 ? 'image/jpeg' : 'image/png' }));
         return ok({ content: [{ type: 'text', text: JSON.stringify(out, null, 2) }, ...previews] });
       } catch (e) {
         return ok({ content: [{ type: 'text', text: 'Error: ' + e.message }], isError: true });

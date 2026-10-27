@@ -45,16 +45,17 @@ L'app demande un **ID d'accès** pour entrer. Les IDs sont gardés **en ligne** 
 - **Contenu partagé** : les exemples d'apprentissage, les skills et les prompts créés par les admins sont publiés en ligne et arrivent chez tous les membres (toutes les 15 minutes et à chaque connexion). La bibliothèque, elle, vient de l'algo cloud GitHub.
 - **Sans internet** : la clé admin de ce PC marche encore (mode hors ligne), mais la gestion des IDs demande internet.
 
-## Génération d'images (ta clé OpenAI pour tous les membres)
+## Génération d'images (gratuite, pour tous les membres)
 
-Tous les membres génèrent des images avec **ta** clé OpenAI. Elle reste cachée sur ton Supabase (jamais dans l'app) ; chaque ID a une limite par jour (20 images par défaut, réglable dans **Studio IA**), les admins n'ont pas de limite.
+Les images (icônes, UI, miniatures, textures, sprites VFX) sont faites **gratuitement** par **Cloudflare Workers AI** (modèle FLUX, environ 100 images par jour offertes par Cloudflare). Les clés restent cachées sur ton Supabase (jamais dans l'app) ; chaque ID a une limite par jour (20 images par défaut, réglable dans **Studio IA**), les admins n'ont pas de limite. Les icônes sont demandées sur fond blanc puis **détourées par l'app** (PNG transparent, sans liseré). Sans compte Cloudflare, la fonction essaie Pollinations (gratuit sans clé, mais souvent saturé).
 
 Installation, une fois, dans ton projet Supabase :
 
 1. **SQL Editor** → colle `supabase/rovex-gen.sql` → **Run**.
-2. **Edge Functions** → **Deploy a new function** → **Via Editor** → nom `rovex-gen` → colle `supabase/functions/rovex-gen/index.ts` → **Deploy**.
+2. **Edge Functions** → **Deploy a new function** → **Via Editor** → nom `rovex-gen` → colle `supabase/functions/rovex-gen/index.ts` → **Deploy** (pour une mise à jour : ouvre `rovex-gen` → **Code**, remplace tout, **Deploy**).
 3. Dans la fonction `rovex-gen` → **Details** : désactive **Verify JWT** (l'app envoie l'ID d'accès, la fonction le vérifie elle-même) → **Save**.
-4. **Edge Functions** → **Secrets** : ajoute `OPENAI_API_KEY`. Facultatif : `OPENAI_IMAGE_MODEL` pour changer de modèle.
+4. Compte **Cloudflare** gratuit (dash.cloudflare.com, sans carte) : copie ton **Account ID** (page **Workers AI** ou colonne de droite de l'accueil), puis **My Profile → API Tokens → Create Token → modèle « Workers AI »** → copie le jeton.
+5. **Edge Functions** → **Secrets** : ajoute `CF_ACCOUNT_ID` et `CF_API_TOKEN`. Facultatif : `CF_IMAGE_MODEL` (par défaut `@cf/black-forest-labs/flux-1-schnell`). Pour revenir à OpenAI (payant) : `OPENAI_API_KEY` + `IMAGE_PROVIDER=openai`.
 
 **Prompt Booster (Groq, gratuit)** : lance aussi `supabase/rovex-ai-text.sql` dans **SQL Editor**, recolle la nouvelle version de `supabase/functions/rovex-gen/index.ts` dans la fonction `rovex-gen` (**Deploy**), puis ajoute le secret `GROQ_API_KEY` (clé gratuite sur console.groq.com/keys ; facultatif : `GROQ_MODEL`, par défaut `openai/gpt-oss-120b`, avec repli automatique sur d'autres modèles Groq). Sans clé Groq, la fonction utilise `GEMINI_API_KEY` si elle existe. Limite par défaut : 50 prompts par jour et par ID, réglable sur la page Prompts.
 
@@ -76,7 +77,6 @@ Installation, une fois, dans ton projet Supabase :
 
 **Connexion Claude** : ouverte aux membres pour brancher Claude Desktop / Claude Code sur leur PC ; les outils MCP et les consignes restent réservés aux admins.
 
-Conseil : fixe un plafond de dépense mensuel dans OpenAI (Settings → Limits), puisque toutes les générations des membres sont facturées sur ton compte.
 
 ## Langues
 

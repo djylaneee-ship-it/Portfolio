@@ -38,7 +38,7 @@ Travail à plusieurs : une branche par dev (`dev/<pseudo>-<sujet>`), une PR, rel
 | `db.js` | Bibliothèque locale (`data/library.json`), catégories, recherche. |
 | `auth.js` / `cloud.js` | IDs d'accès en ligne (Supabase, RPC `rovex_*`), un appareil par ID, contenu partagé par les admins. |
 | `skills.js` / `skill-texts.js` | Skills Claude (socle `rovex-core` + un par catégorie). |
-| `gen.js` | Studio IA (images) et Prompt Booster (texte), par la fonction Supabase `rovex-gen`. |
+| `gen.js` | Studio IA (images gratuites : Cloudflare FLUX, sinon Pollinations ; détourage des icônes avec `nativeImage`) et Prompt Booster (texte), par la fonction Supabase `rovex-gen`. |
 | `crawler.js` / `cloud-crawl.js` | Exploration (YouTube, DevForum, Bluesky, Reddit, Sketchfab, dev.to, Creator Store, GitHub) ; `cloud-crawl.js` tourne en continu sur GitHub Actions et remplit la bibliothèque en ligne. |
 | `studio.js` / `place.js` / `rbxupload.js` | Pont vers le serveur MCP de Roblox Studio, scripts et réglages de la place ouverte, envoi d'images sur Roblox. |
 | `vfx-textures.js` | Bibliothèque de textures VFX (IDs Roblox, grilles de flipbook). |
