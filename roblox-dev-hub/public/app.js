@@ -1453,12 +1453,12 @@ let TEX = null;
 async function renderTextures(params) {
   TEX = await api('/textures');
   const { items, groups } = TEX;
-  const KIND = { particle: '✨', flipbook: '🎞️', decal: '🖼️', texture: '🧩' };
+  const KIND = { particle: '✨', flipbook: '🎞️', decal: '🖼️', texture: '🧩', build: '🧱' };
   view.innerHTML = `
     ${pageHead('VFX', t('nav.textures'), t('tx.sub', { n: num(items.length) }), `<button class="btn primary admin-only" id="tx-add">+ ${t('tx.add')}</button>`)}
     <div class="row tx-tools">
       <input class="input" id="tx-q" style="flex:1;min-width:220px" placeholder="${t('tx.search')}" value="${esc(params.get('q') || '')}">
-      <select class="select" id="tx-kind"><option value="">${t('tx.allKinds')}</option>${['particle', 'flipbook', 'decal', 'texture'].map((k) => `<option value="${k}">${KIND[k]} ${t('tx.kind.' + k)}</option>`).join('')}</select>
+      <select class="select" id="tx-kind"><option value="">${t('tx.allKinds')}</option>${['particle', 'flipbook', 'decal', 'texture', 'build'].map((k) => `<option value="${k}">${KIND[k]} ${t('tx.kind.' + k)}</option>`).join('')}</select>
       <select class="select" id="tx-grid"><option value="">${t('tx.allGrids')}</option>${['2x2', '4x4', '8x8'].map((g) => `<option value="${g}">Flipbook ${g}</option>`).join('')}</select>
     </div>
     <div class="chips tx-chips"><button class="chip on" data-g="">${t('tx.all')} · ${num(items.length)}</button>${groups.map((g) => `<button class="chip" data-g="${esc(g.id)}">${KIND[g.kind] || ''} ${esc(g.label)} · ${g.count}</button>`).join('')}</div>

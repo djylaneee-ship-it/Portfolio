@@ -512,7 +512,7 @@ Résumer les modifications concrètes, les vérifications réalisées et la seul
 // ---------- Skills refaits en version détaillée (pack de l'admin, 27/10/2026) ----------
 // Les textes complets sont dans skill-pack/*.txt (tels que fournis) ; Rovex ajoute à la fin comment utiliser ses outils.
 // Version par skill : les consignes enregistrées pour une version plus ancienne sont remplacées.
-const SKILL_VERSIONS = { vfx: 3, animation: 3, gui: 3, modeling: 3, building: 3 };
+const SKILL_VERSIONS = { vfx: 3, animation: 3, gui: 3, modeling: 3, building: 4 };
 const ROVEX_NOTES = {
   vfx: `OUTILS ROVEX HUB (complément de ce skill)
 - Textures : toutes les textures des ParticleEmitter viennent OBLIGATOIREMENT de la catégorie Textures VFX de Rovex (outil find_vfx_textures) : pour chaque couche, indiquer l'ID, le nom, le groupe et la grille de flipbook. Aucune autre texture : ni ID trouvé ailleurs, ni ID de mémoire, ni ID inventé. Si rien ne convient après plusieurs recherches, le dire et proposer d'en ajouter dans la page Textures VFX.
@@ -534,6 +534,7 @@ const ROVEX_NOTES = {
   building: `OUTILS ROVEX HUB (complément de ce skill)
 - Kit d'environnement prêt dans chaque place : ReplicatedStorage.RovexAssets.Environment (arbres, palmiers, buissons, plantes, rochers, nuages, rayons, eau ; outil rovex_assets). Les cloner et les varier avant de modéliser de nouveaux éléments ; VFX d'ambiance dans RovexAssets.VFX.
 - Nouveaux assets : Blender avec les outils blender_* (voir le skill modeling, Edit Mode obligatoire) ; assemblage de la map dans Studio avec les outils studio_*.
+- Textures de surfaces (sol, herbe, sable, bois, planches, clôture, pavés, roche) : outil find_build_textures, qui montre les textures de l'utilisateur avec leur rbxassetid ; Texture par face (StudsPerTileU/V) ou MaterialVariant (ColorMap). Jamais d'ID de texture inventé.
 - Lire la place existante (outils studio_*) avant de construire, et dire ce qui a été ajouté ou modifié.`,
 };
 const fs = require('fs');

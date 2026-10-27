@@ -506,10 +506,10 @@ const routes = [
   // Textures VFX : la liste (de base + ajoutées par l'admin) et leurs miniatures Roblox.
   ['GET', /^\/api\/textures$/, () => {
     const list = textures.all(state);
-    const cache = readThumbs();
+    const cache = textures.readThumbs();
     return { groups: textures.groups(list), items: list.map((t) => ({ ...t, thumb: (cache[t.id] || {}).url || '' })) };
   }],
-  ['POST', /^\/api\/textures\/thumbs$/, async (req) => textureThumbs(((await json(req)).ids || []).map(String).slice(0, 400))],
+  ['POST', /^\/api\/textures\/thumbs$/, async (req) => textures.thumbs(((await json(req)).ids || []).map(String).slice(0, 400))],
   ['POST', /^\/api\/textures\/import$/, async (req, m, url, session) => {
     const b = await json(req);
     const section = String(b.section || 'Ajoutées').slice(0, 60);
@@ -847,25 +847,6 @@ function robloxStudioInfo() {
 }
 try { studio.sync(); } catch {}
 process.on('exit', () => studio.bridge.kill());
-
-// Miniatures des textures (API publique de Roblox), gardées 7 jours dans data/texture-thumbs.json.
-const THUMBS_FILE = path.join(db.DATA_DIR, 'texture-thumbs.json');
-const readThumbs = () => { try { return JSON.parse(fs.readFileSync(THUMBS_FILE, 'utf8')); } catch { return {}; } };
-async function textureThumbs(ids) {
-  const cache = readThumbs();
-  const week = 7 * 86400e3;
-  const missing = [...new Set(ids)].filter((id) => /^\d+$/.test(id) && !(cache[id] && cache[id].url && Date.now() - cache[id].at < week));
-  for (let i = 0; i < missing.length; i += 100) {
-    const chunk = missing.slice(i, i + 100);
-    try {
-      const r = await fetch(`https://thumbnails.roblox.com/v1/assets?assetIds=${chunk.join(',')}&returnPolicy=PlaceHolder&size=420x420&format=Png&isCircular=false`, { signal: AbortSignal.timeout(20000) });
-      const j = await r.json();
-      for (const d of j.data || []) cache[String(d.targetId)] = { url: d.state === 'Completed' ? d.imageUrl : '', state: d.state, at: Date.now() };
-    } catch {}
-  }
-  if (missing.length) { try { fs.writeFileSync(THUMBS_FILE, JSON.stringify(cache)); } catch {} }
-  return Object.fromEntries(ids.map((id) => [id, (cache[id] || {}).url || '']));
-}
 
 let pushTimer = null;
 function sharedPush(session) {

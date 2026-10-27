@@ -80,6 +80,7 @@ const SKILL_RULE = `
 Skills: for every Roblox task, first identify the domains it needs (scripting, vfx, animation, cutscenes, gui, gfx, modeling, building, audio, design, tools) and call load_skill once with only those categories and the task keywords (an attack = scripting + animation + vfx; a boss intro = cutscenes + animation + vfx, + audio if needed; a menu = gui + scripting). Read all of it before working: the core rules (rovex-core) apply to every task. Project art direction: VFX are built from custom-textured ParticleEmitters, never the Fire, Smoke or Sparkles classes. Their textures MUST come from the Rovex VFX textures (find_vfx_textures): no other texture ID is allowed, never from memory, never invented; if nothing fits after several searches, tell the user instead of using another texture. The ready-made VFX templates of ReplicatedStorage.RovexAssets.VFX (see rovex_assets) are also allowed, with their own textures.
 
 Roblox Studio: when tools starting with studio_ are available, Rovex is connected to the place open in Roblox Studio. Before writing code for the user's game, use them to read the real scripts, the Explorer structure and the data, and follow the existing architecture. Only change the place (edit scripts, run code that modifies it, insert models) when the user asked for it, and say what you changed. To put an image in the game (icon, UI, decal), make or pick it (generate_image), then call upload_image_to_roblox with a target path: Rovex uploads it to Roblox and sets it in Studio.
+Build textures: for any surface texture on a build or map (ground, grass, sand, wood, planks, fence, cobblestone, rock walls…), call find_build_textures: it shows the user's build textures with their rbxassetid; use those, never invented IDs.
 Rovex assets: every place connected to Rovex gets ReplicatedStorage.RovexAssets (Environment = stylized trees, plants, rocks, clouds, water; VFX/Combat and VFX/Fire = 130+ ready VFX templates; UI/StudUI = a stud-style HUD and windows). Call rovex_assets (with keywords) to see what is there and reuse these assets (Clone them) before building from scratch.
 
 User directives: a message or prompt can contain "!reference: library/<folder>/" (the user's reference folder: call rovex_folder with that path first and follow those references), "!skill: <names>" (load exactly these skills with load_skill, no others) and "!software: <names>" (work only in these software, e.g. Roblox Studio = studio_* tools, Blender = blender_* tools). They are mandatory and override your own choices.
@@ -177,6 +178,18 @@ const TOOLS = [
         limit: { type: 'number', description: 'Max results (default 40, max 200).' },
       },
     },
+  },
+  {
+    name: 'find_build_textures',
+    description: 'Surface textures for builds and maps from the user\'s Rovex library (ground: sand, grass; wood: wood, planks, fence; stone: cobblestone, cobblestone wall, rock…). Returns each rbxassetid with its name and group, how to apply it on parts, and SHOWS the textures as images so you can pick the right one. Use these IDs for every build texture (Texture / Decal on parts, MaterialVariant ColorMap) instead of inventing or remembering IDs. No query = all of them.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        query: { type: 'string', description: 'Words to match, e.g. "wood", "stone wall", "grass".' },
+        images: { type: 'boolean', description: 'Show the texture images (default true).' },
+      },
+    },
+    annotations: { readOnlyHint: true, openWorldHint: true },
   },
   {
     name: 'upload_image_to_roblox',
@@ -469,8 +482,34 @@ async function call(name, a = {}) {
       store.save(state);
       return { ok: true, custom: next, note: 'Applied: the open Rovex Hub window updates within a few seconds.' };
     }
+    case 'find_build_textures': {
+      const list = textures.all(state).filter((t) => t.kind === 'build');
+      const found = a.query ? textures.search(list, { query: a.query, limit: 60 }) : textures.search(list, { limit: 200 });
+      const out = {
+        count: found.length,
+        textures: found.map(({ id, rbxassetid, name, variant, group }) => ({ id, rbxassetid, name: [name, variant].filter(Boolean).join(' '), group: group.replace(/^Build · /, '') })),
+        howToUse: 'On a Part: add a Texture instance per visible face (Texture.Texture = rbxassetid, Face = Top/Front..., StudsPerTileU/V around 4-8 so it tiles at the right scale, Color3 to tint). For a whole material: a MaterialVariant in MaterialService with ColorMap = rbxassetid and StudsPerTile, then Part.MaterialVariant. Decal stretches the image once on a face (signs, single pictures), not for tiling.',
+      };
+      if (!found.length) out.note = 'No build texture matches: call again without a query to see all of them.';
+      if (a.images === false || !found.length) return out;
+      // Images des textures, pour que Claude les voie (miniatures Roblox 250 px, ~1,2 Mo max).
+      const urls = await textures.thumbs(found.map((t) => t.id), '250x250').catch(() => ({}));
+      const images = [];
+      let budget = 1200 * 1024;
+      for (const t of out.textures) {
+        if (!urls[t.id]) { t.image = 'not available'; continue; }
+        try {
+          const r = await fetch(urls[t.id], { signal: AbortSignal.timeout(10000) });
+          const buf = Buffer.from(await r.arrayBuffer());
+          if (r.ok && buf.length <= budget) { images.push(buf); budget -= buf.length; t.image = `#${images.length}`; } else t.image = 'not shown (size)';
+        } catch { t.image = 'not available'; }
+      }
+      if (images.length) out.images_note = `The ${images.length} image(s) below are these textures, in the order of their "image" number.`;
+      out.images = images;
+      return out;
+    }
     case 'find_vfx_textures': {
-      const list = textures.all(state);
+      const list = textures.all(state).filter((t) => t.kind !== 'build' || a.kind === 'build');
       const groups = textures.groups(list).map((g) => ({ id: g.id, label: g.label, kind: g.kind, count: g.count }));
       if (!a.query && !a.group && !a.flipbook && !a.kind) return { total: list.length, groups, how: 'Call again with a query (e.g. "toon fire") or a group id to get texture IDs.' };
       const results = textures.search(list, a);
@@ -734,7 +773,7 @@ async function handle(msg) {
         if (out && out.images) delete out.images;
         if (!params.name.startsWith('chat_')) logCall(params.name, params.arguments || {}, out);
         seen();
-        const previews = images.filter((b) => b.length < 900 * 1024).map((b) => ({ type: 'image', data: b.toString('base64'), mimeType: b[0] === 0xff && b[1] === 0xd8 ? 'image/jpeg' : 'image/png' }));
+        const previews = images.filter((b) => b.length < 900 * 1024).map((b) => ({ type: 'image', data: b.toString('base64'), mimeType: b[0] === 0xff && b[1] === 0xd8 ? 'image/jpeg' : b[0] === 0x52 && b[1] === 0x49 ? 'image/webp' : 'image/png' }));
         return ok({ content: [{ type: 'text', text: JSON.stringify(out, null, 2) }, ...previews] });
       } catch (e) {
         return ok({ content: [{ type: 'text', text: 'Error: ' + e.message }], isError: true });
