@@ -955,3 +955,11 @@ body.chat-mode .view { gap: 0; }
 .dir-menu small { color: var(--muted); font-family: var(--mono); }
 .dir-menu p { margin: 6px 8px; font-size: 13px; color: var(--muted2); }
 .dir-menu a { color: var(--accent2); }
+
+.dir-tex { width: 340px; max-width: 90vw; max-height: 340px; display: flex; flex-direction: column; overflow: hidden; }
+.dir-tex .input { padding: 8px 10px; font-size: 13px; margin-bottom: 6px; }
+.dir-tex-list { overflow: auto; }
+.dir-tex-list button { justify-content: flex-start; align-items: center; }
+.dir-tex-list button > span:last-child { display: grid; min-width: 0; }
+.dir-tex-list small { font-family: inherit; font-size: 11px; }
+.dir-tex-img { flex: none; width: 32px; height: 32px; display: grid; place-items: center; border-radius: 7px; background: #0b0814 center / contain no-repeat; font-size: 14px; }

@@ -83,7 +83,7 @@ Roblox Studio: when tools starting with studio_ are available, Rovex is connecte
 Build textures: for any surface texture on a build or map (ground, grass, sand, wood, planks, fence, cobblestone, rock walls…), call find_build_textures: it shows the user's build textures with their rbxassetid; use those, never invented IDs.
 Rovex assets: every place connected to Rovex gets ReplicatedStorage.RovexAssets (Environment = stylized trees, plants, rocks, clouds, water; VFX/Combat and VFX/Fire = 130+ ready VFX templates; UI/StudUI = a stud-style HUD and windows). Call rovex_assets (with keywords) to see what is there and reuse these assets (Clone them) before building from scratch.
 
-User directives: a message or prompt can contain "!reference: library/<folder>/" (the user's reference folder: call rovex_folder with that path first and follow those references), "!skill: <names>" (load exactly these skills with load_skill, no others) and "!software: <names>" (work only in these software, e.g. Roblox Studio = studio_* tools, Blender = blender_* tools). They are mandatory and override your own choices.
+User directives: a message or prompt can contain "!reference: library/<folder>/" (the user's reference folder: call rovex_folder with that path first and follow those references), "!skill: <names>" (load exactly these skills with load_skill, no others) and "!software: <names>" (work only in these software, e.g. Roblox Studio = studio_* tools, Blender = blender_* tools) and "!texture: <ids or names>" (use exactly these Rovex textures, VFX or build; find their details with find_vfx_textures / find_build_textures). They are mandatory and override your own choices.
 
 Images: you cannot draw yourself, but Rovex can. When the user asks for an icon, an image, a UI element, a thumbnail, a texture or a VFX sprite, load the skill of the category, then call generate_image. Describe only the subject: Rovex applies the skill's style and the user's reference images, and saves the PNG in the library. Give the user the file path, and remind them to upload it to Roblox (Creator Hub or Asset Manager) to get its rbxassetid.`;
 
@@ -397,7 +397,8 @@ function chatRefs(items) {
     return `${i.text || '(no text: look at the attached references)'}\n\n[Reference files attached by the user]\n${lines.join('\n')}`;
   }).map((text) => {
     // Directives (!reference, !skill, !software) : déjà vérifiées et traduites en consignes pour Claude.
-    const extra = directives.forClaude(directives.parse(text));
+    const dir = directives.parse(text);
+    const extra = dir.any ? directives.forClaude(dir, directives.resolve(dir, store.load())) : '';
     return extra ? `${text}\n\n${extra}` : text;
   });
   return { messages, images, more };

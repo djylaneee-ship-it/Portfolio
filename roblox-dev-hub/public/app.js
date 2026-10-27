@@ -2865,7 +2865,8 @@ async function renderFolders(params) {
       <pre class="fd-ex">fais une épée de feu comme mes références
 !reference: library/Épées/Feu/
 !skill: vfx, modeling
-!software: Blender, Roblox Studio</pre></div>`;
+!software: Blender, Roblox Studio
+!texture: 10024120805 (Wood Planks)</pre></div>`;
   bindCopy(view);
   const create = async (parent) => {
     const name = prompt(t(parent ? 'fd.subPh' : 'fd.newPh'));
@@ -2911,7 +2912,8 @@ const SOFTWARES = ['Roblox Studio', 'Blender'];
 const dirBar = () => `<div class="dir-bar"><span class="sub">${t('dir.label')}</span>
   <button type="button" class="chip" data-dir="reference">📁 ${t('dir.ref')}</button>
   <button type="button" class="chip" data-dir="skill">🧠 ${t('dir.skill')}</button>
-  <button type="button" class="chip" data-dir="software">🛠 ${t('dir.soft')}</button></div>`;
+  <button type="button" class="chip" data-dir="software">🛠 ${t('dir.soft')}</button>
+  <button type="button" class="chip" data-dir="texture">🎨 ${t('dir.tex')}</button></div>`;
 
 // Ajoute une valeur : nouvelle ligne pour une référence, à la suite de la ligne existante pour skill / software.
 function dirInsert(ta, kind, value) {
@@ -2929,11 +2931,45 @@ function dirInsert(ta, kind, value) {
   ta.focus();
 }
 
+// Menu des textures : recherche dans toute la bibliothèque (VFX et build), insère « ID (Nom) ».
+let DIR_TEX = null;
+async function dirTextureMenu(b, ta) {
+  DIR_TEX = DIR_TEX || (await api('/textures')).items;
+  const menu = document.createElement('div');
+  menu.className = 'dir-menu dir-tex';
+  menu.innerHTML = `<input class="input" placeholder="${t('dir.texPh')}"><div class="dir-tex-list"></div>`;
+  b.parentElement.appendChild(menu);
+  menu.style.left = b.offsetLeft + 'px';
+  const KIND = { particle: '✨', flipbook: '🎞️', decal: '🖼️', texture: '🧩', build: '🧱' };
+  const inp = $('input', menu);
+  let rows = [];
+  const draw = () => {
+    const w = inp.value.toLowerCase().split(/\s+/).filter(Boolean);
+    rows = DIR_TEX.filter((x) => w.every((k) => `${x.id} ${x.name} ${x.variant || ''} ${x.group}`.toLowerCase().includes(k)))
+      .sort((a, c) => (c.kind === 'build') - (a.kind === 'build') || Boolean(c.name) - Boolean(a.name)).slice(0, 40);
+    $('.dir-tex-list', menu).innerHTML = rows.length ? rows.map((x, n) => `<button type="button" data-n="${n}"><span class="dir-tex-img" ${x.thumb ? `style="background-image:url('${esc(x.thumb)}')"` : ''}>${x.thumb ? '' : KIND[x.kind] || '🧩'}</span>
+      <span>${esc([x.name, x.variant].filter(Boolean).join(' ') || x.id)}<small>${KIND[x.kind] || ''} ${esc(x.group)}${x.flipbook ? ' · ' + x.flipbook : ''}</small></span></button>`).join('') : `<p>${t('tx.none')}</p>`;
+    $$('.dir-tex-list button', menu).forEach((x) => x.onclick = (ev) => {
+      ev.stopPropagation();
+      const tx = rows[Number(x.dataset.n)];
+      const label = [tx.name, tx.variant].filter(Boolean).join(' ');
+      menu.remove();
+      dirInsert(ta, 'texture', label ? `${tx.id} (${label})` : tx.id);
+    });
+  };
+  inp.oninput = draw;
+  inp.onclick = (ev) => ev.stopPropagation();
+  draw();
+  inp.focus();
+  setTimeout(() => document.addEventListener('click', function off(ev) { if (!menu.contains(ev.target)) { menu.remove(); document.removeEventListener('click', off); } }), 0);
+}
+
 function bindDirBar(root, ta) {
   $$('[data-dir]', root).forEach((b) => b.onclick = async (e) => {
     e.stopPropagation();
     $$('.dir-menu').forEach((m) => m.remove());
     const kind = b.dataset.dir;
+    if (kind === 'texture') return dirTextureMenu(b, ta);
     let opts = [];
     if (kind === 'reference') opts = (await fdList()).map((f) => ({ v: f.path, label: `📁 ${f.path}`, sub: f.count }));
     if (kind === 'skill') opts = META.categories.filter((c) => c.id !== 'gameplay').map((c) => ({ v: c.id, label: c.label }));

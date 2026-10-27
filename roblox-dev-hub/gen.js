@@ -264,7 +264,7 @@ async function enhancePrompt(state, a = {}) {
   }
   // Directives de l'utilisateur (!reference, !skill, !software) : Groq doit les respecter et les garder.
   const dir = directives.parse(request);
-  const res = directives.resolve(dir);
+  const res = directives.resolve(dir, state);
   const forced = res.skills.map((x) => x.id).filter((x) => skills.SKILL_CATS.includes(x));
   const category = skills.SKILL_CATS.includes(a.category) ? a.category : forced.length === 1 ? forced[0] : '';
   const prompt = `${category ? `Focus category: ${category}\n\n` : ''}User request:\n${request.slice(0, 4000)}`;
