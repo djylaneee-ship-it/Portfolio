@@ -18,7 +18,6 @@ const quality = require('./quality');
 const skills = require('./skills');
 const cloud = require('./cloud');
 const gen = require('./gen');
-const chat = require('./chat');
 const APP_VERSION = require('./package.json').version;
 
 const PORT = Number(process.env.PORT) || 4747;
@@ -48,6 +47,8 @@ if (!state.settings.cleanedV1) {
   db.save(state);
   if (r.resources || r.channels) console.log(`  Quality filter: removed ${r.resources} off-topic items and ${r.channels} gameplay channels.`);
 }
+// Le chat Claude intégré (2.13.0) a été retiré : on efface la clé Claude qu'il avait pu garder sur ce PC.
+try { fs.unlinkSync(path.join(db.DATA_DIR, 'claude-key.bin')); } catch {}
 // En mode HTTP, le serveur MCP travaille sur la même base en mémoire que l'app.
 mcp.useStore({ load: () => state, save: () => persist() });
 
@@ -532,30 +533,7 @@ const routes = [
 // Routes accessibles à un ID d'accès simple (lecture seule). Tout le reste est réservé à l'admin.
 // Ce que les membres peuvent faire en plus de lire : brancher Claude sur leur PC, tester la recherche,
 // mettre à jour l'app, utiliser la génération IA.
-
-// ---------- Chat Claude intégré (clé Claude du membre, gardée sur ce PC) ----------
-// Seulement depuis ce PC : en mode partagé, les autres appareils n'utilisent ni la clé ni le Roblox Studio d'ici.
-const chatLocal = (req) => {
-  if (!isLoopback(req)) throw Object.assign(new Error('Only on this PC'), { key: 'chatLocalOnly', code: 403 });
-};
-routes.push(
-  ['GET', /^\/api\/chat$/, (req) => { chatLocal(req); return { ...chat.status(), chats: chat.list() }; }],
-  ['PUT', /^\/api\/chat\/key$/, async (req) => { chatLocal(req); return chat.setKey((await json(req)).key); }],
-  ['DELETE', /^\/api\/chat\/key$/, (req) => { chatLocal(req); return chat.removeKey(); }],
-  ['PUT', /^\/api\/chat\/settings$/, async (req) => { chatLocal(req); return chat.saveSettings(await json(req)); }],
-  ['POST', /^\/api\/chat\/send$/, async (req) => {
-    chatLocal(req);
-    const b = JSON.parse((await readBody(req, 30 * 1024 * 1024)).toString('utf8') || '{}');
-    const images = (Array.isArray(b.images) ? b.images : []).filter((im) => im && /^image\/(png|jpeg|gif|webp)$/.test(im.type) && typeof im.data === 'string' && im.data.length < 7e6);
-    return chat.start({ chatId: b.chatId || '', text: b.text, images });
-  }],
-  ['GET', /^\/api\/chat\/([\w-]+)$/, (req, m) => { chatLocal(req); return chat.view(m[1]); }],
-  ['PUT', /^\/api\/chat\/([\w-]+)$/, async (req, m) => { chatLocal(req); return chat.rename(m[1], (await json(req)).title); }],
-  ['DELETE', /^\/api\/chat\/([\w-]+)$/, (req, m) => { chatLocal(req); return chat.remove(m[1]); }],
-  ['POST', /^\/api\/chat\/([\w-]+)\/stop$/, (req, m) => { chatLocal(req); return chat.stop(m[1]); }],
-);
-
-const MEMBER_ACTIONS = [/^\/api\/chat(\/[\w-]+)*$/, /^\/api\/custom(\/background)?$/, /^\/api\/textures\/thumbs$/, /^\/api\/place\/(read|write|value)$/, /^\/api\/robloxstudio(\/restart)?$/, /^\/api\/claude\/(desktop|code|send)$/, /^\/api\/mcp\/test$/, /^\/api\/update\/(check|install)$/, /^\/api\/gen(\/.*)?$/];
+const MEMBER_ACTIONS = [/^\/api\/custom(\/background)?$/, /^\/api\/textures\/thumbs$/, /^\/api\/place\/(read|write|value)$/, /^\/api\/robloxstudio(\/restart)?$/, /^\/api\/claude\/(desktop|code|send)$/, /^\/api\/mcp\/test$/, /^\/api\/update\/(check|install)$/, /^\/api\/gen(\/.*)?$/];
 const USER_ROUTES = [/^\/api\/custom$/, /^\/api\/textures$/, /^\/api\/place\/(studios|scripts|values)$/, /^\/api\/robloxstudio$/, /^\/api\/claude$/, /^\/api\/version$/, /^\/api\/prompts$/, /^\/api\/skills$/, /^\/api\/skills\/\w+$/, /^\/api\/level$/, /^\/api\/meta$/, /^\/api\/stats$/, /^\/api\/resources$/, /^\/api\/channels$/, /^\/api\/youtube$/, /^\/api\/crawl$/, /^\/api\/examples$/, /^\/api\/mcp$/];
 
 const cookies = (req) => Object.fromEntries(String(req.headers.cookie || '').split(';').map((c) => c.trim().split('=')).filter((p) => p[0]).map(([k, ...v]) => [k, decodeURIComponent(v.join('='))]));
@@ -667,22 +645,6 @@ const server = http.createServer(async (req, res) => {
     const memberAction = MEMBER_ACTIONS.some((re) => re.test(url.pathname));
     if (session.role !== 'admin' && !memberAction && !(req.method === 'GET' && USER_ROUTES.some((re) => re.test(url.pathname)))) {
       return send(res, 403, { error: 'Admin only', key: 'adminOnly' });
-    }
-    // Flux en direct d'une réponse de Claude (texte, raisonnement, actions).
-    const evM = req.method === 'GET' && url.pathname.match(/^\/api\/chat\/([\w-]+)\/events$/);
-    if (evM) {
-      if (!isLoopback(req)) return send(res, 403, { error: 'Only on this PC', key: 'chatLocalOnly' });
-      res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-store', Connection: 'keep-alive' });
-      const write = (ev, n) => res.write(`id: ${n}\ndata: ${JSON.stringify(ev)}\n\n`);
-      const off = chat.subscribe(evM[1], Number(url.searchParams.get('from')) || 0, (ev, n) => {
-        write(ev, n);
-        if (ev.type === 'done') res.end();
-      });
-      if (!off) { write({ type: 'done' }, 0); return res.end(); }
-      if (res.writableEnded) return;
-      const ping = setInterval(() => res.write(': ping\n\n'), 15e3);
-      req.on('close', () => { clearInterval(ping); off(); });
-      return;
     }
     const zipM = url.pathname.match(/^\/api\/skills\/(\w+)\/zip$/);
     if (zipM && session.role === 'admin' && skills.SKILL_CATS.includes(zipM[1])) {

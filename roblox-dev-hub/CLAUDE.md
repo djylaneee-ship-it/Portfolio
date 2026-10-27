@@ -38,7 +38,6 @@ Travail à plusieurs : une branche par dev (`dev/<pseudo>-<sujet>`), une PR, rel
 | `db.js` | Bibliothèque locale (`data/library.json`), catégories, recherche. |
 | `auth.js` / `cloud.js` | IDs d'accès en ligne (Supabase, RPC `rovex_*`), un appareil par ID, contenu partagé par les admins. |
 | `skills.js` / `skill-texts.js` | Skills Claude (socle `rovex-core` + un par catégorie). |
-| `chat.js` | Chat Claude intégré : Rovex fait l'hôte MCP (outils de `mcp.js` + Roblox Studio), API Claude avec la clé du membre (chiffrée, `claude-key.bin`), conversations dans `chats/`, flux SSE `/api/chat/<id>/events`. |
 | `gen.js` | Studio IA (images) et Prompt Booster (texte), par la fonction Supabase `rovex-gen`. |
 | `crawler.js` / `cloud-crawl.js` | Exploration (YouTube, DevForum, Bluesky, Reddit, Sketchfab, dev.to, Creator Store, GitHub) ; `cloud-crawl.js` tourne en continu sur GitHub Actions et remplit la bibliothèque en ligne. |
 | `studio.js` / `place.js` / `rbxupload.js` | Pont vers le serveur MCP de Roblox Studio, scripts et réglages de la place ouverte, envoi d'images sur Roblox. |
