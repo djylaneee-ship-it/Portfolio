@@ -34,3 +34,18 @@ jobs:
           curl -s -w "  [HTTP %{http_code}]\n" "https://owupuxmgxtjmslhhawaf.supabase.co/functions/v1/rovex-gen" -H "apikey: $K"
           echo "== fonction rovex-gen (POST avec un faux ID : doit refuser l'ID, sans rien générer)"
           curl -s -w "  [HTTP %{http_code}]\n" -X POST "https://owupuxmgxtjmslhhawaf.supabase.co/functions/v1/rovex-gen" -H "apikey: $K" -H "Content-Type: application/json" -d '{"type":"image","code":"RDH-AAAA-BBBB-CCCC","prompt":"test"}'
+      - name: Images gratuites (Pollinations, sans clé)
+        run: |
+          P="Roblox simulator game icon of two curved arrows forming a circle (rebirth symbol), one blue arrow and one orange arrow, chunky faceted shapes, very thick dark navy outline, vibrant saturated gradients, cel shaded highlights, slight 3D, centered, isolated on a plain pure white background, no text"
+          E=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" "$P")
+          curl -s "https://image.pollinations.ai/models" -w "  [models HTTP %{http_code}]\n" | head -c 600; echo
+          for M in flux turbo; do
+            echo "== image.pollinations.ai model=$M"
+            curl -s -L -m 120 -D h.txt -o img.bin "https://image.pollinations.ai/prompt/$E?width=384&height=384&model=$M&seed=7&nologo=true" -w "  [HTTP %{http_code}, %{size_download} bytes, %{time_total}s]\n"
+            grep -i "content-type\|x-ratelimit\|retry" h.txt || true
+            file img.bin
+            if file img.bin | grep -qi "image"; then echo "B64START"; base64 -w0 img.bin; echo; echo "B64END"; else head -c 400 img.bin; echo; fi
+            sleep 16
+          done
+          echo "== gen.pollinations.ai sans clé"
+          curl -s -L -m 120 -o img2.bin "https://gen.pollinations.ai/image/$E?width=256&height=256&model=flux" -w "  [HTTP %{http_code}, %{size_download} bytes]\n"; file img2.bin; head -c 300 img2.bin | strings | head -5
