@@ -434,6 +434,33 @@ def is_running():
     return _server is not None and _server.running
 
 
+def _stop_other_copies():
+    """Stop the server of any other loaded copy of this add-on (e.g. an old version still enabled). True if one ran."""
+    own = __name__
+    found = False
+    for name, mod in list(sys.modules.items()):
+        if mod is None or name == own or not name.endswith("claude_blender_mcp.server"):
+            continue
+        try:
+            if getattr(mod, "is_running", lambda: False)():
+                print("Claude MCP: stopping another copy of the add-on (%s, version %s)" % (
+                    name, getattr(mod, "ADDON_VERSION", "?")))
+                mod.stop()
+                found = True
+        except Exception as exc:
+            print("Claude MCP: could not stop %s: %s" % (name, exc))
+    if found:
+        try:
+            import addon_utils
+            mine = own.rpartition(".")[0]
+            for name in {n.rpartition(".")[0] for n in sys.modules if n.endswith("claude_blender_mcp.server")} - {mine}:
+                addon_utils.disable(name, default_set=True)
+                print("Claude MCP: disabled the old add-on", name)
+        except Exception as exc:
+            print("Claude MCP: could not disable the old add-on:", exc)
+    return found
+
+
 def start(port=DEFAULT_PORT):
     """Listen on 127.0.0.1:port (restarting if running on another port). Returns False if the port is busy."""
     global _server
@@ -447,7 +474,14 @@ def start(port=DEFAULT_PORT):
         commands.load_all()
     srv = _Server(port)
     try:
-        srv.open()
+        try:
+            srv.open()
+        except OSError:
+            # Une autre copie de l'add-on (ancienne version) tourne dans ce Blender et garde le port : on l'arrête.
+            if not _stop_other_copies():
+                raise
+            time.sleep(0.3)
+            srv.open()
     except OSError as exc:
         status.update(running=False, port=None, clients=0)
         status["last_error"] = "Cannot listen on %s:%d (%s). Is another Blender using this port?" % (HOST, port, exc)

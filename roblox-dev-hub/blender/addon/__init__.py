@@ -130,6 +130,7 @@ class CLAUDE_PT_server(bpy.types.Panel):
         layout = self.layout
         st = server.status
         box = layout.box()
+        box.label(text="Claude Blender MCP v%s" % server.ADDON_VERSION)
         if st["running"]:
             box.label(text="Running on 127.0.0.1:%d" % st["port"], icon="CHECKMARK")
             box.label(text="Clients: %d   Requests: %d" % (st["clients"], st["requests"]))

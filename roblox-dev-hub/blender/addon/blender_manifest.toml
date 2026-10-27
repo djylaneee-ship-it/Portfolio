@@ -1,7 +1,7 @@
 schema_version = "1.0.0"
 
 id = "claude_blender_mcp"
-version = "0.2.0"
+version = "0.2.1"
 name = "Claude Blender MCP"
 tagline = "Let Claude model, sculpt, rig and animate in Blender (Rovex Hub)"
 maintainer = "djyla"

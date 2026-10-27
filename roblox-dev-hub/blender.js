@@ -12,7 +12,7 @@ const db = require('./db');
 
 const SETTINGS_FILE = path.join(db.DATA_DIR, 'blender.json');
 const EXPORT_DIR = path.join(path.dirname(db.DATA_DIR), 'blender-exports');
-const ADDON_VERSION = '0.2.0';
+const ADDON_VERSION = '0.2.1';
 const ADDON_ZIP = path.join(__dirname, 'blender', `claude_blender_mcp-${ADDON_VERSION}.zip`);
 const SPEC = JSON.parse(fs.readFileSync(path.join(__dirname, 'blender', 'tools.json'), 'utf8'));
 const NAMES = new Set(SPEC.tools.map((t) => t.name));
