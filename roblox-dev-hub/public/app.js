@@ -1576,7 +1576,7 @@ function agList() {
   if (!box) return;
   box.innerHTML = AG.list.length ? AG.list.map((a) => `<a class="chat-conv ag ${a.id === AG.cur ? 'active' : ''} ${a.online ? 'on' : 'off'}" href="#/chat?a=${encodeURIComponent(a.id)}" data-id="${esc(a.id)}">
       <span><i class="ag-dot"></i>${esc(a.name)}${AG.unread[a.id] ? `<em class="ag-unread">${AG.unread[a.id]}</em>` : ''}</span>
-      <small>${a.online ? (a.typing ? t('ag.working') : t('ag.online')) : t('ag.offline')}</small></a>`).join('')
+      <small>${a.online ? (a.typing ? t('ag.working') : t('ag.online')) : t('ag.offline')}${a.via ? ' · ' + (a.via === 'desktop' ? 'Claude Desktop' : 'Claude Code') : ''}</small></a>`).join('')
     : `<p class="muted small">${t('ag.none')}</p>`;
   const dot = $('#chat-dot');
   if (dot) dot.hidden = !AG.list.some((a) => a.online);
@@ -1635,41 +1635,68 @@ function agSetupHtml() {
   const win = s.platform === 'win32';
   const install = win ? 'irm https://claude.ai/install.ps1 | iex' : 'curl -fsSL https://claude.ai/install.sh | bash';
   return `<div class="ag-setup">
-    <h2>${t('ag.setupTitle')}</h2><p class="muted">${t('ag.setupSub')}</p>
-    <div class="ag-steps">
-      <div class="ag-step ${s.code && s.code.installed ? 'done' : ''}"><span class="num">1</span><div><b>${t('ag.s1')}</b>
-        ${s.code && s.code.installed ? `<p>✓ ${t('ag.s1ok', { v: esc(s.code.version || '') })}</p>` : `<p>${t(win ? 'ag.s1win' : 'ag.s1mac')}</p>${codeBox(install)}<p>${t('ag.s1login')}</p>`}</div></div>
-      <div class="ag-step"><span class="num">2</span><div><b>${t('ag.s2')}</b><p>${t('ag.s2t')}</p><button class="btn primary" data-launch>${t('ag.launch')}</button></div></div>
-      <div class="ag-step"><span class="num">3</span><div><b>${t('ag.s3')}</b><p>${t('ag.s3t')}</p></div></div>
-    </div>
-    <div class="ag-note">⚠️ ${t('ag.preview')}</div>
+    <h2>${t('ag.setupTitle')}</h2><p class="muted">${t('ag.setupSub2')}</p>
+    <div class="ag-mode"><h3>💬 ${t('ag.modeDesktop')}</h3><p class="muted">${t('ag.modeDesktopSub')}</p>
+      <div class="ag-steps">
+        <div class="ag-step"><span class="num">1</span><div><b>${t('ag.d1')}</b><p>${t('ag.d1t')}</p><button class="btn primary" data-launch="desktop">${t('ag.connectDesktop')}</button></div></div>
+        <div class="ag-step"><span class="num">2</span><div><b>${t('ag.d2')}</b><p>${t('ag.d2t')}</p></div></div>
+      </div></div>
+    <div class="ag-mode"><h3>⌨️ ${t('ag.modeCode')}</h3><p class="muted">${t('ag.modeCodeSub')}</p>
+      <div class="ag-steps">
+        <div class="ag-step ${s.code && s.code.installed ? 'done' : ''}"><span class="num">1</span><div><b>${t('ag.s1')}</b>
+          ${s.code && s.code.installed ? `<p>✓ ${t('ag.s1ok', { v: esc(s.code.version || '') })}</p>` : `<p>${t(win ? 'ag.s1win' : 'ag.s1mac')}</p>${codeBox(install)}<p>${t('ag.s1login')}</p>`}</div></div>
+        <div class="ag-step"><span class="num">2</span><div><b>${t('ag.s2')}</b><p>${t('ag.s2t')}</p><button class="btn" data-launch="code">${t('ag.launchCode')}</button></div></div>
+      </div>
+      <div class="ag-note">⚠️ ${t('ag.preview')}</div></div>
+    <p class="muted small">${t('ag.s3t')}</p>
   </div>`;
 }
 function agSetupBind() {
   bindCopy($('#chat-msgs'));
-  $$('[data-launch]').forEach((b) => b.onclick = agLaunchModal);
+  $$('#chat-msgs [data-launch]').forEach((b) => b.onclick = () => agLaunchModal(b.dataset.launch));
 }
 
-function agLaunchModal() {
+function agLaunchModal(mode) {
   const taken = new Set(AG.list.filter((a) => a.online).map((a) => a.name.toLowerCase()));
   const names = ['Claude', 'Scripteur', 'VFX', 'UI', 'Builder', 'Animateur'];
   const first = names.find((n) => !taken.has(n.toLowerCase())) || 'Claude 2';
+  let via = mode === 'code' ? 'code' : 'desktop';
   openModal(`<h2>🚀 ${t('ag.launchTitle')}</h2><p>${t('ag.launchSub')}</p>
     <div class="field"><label>${t('ag.name')}</label><input class="input" id="al-name" value="${esc(first)}" maxlength="30"></div>
     <div class="chips" style="margin-bottom:14px">${names.map((n) => `<button class="chip" data-n="${n}">${n}</button>`).join('')}</div>
-    <div class="ag-note">${t('ag.launchHelp')}</div>
-    <div class="row" style="margin-top:14px"><button class="btn primary" id="al-go">${t('ag.launch')}</button></div>
+    <div class="tabs" id="al-via"><button data-via="desktop">💬 Claude Desktop</button><button data-via="code">⌨️ Claude Code</button></div>
+    <div class="ag-note" id="al-help"></div>
+    <div class="row" style="margin-top:14px"><button class="btn primary" id="al-go"></button></div>
     <div id="al-out"></div>`);
+  const pick = (v) => {
+    via = v;
+    $$('#al-via button').forEach((b) => b.classList.toggle('active', b.dataset.via === v));
+    $('#al-help').innerHTML = t(v === 'desktop' ? 'ag.helpDesktop' : 'ag.launchHelp');
+    $('#al-go').textContent = t(v === 'desktop' ? 'ag.connectDesktop' : 'ag.launchCode');
+    $('#al-out').innerHTML = '';
+  };
+  pick(via);
+  $$('#al-via button').forEach((b) => b.onclick = () => pick(b.dataset.via));
   $$('[data-n]').forEach((b) => b.onclick = () => ($('#al-name').value = b.dataset.n));
   $('#al-go').onclick = async (e) => {
     const b = e.currentTarget;
     b.disabled = true;
+    const name = $('#al-name').value;
     try {
-      const r = await api('/agents/launch', { method: 'POST', body: { name: $('#al-name').value } });
-      $('#al-out').innerHTML = r.opened
-        ? `<p class="ok-line">✓ ${t('ag.launched', { name: esc(r.name) })}</p>`
-        : `<p>${t('ag.manual')}</p>${codeBox(`cd "${r.dir}"`)}${codeBox(r.command)}`;
-      bindCopy($('#al-out'));
+      if (via === 'desktop') {
+        // Claude Desktop s'ouvre sur une nouvelle conversation, la consigne déjà écrite : il reste à appuyer sur Entrée.
+        const { text } = await api('/agents/prompt?name=' + encodeURIComponent(name));
+        await copyText(text);
+        const r = await api('/claude/send', { method: 'POST', body: { text, target: 'desktop' } });
+        if (!r.opened) window.location.href = r.link;
+        $('#al-out').innerHTML = `<p class="ok-line">✓ ${t('ag.desktopOpened')}</p>`;
+      } else {
+        const r = await api('/agents/launch', { method: 'POST', body: { name } });
+        $('#al-out').innerHTML = r.opened
+          ? `<p class="ok-line">✓ ${t('ag.launched', { name: esc(r.name) })}</p>`
+          : `<p>${t('ag.manual')}</p>${codeBox(`cd "${r.dir}"`)}${codeBox(r.command)}`;
+        bindCopy($('#al-out'));
+      }
     } catch (er) {
       $('#al-out').innerHTML = `<p class="chat-err">⚠️ ${esc(er.message)}</p>`;
     }
@@ -1772,7 +1799,7 @@ async function renderChat(params) {
   ta.oninput = () => { ta.style.height = ''; ta.style.height = Math.min(ta.scrollHeight, 260) + 'px'; };
   ta.onkeydown = (e) => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); agSend(); } };
   $('#chat-form').onsubmit = (e) => { e.preventDefault(); agSend(); };
-  $$('[data-launch]').forEach((b) => b.onclick = agLaunchModal);
+  $$('[data-launch]').forEach((b) => b.onclick = () => agLaunchModal(b.dataset.launch));
   $('#ag-help').onclick = (e) => { e.preventDefault(); agSelect(''); };
   $('#ag-clear').onclick = async () => {
     if (!AG.cur || !confirm(t('ag.clearAsk'))) return;

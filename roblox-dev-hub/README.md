@@ -95,7 +95,10 @@ L'app récupère ce fichier toutes les 30 minutes (**Réglages → Source cloud*
 
 ## Chat Claude (ton Claude Code relié à Rovex)
 
-La page **Chat Claude** permet de parler à Claude **dans Rovex, avec ton abonnement Claude** (Pro ou Max), sans clé API : Rovex se branche sur **Claude Code** par un *channel* (fonction officielle de Claude Code, en test chez Anthropic). Claude Code tourne dans une petite fenêtre qu'on réduit ; on discute dans Rovex.
+La page **Chat Claude** permet de parler à Claude **dans Rovex, avec ton abonnement Claude** (Pro ou Max), sans clé API. Deux façons de brancher un Claude :
+
+- **Claude Desktop** (le plus simple) : « Connecter Claude Desktop » ouvre une nouvelle conversation avec la consigne déjà écrite (aussi disponible comme prompt MCP `rovex-chat` dans le menu **+**). Claude y tourne en boucle avec les outils MCP `chat_listen` (attend le prochain message, jusqu'à 55 s), `chat_reply` et `chat_status`. Claude Desktop reste ouvert (réduit) ; quand la conversation atteint sa limite, on en rebranche une nouvelle.
+- **Claude Code** : Rovex se branche par un *channel* (fonction officielle de Claude Code, en test chez Anthropic). Claude Code tourne dans une petite fenêtre qu'on réduit ; les messages arrivent sans boucle et ses autorisations s'affichent dans Rovex.
 
 - **Lancer un Claude** : Rovex prépare un dossier de travail (`data/claude-workspace` : `.mcp.json` avec `rovex-chat` + `rovex-hub`, outils Rovex pré-autorisés, `CLAUDE.md`) et ouvre un terminal avec `claude --dangerously-load-development-channels server:rovex-chat`. Au lancement, choisir « I am using this for local development » (écran normal pendant la phase de test des channels).
 - **Plusieurs Claudes** : chaque Claude a un nom (Scripteur, VFX, UI…) et sa conversation ; ils travaillent en parallèle.

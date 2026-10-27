@@ -51,8 +51,9 @@ function add(m) {
   return msg;
 }
 
-const online = (a) => Boolean(a.wait) || Date.now() - a.lastSeen < ONLINE_MS;
-const pub = (a) => ({ id: a.id, name: a.name, cwd: a.cwd, host: a.host, online: online(a), typing: a.typing, since: a.since });
+// Connecté : en attente d'un message, vu récemment, ou en plein travail (Claude Desktop n'écoute pas pendant qu'il travaille).
+const online = (a) => !a.gone && (Boolean(a.wait) || Date.now() - a.lastSeen < ONLINE_MS || (a.typing && Date.now() - a.lastSeen < 20 * 60e3));
+const pub = (a) => ({ id: a.id, name: a.name, via: a.via, cwd: a.cwd, host: a.host, online: online(a), typing: a.typing, since: a.since });
 function list() {
   for (const [id, a] of agents) if (!online(a) && Date.now() - a.lastSeen > 6 * 3600e3) agents.delete(id);
   const out = [...agents.values()].map(pub);
@@ -84,6 +85,8 @@ function agentOf(id, info = {}) {
 function inbox(q, res) {
   const a = agentOf(String(q.get('id') || ''), { name: q.get('name'), cwd: q.get('cwd'), host: q.get('host') });
   a.gone = false;
+  a.via = q.get('via') === 'desktop' ? 'desktop' : 'code';
+  const wait = Math.max(5, Math.min(110, Number(q.get('wait')) || 25)) * 1000;
   const flush = () => {
     const items = a.queue.splice(0);
     a.wait = null;
@@ -93,7 +96,7 @@ function inbox(q, res) {
   };
   if (a.queue.length) return flush();
   if (a.wait) a.wait.flush();
-  const timer = setTimeout(flush, 25e3);
+  const timer = setTimeout(flush, wait);
   a.wait = { flush: () => { clearTimeout(timer); flush(); } };
   res.on('close', () => { clearTimeout(timer); if (a.wait && !res.writableEnded) { a.wait = null; if (!a.gone) a.lastSeen = Date.now(); } });
 }

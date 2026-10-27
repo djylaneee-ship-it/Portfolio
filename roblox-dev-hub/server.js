@@ -542,6 +542,7 @@ const agentLocal = (req) => {
 routes.push(
   ['GET', /^\/api\/agents$/, (req) => { agentLocal(req); return agents.view(); }],
   ['GET', /^\/api\/agents\/setup$/, (req) => { agentLocal(req); return agents.setup(); }],
+  ['GET', /^\/api\/agents\/prompt$/, (req, m, url) => { agentLocal(req); return { text: mcp.CHAT_PROMPT(String(url.searchParams.get('name') || 'Claude').replace(/[^\p{L}\p{N} _-]/gu, '').trim().slice(0, 30) || 'Claude') }; }],
   ['POST', /^\/api\/agents\/send$/, async (req) => { agentLocal(req); return agents.send(await json(req)); }],
   ['POST', /^\/api\/agents\/verdict$/, async (req) => { agentLocal(req); return agents.verdict(await json(req)); }],
   ['POST', /^\/api\/agents\/launch$/, async (req) => { agentLocal(req); return agents.launch(await json(req)); }],

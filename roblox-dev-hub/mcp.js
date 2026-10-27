@@ -72,6 +72,11 @@ Roblox Studio: when tools starting with studio_ are available, Rovex is connecte
 
 Images: you cannot draw yourself, but Rovex can. When the user asks for an icon, an image, a UI element, a thumbnail, a texture or a VFX sprite, load the skill of the category, then call generate_image. Describe only the subject: Rovex applies the skill's style and the user's reference images, and saves the PNG in the library. Give the user the file path, and remind them to upload it to Roblox (Creator Hub or Asset Manager) to get its rbxassetid.`;
 
+// Consigne qui branche une conversation de Claude Desktop sur le Chat Claude de Rovex (boucle écouter → travailler → répondre).
+const CHAT_PROMPT = (name) => `Connect to the Claude chat of the Rovex Hub app as "${name}" and stay connected.
+Loop forever: call chat_listen (name "${name}"). When it returns messages, do what the user asks with the Rovex and Roblox Studio tools (load_skill first for Roblox work, chat_status with one short sentence for each step), then answer with chat_reply (name "${name}") in the user's language, short and clear. Then call chat_listen again. When it returns no message, call chat_listen again immediately, without writing anything.
+The user reads only the Rovex chat, never this conversation: do not write text here, only call the tools. Stop only if the user writes "stop" in Rovex.`;
+
 const DEFAULT_INSTRUCTIONS = `Before writing any Luau, search Rovex Hub.
 1. Start with the validated examples for the category (list_examples / get_example).
 2. Follow their structure: ModuleScripts, RemoteEvents validated on the server, never trust the client.
@@ -170,6 +175,35 @@ const TOOLS = [
         face: { type: 'string', enum: ['Front', 'Back', 'Top', 'Bottom', 'Left', 'Right'], description: 'Face for a Decal added on a Part. Default Front.' },
       },
       required: ['image'],
+    },
+  },
+  {
+    name: 'chat_listen',
+    description: 'Rovex chat (talk to the user inside the Rovex Hub app): wait for the next messages the user writes to you in the Claude chat of Rovex. Returns them, or an empty list after the wait: then call chat_listen again right away. Use this loop only when the user asked you to connect to the Rovex chat.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string', description: 'Your name in the Rovex chat (default "Claude"). Keep the same name for the whole conversation.' },
+        wait_seconds: { type: 'number', description: 'How long to wait for a message (10-55, default 50).' },
+      },
+    },
+  },
+  {
+    name: 'chat_reply',
+    description: 'Rovex chat: send your answer to the user in the Claude chat of Rovex (Markdown, Luau in ```lua blocks). The user does not read Claude Desktop, only this.',
+    inputSchema: {
+      type: 'object',
+      properties: { text: { type: 'string', description: 'Your message' }, name: { type: 'string', description: 'Same name as in chat_listen' } },
+      required: ['text'],
+    },
+  },
+  {
+    name: 'chat_status',
+    description: 'Rovex chat: show what you are doing right now (one short sentence) in the "What Claude is doing" panel, during a long task.',
+    inputSchema: {
+      type: 'object',
+      properties: { text: { type: 'string' }, name: { type: 'string', description: 'Same name as in chat_listen' } },
+      required: ['text'],
     },
   },
   {
@@ -298,6 +332,22 @@ function matchExamples(state, { query = '', category = '', drafts = false } = {}
 }
 const briefExample = (e) => ({ id: e.id, title: e.title, category: e.category, status: e.status, request: e.prompt, file: e.filename });
 
+// Chat Claude de Rovex depuis Claude Desktop : on passe par le serveur local de l'app (clé de data/agent.json).
+const agentName = (n) => String(n || 'Claude').replace(/[^\p{L}\p{N} _-]/gu, '').trim().slice(0, 30) || 'Claude';
+const agentId = (n) => agentName(n).toLowerCase().replace(/[^\p{L}\p{N}]+/gu, '-') || 'claude';
+async function agentApi(pathname, { method = 'GET', body, timeout = 15e3 } = {}) {
+  let link = null;
+  try { link = JSON.parse(fs.readFileSync(path.join(db.DATA_DIR, 'agent.json'), 'utf8')); } catch {}
+  if (!link || !link.port) throw new Error('Open the Rovex Hub app first: the chat lives in the app.');
+  const res = await fetch(`http://127.0.0.1:${link.port}${pathname}`, {
+    method, headers: { 'X-Rovex-Agent-Key': link.key, ...(body && { 'Content-Type': 'application/json' }) },
+    body: body && JSON.stringify(body), signal: AbortSignal.timeout(timeout),
+  });
+  const j = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(j.error || `Rovex HTTP ${res.status}`);
+  return j;
+}
+
 async function call(name, a = {}) {
   const state = store.load();
   switch (name) {
@@ -337,6 +387,20 @@ async function call(name, a = {}) {
     }
     case 'upload_image_to_roblox':
       return rbxupload.upload(state, a);
+    case 'chat_listen': {
+      const wait = Math.max(10, Math.min(55, Number(a.wait_seconds) || 50));
+      const q = new URLSearchParams({ id: agentId(a.name), name: agentName(a.name), via: 'desktop', wait: String(wait) });
+      const r = await agentApi(`/agent/inbox?${q}`, { timeout: (wait + 15) * 1000 });
+      const messages = (r.items || []).filter((i) => i.kind === 'chat').map((i) => i.text);
+      // Réponse courte quand rien n'arrive : la conversation de Claude grossit le moins possible.
+      return messages.length ? { messages, next: 'Do the work (chat_status for each step), answer with chat_reply, then call chat_listen again.' } : { messages: [], next: 'call chat_listen again' };
+    }
+    case 'chat_reply':
+      await agentApi('/agent/reply', { method: 'POST', body: { id: agentId(a.name), text: String(a.text || '') } });
+      return { sent: true, next: 'call chat_listen again' };
+    case 'chat_status':
+      await agentApi('/agent/status', { method: 'POST', body: { id: agentId(a.name), text: String(a.text || '') } });
+      return { shown: true };
     case 'generate_image': {
       const out = await gen.generateImage(state, a);
       store.save(state);
@@ -501,7 +565,7 @@ async function handle(msg) {
     if (method === 'prompts/list') {
       const st = store.load();
       const tpl = templates(st);
-      return ok({ prompts: skills.SKILL_CATS.map((c) => skills.getSkill(st, c)).filter((x) => x.enabled).map((x) => ({
+      return ok({ prompts: [{ name: 'rovex-chat', title: 'Rovex · Chat Claude', description: 'Connect this conversation to the Claude chat of the Rovex Hub app: you then talk to Claude from Rovex.', arguments: [{ name: 'name', description: 'Name of this Claude in Rovex (e.g. Scripteur)', required: false }] }].concat(skills.SKILL_CATS.map((c) => skills.getSkill(st, c)).filter((x) => x.enabled).map((x) => ({
         name: x.name, description: `Rovex skill: ${db.CATEGORIES.find((k) => k.id === x.id).label} — loads the category knowledge, then does your task`,
         arguments: [{ name: 'task', description: 'What you want Claude to do', required: false }],
       })).concat(tpl.list.map((p) => {
@@ -511,7 +575,10 @@ async function handle(msg) {
           name: tplName(p), title: 'Rovex · ' + p.title, description: 'Rovex Hub prompt template: ' + p.title,
           arguments: slots.map((x) => ({ name: x, description: (TPL.PROMPT_SLOTS[x] && (TPL.PROMPT_SLOTS[x][lang] || TPL.PROMPT_SLOTS[x].en)) || x, required: false })),
         };
-      })) });
+      }))) });
+    }
+    if (method === 'prompts/get' && params.name === 'rovex-chat') {
+      return ok({ description: 'Rovex chat', messages: [{ role: 'user', content: { type: 'text', text: CHAT_PROMPT(agentName((params.arguments || {}).name)) } }] });
     }
     if (method === 'prompts/get' && String(params.name || '').startsWith('template-')) {
       const { lang, list } = templates(store.load());
@@ -548,7 +615,7 @@ async function handle(msg) {
         // Images générées : aperçu envoyé à Claude (s'il n'est pas trop lourd), jamais gardé dans le journal.
         const images = (out && out.images) || [];
         if (out && out.images) delete out.images;
-        logCall(params.name, params.arguments || {}, out);
+        if (!params.name.startsWith('chat_')) logCall(params.name, params.arguments || {}, out);
         seen();
         const previews = images.filter((b) => b.length < 900 * 1024).map((b) => ({ type: 'image', data: b.toString('base64'), mimeType: b[0] === 0xff && b[1] === 0xd8 ? 'image/jpeg' : 'image/png' }));
         return ok({ content: [{ type: 'text', text: JSON.stringify(out, null, 2) }, ...previews] });
@@ -562,7 +629,7 @@ async function handle(msg) {
   }
 }
 
-module.exports = { handle, call, useStore, clients, activity, TOOLS, DEFAULT_INSTRUCTIONS };
+module.exports = { handle, call, useStore, clients, activity, TOOLS, DEFAULT_INSTRUCTIONS, CHAT_PROMPT };
 
 // Mode stdio : `node mcp.js` (le client MCP lance ce fichier lui-même).
 if (require.main === module) {
