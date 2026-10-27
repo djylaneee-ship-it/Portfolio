@@ -1450,19 +1450,22 @@ async function placeValues(s) {
 
 // ---------- Textures VFX : les IDs Roblox des textures de particules (Claude les récupère par find_vfx_textures) ----------
 let TEX = null;
-async function renderTextures(params) {
+// build = true : page « Textures de build » (sol, bois, pierre…) ; sinon les textures VFX.
+async function renderTextures(params, build = false) {
   TEX = await api('/textures');
-  const { items, groups } = TEX;
+  const items = TEX.items.filter((x) => (x.kind === 'build') === build);
+  const groups = TEX.groups.filter((g) => (g.kind === 'build') === build);
   const KIND = { particle: '✨', flipbook: '🎞️', decal: '🖼️', texture: '🧩', build: '🧱' };
   view.innerHTML = `
-    ${pageHead('VFX', t('nav.textures'), t('tx.sub', { n: num(items.length) }), `<button class="btn primary admin-only" id="tx-add">+ ${t('tx.add')}</button>`)}
+    ${build ? pageHead('BUILD', t('nav.buildtex'), t('tx.subBuild', { n: num(items.length) }))
+      : pageHead('VFX', t('nav.textures'), t('tx.sub', { n: num(items.length) }), `<button class="btn primary admin-only" id="tx-add">+ ${t('tx.add')}</button>`)}
     <div class="row tx-tools">
-      <input class="input" id="tx-q" style="flex:1;min-width:220px" placeholder="${t('tx.search')}" value="${esc(params.get('q') || '')}">
-      <select class="select" id="tx-kind"><option value="">${t('tx.allKinds')}</option>${['particle', 'flipbook', 'decal', 'texture', 'build'].map((k) => `<option value="${k}">${KIND[k]} ${t('tx.kind.' + k)}</option>`).join('')}</select>
-      <select class="select" id="tx-grid"><option value="">${t('tx.allGrids')}</option>${['2x2', '4x4', '8x8'].map((g) => `<option value="${g}">Flipbook ${g}</option>`).join('')}</select>
+      <input class="input" id="tx-q" style="flex:1;min-width:220px" placeholder="${t(build ? 'tx.searchBuild' : 'tx.search')}" value="${esc(params.get('q') || '')}">
+      <select class="select" id="tx-kind" ${build ? 'hidden' : ''}><option value="">${t('tx.allKinds')}</option>${['particle', 'flipbook', 'decal', 'texture'].map((k) => `<option value="${k}">${KIND[k]} ${t('tx.kind.' + k)}</option>`).join('')}</select>
+      <select class="select" id="tx-grid" ${build ? 'hidden' : ''}><option value="">${t('tx.allGrids')}</option>${['2x2', '4x4', '8x8'].map((g) => `<option value="${g}">Flipbook ${g}</option>`).join('')}</select>
     </div>
-    <div class="chips tx-chips"><button class="chip on" data-g="">${t('tx.all')} · ${num(items.length)}</button>${groups.map((g) => `<button class="chip" data-g="${esc(g.id)}">${KIND[g.kind] || ''} ${esc(g.label)} · ${g.count}</button>`).join('')}</div>
-    <p class="sub" style="font-size:13px;margin:6px 0 14px">${t('tx.hint')}</p>
+    <div class="chips tx-chips"><button class="chip on" data-g="">${t('tx.all')} · ${num(items.length)}</button>${groups.map((g) => `<button class="chip" data-g="${esc(g.id)}">${KIND[g.kind] || ''} ${esc(g.label.replace(/^Build · /, ''))} · ${g.count}</button>`).join('')}</div>
+    ${build ? '' : `<p class="sub" style="font-size:13px;margin:6px 0 14px">${t('tx.hint')}</p>`}
     <div class="tx-grid" id="tx-grid-box"></div>
     <div class="row" style="justify-content:center;margin-top:18px"><button class="btn" id="tx-more" hidden>${t('tx.more')}</button></div>`;
   let group = params.get('g') || '';
@@ -1938,7 +1941,7 @@ async function renderChat() {
 
 // ---------- Deux espaces : Création (skills, textures, prompts…) et Ressources (bibliothèque, open source…) ----------
 const SPACES = {
-  create: ['examples', 'textures', 'skills', 'prompts', 'studio', 'level', 'connect', 'robloxstudio', 'blender', 'place', 'dev'],
+  create: ['examples', 'textures', 'buildtex', 'skills', 'prompts', 'studio', 'level', 'connect', 'robloxstudio', 'blender', 'place', 'dev'],
   resources: ['library', 'folders', 'opensource', 'channels', 'youtube', 'favorites', 'explore'],
 };
 const spaceOf = (route) => Object.keys(SPACES).find((k) => SPACES[k].includes(route)) || null;
@@ -3038,7 +3041,7 @@ async function route() {
   const pages = {
     library: () => renderLibrary(params), favorites: () => renderLibrary(params, true), examples: renderExamples,
     youtube: () => renderYoutube(params), channels: () => renderChannels(params), explore: renderExplore,
-    chat: renderChat, connect: renderConnect, admin: renderAdmin, settings: renderSettings, update: renderUpdate, robloxstudio: renderRobloxStudio, blender: renderBlender, custom: renderCustom, dev: renderDev, textures: () => renderTextures(params), place: () => renderPlace(params), level: renderLevel, opensource: renderOpenSource, skills: renderSkills, prompts: renderPrompts, studio: renderStudio, folders: () => renderFolders(params),
+    chat: renderChat, connect: renderConnect, admin: renderAdmin, settings: renderSettings, update: renderUpdate, robloxstudio: renderRobloxStudio, blender: renderBlender, custom: renderCustom, dev: renderDev, textures: () => renderTextures(params), buildtex: () => renderTextures(params, true), place: () => renderPlace(params), level: renderLevel, opensource: renderOpenSource, skills: renderSkills, prompts: renderPrompts, studio: renderStudio, folders: () => renderFolders(params),
   };
   if (path === 'chat' && $('#chat')) return;
   try {
