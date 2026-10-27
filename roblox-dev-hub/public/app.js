@@ -1577,9 +1577,9 @@ function md(src) {
   return out.join('');
 }
 
-// ---------- Chat Claude : tes Claude Code (ton abonnement) reliés à Rovex, qui tournent en arrière-plan ----------
-const AG = { list: [], messages: [], cur: '', es: null, unread: {}, setup: null };
-const agentName = (id) => (AG.list.find((a) => a.id === id) || {}).name || id;
+// ---------- Chat Claude : ta conversation Claude Desktop (ton abonnement), reliée à Rovex par MCP ----------
+// Claude écoute le chat avec l'outil chat_listen et répond avec chat_reply : on discute ici, Claude Desktop reste réduit.
+const AG = { claude: { online: false, working: false, waiting: 0 }, messages: [], es: null };
 
 function agClose() {
   if (AG.es) { AG.es.close(); AG.es = null; }
@@ -1589,158 +1589,71 @@ function agMsgHtml(m) {
   if (m.role === 'user') return `<div class="msg user" data-m="${m.id}"><div class="bubble">${esc(m.text).replace(/\n/g, '<br>')}</div></div>`;
   if (m.role === 'claude') return `<div class="msg bot" data-m="${m.id}"><span class="bot-av"><img src="logo.png" alt=""></span><div class="bot-body"><div class="md">${md(m.text)}</div></div></div>`;
   if (m.role === 'status') return `<div class="chat-step" data-m="${m.id}"><i class="tool-st ok"></i>${esc(m.text)}</div>`;
-  if (m.role === 'system') return `<div class="chat-sys" data-m="${m.id}">${t('ag.' + m.key, { name: esc(m.name || '') })} · ${ago(m.t)}</div>`;
-  if (m.role === 'perm') {
-    const open = m.state === 'open';
-    return `<div class="perm ${esc(m.state)}" data-m="${m.id}"><div class="perm-head">🔐 <b>${t('ag.permTitle', { tool: esc(m.tool) })}</b></div>
-      <p>${esc(m.text)}</p>${m.preview ? `<pre>${esc(m.preview)}</pre>` : ''}
-      <div class="row">${open ? `<button class="btn primary small" data-allow="${m.id}">✓ ${t('ag.allow')}</button><button class="btn small danger" data-deny="${m.id}">✕ ${t('ag.deny')}</button>`
-        : `<span class="perm-state">${t(m.state === 'allowed' ? 'ag.allowed' : 'ag.denied')}</span>`}</div></div>`;
-  }
   return '';
 }
 
-function agBind(root) {
-  bindCopy(root);
-  $$('[data-allow],[data-deny]', root).forEach((b) => b.onclick = async () => {
-    const id = b.dataset.allow || b.dataset.deny;
-    $$(`[data-m="${id}"] button`).forEach((x) => (x.disabled = true));
-    try { await api('/agents/verdict', { method: 'POST', body: { msg: id, behavior: b.dataset.allow ? 'allow' : 'deny' } }); }
-    catch (e) { toast(e.message, true); $$(`[data-m="${id}"] button`).forEach((x) => (x.disabled = false)); }
-  });
-}
-
-function agList() {
-  const box = $('#ag-list');
-  if (!box) return;
-  box.innerHTML = AG.list.length ? AG.list.map((a) => `<a class="chat-conv ag ${a.id === AG.cur ? 'active' : ''} ${a.online ? 'on' : 'off'}" href="#/chat?a=${encodeURIComponent(a.id)}" data-id="${esc(a.id)}">
-      <span><i class="ag-dot"></i>${esc(a.name)}${AG.unread[a.id] ? `<em class="ag-unread">${AG.unread[a.id]}</em>` : ''}</span>
-      <small>${a.online ? (a.typing ? t('ag.working') : t('ag.online')) : t('ag.offline')}${a.via ? ' · ' + (a.via === 'desktop' ? 'Claude Desktop' : 'Claude Code') : ''}</small></a>`).join('')
-    : `<p class="muted small">${t('ag.none')}</p>`;
-  const dot = $('#chat-dot');
-  if (dot) dot.hidden = !AG.list.some((a) => a.online);
+// Ouvre Claude Desktop sur une nouvelle conversation avec la consigne déjà écrite (aussi copiée).
+async function agConnect() {
+  try {
+    const { text } = await api('/agents/prompt');
+    await copyText(text);
+    const r = await api('/claude/send', { method: 'POST', body: { text, target: 'desktop' } });
+    if (!r.opened) window.location.href = r.link;
+    toast(t('ag.desktopOpened'));
+  } catch (e) { toast(e.message, true); }
 }
 
 function agHead() {
-  const a = AG.list.find((x) => x.id === AG.cur);
-  if (!$('#chat-title')) return;
-  $('#chat-title').textContent = a ? a.name : t('ag.title');
-  $('#chat-model-tag').textContent = a ? (a.online ? (a.typing ? t('ag.working') : t('ag.online')) : t('ag.offline')) : '';
-  $('#chat-live').hidden = !(a && a.online);
-  const ta = $('#chat-text');
-  if (ta) { ta.disabled = !(a && a.online); ta.placeholder = a && a.online ? t('ag.ph', { name: a.name }) : t('ag.phOff'); }
-  $('#chat-send').disabled = !(a && a.online);
+  const c = AG.claude;
+  const st = c.online ? (c.working ? 'working' : 'on') : 'off';
+  const pill = $('#ag-pill');
+  if (pill) { pill.className = 'ag-pill ' + st; pill.textContent = t(st === 'working' ? 'ag.working' : st === 'on' ? 'ag.listening' : 'ag.notConnected'); }
+  const con = $('#ag-connect');
+  if (con) con.hidden = c.online;
+  const bar = $('#ag-offbar');
+  if (bar) bar.hidden = c.online || !AG.messages.length;
   const typing = $('#ag-typing');
-  if (typing) typing.hidden = !(a && a.online && a.typing);
+  if (typing) typing.hidden = !(c.online && c.working);
+  const dot = $('#chat-dot');
+  if (dot) dot.hidden = !c.online;
 }
 
-// Panneau de droite : les étapes annoncées par Claude, les autorisations en attente, les outils Rovex utilisés.
+// Panneau de droite : les étapes annoncées par Claude et les outils Rovex utilisés.
 function agSide() {
   const box = $('#chat-steps');
   if (!box) return;
-  const mine = AG.messages.filter((m) => m.agent === AG.cur);
-  const steps = mine.filter((m) => m.role === 'status').slice(-12).reverse();
-  const busy = (AG.list.find((a) => a.id === AG.cur) || {}).typing;
-  const perms = mine.filter((m) => m.role === 'perm' && m.state === 'open');
+  const steps = AG.messages.filter((m) => m.role === 'status').slice(-12).reverse();
   const tools = (MCP.log || []).slice(0, 8);
-  box.innerHTML = `${perms.length ? `<div class="side-step perm-wait"><i class="tool-st"></i><div><b>${t('ag.permWait', { n: perms.length })}</b></div></div>` : ''}
-    ${steps.map((m, i) => `<div class="side-step act ${i || !busy ? 'ok' : ''}"><i class="tool-st"></i><div><b>${esc(m.text)}</b><small>${ago(m.t)}</small></div></div>`).join('')}
-    ${tools.length ? `<h4 class="side-sub">${t('ag.tools')}</h4>${tools.map((l) => `<div class="side-step tool ok"><i class="tool-st"></i><div><b>${esc(l.tool)}</b><small>${esc([l.category, l.q].filter(Boolean).join(' · '))} · ${ago(l.t)}</small></div></div>`).join('')}` : ''}
-    ${!steps.length && !perms.length && !tools.length ? `<p class="muted small chat-side-empty">${t('ag.sideEmpty')}</p>` : ''}`;
+  box.innerHTML = `${steps.map((m, i) => `<div class="side-step act ${i || !AG.claude.working ? 'ok' : ''}"><i class="tool-st"></i><div><b>${esc(m.text)}</b><small>${ago(m.t)}</small></div></div>`).join('')}
+    ${tools.length ? `<h4 class="side-sub">${t('ag.tools')}</h4>${tools.map((l) => `<div class="side-step rtool ok"><i class="tool-st"></i><div><b>${esc(l.tool)}</b><small>${esc([l.category, l.q].filter(Boolean).join(' · '))} · ${ago(l.t)}</small></div></div>`).join('')}` : ''}
+    ${!steps.length && !tools.length ? `<p class="muted small chat-side-empty">${t('ag.sideEmpty')}</p>` : ''}`;
 }
 
 const agNear = () => { const b = $('#chat-msgs'); return !b || b.scrollHeight - b.scrollTop - b.clientHeight < 160; };
 const agScroll = () => { const b = $('#chat-msgs'); if (b) b.scrollTop = b.scrollHeight; };
 
+function agWelcome() {
+  return `<div class="ag-setup">
+    <span class="logo big"><img src="logo.png" alt=""></span>
+    <h2>${t('ag.setupTitle')}</h2><p class="muted">${t('ag.setupSub3')}</p>
+    <div class="ag-steps">
+      <div class="ag-step"><span class="num">1</span><div><b>${t('ag.c1')}</b><p>${t('ag.c1t')}</p><button class="btn primary" data-connect>${t('ag.connectDesktop')}</button></div></div>
+      <div class="ag-step"><span class="num">2</span><div><b>${t('ag.c2')}</b><p>${t('ag.c2t')}</p></div></div>
+      <div class="ag-step"><span class="num">3</span><div><b>${t('ag.c3')}</b><p>${t('ag.c3t')}</p></div></div>
+    </div>
+  </div>`;
+}
+
 function agThread() {
   const box = $('#chat-msgs');
   if (!box) return;
-  const mine = AG.messages.filter((m) => m.agent === AG.cur);
-  box.innerHTML = AG.cur
-    ? (mine.length ? mine.map(agMsgHtml).join('') : `<div class="chat-welcome"><h2>${t('ag.hello', { name: esc(agentName(AG.cur)) })}</h2><p>${t('ag.helloSub')}</p></div>`)
-      + `<div class="msg bot" id="ag-typing" hidden><span class="bot-av"><img src="logo.png" alt=""></span><div class="bot-body"><div class="typing"><i></i><i></i><i></i></div></div></div>`
-    : agSetupHtml();
-  agBind(box);
-  if (!AG.cur) agSetupBind();
-  AG.unread[AG.cur] = 0;
-  agList();
+  box.innerHTML = (AG.messages.length ? AG.messages.map(agMsgHtml).join('') : agWelcome())
+    + `<div class="msg bot" id="ag-typing" hidden><span class="bot-av"><img src="logo.png" alt=""></span><div class="bot-body"><div class="typing"><i></i><i></i><i></i></div></div></div>`;
+  bindCopy(box);
+  $$('[data-connect]', box).forEach((b) => b.onclick = agConnect);
   agHead();
   agSide();
   agScroll();
-}
-
-function agSetupHtml() {
-  const s = AG.setup || {};
-  const win = s.platform === 'win32';
-  const install = win ? 'irm https://claude.ai/install.ps1 | iex' : 'curl -fsSL https://claude.ai/install.sh | bash';
-  return `<div class="ag-setup">
-    <h2>${t('ag.setupTitle')}</h2><p class="muted">${t('ag.setupSub2')}</p>
-    <div class="ag-mode"><h3>💬 ${t('ag.modeDesktop')}</h3><p class="muted">${t('ag.modeDesktopSub')}</p>
-      <div class="ag-steps">
-        <div class="ag-step"><span class="num">1</span><div><b>${t('ag.d1')}</b><p>${t('ag.d1t')}</p><button class="btn primary" data-launch="desktop">${t('ag.connectDesktop')}</button></div></div>
-        <div class="ag-step"><span class="num">2</span><div><b>${t('ag.d2')}</b><p>${t('ag.d2t')}</p></div></div>
-      </div></div>
-    <div class="ag-mode"><h3>⌨️ ${t('ag.modeCode')}</h3><p class="muted">${t('ag.modeCodeSub')}</p>
-      <div class="ag-steps">
-        <div class="ag-step ${s.code && s.code.installed ? 'done' : ''}"><span class="num">1</span><div><b>${t('ag.s1')}</b>
-          ${s.code && s.code.installed ? `<p>✓ ${t('ag.s1ok', { v: esc(s.code.version || '') })}</p>` : `<p>${t(win ? 'ag.s1win' : 'ag.s1mac')}</p>${codeBox(install)}<p>${t('ag.s1login')}</p>`}</div></div>
-        <div class="ag-step"><span class="num">2</span><div><b>${t('ag.s2')}</b><p>${t('ag.s2t')}</p><button class="btn" data-launch="code">${t('ag.launchCode')}</button></div></div>
-      </div>
-      <div class="ag-note">⚠️ ${t('ag.preview')}</div></div>
-    <p class="muted small">${t('ag.s3t')}</p>
-  </div>`;
-}
-function agSetupBind() {
-  bindCopy($('#chat-msgs'));
-  $$('#chat-msgs [data-launch]').forEach((b) => b.onclick = () => agLaunchModal(b.dataset.launch));
-}
-
-function agLaunchModal(mode) {
-  const taken = new Set(AG.list.filter((a) => a.online).map((a) => a.name.toLowerCase()));
-  const names = ['Claude', 'Scripteur', 'VFX', 'UI', 'Builder', 'Animateur'];
-  const first = names.find((n) => !taken.has(n.toLowerCase())) || 'Claude 2';
-  let via = mode === 'code' ? 'code' : 'desktop';
-  openModal(`<h2>🚀 ${t('ag.launchTitle')}</h2><p>${t('ag.launchSub')}</p>
-    <div class="field"><label>${t('ag.name')}</label><input class="input" id="al-name" value="${esc(first)}" maxlength="30"></div>
-    <div class="chips" style="margin-bottom:14px">${names.map((n) => `<button class="chip" data-n="${n}">${n}</button>`).join('')}</div>
-    <div class="tabs" id="al-via"><button data-via="desktop">💬 Claude Desktop</button><button data-via="code">⌨️ Claude Code</button></div>
-    <div class="ag-note" id="al-help"></div>
-    <div class="row" style="margin-top:14px"><button class="btn primary" id="al-go"></button></div>
-    <div id="al-out"></div>`);
-  const pick = (v) => {
-    via = v;
-    $$('#al-via button').forEach((b) => b.classList.toggle('active', b.dataset.via === v));
-    $('#al-help').innerHTML = t(v === 'desktop' ? 'ag.helpDesktop' : 'ag.launchHelp');
-    $('#al-go').textContent = t(v === 'desktop' ? 'ag.connectDesktop' : 'ag.launchCode');
-    $('#al-out').innerHTML = '';
-  };
-  pick(via);
-  $$('#al-via button').forEach((b) => b.onclick = () => pick(b.dataset.via));
-  $$('[data-n]').forEach((b) => b.onclick = () => ($('#al-name').value = b.dataset.n));
-  $('#al-go').onclick = async (e) => {
-    const b = e.currentTarget;
-    b.disabled = true;
-    const name = $('#al-name').value;
-    try {
-      if (via === 'desktop') {
-        // Claude Desktop s'ouvre sur une nouvelle conversation, la consigne déjà écrite : il reste à appuyer sur Entrée.
-        const { text } = await api('/agents/prompt?name=' + encodeURIComponent(name));
-        await copyText(text);
-        const r = await api('/claude/send', { method: 'POST', body: { text, target: 'desktop' } });
-        if (!r.opened) window.location.href = r.link;
-        $('#al-out').innerHTML = `<p class="ok-line">✓ ${t('ag.desktopOpened')}</p>`;
-      } else {
-        const r = await api('/agents/launch', { method: 'POST', body: { name } });
-        $('#al-out').innerHTML = r.opened
-          ? `<p class="ok-line">✓ ${t('ag.launched', { name: esc(r.name) })}</p>`
-          : `<p>${t('ag.manual')}</p>${codeBox(`cd "${r.dir}"`)}${codeBox(r.command)}`;
-        bindCopy($('#al-out'));
-      }
-    } catch (er) {
-      $('#al-out').innerHTML = `<p class="chat-err">⚠️ ${esc(er.message)}</p>`;
-    }
-    b.disabled = false;
-  };
 }
 
 function agListen() {
@@ -1749,88 +1662,65 @@ function agListen() {
   AG.es = es;
   es.onmessage = (e) => {
     const ev = JSON.parse(e.data);
-    if (ev.type === 'agents') {
-      const first = !AG.list.length && ev.agents.length;
-      AG.list = ev.agents;
-      if (!AG.cur && first) { const on = AG.list.find((a) => a.online); if (on) return agSelect(on.id); }
-      agList(); agHead(); agSide();
+    if (ev.type === 'state') {
+      AG.claude = ev.claude;
+      agHead();
+      agSide();
     } else if (ev.type === 'msg') {
       AG.messages.push(ev.msg);
-      if (ev.msg.agent !== AG.cur) {
-        if (ev.msg.role === 'claude') AG.unread[ev.msg.agent] = (AG.unread[ev.msg.agent] || 0) + 1;
-        return agList();
-      }
-      const stick = agNear();
       const box = $('#chat-msgs');
-      $('.chat-welcome', box)?.remove();
+      if (!box) return;
+      const stick = agNear();
+      if ($('.ag-setup', box)) return agThread();
       $('#ag-typing').insertAdjacentHTML('beforebegin', agMsgHtml(ev.msg));
-      agBind(box.querySelector(`[data-m="${ev.msg.id}"]`).parentElement);
+      bindCopy(box);
       if (stick || ev.msg.role === 'user') agScroll();
-      agSide();
-    } else if (ev.type === 'perm') {
-      const i = AG.messages.findIndex((m) => m.id === ev.msg.id);
-      if (i >= 0) AG.messages[i] = ev.msg;
-      const el = $(`[data-m="${ev.msg.id}"]`);
-      if (el) { el.outerHTML = agMsgHtml(ev.msg); }
+      agHead();
       agSide();
     } else if (ev.type === 'reset') {
-      api('/agents').then((v) => { AG.messages = v.messages; agThread(); }).catch(() => {});
+      AG.messages = [];
+      agThread();
     }
   };
-}
-
-function agSelect(id) {
-  AG.cur = id || '';
-  try { localStorage.setItem('rovex-agent', AG.cur); } catch {}
-  if (location.hash !== '#/chat' + (id ? '?a=' + encodeURIComponent(id) : '')) history.replaceState(null, '', '#/chat' + (id ? '?a=' + encodeURIComponent(id) : ''));
-  agThread();
-  $('#chat-text')?.focus();
 }
 
 async function agSend() {
   const ta = $('#chat-text');
   const text = ta.value.trim();
-  if (!text || !AG.cur) return;
+  if (!text) return;
   $('#chat-send').disabled = true;
   try {
-    await api('/agents/send', { method: 'POST', body: { agent: AG.cur, text } });
+    await api('/agents/send', { method: 'POST', body: { text } });
     ta.value = '';
     ta.style.height = '';
   } catch (e) { toast(e.message, true); }
-  agHead();
+  $('#chat-send').disabled = false;
 }
 
-async function renderChat(params) {
+async function renderChat() {
   document.body.classList.add('chat-mode');
-  const [v, s] = await Promise.all([api('/agents'), api('/agents/setup').catch(() => ({}))]);
-  AG.list = v.agents;
+  const v = await api('/agents');
+  AG.claude = v.claude;
   AG.messages = v.messages;
-  AG.setup = s;
-  let saved = '';
-  try { saved = localStorage.getItem('rovex-agent') || ''; } catch {}
-  const want = params.get('a') || saved;
-  AG.cur = AG.list.some((a) => a.id === want) ? want : (AG.list.find((a) => a.online) || AG.list[0] || {}).id || '';
   view.innerHTML = `
-    <div class="chat ${AG.hideSide ? 'no-side' : ''}" id="chat">
-      <aside class="chat-list">
-        <button class="btn primary" data-launch>${PLUS}<span>${t('ag.launch')}</span></button>
-        <div class="chat-convs" id="ag-list"></div>
-        <div class="chat-cfg"><a class="btn small" href="#/chat?a=" id="ag-help">❔ ${t('ag.how')}</a></div>
-      </aside>
+    <div class="chat solo ${AG.hideSide ? 'no-side' : ''}" id="chat">
       <section class="chat-main">
-        <div class="chat-head"><div><b id="chat-title"></b><small id="chat-model-tag"></small></div><i class="chat-live" id="chat-live" hidden></i>
+        <div class="chat-head"><span class="bot-av"><img src="logo.png" alt=""></span><div><b>Claude</b><small>${t('ag.subtitle')}</small></div>
+          <span class="ag-pill" id="ag-pill"></span>
+          <button class="btn small primary" id="ag-connect">${t('ag.connectDesktop')}</button>
           <button class="icon-btn" id="ag-clear" title="${t('ag.clear')}"><svg class="line" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button>
           <button class="icon-btn" id="chat-side-btn" title="${t('ag.activity')}"><svg class="line" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M15 4v16"/></svg></button></div>
         <div class="chat-msgs" id="chat-msgs"></div>
+        <div class="ag-offbar" id="ag-offbar" hidden>${t('ag.offbar')} <button class="btn small" data-connect>${t('ag.connectDesktop')}</button></div>
         <form class="chat-input" id="chat-form">
-          <textarea id="chat-text" rows="1"></textarea>
+          <textarea id="chat-text" rows="1" placeholder="${t('ag.ph', { name: 'Claude' })}"></textarea>
           <div class="chat-input-row"><small class="muted">${t('ag.hint')}</small>
             <button class="btn primary chat-send" id="chat-send" title="${t('ag.send')}"><svg class="line" viewBox="0 0 24 24" style="stroke-width:2.4"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button></div>
         </form>
       </section>
       <aside class="chat-side">
         <h3>${t('ag.activity')}</h3>
-        <p class="muted small">${t('ag.activitySub')}</p>
+        <p class="muted small">${t('ag.activitySub2')}</p>
         <div class="chat-steps" id="chat-steps"></div>
       </aside>
     </div>`;
@@ -1838,11 +1728,11 @@ async function renderChat(params) {
   ta.oninput = () => { ta.style.height = ''; ta.style.height = Math.min(ta.scrollHeight, 260) + 'px'; };
   ta.onkeydown = (e) => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); agSend(); } };
   $('#chat-form').onsubmit = (e) => { e.preventDefault(); agSend(); };
-  $$('[data-launch]').forEach((b) => b.onclick = () => agLaunchModal(b.dataset.launch));
-  $('#ag-help').onclick = (e) => { e.preventDefault(); agSelect(''); };
+  $('#ag-connect').onclick = agConnect;
+  $$('#ag-offbar [data-connect]').forEach((b) => b.onclick = agConnect);
   $('#ag-clear').onclick = async () => {
-    if (!AG.cur || !confirm(t('ag.clearAsk'))) return;
-    await api('/agents/clear', { method: 'POST', body: { agent: AG.cur } }).catch((er) => toast(er.message, true));
+    if (!confirm(t('ag.clearAsk'))) return;
+    await api('/agents/clear', { method: 'POST' }).catch((er) => toast(er.message, true));
   };
   $('#chat-side-btn').onclick = () => {
     if (innerWidth <= 1250) return $('#chat').classList.toggle('side-open');
@@ -1851,6 +1741,7 @@ async function renderChat(params) {
   };
   agThread();
   agListen();
+  ta.focus();
 }
 
 // ---------- Deux espaces : Création (skills, textures, prompts…) et Ressources (bibliothèque, open source…) ----------
@@ -2667,10 +2558,9 @@ async function route() {
   const pages = {
     library: () => renderLibrary(params), favorites: () => renderLibrary(params, true), examples: renderExamples,
     youtube: () => renderYoutube(params), channels: () => renderChannels(params), explore: renderExplore,
-    chat: () => renderChat(params), connect: renderConnect, admin: renderAdmin, settings: renderSettings, update: renderUpdate, robloxstudio: renderRobloxStudio, blender: renderBlender, custom: renderCustom, dev: renderDev, textures: () => renderTextures(params), place: () => renderPlace(params), level: renderLevel, opensource: renderOpenSource, skills: renderSkills, prompts: renderPrompts, studio: renderStudio,
+    chat: renderChat, connect: renderConnect, admin: renderAdmin, settings: renderSettings, update: renderUpdate, robloxstudio: renderRobloxStudio, blender: renderBlender, custom: renderCustom, dev: renderDev, textures: () => renderTextures(params), place: () => renderPlace(params), level: renderLevel, opensource: renderOpenSource, skills: renderSkills, prompts: renderPrompts, studio: renderStudio,
   };
-  // Changer de Claude sans recharger la page du chat.
-  if (path === 'chat' && $('#chat')) return agSelect(params.get('a') || '');
+  if (path === 'chat' && $('#chat')) return;
   try {
     await transition(pages[path] || renderHome);
   } catch (e) {
@@ -2730,6 +2620,6 @@ window.addEventListener('hashchange', route);
     if (list) list.innerHTML = activityList(MCP.log || []);
     if ($('#chat')) agSide();
     // Point vert sur « Chat Claude » quand un Claude est connecté (hors de la page du chat).
-    else api('/agents').then((v) => { const d = $('#chat-dot'); if (d) d.hidden = !v.agents.some((a) => a.online); }).catch(() => {});
+    else api('/agents').then((v) => { const d = $('#chat-dot'); if (d) d.hidden = !v.claude.online; }).catch(() => {});
   }, 20000);
 })();

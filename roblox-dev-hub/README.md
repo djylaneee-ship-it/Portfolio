@@ -93,18 +93,13 @@ L'app récupère ce fichier toutes les 30 minutes (**Réglages → Source cloud*
 - Optionnel : un secret `YOUTUBE_API_KEY` (Settings → Secrets → Actions) pour la recherche de vidéos YouTube.
 - GitHub désactive les tâches planifiées d'un dépôt public après 60 jours sans activité : les commits de l'algo comptent comme activité, mais s'il s'arrête, réactive-le dans l'onglet Actions.
 
-## Chat Claude (ton Claude Code relié à Rovex)
+## Chat Claude (ton Claude Desktop relié par MCP)
 
-La page **Chat Claude** permet de parler à Claude **dans Rovex, avec ton abonnement Claude** (Pro ou Max), sans clé API. Deux façons de brancher un Claude :
+La page **Chat Claude** permet de parler à Claude **dans Rovex, avec ton abonnement Claude**, seulement par MCP : une conversation de Claude Desktop écoute le chat avec l'outil `chat_listen` (attend le prochain message, 40 s au plus), répond avec `chat_reply` et annonce ses étapes avec `chat_status`, puis réécoute. On discute dans Rovex, Claude Desktop reste réduit.
 
-- **Claude Desktop** (le plus simple) : « Connecter Claude Desktop » ouvre une nouvelle conversation avec la consigne déjà écrite (aussi disponible comme prompt MCP `rovex-chat` dans le menu **+**). Claude y tourne en boucle avec les outils MCP `chat_listen` (attend le prochain message, jusqu'à 55 s), `chat_reply` et `chat_status`. Claude Desktop reste ouvert (réduit) ; quand la conversation atteint sa limite, on en rebranche une nouvelle.
-- **Claude Code** : Rovex se branche par un *channel* (fonction officielle de Claude Code, en test chez Anthropic). Claude Code tourne dans une petite fenêtre qu'on réduit ; les messages arrivent sans boucle et ses autorisations s'affichent dans Rovex.
-
-- **Lancer un Claude** : Rovex prépare un dossier de travail (`data/claude-workspace` : `.mcp.json` avec `rovex-chat` + `rovex-hub`, outils Rovex pré-autorisés, `CLAUDE.md`) et ouvre un terminal avec `claude --dangerously-load-development-channels server:rovex-chat`. Au lancement, choisir « I am using this for local development » (écran normal pendant la phase de test des channels).
-- **Plusieurs Claudes** : chaque Claude a un nom (Scripteur, VFX, UI…) et sa conversation ; ils travaillent en parallèle.
-- **Ce que fait Claude** : les étapes qu'il annonce (outil `status`), les autorisations en attente et les outils Rovex utilisés. Les demandes d'autorisation de Claude Code (Bash, fichiers…) s'affichent dans le chat avec **Autoriser / Refuser**.
-- Code : `channel.js` (serveur MCP stdio lancé par Claude Code, notifications `claude/channel`, outils `reply` et `status`, relais des autorisations) et `agents.js` (Claudes connectés, messages, requête longue `/agent/inbox`, clé locale `data/agent.json`). Le chat ne marche que sur le PC où Rovex est installé.
-- Il faut Claude Code installé et connecté au compte Claude (Windows : `irm https://claude.ai/install.ps1 | iex` dans PowerShell, puis `claude` une fois pour se connecter).
+- **Connecter Claude Desktop** ouvre une nouvelle conversation avec la consigne déjà écrite (aussi en prompt MCP `rovex-chat`, menu **+**). La première fois, choisir « Toujours autoriser » pour les trois outils du chat.
+- Les messages écrits quand Claude n'écoute pas l'attendent. Si la conversation s'arrête (fermée ou trop longue), on la rebranche : l'historique reste dans Rovex (`data/agent-chat.json`).
+- Code : `agents.js` (conversation, file d'attente, requête longue `/agent/inbox`, clé locale `data/agent.json`) et les outils `chat_*` de `mcp.js`. Le chat ne marche que sur le PC où Rovex est installé.
 
 ## Blender (modélisation et animations R6)
 

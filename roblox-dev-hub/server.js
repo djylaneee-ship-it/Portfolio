@@ -535,18 +535,15 @@ const routes = [
 // Routes accessibles à un ID d'accès simple (lecture seule). Tout le reste est réservé à l'admin.
 // Ce que les membres peuvent faire en plus de lire : brancher Claude sur leur PC, tester la recherche,
 // mettre à jour l'app, utiliser la génération IA.
-// ---------- Chat Claude (Claude Code relié par le channel, abonnement de l'utilisateur) ----------
+// ---------- Chat Claude (Claude Desktop relié par MCP, abonnement de l'utilisateur) ----------
 // Seulement depuis ce PC : en mode partagé, un autre appareil ne parle pas au Claude d'ici.
 const agentLocal = (req) => {
   if (!isLoopback(req)) throw Object.assign(new Error('Only on this PC'), { key: 'chatLocalOnly', code: 403 });
 };
 routes.push(
   ['GET', /^\/api\/agents$/, (req) => { agentLocal(req); return agents.view(); }],
-  ['GET', /^\/api\/agents\/setup$/, (req) => { agentLocal(req); return agents.setup(); }],
-  ['GET', /^\/api\/agents\/prompt$/, (req, m, url) => { agentLocal(req); return { text: mcp.CHAT_PROMPT(String(url.searchParams.get('name') || 'Claude').replace(/[^\p{L}\p{N} _-]/gu, '').trim().slice(0, 30) || 'Claude') }; }],
+  ['GET', /^\/api\/agents\/prompt$/, (req) => { agentLocal(req); return { text: mcp.CHAT_PROMPT }; }],
   ['POST', /^\/api\/agents\/send$/, async (req) => { agentLocal(req); return agents.send(await json(req)); }],
-  ['POST', /^\/api\/agents\/verdict$/, async (req) => { agentLocal(req); return agents.verdict(await json(req)); }],
-  ['POST', /^\/api\/agents\/launch$/, async (req) => { agentLocal(req); return agents.launch(await json(req)); }],
   // Blender (add-on Claude Blender MCP sur ce PC).
   ['GET', /^\/api\/blender$/, async (req) => { agentLocal(req); return blender.status(); }],
   ['PUT', /^\/api\/blender$/, async (req) => { agentLocal(req); blender.writeSettings(await json(req)); return blender.status(); }],
@@ -557,7 +554,7 @@ routes.push(
     try { const { shell } = require('electron'); if (shell && shell.showItemInFolder) { shell.showItemInFolder(blender.ADDON_ZIP); shown = true; } } catch {}
     return { shown, path: blender.ADDON_ZIP };
   }],
-  ['POST', /^\/api\/agents\/clear$/, async (req) => { agentLocal(req); return agents.clear((await json(req)).agent); }],
+  ['POST', /^\/api\/agents\/clear$/, (req) => { agentLocal(req); return agents.clear(); }],
 );
 
 const MEMBER_ACTIONS = [/^\/api\/agents(\/[\w-]+)?$/, /^\/api\/blender(\/addon)?$/, /^\/api\/custom(\/background)?$/, /^\/api\/textures\/thumbs$/, /^\/api\/place\/(read|write|value)$/, /^\/api\/robloxstudio(\/restart)?$/, /^\/api\/claude\/(desktop|code|send)$/, /^\/api\/mcp\/test$/, /^\/api\/update\/(check|install)$/, /^\/api\/gen(\/.*)?$/];
@@ -657,11 +654,11 @@ const server = http.createServer(async (req, res) => {
     if (!out || (Array.isArray(out) && !out.length)) { res.writeHead(202); return res.end(); }
     return send(res, 200, out);
   }
-  // channel.js (Claude Code sur ce PC) : clé du dossier des données, jamais depuis un autre appareil.
+  // mcp.js (Claude Desktop sur ce PC) : clé du dossier des données, jamais depuis un autre appareil.
   if (url.pathname.startsWith('/agent/')) {
     if (!isLoopback(req) || !agents.keyOk(req.headers['x-rovex-agent-key'])) return send(res, 403, { error: 'Forbidden', key: 'forbidden' });
     if (req.method === 'GET' && url.pathname === '/agent/inbox') return agents.inbox(url.searchParams, res);
-    const fn = { '/agent/reply': agents.reply, '/agent/status': agents.status, '/agent/permission': agents.permission, '/agent/bye': agents.bye }[url.pathname];
+    const fn = { '/agent/reply': agents.reply, '/agent/status': agents.status }[url.pathname];
     if (!fn || req.method !== 'POST') return send(res, 404, { error: 'Unknown route', key: 'notFound' });
     try { return send(res, 200, fn(await json(req))); } catch (e) { return send(res, e.code || 400, { error: e.message, key: e.key }); }
   }
@@ -685,7 +682,7 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'GET' && url.pathname === '/api/agents/events') {
       if (!isLoopback(req)) return send(res, 403, { error: 'Only on this PC', key: 'chatLocalOnly' });
       res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-store', Connection: 'keep-alive' });
-      res.write(`data: ${JSON.stringify({ type: 'agents', agents: agents.list() })}\n\n`);
+      res.write(`data: ${JSON.stringify({ type: 'state', claude: agents.state() })}\n\n`);
       const off = agents.subscribe((ev) => res.write(`data: ${JSON.stringify(ev)}\n\n`));
       const ping = setInterval(() => res.write(': ping\n\n'), 15e3);
       req.on('close', () => { clearInterval(ping); off(); });

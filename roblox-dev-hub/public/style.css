@@ -829,22 +829,10 @@ body.chat-mode .view { gap: 0; }
 .cn-chat > span { font-size: 26px; }
 .cn-chat div { flex: 1; } .cn-chat p { margin: 2px 0 0; color: var(--muted2); }
 .cn-chat svg { width: 22px; height: 22px; transition: transform .3s var(--spring); } .cn-chat:hover svg { transform: translateX(4px); }
-/* Chat Claude par channel : Claudes, étapes, autorisations, mise en route. */
-.chat-conv.ag span { display: flex; align-items: center; gap: 8px; }
-.ag-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--line2); flex: none; }
-.chat-conv.ag.on .ag-dot { background: var(--ok); box-shadow: 0 0 0 3px rgba(52, 211, 153, .15); }
-.chat-conv.ag.off { opacity: .6; }
-.ag-unread { margin-left: auto; font-style: normal; font-size: 11px; font-weight: 700; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--accent); color: #fff; display: grid; place-items: center; }
+/* Chat Claude : étapes, mise en route. */
 .chat-step { max-width: 860px; width: 100%; margin: -10px auto 0; padding-left: 42px; display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--muted2); }
 .chat-step .tool-st { width: 7px; height: 7px; background: var(--accent2); }
 .chat-sys { text-align: center; font-size: 11.5px; color: var(--muted); }
-.perm { max-width: 860px; width: 100%; margin: 0 auto; padding: 14px 16px; border-radius: 14px; border: 1px solid var(--warn); background: rgba(252, 211, 77, .06); }
-.perm.allowed { border-color: rgba(52, 211, 153, .5); background: rgba(52, 211, 153, .05); }
-.perm.denied { border-color: rgba(248, 113, 113, .5); background: rgba(248, 113, 113, .05); }
-.perm-head { font-size: 14px; } .perm p { margin: 6px 0 8px; color: var(--muted2); font-size: 13px; }
-.perm pre { margin: 0 0 10px; max-height: 200px; overflow: auto; padding: 10px 12px; border-radius: 9px; background: #07050C; border: 1px solid var(--line); font: 11.5px/1.55 var(--mono); color: #D9D2EA; white-space: pre-wrap; overflow-wrap: anywhere; }
-.perm-state { font-size: 12.5px; font-weight: 600; color: var(--muted2); }
-.side-step.perm-wait { background: rgba(252, 211, 77, .1); }
 .side-sub { margin: 10px 0 2px; font: 600 10.5px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
 .ag-setup { max-width: 720px; margin: auto; display: flex; flex-direction: column; gap: 14px; }
 .ag-setup h2 { font-family: var(--display); font-size: 24px; margin: 0; }
@@ -852,14 +840,25 @@ body.chat-mode .view { gap: 0; }
 .ag-steps { display: flex; flex-direction: column; gap: 10px; }
 .ag-step { display: flex; gap: 14px; padding: 16px; border-radius: 16px; background: var(--panel2); border: 1px solid var(--line); }
 .ag-step .num { width: 30px; height: 30px; font-size: 14px; margin: 0; flex: none; }
-.ag-step.done .num { background: var(--ok); }
 .ag-step > div { flex: 1; min-width: 0; } .ag-step p { margin: 4px 0 8px; color: var(--muted2); font-size: 13px; }
 .ag-note { font-size: 12.5px; color: var(--muted2); padding: 10px 14px; border-radius: 12px; background: var(--panel2); border: 1px dashed var(--line2); }
 .ok-line { color: var(--ok2); font-weight: 600; }
 .chat-input textarea:disabled { opacity: .5; cursor: not-allowed; }
-.ag-mode { padding: 18px; border-radius: 18px; border: 1px solid var(--line2); background: var(--panel); display: flex; flex-direction: column; gap: 10px; }
-.ag-mode h3 { margin: 0; font-size: 16px; } .ag-mode > p { margin: -4px 0 0; }
-#al-via { margin: 4px 0 12px; } #al-via button.active { background: var(--accent-bg); color: var(--text); }
 .bl-steps { grid-template-columns: repeat(4, 1fr); }
 @media (max-width: 1300px) { .bl-steps { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 760px) { .bl-steps { grid-template-columns: 1fr; } }
+/* Chat Claude par MCP : une seule conversation. */
+.chat.solo { grid-template-columns: minmax(0, 1fr) 300px; }
+.chat.solo.no-side { grid-template-columns: minmax(0, 1fr); }
+.chat.solo .chat-head .bot-av { width: 34px; height: 34px; }
+.chat.solo .chat-head > div { flex-direction: column; gap: 0; }
+.ag-pill { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
+.ag-pill.on { color: var(--ok2); background: rgba(52, 211, 153, .12); }
+.ag-pill.working { color: var(--warn); background: rgba(252, 211, 77, .12); }
+.ag-pill.off { color: var(--muted2); background: var(--panel2); }
+.ag-offbar { margin: 0 clamp(10px, 3%, 40px) 8px; padding: 8px 12px; border-radius: 12px; background: var(--panel2); border: 1px dashed var(--line2); font-size: 12.5px; color: var(--muted2); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.ag-setup .logo.big { margin: 0 auto; }
+.ag-setup { text-align: left; }
+.ag-setup > h2, .ag-setup > p { text-align: center; }
+@media (max-width: 1250px) { .chat.solo, .chat.solo.no-side { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 860px) { .chat.solo .chat-list { display: none; } }
