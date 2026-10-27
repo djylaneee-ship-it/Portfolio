@@ -19,7 +19,7 @@ Variables utiles pour tester sans toucher à la vraie base :
 - `ROVEX_NO_AUTOCONNECT=1` : ne pas écrire dans la config de Claude Desktop.
 - `PORT=4790` : autre port.
 - `ROVEX_STUDIO_CONTENT=/un/dossier` : faux dossier « content » de Roblox Studio (tests de l'import des packs d'assets).
-- `ROVEX_SUPABASE_URL` / `ROVEX_SUPABASE_KEY` : une autre base Supabase (ou un faux serveur de test).
+- `ROVEX_SUPABASE_URL` / `ROVEX_SUPABASE_KEY` : une autre base Supabase (ou un faux serveur de test : un Postgres local avec les fichiers `supabase/*.sql` et un petit serveur qui traduit `POST /rest/v1/rpc/<fn>` en `select public.<fn>(...)`).
 
 Avant chaque commit : `for f in *.js public/app.js; do node --check $f; done`. Pour l'interface, une capture Playwright de la page modifiée (`require('playwright')`, `chromium.launch()`).
 
@@ -41,6 +41,7 @@ Travail à plusieurs : une branche par dev (`dev/<pseudo>-<sujet>`), une PR, rel
 | `skills.js` / `skill-texts.js` / `skill-pack/` | Skills Claude (socle `rovex-core` + un par catégorie). Les skills VFX, Animation, GUI, Modeling et Building sont les textes complets de `skill-pack/*.txt` + une courte note d'outils Rovex (`ROVEX_NOTES`) ; monter leur numéro dans `SKILL_VERSIONS` quand le texte change. |
 | `agents.js` | Chat Claude par MCP : une conversation de Claude Desktop écoute le chat (outils `chat_listen` / `chat_attachment` / `chat_reply` / `chat_status` de `mcp.js`) ; `agents.js` garde la conversation et les messages en attente, `/agent/*` (clé locale) et `/api/agents/*`. Images et vidéos de référence : préparées dans l'interface (images réduites, images clés pour une vidéo), rangées dans `media/chat/`, envoyées à Claude par `chat_listen` (le reste avec `chat_attachment`). |
 | `folders.js` / `directives.js` | Dossiers de l'utilisateur (`data/folders.json`, fichiers dans `media/folders/`) : ressources, textures VFX et fichiers importés, outil MCP `rovex_folder`. Directives des prompts `!reference:` / `!skill:` / `!software:` / `!texture:` : lues, vérifiées, données à Groq (Prompt Booster) et à Claude (Chat Claude, instructions MCP). |
+| `cowork.js` / `public/cowork-ui.js` | Espace Co-work (3e espace du sélecteur) : projets partagés entre plusieurs IDs, tâches façon Trello (colonnes / cartes, glisser-déposer, personne, échéance, checklist), tableau d'idées façon Milanote (dossiers, notes, images, checklists, liens posés librement), membres invités avec leur ID Rovex public (`RVX-` + id de l'ID d'accès, jamais le code). Données en ligne : `supabase/rovex-cowork.sql` (fonctions `rovex_cw_*`), synchro toutes les 4 s ; images en cache dans `media/cowork/`. Sans ce SQL, la page dit à l'admin de le lancer. |
 | `gen.js` | Studio IA (images gratuites : Cloudflare FLUX, sinon Pollinations ; détourage des icônes avec `nativeImage`) et Prompt Booster (texte), par la fonction Supabase `rovex-gen`. |
 | `crawler.js` / `cloud-crawl.js` | Exploration (YouTube, DevForum, Bluesky, Reddit, Sketchfab, dev.to, Creator Store, GitHub) ; `cloud-crawl.js` tourne en continu sur GitHub Actions et remplit la bibliothèque en ligne. |
 | `studio.js` / `place.js` / `rbxupload.js` | Pont vers le serveur MCP de Roblox Studio, scripts et réglages de la place ouverte, envoi d'images sur Roblox. |
@@ -50,7 +51,7 @@ Travail à plusieurs : une branche par dev (`dev/<pseudo>-<sujet>`), une PR, rel
 | `public/` | Interface : `index.html`, `app.js` (pages), `i18n.js` (textes en/fr/es/pt), `custom.js` (thèmes et fonds), `style.css`. |
 | `supabase/` | SQL à lancer dans Supabase (SQL Editor) et la fonction Edge `rovex-gen`. |
 
-Les pages de l'interface sont des fonctions `renderXxx()` dans `public/app.js`, branchées dans l'objet `pages` de `route()`. Deux espaces (sélecteur en haut) : `SPACES.create` et `SPACES.resources`.
+Les pages de l'interface sont des fonctions `renderXxx()` dans `public/app.js`, branchées dans l'objet `pages` de `route()`. Trois espaces (sélecteur en haut) : `SPACES.create`, `SPACES.resources` et `SPACES.cowork`.
 
 ## Règles
 

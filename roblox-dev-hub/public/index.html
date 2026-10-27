@@ -24,6 +24,7 @@
         <a href="#/" data-route="home"><svg class="line" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span data-i18n="nav.home"></span></a>
         <a href="#/chat" data-route="chat"><svg class="line" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/><path d="M8.5 10.5h.01M12 10.5h.01M15.5 10.5h.01" style="stroke-width:2.6"/></svg><span data-i18n="nav.chat"></span><i class="nav-dot ok" id="chat-dot" hidden></i></a>
         <a href="#/library" data-route="library"><svg class="line" viewBox="0 0 24 24"><path d="M4 19V5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2zM8 7h6M8 11h6"/></svg><span data-i18n="nav.library"></span></a>
+        <a href="#/cowork" data-route="cowork"><svg class="line" viewBox="0 0 24 24"><rect x="3" y="4" width="5" height="16" rx="1.5"/><rect x="10" y="4" width="5" height="11" rx="1.5"/><rect x="17" y="4" width="4" height="7" rx="1.5"/></svg><span data-i18n="nav.cowork"></span></a>
         <a href="#/folders" data-route="folders"><svg class="line" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M12 11v5M9.5 13.5h5"/></svg><span data-i18n="nav.folders"></span></a>
         <a href="#/opensource" data-route="opensource"><svg class="line" viewBox="0 0 24 24"><path d="M8 9l-4 3 4 3M16 9l4 3-4 3M13.5 5l-3 14"/></svg><span data-i18n="nav.opensource"></span></a>
         <a href="#/examples" data-route="examples"><svg class="line" viewBox="0 0 24 24"><path d="M12 3l2.5 5.5L20 11l-5.5 2.5L12 19l-2.5-5.5L4 11l5.5-2.5z"/></svg><span data-i18n="nav.examples"></span></a>
@@ -66,6 +67,7 @@
           <span class="sw-pill" id="sw-pill"></span>
           <button data-space="create" role="tab"><span>🎨</span><b data-i18n="space.create"></b></button>
           <button data-space="resources" role="tab"><span>📚</span><b data-i18n="space.resources"></b></button>
+          <button data-space="cowork" role="tab"><span>🤝</span><b data-i18n="space.cowork"></b></button>
         </div>
         <label class="search">
           <svg class="line" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
@@ -105,6 +107,7 @@
   <div class="toasts" id="toasts"></div>
   <script src="custom.js"></script>
   <script src="i18n.js"></script>
+  <script src="cowork-ui.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

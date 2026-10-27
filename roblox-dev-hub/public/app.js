@@ -66,7 +66,7 @@ async function api(path, opts = {}) {
   });
   const data = await res.json();
   if (res.status === 401 && path !== '/login') showLogin(data.key === 'otherDevice' ? t('err.otherDevice', data.vars) : '');
-  if (!res.ok) throw new Error(data.key && has('err.' + data.key) ? t('err.' + data.key, data.vars) : data.error || t('err.generic'));
+  if (!res.ok) throw Object.assign(new Error(data.key && has('err.' + data.key) ? t('err.' + data.key, data.vars) : data.error || t('err.generic')), { key: data.key });
   return data;
 }
 
@@ -1943,6 +1943,7 @@ async function renderChat() {
 const SPACES = {
   create: ['examples', 'textures', 'buildtex', 'skills', 'prompts', 'studio', 'level', 'connect', 'robloxstudio', 'blender', 'place', 'dev'],
   resources: ['library', 'folders', 'opensource', 'channels', 'youtube', 'favorites', 'explore'],
+  cowork: ['cowork', 'project'],
 };
 const spaceOf = (route) => Object.keys(SPACES).find((k) => SPACES[k].includes(route)) || null;
 let SPACE = (() => { try { return localStorage.getItem('rovex-space') || 'create'; } catch { return 'create'; } })();
@@ -1970,6 +1971,7 @@ $$('#space-switch button').forEach((b) => b.onclick = () => {
   applySpace(s);
   const cur = (location.hash.slice(2).split('?')[0]) || 'home';
   const sp = spaceOf(cur);
+  if (s === 'cowork') { if (sp !== 'cowork') location.hash = '#/cowork'; return; }
   if (sp && sp !== s) location.hash = s === 'create' ? '#/skills' : '#/library';
 });
 window.addEventListener('resize', moveSpacePill);
@@ -3041,7 +3043,7 @@ async function route() {
   let path = (p || '/').replace(/^\//, '') || 'home';
   if (path === 'mcp') path = 'connect';
   const params = new URLSearchParams(qs || '');
-  const name = path === 'library' && params.get('cat') ? '' : path;
+  const name = path === 'library' && params.get('cat') ? '' : path === 'project' ? 'cowork' : path;
   const sp = spaceOf(path);
   if (sp && sp !== SPACE) applySpace(sp);
   $$('#nav a').forEach((a) => a.classList.toggle('active', a.dataset.route === name));
@@ -3057,6 +3059,7 @@ async function route() {
     library: () => renderLibrary(params), favorites: () => renderLibrary(params, true), examples: renderExamples,
     youtube: () => renderYoutube(params), channels: () => renderChannels(params), explore: renderExplore,
     chat: renderChat, connect: renderConnect, admin: renderAdmin, settings: renderSettings, update: renderUpdate, robloxstudio: renderRobloxStudio, blender: renderBlender, custom: renderCustom, dev: renderDev, textures: () => renderTextures(params), buildtex: () => renderTextures(params, true), place: () => renderPlace(params), level: renderLevel, opensource: renderOpenSource, skills: renderSkills, prompts: renderPrompts, studio: renderStudio, folders: () => renderFolders(params),
+    cowork: renderCowork, project: () => renderProject(params),
   };
   if (path === 'chat' && $('#chat')) return;
   try {

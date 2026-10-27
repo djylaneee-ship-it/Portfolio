@@ -22,6 +22,7 @@ const gen = require('./gen');
 const agents = require('./agents');
 const blender = require('./blender');
 const folders = require('./folders');
+const cowork = require('./cowork');
 const APP_VERSION = require('./package.json').version;
 
 const PORT = Number(process.env.PORT) || 4747;
@@ -188,6 +189,17 @@ const routes = [
     persist();
     return r.resource;
   }],
+  // Co-work : projets partagés (base en ligne, avec l'ID d'accès de la session).
+  ['GET', /^\/api\/cowork$/, (req, m, url, session) => cowork.projects(session)],
+  ['POST', /^\/api\/cowork$/, async (req, m, url, session) => cowork.create(session, await json(req))],
+  ['PUT', /^\/api\/cowork\/profile$/, async (req, m, url, session) => cowork.profile(session, (await json(req)).name)],
+  ['GET', /^\/api\/cowork\/([\w-]+)\/sync$/, (req, m, url, session) => cowork.sync(session, m[1], url.searchParams.get('since'))],
+  ['PUT', /^\/api\/cowork\/([\w-]+)\/nodes$/, async (req, m, url, session) => cowork.put(session, m[1], (await json(req)).nodes)],
+  ['POST', /^\/api\/cowork\/([\w-]+)\/files$/, async (req, m, url, session) => cowork.filePut(session, m[1], (await json(req)).data)],
+  ['POST', /^\/api\/cowork\/([\w-]+)\/members$/, async (req, m, url, session) => cowork.invite(session, m[1], (await json(req)).publicId)],
+  ['DELETE', /^\/api\/cowork\/([\w-]+)\/members\/([\w-]+)$/, (req, m, url, session) => cowork.kick(session, m[1], m[2])],
+  ['PUT', /^\/api\/cowork\/([\w-]+)$/, async (req, m, url, session) => cowork.update(session, m[1], await json(req))],
+  ['DELETE', /^\/api\/cowork\/([\w-]+)$/, (req, m, url, session) => cowork.remove(session, m[1])],
   // Dossiers de l'utilisateur (ressources, textures VFX et fichiers importés), pour les « !reference: » des prompts.
   ['GET', /^\/api\/folders$/, () => ({ folders: folders.list() })],
   ['POST', /^\/api\/folders$/, async (req) => folders.create(await json(req))],
@@ -587,7 +599,7 @@ routes.push(
   ['POST', /^\/api\/agents\/clear$/, (req) => { agentLocal(req); return agents.clear(); }],
 );
 
-const MEMBER_ACTIONS = [/^\/api\/folders(\/[\w-]+(\/(items|upload))?)?$/, /^\/api\/folder-items\/[\w-]+(\/previews)?$/, /^\/api\/agents(\/[\w-]+)?$/, /^\/api\/blender(\/addon)?$/, /^\/api\/custom(\/background)?$/, /^\/api\/textures\/thumbs$/, /^\/api\/place\/(read|write|value)$/, /^\/api\/robloxstudio(\/restart|\/assets)?$/, /^\/api\/claude\/(desktop|code|send)$/, /^\/api\/mcp\/test$/, /^\/api\/update\/(check|install)$/, /^\/api\/gen(\/.*)?$/];
+const MEMBER_ACTIONS = [/^\/api\/cowork(\/[\w-]+(\/(sync|nodes|files|members)(\/[\w-]+)?)?)?$/, /^\/api\/folders(\/[\w-]+(\/(items|upload))?)?$/, /^\/api\/folder-items\/[\w-]+(\/previews)?$/, /^\/api\/agents(\/[\w-]+)?$/, /^\/api\/blender(\/addon)?$/, /^\/api\/custom(\/background)?$/, /^\/api\/textures\/thumbs$/, /^\/api\/place\/(read|write|value)$/, /^\/api\/robloxstudio(\/restart|\/assets)?$/, /^\/api\/claude\/(desktop|code|send)$/, /^\/api\/mcp\/test$/, /^\/api\/update\/(check|install)$/, /^\/api\/gen(\/.*)?$/];
 const USER_ROUTES = [/^\/api\/custom$/, /^\/api\/textures$/, /^\/api\/place\/(studios|scripts|values)$/, /^\/api\/robloxstudio(\/assets)?$/, /^\/api\/claude$/, /^\/api\/version$/, /^\/api\/prompts$/, /^\/api\/skills$/, /^\/api\/skills\/\w+$/, /^\/api\/level$/, /^\/api\/meta$/, /^\/api\/stats$/, /^\/api\/resources$/, /^\/api\/channels$/, /^\/api\/youtube$/, /^\/api\/crawl$/, /^\/api\/examples$/, /^\/api\/mcp$/];
 
 const cookies = (req) => Object.fromEntries(String(req.headers.cookie || '').split(';').map((c) => c.trim().split('=')).filter((p) => p[0]).map(([k, ...v]) => [k, decodeURIComponent(v.join('='))]));
@@ -718,6 +730,12 @@ const server = http.createServer(async (req, res) => {
       const ping = setInterval(() => res.write(': ping\n\n'), 15e3);
       req.on('close', () => { clearInterval(ping); off(); });
       return;
+    }
+    // Image d'une carte du co-work (gardée en cache sur ce PC).
+    const cwFile = req.method === 'GET' && url.pathname.match(/^\/api\/cowork\/([\w-]+)\/files\/([\w-]+)$/);
+    if (cwFile) {
+      try { return serveFile(req, res, await cowork.file(session, cwFile[1], cwFile[2])); }
+      catch (e) { return send(res, e.code || 400, { error: e.message, key: e.key }); }
     }
     const zipM = url.pathname.match(/^\/api\/skills\/(\w+)\/zip$/);
     if (zipM && session.role === 'admin' && skills.SKILL_CATS.includes(zipM[1])) {
