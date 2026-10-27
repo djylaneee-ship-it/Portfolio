@@ -43,7 +43,9 @@ async function providerError(res: Response, name: string) {
   let msg = `HTTP ${res.status}`;
   try {
     const j = await res.json();
-    msg = j?.error?.message ?? j?.detail?.message ?? (typeof j?.detail === 'string' ? j.detail : msg);
+    // Cloudflare : { errors: [{ code, message }] } (ex. 7003 = Account ID invalide, 10000 = jeton refusé).
+    const cf = Array.isArray(j?.errors) && j.errors[0] ? `${j.errors[0].message ?? ''} (code ${j.errors[0].code ?? '?'})` : null;
+    msg = j?.error?.message ?? cf ?? j?.detail?.message ?? (typeof j?.detail === 'string' ? j.detail : msg);
   } catch { /* corps vide */ }
   return json({ error: `${name}: ${String(msg).slice(0, 300)}`, key: 'genFailed', vars: { provider: name, msg: String(msg).slice(0, 300) } }, 502);
 }
