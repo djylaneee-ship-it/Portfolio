@@ -106,6 +106,12 @@ La page **Chat Claude** permet de parler à Claude **dans Rovex, avec ton abonne
 - Code : `channel.js` (serveur MCP stdio lancé par Claude Code, notifications `claude/channel`, outils `reply` et `status`, relais des autorisations) et `agents.js` (Claudes connectés, messages, requête longue `/agent/inbox`, clé locale `data/agent.json`). Le chat ne marche que sur le PC où Rovex est installé.
 - Il faut Claude Code installé et connecté au compte Claude (Windows : `irm https://claude.ai/install.ps1 | iex` dans PowerShell, puis `claude` une fois pour se connecter).
 
+## Blender (modélisation et animations R6)
+
+La page **Blender** branche Claude sur Blender grâce à l'add-on **Claude Blender MCP** (inclus : `blender/claude_blender_mcp-0.1.0.zip`, Blender 4.2+). L'add-on écoute sur `127.0.0.1:9876` (une ligne JSON par commande) ; Rovex lui parle directement (`blender.js`, pas besoin de Python) et donne ses 25 outils à Claude quand on active l'interrupteur : `blender_execute_python` (modélisation bpy/bmesh, export FBX), `blender_viewport_screenshot`, `blender_scene_info`… et les outils d'animation R6 (`r6_create_animation`, `r6_preview`, `r6_analyze`, `r6_export` vers Roblox Studio…). Schémas des outils : `blender/tools.json`. Exports dans `blender-exports/` (dossier des données).
+
+Installation : bouton **Montrer l'add-on** → Blender **Edit › Preferences › Get Extensions › ⌄ › Install from Disk…** → cocher **Claude Blender MCP** → dans le .blend, **N › onglet Claude** affiche *Running on 127.0.0.1:9876* → activer l'interrupteur dans Rovex.
+
 ## Relier en MCP
 
 L'app expose un serveur MCP (`rovex-hub`), à brancher dans Claude ou tout autre client MCP. La page **Connexion Claude** affiche la config exacte, prête à copier, et la commande Claude Code : `claude mcp add --transport http rovex-hub http://localhost:4747/mcp`.

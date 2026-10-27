@@ -1169,6 +1169,45 @@ async function renderConnect() {
   };
 }
 
+// ---------- Blender : l'add-on « Claude Blender MCP » ; Rovex donne ses outils à Claude (modélisation, animations R6) ----------
+async function renderBlender() {
+  const d = await api('/blender');
+  const state = !d.enabled ? 'off' : d.connected ? 'ready' : 'error';
+  const ideas = ['bl.idea1', 'bl.idea2', 'bl.idea3', 'bl.idea4'];
+  view.innerHTML = `
+    ${pageHead('MCP', 'Blender', t('bl.sub'))}
+    <div class="panel rs-status ${state}" data-spot>
+      <span class="pulse"></span>
+      <div class="rs-main"><b>${t('bl.state.' + state)}</b>
+        <small>${state === 'ready' ? esc(['Blender ' + (d.blender || ''), d.file ? d.file.split(/[\\/]/).pop() : t('bl.noFile'), 'add-on ' + (d.addon || '')].join(' · ')) + ' · ' + t('rs.nTools', { n: d.tools })
+          : state === 'error' ? esc(d.error) : t('bl.offText')}</small></div>
+      <label class="switch"><input type="checkbox" id="bl-on" ${d.enabled ? 'checked' : ''}><span></span></label>
+      <button class="btn" id="bl-retry" ${d.enabled ? '' : 'hidden'}>${t('rs.retry')}</button>
+    </div>
+    <div class="steps bl-steps">
+      <div class="panel" data-spot><span class="num">1</span><h3>${t('bl.s1')}</h3><p>${t('bl.s1t')}</p><button class="btn primary" id="bl-addon">📦 ${t('bl.showAddon')}</button><div id="bl-addon-out"></div></div>
+      <div class="panel" data-spot><span class="num">2</span><h3>${t('bl.s2')}</h3><p>${t('bl.s2t')}</p></div>
+      <div class="panel" data-spot><span class="num">3</span><h3>${t('bl.s3')}</h3><p>${t('bl.s3t')}</p></div>
+      <div class="panel" data-spot><span class="num">4</span><h3>${t('bl.s4')}</h3><p>${t('bl.s4t')}</p></div>
+    </div>
+    <div class="two-col">
+      <div class="panel" data-spot><h3>💬 ${t('bl.askTitle')}</h3><p>${t('bl.askText')}</p>
+        <div class="chips">${ideas.map((k) => `<button class="chip" data-copy="${esc(t(k))}">${esc(t(k))}</button>`).join('')}</div></div>
+      <div class="panel" data-spot><h3>⚙️ ${t('bl.cfgTitle')}</h3><p>${t('bl.cfgText')}</p>
+        <form class="row" id="bl-cfg"><input class="input" id="bl-port" inputmode="numeric" style="max-width:140px" value="${esc(d.port)}"><button class="btn">${t('save')}</button></form>
+        <p class="sub" style="font-size:13px;margin-top:12px">${t('bl.exports')}</p>${codeBox(d.exportDir)}</div>
+    </div>`;
+  bindCopy(view);
+  $('#bl-on').onchange = async (e) => { await api('/blender', { method: 'PUT', body: { enabled: e.target.checked } }).catch((er) => toast(er.message, true)); renderBlender(); };
+  $('#bl-retry').onclick = () => renderBlender();
+  $('#bl-cfg').onsubmit = async (e) => { e.preventDefault(); await api('/blender', { method: 'PUT', body: { port: $('#bl-port').value } }).catch((er) => toast(er.message, true)); renderBlender(); };
+  $('#bl-addon').onclick = async () => {
+    const r = await api('/blender/addon', { method: 'POST' }).catch((er) => { toast(er.message, true); return null; });
+    if (r && !r.shown) { $('#bl-addon-out').innerHTML = codeBox(r.path); bindCopy($('#bl-addon-out')); }
+    else if (r) toast(t('bl.addonShown'));
+  };
+}
+
 // ---------- Roblox Studio : Rovex se branche sur le serveur MCP de Studio et repasse ses outils à Claude ----------
 async function renderRobloxStudio() {
   const d = await api('/robloxstudio');
@@ -1816,7 +1855,7 @@ async function renderChat(params) {
 
 // ---------- Deux espaces : Création (skills, textures, prompts…) et Ressources (bibliothèque, open source…) ----------
 const SPACES = {
-  create: ['examples', 'textures', 'skills', 'prompts', 'studio', 'level', 'connect', 'robloxstudio', 'place', 'dev'],
+  create: ['examples', 'textures', 'skills', 'prompts', 'studio', 'level', 'connect', 'robloxstudio', 'blender', 'place', 'dev'],
   resources: ['library', 'opensource', 'channels', 'youtube', 'favorites', 'explore'],
 };
 const spaceOf = (route) => Object.keys(SPACES).find((k) => SPACES[k].includes(route)) || null;
@@ -2628,7 +2667,7 @@ async function route() {
   const pages = {
     library: () => renderLibrary(params), favorites: () => renderLibrary(params, true), examples: renderExamples,
     youtube: () => renderYoutube(params), channels: () => renderChannels(params), explore: renderExplore,
-    chat: () => renderChat(params), connect: renderConnect, admin: renderAdmin, settings: renderSettings, update: renderUpdate, robloxstudio: renderRobloxStudio, custom: renderCustom, dev: renderDev, textures: () => renderTextures(params), place: () => renderPlace(params), level: renderLevel, opensource: renderOpenSource, skills: renderSkills, prompts: renderPrompts, studio: renderStudio,
+    chat: () => renderChat(params), connect: renderConnect, admin: renderAdmin, settings: renderSettings, update: renderUpdate, robloxstudio: renderRobloxStudio, blender: renderBlender, custom: renderCustom, dev: renderDev, textures: () => renderTextures(params), place: () => renderPlace(params), level: renderLevel, opensource: renderOpenSource, skills: renderSkills, prompts: renderPrompts, studio: renderStudio,
   };
   // Changer de Claude sans recharger la page du chat.
   if (path === 'chat' && $('#chat')) return agSelect(params.get('a') || '');

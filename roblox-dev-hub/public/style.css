@@ -860,3 +860,6 @@ body.chat-mode .view { gap: 0; }
 .ag-mode { padding: 18px; border-radius: 18px; border: 1px solid var(--line2); background: var(--panel); display: flex; flex-direction: column; gap: 10px; }
 .ag-mode h3 { margin: 0; font-size: 16px; } .ag-mode > p { margin: -4px 0 0; }
 #al-via { margin: 4px 0 12px; } #al-via button.active { background: var(--accent-bg); color: var(--text); }
+.bl-steps { grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 1300px) { .bl-steps { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 760px) { .bl-steps { grid-template-columns: 1fr; } }

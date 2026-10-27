@@ -42,6 +42,7 @@ Travail à plusieurs : une branche par dev (`dev/<pseudo>-<sujet>`), une PR, rel
 | `gen.js` | Studio IA (images gratuites : Cloudflare FLUX, sinon Pollinations ; détourage des icônes avec `nativeImage`) et Prompt Booster (texte), par la fonction Supabase `rovex-gen`. |
 | `crawler.js` / `cloud-crawl.js` | Exploration (YouTube, DevForum, Bluesky, Reddit, Sketchfab, dev.to, Creator Store, GitHub) ; `cloud-crawl.js` tourne en continu sur GitHub Actions et remplit la bibliothèque en ligne. |
 | `studio.js` / `place.js` / `rbxupload.js` | Pont vers le serveur MCP de Roblox Studio, scripts et réglages de la place ouverte, envoi d'images sur Roblox. |
+| `blender.js` / `blender/` | Pont vers Blender : add-on Claude Blender MCP (TCP 127.0.0.1:9876, une ligne JSON par commande), schémas des 25 outils dans `blender/tools.json`, réglage `data/blender.json`. |
 | `vfx-textures.js` | Bibliothèque de textures VFX (IDs Roblox, grilles de flipbook). |
 | `public/` | Interface : `index.html`, `app.js` (pages), `i18n.js` (textes en/fr/es/pt), `custom.js` (thèmes et fonds), `style.css`. |
 | `supabase/` | SQL à lancer dans Supabase (SQL Editor) et la fonction Edge `rovex-gen`. |

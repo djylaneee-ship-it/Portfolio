@@ -19,6 +19,7 @@ const skills = require('./skills');
 const cloud = require('./cloud');
 const gen = require('./gen');
 const agents = require('./agents');
+const blender = require('./blender');
 const APP_VERSION = require('./package.json').version;
 
 const PORT = Number(process.env.PORT) || 4747;
@@ -546,10 +547,20 @@ routes.push(
   ['POST', /^\/api\/agents\/send$/, async (req) => { agentLocal(req); return agents.send(await json(req)); }],
   ['POST', /^\/api\/agents\/verdict$/, async (req) => { agentLocal(req); return agents.verdict(await json(req)); }],
   ['POST', /^\/api\/agents\/launch$/, async (req) => { agentLocal(req); return agents.launch(await json(req)); }],
+  // Blender (add-on Claude Blender MCP sur ce PC).
+  ['GET', /^\/api\/blender$/, async (req) => { agentLocal(req); return blender.status(); }],
+  ['PUT', /^\/api\/blender$/, async (req) => { agentLocal(req); blender.writeSettings(await json(req)); return blender.status(); }],
+  ['POST', /^\/api\/blender\/addon$/, (req) => {
+    agentLocal(req);
+    // Montre le zip de l'add-on dans l'explorateur, prêt pour « Install from Disk… » dans Blender.
+    let shown = false;
+    try { const { shell } = require('electron'); if (shell && shell.showItemInFolder) { shell.showItemInFolder(blender.ADDON_ZIP); shown = true; } } catch {}
+    return { shown, path: blender.ADDON_ZIP };
+  }],
   ['POST', /^\/api\/agents\/clear$/, async (req) => { agentLocal(req); return agents.clear((await json(req)).agent); }],
 );
 
-const MEMBER_ACTIONS = [/^\/api\/agents(\/[\w-]+)?$/, /^\/api\/custom(\/background)?$/, /^\/api\/textures\/thumbs$/, /^\/api\/place\/(read|write|value)$/, /^\/api\/robloxstudio(\/restart)?$/, /^\/api\/claude\/(desktop|code|send)$/, /^\/api\/mcp\/test$/, /^\/api\/update\/(check|install)$/, /^\/api\/gen(\/.*)?$/];
+const MEMBER_ACTIONS = [/^\/api\/agents(\/[\w-]+)?$/, /^\/api\/blender(\/addon)?$/, /^\/api\/custom(\/background)?$/, /^\/api\/textures\/thumbs$/, /^\/api\/place\/(read|write|value)$/, /^\/api\/robloxstudio(\/restart)?$/, /^\/api\/claude\/(desktop|code|send)$/, /^\/api\/mcp\/test$/, /^\/api\/update\/(check|install)$/, /^\/api\/gen(\/.*)?$/];
 const USER_ROUTES = [/^\/api\/custom$/, /^\/api\/textures$/, /^\/api\/place\/(studios|scripts|values)$/, /^\/api\/robloxstudio$/, /^\/api\/claude$/, /^\/api\/version$/, /^\/api\/prompts$/, /^\/api\/skills$/, /^\/api\/skills\/\w+$/, /^\/api\/level$/, /^\/api\/meta$/, /^\/api\/stats$/, /^\/api\/resources$/, /^\/api\/channels$/, /^\/api\/youtube$/, /^\/api\/crawl$/, /^\/api\/examples$/, /^\/api\/mcp$/];
 
 const cookies = (req) => Object.fromEntries(String(req.headers.cookie || '').split(';').map((c) => c.trim().split('=')).filter((p) => p[0]).map(([k, ...v]) => [k, decodeURIComponent(v.join('='))]));
