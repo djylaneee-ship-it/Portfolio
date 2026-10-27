@@ -8,6 +8,10 @@ const db = require('./db');
 
 const AGENT_FILE = path.join(db.DATA_DIR, 'agent.json');
 const CHAT_FILE = path.join(db.DATA_DIR, 'agent-chat.json');
+// Images de référence envoyées à Claude (photos, captures, images clés des vidéos) : media/chat/.
+const CHAT_MEDIA = path.join(db.MEDIA_DIR, 'chat');
+const MAX_FILES = 8;
+const MAX_FRAMES = 8;
 const ONLINE_MS = 45e3;
 
 const claude = { lastSeen: 0, wait: null, queue: [], working: false };
@@ -96,12 +100,35 @@ function status(b) {
 
 // ---------- Côté interface ----------
 const view = () => ({ claude: state(), messages: chat.slice(-300) });
+// Pièces jointes : images déjà réduites par l'interface (JPEG / PNG / WebP en data URL). Une vidéo arrive en
+// quelques images clés avec leur instant, que Claude regarde comme une suite.
+function saveFiles(list) {
+  if (!Array.isArray(list)) return [];
+  fs.mkdirSync(CHAT_MEDIA, { recursive: true });
+  return list.slice(0, MAX_FILES).map((f) => {
+    const frames = (Array.isArray(f.frames) ? f.frames : []).slice(0, MAX_FRAMES).map((src) => {
+      const m = String(src).match(/^data:image\/(jpeg|png);base64,([A-Za-z0-9+/=]+)$/);
+      if (!m) throw Object.assign(new Error('Unsupported file'), { key: 'chatFileBad' });
+      const buf = Buffer.from(m[2], 'base64');
+      if (buf.length > 3 * 1024 * 1024) throw Object.assign(new Error('File too large'), { key: 'tooBig' });
+      const name = `${crypto.randomBytes(8).toString('hex')}.${m[1] === 'jpeg' ? 'jpg' : 'png'}`;
+      fs.writeFileSync(path.join(CHAT_MEDIA, name), buf);
+      return 'chat/' + name;
+    });
+    if (!frames.length) return null;
+    const kind = f.kind === 'video' ? 'video' : 'image';
+    const times = kind === 'video' && Array.isArray(f.times) ? f.times.slice(0, frames.length).map((x) => Math.round(Number(x) * 10) / 10 || 0) : undefined;
+    return { kind, name: String(f.name || '').slice(0, 120), frames, ...(times && { times }), ...(kind === 'video' && { duration: Math.round(Number(f.duration) * 10) / 10 || 0 }) };
+  }).filter(Boolean);
+}
+
 // Le message attend Claude s'il n'écoute pas encore : il le reçoit dès qu'il se connecte.
 function send(b) {
   const text = String(b.text || '').trim().slice(0, 20000);
-  if (!text) throw Object.assign(new Error('Empty message'), { key: 'chatEmpty' });
-  const msg = add({ role: 'user', text });
-  claude.queue.push({ kind: 'chat', text });
+  const files = saveFiles(b.files);
+  if (!text && !files.length) throw Object.assign(new Error('Empty message'), { key: 'chatEmpty' });
+  const msg = add({ role: 'user', text, ...(files.length && { files }) });
+  claude.queue.push({ kind: 'chat', text, ...(files.length && { files }) });
   if (claude.wait) claude.wait.flush();
   changed();
   return { ok: true, msg };
@@ -110,6 +137,7 @@ function clear() {
   chat = [];
   claude.queue = [];
   persist();
+  fs.rm(CHAT_MEDIA, { recursive: true, force: true }, () => {});
   emit({ type: 'reset' });
   changed();
   return { ok: true };
@@ -119,4 +147,4 @@ function subscribe(fn) {
   return () => listeners.delete(fn);
 }
 
-module.exports = { init, keyOk, inbox, reply, status, view, send, clear, subscribe, state };
+module.exports = { CHAT_MEDIA, init, keyOk, inbox, reply, status, view, send, clear, subscribe, state };
