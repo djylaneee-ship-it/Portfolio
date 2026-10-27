@@ -1,0 +1,28 @@
+schema_version = "1.0.0"
+
+id = "claude_blender_mcp"
+version = "0.2.0"
+name = "Claude Blender MCP"
+tagline = "Let Claude model, sculpt, rig and animate in Blender (Rovex Hub)"
+maintainer = "djyla"
+type = "add-on"
+
+tags = ["Modeling", "Sculpt", "Animation", "Rigging"]
+
+blender_version_min = "4.2.0"
+
+license = [
+  "SPDX:GPL-3.0-or-later",
+]
+
+[permissions]
+network = "Local TCP server on 127.0.0.1 that receives commands from Claude"
+files = "Save .blend files, screenshots, previews and Roblox exports"
+
+[build]
+paths_exclude_pattern = [
+  "__pycache__/",
+  "*.pyc",
+  "/.git/",
+  "/*.zip",
+]

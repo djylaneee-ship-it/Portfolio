@@ -1,7 +1,9 @@
 // Pont vers Blender : l'add-on « Claude Blender MCP » (dossier blender/) écoute sur 127.0.0.1:9876 et reçoit des
 // commandes JSON, une par ligne ({id, command, params} → {id, status, result|error}). Rovex parle directement à
-// ce port (pas besoin de Python) et donne ses outils à Claude : modélisation par bpy (blender_execute_python),
-// captures de la vue 3D, et tous les outils d'animation R6 (r6_*). Désactivé tant que l'utilisateur ne l'active pas.
+// ce port (pas besoin de Python) et donne ses outils à Claude : modélisation, Edit Mode, sculpt, rig et animation par
+// bpy + la boîte à outils rx de l'add-on (blender_execute_python), vue multi-angles (blender_view), captures et tous
+// les outils d'animation R6 (r6_*). Source de l'add-on : blender/addon (zip refait par blender/build_addon.py).
+// Désactivé tant que l'utilisateur ne l'active pas.
 const fs = require('fs');
 const net = require('net');
 const path = require('path');
@@ -10,10 +12,15 @@ const db = require('./db');
 
 const SETTINGS_FILE = path.join(db.DATA_DIR, 'blender.json');
 const EXPORT_DIR = path.join(path.dirname(db.DATA_DIR), 'blender-exports');
-const ADDON_ZIP = path.join(__dirname, 'blender', 'claude_blender_mcp-0.1.0.zip');
+const ADDON_VERSION = '0.2.0';
+const ADDON_ZIP = path.join(__dirname, 'blender', `claude_blender_mcp-${ADDON_VERSION}.zip`);
 const SPEC = JSON.parse(fs.readFileSync(path.join(__dirname, 'blender', 'tools.json'), 'utf8'));
 const NAMES = new Set(SPEC.tools.map((t) => t.name));
-const LONG = new Set(['r6_preview', 'r6_export']);
+const LONG = new Set(['r6_preview', 'r6_export', 'blender_view']);
+const IMAGES = new Set(['blender_viewport_screenshot', 'blender_view', 'r6_preview']);
+// Vieil add-on (0.1.x) : pas de rx ni de vue multi-angles.
+const OLD_ADDON = `\nThe Blender add-on is outdated: ask the user to install claude_blender_mcp-${ADDON_VERSION}.zip (Rovex > Blender > step 1: Edit > Preferences > Get Extensions > Install from Disk), then retry.`;
+const newer = (a, b) => { const x = String(a || '0').split('.').map(Number); const y = b.split('.').map(Number); for (let i = 0; i < 3; i++) { if ((x[i] || 0) !== y[i]) return (x[i] || 0) > y[i]; } return true; };
 
 function readSettings() {
   try { return { enabled: false, port: 9876, ...JSON.parse(fs.readFileSync(SETTINGS_FILE, 'utf8')) }; } catch { return { enabled: false, port: 9876 }; }
@@ -34,7 +41,7 @@ const owns = (name) => enabled() && NAMES.has(name);
 function tools() {
   if (!enabled()) return [];
   return SPEC.tools.map((t) => (t.name === 'blender_execute_python'
-    ? { ...t, description: `${t.description}\nExport folder for FBX/OBJ files: ${EXPORT_DIR}` }
+    ? { ...t, description: `${t.description}\nExport folder (rx.export_fbx default): ${EXPORT_DIR}` }
     : t));
 }
 
@@ -112,8 +119,8 @@ async function call(name, a = {}) {
   let params = { ...defaults, ...a };
   let timeout = LONG.has(name) ? 300e3 : 120e3;
   if (name === 'blender_execute_python') {
-    timeout = Math.max(1000, (Number(a.timeout_s) || 120) * 1000);
-    params = { code: a.code };
+    timeout = Math.max(1000, (Number(a.timeout_s) || 180) * 1000);
+    params = { code: a.code, fresh: Boolean(a.fresh), export_dir: EXPORT_DIR };
   }
   if (name === 'r6_create_animation') params.params = a.params || {};
   if (name === 'r6_export') {
@@ -122,9 +129,18 @@ async function call(name, a = {}) {
     params.joints = Array.isArray(a.joints) && a.joints.length ? a.joints : null;
     params.grip = a.grip && a.grip !== 'tool' ? a.grip : null;
   }
-  const result = await send(command, params, timeout);
-  if (name === 'blender_ping' && result && typeof result === 'object') result.port = result.port || readSettings().port;
-  if (name === 'blender_viewport_screenshot' || name === 'r6_preview') return withImage(result);
+  let result;
+  try {
+    result = await send(command, params, timeout);
+  } catch (e) {
+    if (/Unknown command '(view|mesh_stats)'|name 'rx' is not defined/.test(e.message)) e.message += OLD_ADDON;
+    throw e;
+  }
+  if (name === 'blender_ping' && result && typeof result === 'object') {
+    result.port = result.port || readSettings().port;
+    if (!newer(result.addon_version, ADDON_VERSION)) result.warning = OLD_ADDON.trim();
+  }
+  if (IMAGES.has(name)) return withImage(result);
   return { content: [text(result)] };
 }
 
@@ -134,9 +150,11 @@ async function status() {
   let ping = null;
   let error = '';
   try { ping = await send('ping', {}, 4000); } catch (e) { error = e.message.split('\n')[0]; }
-  return { ...s, connected: Boolean(ping), blender: ping && ping.blender, file: ping && ping.file, addon: ping && ping.addon_version, error, tools: SPEC.tools.length, exportDir: EXPORT_DIR, addonZip: ADDON_ZIP };
+  return { ...s, connected: Boolean(ping), blender: ping && ping.blender, file: ping && ping.file, addon: ping && ping.addon_version, addonOld: Boolean(ping) && !newer(ping.addon_version, ADDON_VERSION), addonVersion: ADDON_VERSION, error, tools: SPEC.tools.length, exportDir: EXPORT_DIR, addonZip: ADDON_ZIP };
 }
 
-const INSTRUCTIONS = `\n\nBlender is connected through Rovex: for ANY 3D modeling task (model, mesh, weapon, pet, prop…) you MUST model it in Blender with blender_execute_python (bpy / bmesh, low poly Roblox style), check it with blender_viewport_screenshot, iterate, and export FBX for Roblox; do not build it from Roblox parts instead. For Roblox R6 animations: ${SPEC.instructions || ''}`;
+const INSTRUCTIONS = `\n\nBlender is connected through Rovex with full access: for ANY 3D modeling task (model, mesh, weapon, pet, prop, creature…) you MUST make it in Blender, not from Roblox parts.
+Workflow: blender_scene_info -> build step by step with blender_execute_python and the rx toolkit (rx.prim, then Edit Mode with \`with rx.edit(ob) as bm:\` + rx.extrude / rx.inset / rx.bevel / rx.loop_cut, modifiers, rx.sculpt brushes for organic shapes, rx.paint colors) -> after EVERY step look at it with blender_view (front, right, top, persp; wireframe to check topology) and fix -> rx.stats for polycount (keep Roblox models light) -> rx.armature + rx.skin + rx.key / rx.pose to rig and animate -> rx.export_fbx and tell the user the file path (Roblox Studio: 3D Importer). Keep code in small calls: variables persist between calls. Errors come back with the Blender traceback and state: read them and fix the code.
+For Roblox R6 animations: ${SPEC.instructions || ''}`;
 
-module.exports = { readSettings, writeSettings, enabled, owns, tools, call, status, ADDON_ZIP, EXPORT_DIR, INSTRUCTIONS, SETTINGS_FILE };
+module.exports = { readSettings, writeSettings, enabled, owns, tools, call, status, ADDON_ZIP, ADDON_VERSION, EXPORT_DIR, INSTRUCTIONS, SETTINGS_FILE };

@@ -1181,7 +1181,7 @@ async function renderConnect() {
 async function renderBlender() {
   const d = await api('/blender');
   const state = !d.enabled ? 'off' : d.connected ? 'ready' : 'error';
-  const ideas = ['bl.idea1', 'bl.idea2', 'bl.idea3', 'bl.idea4'];
+  const ideas = ['bl.idea1', 'bl.idea5', 'bl.idea3', 'bl.idea2', 'bl.idea4'];
   view.innerHTML = `
     ${pageHead('MCP', 'Blender', t('bl.sub'))}
     <div class="panel rs-status ${state}" data-spot>
@@ -1192,6 +1192,7 @@ async function renderBlender() {
       <label class="switch"><input type="checkbox" id="bl-on" ${d.enabled ? 'checked' : ''}><span></span></label>
       <button class="btn" id="bl-retry" ${d.enabled ? '' : 'hidden'}>${t('rs.retry')}</button>
     </div>
+    ${d.addonOld ? `<div class="panel bl-old" data-spot>⚠️ ${esc(t('bl.old', { v: d.addon || '?', n: d.addonVersion }))}</div>` : ''}
     <div class="steps bl-steps">
       <div class="panel" data-spot><span class="num">1</span><h3>${t('bl.s1')}</h3><p>${t('bl.s1t')}</p><button class="btn primary" id="bl-addon">📦 ${t('bl.showAddon')}</button><div id="bl-addon-out"></div></div>
       <div class="panel" data-spot><span class="num">2</span><h3>${t('bl.s2')}</h3><p>${t('bl.s2t')}</p></div>
