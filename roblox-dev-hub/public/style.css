@@ -1079,3 +1079,14 @@ body.chat-mode .view { gap: 0; }
 .cw-colors { display: flex; gap: 8px; flex-wrap: wrap; }
 .cw-colors button { width: 30px; height: 30px; border-radius: 50%; border: 3px solid transparent; cursor: pointer; }
 .cw-colors button.on { border-color: var(--text); }
+
+/* Meshy AI (page Blender) */
+.my-panel { margin-top: 18px; }
+.my-key { gap: 10px; align-items: center; margin: 10px 0 6px; }
+.my-err { color: var(--danger); font-size: 13px; margin: 6px 0 0; }
+.my-h { margin: 18px 0 10px; font-size: 14px; }
+.my-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
+.my-item { display: grid; gap: 3px; padding: 8px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel2); min-width: 0; }
+.my-item img, .my-noimg { width: 100%; aspect-ratio: 1; object-fit: contain; border-radius: 8px; background: #0b0814; display: grid; place-items: center; font-size: 28px; }
+.my-item b { font-size: 12.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.my-item small { color: var(--muted); font-size: 11px; }

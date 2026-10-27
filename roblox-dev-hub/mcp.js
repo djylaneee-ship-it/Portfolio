@@ -14,6 +14,7 @@ const rbxupload = require('./rbxupload');
 const rbxassets = require('./rbxassets');
 const folders = require('./folders');
 const directives = require('./directives');
+const meshy = require('./meshy');
 const textures = require('./vfx-textures');
 const vm = require('vm');
 
@@ -80,6 +81,7 @@ const SKILL_RULE = `
 Skills: for every Roblox task, first identify the domains it needs (scripting, vfx, animation, cutscenes, gui, gfx, modeling, building, audio, design, tools) and call load_skill once with only those categories and the task keywords (an attack = scripting + animation + vfx; a boss intro = cutscenes + animation + vfx, + audio if needed; a menu = gui + scripting). Read all of it before working: the core rules (rovex-core) apply to every task. Project art direction: VFX are built from custom-textured ParticleEmitters, never the Fire, Smoke or Sparkles classes. Their textures MUST come from the Rovex VFX textures (find_vfx_textures): no other texture ID is allowed, never from memory, never invented; if nothing fits after several searches, tell the user instead of using another texture. The ready-made VFX templates of ReplicatedStorage.RovexAssets.VFX (see rovex_assets) are also allowed, with their own textures.
 
 Roblox Studio: when tools starting with studio_ are available, Rovex is connected to the place open in Roblox Studio. Before writing code for the user's game, use them to read the real scripts, the Explorer structure and the data, and follow the existing architecture. Only change the place (edit scripts, run code that modifies it, insert models) when the user asked for it, and say what you changed. To put an image in the game (icon, UI, decal), make or pick it (generate_image), then call upload_image_to_roblox with a target path: Rovex uploads it to Roblox and sets it in Studio.
+Meshy AI: when the meshy_* tools are available (the user saved their own Meshy key), you can start a complex or organic model (creature, character, detailed prop) from a Meshy base shape: meshy_text_to_3d or meshy_image_to_3d (shape only unless a texture is asked), it lands in Blender, then rework it there (proportions, low poly cleanup with rx.decimate / rx.remesh or meshy_remesh, flat colors with rx.paint, rig, animate). Meshy spends the user's credits: one generation per request, never batches the user did not ask for.
 Build textures: for any surface texture on a build or map (ground, grass, sand, wood, planks, fence, cobblestone, rock walls…), call find_build_textures: it shows the user's build textures with their rbxassetid; use those, never invented IDs.
 Rovex assets: every place connected to Rovex gets ReplicatedStorage.RovexAssets (Environment = stylized trees, plants, rocks, clouds, water; VFX/Combat and VFX/Fire = 130+ ready VFX templates; UI/StudUI = a stud-style HUD and windows). Call rovex_assets (with keywords) to see what is there and reuse these assets (Clone them) before building from scratch.
 
@@ -227,6 +229,72 @@ const TOOLS = [
     description: 'Rovex chat: show what you are doing right now (one short sentence) in the Rovex chat, during a long task.',
     inputSchema: { type: 'object', properties: { text: { type: 'string' } }, required: ['text'] },
     annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false },
+  },
+  {
+    name: 'meshy_text_to_3d',
+    description: 'Meshy AI (the user\'s own Meshy account and credits): generate a 3D model from a text description, as a BASE SHAPE to rework in Blender. By default only the shape (no texture, cheaper and faster); texture=true adds a texture pass. Waits up to ~100 s, downloads the GLB, imports it into the open Blender scene and shows a thumbnail; if it is not ready yet, call meshy_task with the returned task_id. Then look at it with blender_view and clean it with rx (apply_transform, decimate or remesh, shade, paint). Each call spends Meshy credits: only generate what the user asked for.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        prompt: { type: 'string', description: 'What to model, in English, concrete: shape, proportions, style (e.g. "low poly cartoon fox sitting, big tail, stylized").' },
+        model_type: { type: 'string', enum: ['standard', 'lowpoly'], description: 'lowpoly = clean low-poly mesh (good for Roblox); standard = detailed.' },
+        topology: { type: 'string', enum: ['quad', 'triangle'], description: 'Standard model only: remesh to quads or triangles.' },
+        target_polycount: { type: 'number', description: 'Standard model only: wanted polygon count (100-300000).' },
+        symmetry: { type: 'string', enum: ['auto', 'on', 'off'] },
+        texture: { type: 'boolean', description: 'Also texture the model (second, longer Meshy task). Default false.' },
+        texture_prompt: { type: 'string', description: 'Texture description when texture=true.' },
+        import_to_blender: { type: 'boolean', description: 'Import the GLB into Blender when it is connected (default true).' },
+      },
+      required: ['prompt'],
+    },
+    annotations: { readOnlyHint: false, openWorldHint: true },
+  },
+  {
+    name: 'meshy_image_to_3d',
+    description: 'Meshy AI: make a 3D base shape from a reference image (a file path on this PC, e.g. from rovex_folder or a chat attachment, or an https link). Same flow as meshy_text_to_3d: GLB downloaded, imported into Blender, thumbnail shown; use meshy_task if it is not ready yet. Spends the user\'s Meshy credits.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        image: { type: 'string', description: 'PNG/JPG file path on this PC, or an https URL.' },
+        name: { type: 'string', description: 'Short name for the model.' },
+        model_type: { type: 'string', enum: ['standard', 'lowpoly'] },
+        topology: { type: 'string', enum: ['quad', 'triangle'] },
+        target_polycount: { type: 'number' },
+        symmetry: { type: 'string', enum: ['auto', 'on', 'off'] },
+        texture: { type: 'boolean', description: 'Texture it from the image (default false: shape only).' },
+        import_to_blender: { type: 'boolean' },
+      },
+      required: ['image'],
+    },
+    annotations: { readOnlyHint: false, openWorldHint: true },
+  },
+  {
+    name: 'meshy_remesh',
+    description: 'Meshy AI: rebuild a model made earlier (its task_id) with a clean topology and a target polygon count (quad by default, origin at the bottom), then download it and import it into Blender. Useful to get a light Roblox-ready base. Spends Meshy credits.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        task_id: { type: 'string' },
+        target_polycount: { type: 'number', description: 'Default 5000.' },
+        topology: { type: 'string', enum: ['quad', 'triangle'] },
+        height: { type: 'number', description: 'Optional height of the model in meters.' },
+        import_to_blender: { type: 'boolean' },
+      },
+      required: ['task_id'],
+    },
+    annotations: { readOnlyHint: false, openWorldHint: true },
+  },
+  {
+    name: 'meshy_task',
+    description: 'Meshy AI: check a generation started earlier (task_id from another meshy_* tool). Waits up to ~100 s; when it is done, downloads the GLB, imports it into Blender and shows the thumbnail.',
+    inputSchema: { type: 'object', properties: { task_id: { type: 'string' }, import_to_blender: { type: 'boolean' } }, required: ['task_id'] },
+    annotations: { readOnlyHint: false, openWorldHint: true },
+  },
+  {
+    name: 'meshy_balance',
+    description: 'Meshy AI: the credits left on the user\'s Meshy account.',
+    inputSchema: { type: 'object', properties: {} },
+    annotations: { readOnlyHint: true, openWorldHint: true },
   },
   {
     name: 'rovex_folder',
@@ -520,6 +588,11 @@ async function call(name, a = {}) {
       return rbxassets.list(a.query, a.limit);
     case 'rovex_folder':
       return folderView(a.path);
+    case 'meshy_text_to_3d': return meshy.textTo3d(a);
+    case 'meshy_image_to_3d': return meshy.imageTo3d(a);
+    case 'meshy_remesh': return meshy.remesh(a);
+    case 'meshy_task': return meshy.task(a);
+    case 'meshy_balance': return meshy.balance();
     case 'upload_image_to_roblox':
       return rbxupload.upload(state, a);
     case 'chat_listen': {
@@ -643,8 +716,9 @@ async function call(name, a = {}) {
 function enabledTools() {
   const settings = store.load().settings || {};
   const off = settings.mcpTools || {};
-  // Les outils dev_* n'existent qu'en mode développeur.
-  return TOOLS.filter((x) => off[x.name] !== false && (!x.name.startsWith('dev_') || settings.devMode));
+  // Les outils dev_* n'existent qu'en mode développeur, les meshy_* quand une clé Meshy est enregistrée.
+  const hasMeshy = meshy.enabled();
+  return TOOLS.filter((x) => off[x.name] !== false && (!x.name.startsWith('dev_') || settings.devMode) && (!x.name.startsWith('meshy_') || hasMeshy));
 }
 
 // Journal « Activité de Claude » (les 100 derniers appels) et compteurs du niveau : dans un petit fichier à
@@ -803,10 +877,13 @@ if (require.main === module) {
   try { studio.sync(); } catch {}
   // Blender activé ou désactivé dans l'app : la liste des outils change.
   let blenderOn = blender.enabled();
+  let meshyOn = meshy.enabled();
   setInterval(() => {
     const on = blender.enabled();
-    if (on !== blenderOn && CLIENT) process.stdout.write(JSON.stringify({ jsonrpc: '2.0', method: 'notifications/tools/list_changed' }) + '\n');
+    const m = meshy.enabled();
+    if ((on !== blenderOn || m !== meshyOn) && CLIENT) process.stdout.write(JSON.stringify({ jsonrpc: '2.0', method: 'notifications/tools/list_changed' }) + '\n');
     blenderOn = on;
+    meshyOn = m;
   }, 5000).unref();
   // Réglage modifié dans l'app : on suit sans redémarrer Claude.
   setInterval(() => { try { studio.sync(); } catch {} }, 15e3).unref();

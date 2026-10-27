@@ -1180,8 +1180,31 @@ async function renderConnect() {
 }
 
 // ---------- Blender : l'add-on « Claude Blender MCP » ; Rovex donne ses outils à Claude (modélisation, animations R6) ----------
+// Meshy AI sur la page Blender : chaque membre enregistre sa propre clé (gardée sur son PC).
+function meshyPanel(m) {
+  const done = (m.tasks || []).filter((x) => x.status === 'SUCCEEDED');
+  return `<div class="panel my-panel" data-spot>
+    <div class="row" style="justify-content:space-between"><h3 style="margin:0">🧊 Meshy AI</h3>
+      ${m.hasKey ? `<span class="st ${m.error ? 'draft' : 'validated'}">${m.error ? t('my.keyProblem') : t('my.connected')}</span>` : `<span class="st review">${t('my.noKey')}</span>`}</div>
+    <p>${t('my.text')}</p>
+    ${m.hasKey ? `<div class="row my-key"><code class="cw-pid">${esc(m.keyHint)}</code>
+        ${m.balance !== undefined ? `<span class="sub">${t('my.credits', { n: num(m.balance) })}</span>` : ''}
+        <button class="btn small danger" id="my-del">${t('my.remove')}</button></div>
+      ${m.error ? `<p class="my-err">⚠️ ${esc(m.error)}</p>` : ''}`
+      : `<form class="row my-key" id="my-form"><input class="input" id="my-key" type="password" placeholder="msy_…" autocomplete="off" style="flex:1;min-width:220px">
+        <button class="btn primary">${t('save')}</button></form>
+      <p class="sub" style="font-size:13px">${t('my.howKey')}</p>`}
+    <div class="chips" style="margin-top:10px">${['my.idea1', 'my.idea2'].map((k) => `<button class="chip" data-copy="${esc(t(k))}">${esc(t(k))}</button>`).join('')}</div>
+    ${done.length ? `<h4 class="my-h">${t('my.recent')}</h4><div class="my-grid">${done.map((x) => `<div class="my-item">
+        ${x.hasThumb ? `<img src="/api/meshy/thumb/${esc(x.id)}" alt="" loading="lazy">` : '<span class="my-noimg">🧊</span>'}
+        <b title="${esc(x.name)}">${esc(x.name || x.id)}</b><small>${esc(x.kind)} · ${ago(x.at)}</small></div>`).join('')}</div>
+      <p class="sub" style="font-size:12.5px;margin-top:8px">${t('my.folder')}</p>${codeBox(m.outDir)}` : ''}
+  </div>`;
+}
+
 async function renderBlender() {
   const d = await api('/blender');
+  const my = await api('/meshy').catch(() => null);
   const state = !d.enabled ? 'off' : d.connected ? 'ready' : 'error';
   const ideas = ['bl.idea1', 'bl.idea5', 'bl.idea3', 'bl.idea2', 'bl.idea4'];
   view.innerHTML = `
@@ -1207,8 +1230,20 @@ async function renderBlender() {
       <div class="panel" data-spot><h3>⚙️ ${t('bl.cfgTitle')}</h3><p>${t('bl.cfgText')}</p>
         <form class="row" id="bl-cfg"><input class="input" id="bl-port" inputmode="numeric" style="max-width:140px" value="${esc(d.port)}"><button class="btn">${t('save')}</button></form>
         <p class="sub" style="font-size:13px;margin-top:12px">${t('bl.exports')}</p>${codeBox(d.exportDir)}</div>
-    </div>`;
+    </div>
+    ${my ? meshyPanel(my) : ''}`;
   bindCopy(view);
+  const myForm = $('#my-form');
+  if (myForm) myForm.onsubmit = async (e) => {
+    e.preventDefault();
+    try { await api('/meshy', { method: 'PUT', body: { key: $('#my-key').value } }); toast(t('my.saved')); renderBlender(); } catch (er) { toast(er.message, true); }
+  };
+  const myDel = $('#my-del');
+  if (myDel) myDel.onclick = async () => {
+    if (!confirm(t('my.confirmRemove'))) return;
+    await api('/meshy', { method: 'PUT', body: { key: '' } }).catch((er) => toast(er.message, true));
+    renderBlender();
+  };
   $('#bl-on').onchange = async (e) => { await api('/blender', { method: 'PUT', body: { enabled: e.target.checked } }).catch((er) => toast(er.message, true)); renderBlender(); };
   $('#bl-retry').onclick = () => renderBlender();
   $('#bl-cfg').onsubmit = async (e) => { e.preventDefault(); await api('/blender', { method: 'PUT', body: { port: $('#bl-port').value } }).catch((er) => toast(er.message, true)); renderBlender(); };
@@ -2927,7 +2962,7 @@ async function renderFolders(params) {
 }
 
 // ---------- Directives des prompts : !reference / !skill / !software, insérées par des boutons ----------
-const SOFTWARES = ['Roblox Studio', 'Blender'];
+const SOFTWARES = ['Roblox Studio', 'Blender', 'Meshy'];
 const dirBar = () => `<div class="dir-bar"><span class="sub">${t('dir.label')}</span>
   <button type="button" class="chip" data-dir="reference">📁 ${t('dir.ref')}</button>
   <button type="button" class="chip" data-dir="skill">🧠 ${t('dir.skill')}</button>

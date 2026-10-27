@@ -31,6 +31,7 @@ const SKILL_ALIASES = {
 const SOFTWARE = [
   { name: 'Roblox Studio', keys: ['robloxstudio', 'studio', 'roblox', 'rbxstudio'], tools: 'the studio_* tools (read and edit the open place), execute_luau, upload_image_to_roblox' },
   { name: 'Blender', keys: ['blender', 'blend'], tools: 'the blender_* tools (blender_execute_python with the rx toolkit, blender_view) and r6_* for R6 animations' },
+  { name: 'Meshy', keys: ['meshy', 'meshyai'], tools: 'the meshy_* tools (base shapes from text or images, then imported into Blender)' },
 ];
 
 function parse(text) {

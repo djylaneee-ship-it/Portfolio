@@ -1,7 +1,7 @@
 {
   "name": "rovex-hub",
   "productName": "Rovex Hub",
-  "version": "2.26.0",
+  "version": "2.27.0",
   "description": "Rovex Hub: Roblox dev knowledge base (videos, docs, VFX, scripts, animations, GUI, GFX) connected to Claude via MCP.",
   "author": "Rovex",
   "main": "electron.js",

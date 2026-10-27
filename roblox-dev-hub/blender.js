@@ -157,4 +157,7 @@ const INSTRUCTIONS = `\n\nBlender is connected through Rovex with full access: f
 Workflow: blender_scene_info -> build step by step with blender_execute_python and the rx toolkit (rx.prim, then Edit Mode with \`with rx.edit(ob) as bm:\` + rx.extrude / rx.inset / rx.bevel / rx.loop_cut, modifiers, rx.sculpt brushes for organic shapes, rx.paint colors) -> after EVERY step look at it with blender_view (front, right, top, persp; wireframe to check topology) and fix -> rx.stats for polycount (keep Roblox models light) -> rx.armature + rx.skin + rx.key / rx.pose to rig and animate -> rx.export_fbx and tell the user the file path (Roblox Studio: 3D Importer). Keep code in small calls: variables persist between calls. Errors come back with the Blender traceback and state: read them and fix the code.
 For Roblox R6 animations: ${SPEC.instructions || ''}`;
 
-module.exports = { readSettings, writeSettings, enabled, owns, tools, call, status, ADDON_ZIP, ADDON_VERSION, EXPORT_DIR, INSTRUCTIONS, SETTINGS_FILE };
+// Code Python lancé dans Blender par d'autres modules de Rovex (ex. import des modèles Meshy).
+const run = (code, timeout = 120e3) => send('execute_python', { code, export_dir: EXPORT_DIR }, timeout);
+
+module.exports = { readSettings, writeSettings, enabled, owns, tools, call, run, status, ADDON_ZIP, ADDON_VERSION, EXPORT_DIR, INSTRUCTIONS, SETTINGS_FILE };

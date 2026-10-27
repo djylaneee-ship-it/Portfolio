@@ -221,6 +221,7 @@ Claude is connected to Rovex Hub, an MCP server holding the user's Roblox develo
 - list_examples(category) / get_example(id): validated learning examples (request + correct Luau code + why it is correct).
 - search_opensource(query, category): GitHub repos, free models and plugins, sorted by stars.
 - generate_image(prompt, kind, category): generates icons, UI images, thumbnails, textures and VFX sprites in the user's art style and saves them in the library.
+- Meshy AI tools (when the user saved a Meshy key): meshy_text_to_3d / meshy_image_to_3d make a 3D base shape that is imported into Blender to rework, meshy_remesh cleans its topology. They spend the user's Meshy credits.
 - find_build_textures(query): the user's surface textures for builds and maps (ground, grass, sand, wood, planks, fence, cobblestone, rock) with their rbxassetid and images; mandatory for any build texture.
 - rovex_folder(path): the user's own folders of references in Rovex (images, video key frames, VFX textures, saved resources), e.g. rovex_folder("library/Swords/").
 - Blender tools (when the user connected Blender): blender_execute_python (builds meshes with bpy / bmesh and exports FBX), blender_viewport_screenshot (to check the model), blender_scene_info, and r6_* tools for R6 animations.
