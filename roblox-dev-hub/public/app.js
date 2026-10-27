@@ -2399,8 +2399,8 @@ async function renderAdmin() {
   if ($('#reset-key')) $('#reset-key').onclick = async () => {
     if (!confirm(t('admin.confirmReset'))) return;
     const r = await api('/admin/reset-key', { method: 'POST' });
-    prompt(t('admin.newKey'), r.key);
-    location.reload();
+    openModal(`<h2 class="detail-title">${t('admin.newKey')}</h2>${codeBox(r.key)}<div class="row" style="margin-top:16px"><button class="btn primary" id="key-ok">OK</button></div>`);
+    $('#key-ok').onclick = () => location.reload();
   };
 }
 
@@ -2708,6 +2708,20 @@ async function upload(files, category = '') {
   refreshStats(); route();
 }
 
+// Petite fenêtre de saisie : window.prompt() n'existe pas dans l'app de bureau (Electron).
+function askText(title, value = '', placeholder = '') {
+  return new Promise((done) => {
+    openModal(`<h2 class="detail-title">${esc(title)}</h2>
+      <form id="ask-form" class="row"><input class="input" name="v" style="flex:1" value="${esc(value)}" placeholder="${esc(placeholder)}" autocomplete="off" required><button class="btn primary">${t('save')}</button></form>`);
+    let out = null;
+    const inp = $('#ask-form input');
+    inp.focus();
+    inp.select();
+    $('#ask-form').onsubmit = (e) => { e.preventDefault(); out = inp.value.trim() || null; closeModal(); };
+    const watch = setInterval(() => { if ($('#modal').hidden) { clearInterval(watch); done(out); } }, 120);
+  });
+}
+
 // ---------- Mes dossiers : ressources, textures VFX et fichiers importés, appelés dans un prompt par « !reference: » ----------
 let FD_OPEN = '';
 const fdTree = (list) => {
@@ -2872,7 +2886,7 @@ async function renderFolders(params) {
 !texture: 10024120805 (Wood Planks)</pre></div>`;
   bindCopy(view);
   const create = async (parent) => {
-    const name = prompt(t(parent ? 'fd.subPh' : 'fd.newPh'));
+    const name = await askText(t(parent ? 'fd.sub2' : 'fd.new'), '', t(parent ? 'fd.subPh' : 'fd.newPh'));
     if (!name) return;
     try { const f = await api('/folders', { method: 'POST', body: { name, parent } }); FD_OPEN = f.id; renderFolders(new URLSearchParams({ f: f.id })); } catch (e) { toast(e.message, true); }
   };
@@ -2882,7 +2896,7 @@ async function renderFolders(params) {
   if (!cur) return;
   $('#fd-sub').onclick = () => create(cur.id);
   $('#fd-ren').onclick = async () => {
-    const name = prompt(t('fd.rename'), cur.name);
+    const name = await askText(t('fd.rename'), cur.name);
     if (!name || name === cur.name) return;
     try { await api('/folders/' + cur.id, { method: 'PUT', body: { name } }); renderFolders(params); } catch (e) { toast(e.message, true); }
   };
@@ -2983,10 +2997,11 @@ function bindDirBar(root, ta) {
       : `<p>${t('fd.none')} <a href="#/folders">${t('nav.folders')} →</a></p>`;
     b.parentElement.appendChild(menu);
     menu.style.left = b.offsetLeft + 'px';
-    $$('button', menu).forEach((x) => x.onclick = (ev) => {
+    $$('button', menu).forEach((x) => x.onclick = async (ev) => {
       ev.stopPropagation();
       const o = opts[Number(x.dataset.n)];
-      const v = o.v || (prompt(t('dir.otherPh')) || '').trim();
+      menu.remove();
+      const v = o.v || ((await askText(t('dir.other').replace('…', ''), '', t('dir.otherPh'))) || '').trim();
       menu.remove();
       if (v) dirInsert(ta, kind, v);
     });
