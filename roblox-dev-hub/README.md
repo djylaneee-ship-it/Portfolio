@@ -93,6 +93,16 @@ L'app récupère ce fichier toutes les 30 minutes (**Réglages → Source cloud*
 - Optionnel : un secret `YOUTUBE_API_KEY` (Settings → Secrets → Actions) pour la recherche de vidéos YouTube.
 - GitHub désactive les tâches planifiées d'un dépôt public après 60 jours sans activité : les commits de l'algo comptent comme activité, mais s'il s'arrête, réactive-le dans l'onglet Actions.
 
+## Chat Claude intégré (sans Claude Desktop)
+
+La page **Chat Claude** permet de parler à Claude directement dans Rovex, avec une interface comme celle de Claude : conversations à gauche, réponse au centre, et à droite le panneau **Ce que fait Claude** (son raisonnement et chaque action : skills, bibliothèque, textures VFX, Roblox Studio…), en direct.
+
+- Rovex joue lui-même le rôle de Claude Desktop : il donne à Claude **les mêmes outils MCP** (y compris les outils `studio_*` de Roblox Studio) et les exécute. **Claude Desktop peut rester fermé.**
+- Chaque membre branche **sa propre clé Claude** (console.anthropic.com → API Keys) : elle reste sur son PC, chiffrée par Windows, et n'est jamais envoyée à Rovex. On paie à l'usage sur la Console Claude. L'abonnement Claude Pro / Max ne marche que dans les apps d'Anthropic (Claude Desktop, claude.ai, Claude Code) : pour l'utiliser, garde la connexion MCP classique, les deux marchent.
+- Modèles : Claude Opus 5.5 (par défaut), Sonnet 5.5, Haiku 5.5 ; réflexion rapide / normale / poussée / maximale. Images jointes (bouton, coller, glisser).
+- Les conversations sont gardées dans `chats/` (dossier des données). Claude continue de travailler si tu changes de page ; un point vert sur « Chat Claude » le montre.
+- Le chat ne marche que sur le PC où Rovex est installé (pas depuis un autre appareil en mode partagé).
+
 ## Relier en MCP
 
 L'app expose un serveur MCP (`rovex-hub`), à brancher dans Claude ou tout autre client MCP. La page **Connexion Claude** affiche la config exacte, prête à copier, et la commande Claude Code : `claude mcp add --transport http rovex-hub http://localhost:4747/mcp`.

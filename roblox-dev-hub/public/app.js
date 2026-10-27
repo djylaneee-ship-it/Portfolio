@@ -1125,6 +1125,7 @@ async function renderConnect() {
     ${pageHead(t('cn.eyebrow'), t('nav.connect'), t('cn.sub'), `
       <div class="server-card ${m.connected ? '' : 'off'}"><span class="pulse"></span><div><b>${m.connected ? t('cn.statusOn') : t('cn.statusOff')}</b><small>${esc(m.url.replace('http://', ''))}${m.lastCall ? ' · ' + ago(m.lastCall) : ''}</small></div>
       <button class="btn small" data-copy="${esc(m.url)}">${t('copy')}</button></div>`)}
+    <a class="panel cn-chat" href="#/chat" data-spot><span>💬</span><div><b>${t('cn.chatTitle')}</b><p>${t('cn.chatText')}</p></div>${ARROW}</a>
     <div class="claude-apps" id="claude-apps"><div class="skel" style="min-height:150px"></div><div class="skel" style="min-height:150px"></div></div>
     <div class="steps">
       <div class="panel" data-spot><span class="num">1</span><h3>${t('cn.s1')}</h3><p>${t('cn.s1t')}</p></div>
@@ -1477,6 +1478,525 @@ async function renderTextures(params) {
     };
   };
   draw();
+}
+
+// ---------- Chat Claude dans Rovex : Rovex fait l'hôte MCP, Claude Desktop peut rester fermé ----------
+const CHAT = { id: '', es: null, running: false, atts: [], status: null };
+const MODEL_LABEL = { 'claude-opus-5-5': 'Claude Opus 5.5', 'claude-sonnet-5-5': 'Claude Sonnet 5.5', 'claude-haiku-5-5': 'Claude Haiku 5.5' };
+const SEND_ICON = '<svg class="line" viewBox="0 0 24 24" style="stroke-width:2.4"><path d="M12 19V5M5 12l7-7 7 7"/></svg>';
+const CLIP = '<svg class="line" viewBox="0 0 24 24"><path d="M21 11.5l-8.6 8.6a5.5 5.5 0 0 1-7.8-7.8l8.9-8.9a3.7 3.7 0 0 1 5.2 5.2l-8.9 8.9a1.8 1.8 0 0 1-2.6-2.6L15.5 7"/></svg>';
+
+// Petit Markdown sûr (tout est échappé) : titres, listes, citations, tableaux, code, gras, liens.
+function mdInline(raw) {
+  return String(raw).split(/(`[^`\n]+`)/g).map((part, i) => (i % 2 ? `<code>${esc(part.slice(1, -1))}</code>` : esc(part)
+    .replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
+    .replace(/(^|[\s(])\*(?!\s)(.+?)\*(?=[\s).,!?:;]|$)/g, '$1<i>$2</i>')
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>'))).join('');
+}
+function md(src) {
+  const lines = String(src || '').replace(/\r/g, '').split('\n');
+  const out = [];
+  const LIST = /^\s*([-*+]|\d+[.)])\s+/;
+  const cells = (l) => l.trim().replace(/^\||\|$/g, '').split('|').map((x) => x.trim());
+  let i = 0;
+  while (i < lines.length) {
+    const l = lines[i];
+    const fence = l.match(/^\s*```\s*([\w+-]*)/);
+    if (fence) {
+      const buf = [];
+      i++;
+      while (i < lines.length && !/^\s*```/.test(lines[i])) buf.push(lines[i++]);
+      i++;
+      const code = buf.join('\n');
+      const lua = /^(lua|luau)?$/i.test(fence[1]);
+      out.push(`<div class="code md-code"><div class="md-code-bar"><span>${esc(fence[1] || 'code')}</span><button class="btn small" data-copy="${esc(code)}">${t('copy')}</button></div><pre>${lua ? highlight(code) : esc(code)}</pre></div>`);
+      continue;
+    }
+    const h = l.match(/^(#{1,4})\s+(.*)/);
+    if (h) { out.push(`<h${h[1].length + 2}>${mdInline(h[2])}</h${h[1].length + 2}>`); i++; continue; }
+    if (LIST.test(l)) {
+      const ordered = /^\s*\d/.test(l);
+      const items = [];
+      while (i < lines.length && LIST.test(lines[i])) items.push(lines[i++].replace(LIST, ''));
+      out.push(`<${ordered ? 'ol' : 'ul'}>${items.map((x) => `<li>${mdInline(x)}</li>`).join('')}</${ordered ? 'ol' : 'ul'}>`);
+      continue;
+    }
+    if (/^\s*>/.test(l)) {
+      const q = [];
+      while (i < lines.length && /^\s*>/.test(lines[i])) q.push(lines[i++].replace(/^\s*>\s?/, ''));
+      out.push(`<blockquote>${q.map(mdInline).join('<br>')}</blockquote>`);
+      continue;
+    }
+    if (/^\s*(---+|\*\*\*+)\s*$/.test(l)) { out.push('<hr>'); i++; continue; }
+    if (/^\s*\|.*\|\s*$/.test(l)) {
+      const rows = [];
+      while (i < lines.length && /^\s*\|.*\|\s*$/.test(lines[i])) rows.push(lines[i++]);
+      const body = rows.filter((r) => !/^[\s|:-]+$/.test(r)).map(cells);
+      out.push(`<div class="md-table"><table><thead><tr>${(body.shift() || []).map((c) => `<th>${mdInline(c)}</th>`).join('')}</tr></thead><tbody>${body.map((r) => `<tr>${r.map((c) => `<td>${mdInline(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`);
+      continue;
+    }
+    if (!l.trim()) { i++; continue; }
+    const para = [];
+    while (i < lines.length && lines[i].trim() && !/^\s*(```|#{1,4}\s|>|\|)/.test(lines[i]) && !LIST.test(lines[i])) para.push(lines[i++]);
+    if (!para.length) para.push(lines[i++]);
+    out.push(`<p>${para.map(mdInline).join('<br>')}</p>`);
+  }
+  return out.join('');
+}
+
+// Nom lisible d'un outil (Roblox Studio : préfixe studio_).
+function toolLabel(name) {
+  if (has('chat.tool.' + name)) return t('chat.tool.' + name);
+  if (name.startsWith('studio_')) return 'Roblox Studio · ' + name.slice(7).replace(/_/g, ' ');
+  return name.replace(/_/g, ' ');
+}
+// Résumé court des arguments d'un appel (la requête, la catégorie, le script…).
+function toolArgs(input) {
+  let a = {};
+  try { a = JSON.parse(input || '{}'); } catch { return ''; }
+  const v = a.query || a.categories || a.category || a.path || a.title || a.url || a.name || a.id || a.mode || '';
+  return String(Array.isArray(v) ? v.join(' + ') : typeof v === 'object' ? '' : v).slice(0, 70);
+}
+function prettyJson(s) {
+  try { return JSON.stringify(JSON.parse(s), null, 2); } catch { return String(s || ''); }
+}
+
+function chatClose() {
+  if (CHAT.es) { CHAT.es.close(); CHAT.es = null; }
+}
+// Point vert sur « Chat Claude » tant que Claude travaille, même sur une autre page.
+let chatDotTimer = null;
+function chatDot(on) {
+  const d = $('#chat-dot');
+  if (d) d.hidden = !on;
+  clearInterval(chatDotTimer);
+  if (!on) return;
+  chatDotTimer = setInterval(async () => {
+    if (CHAT.es) return;
+    const r = await api('/chat').catch(() => null);
+    if (r && !r.chats.some((c) => c.running)) chatDot(false);
+  }, 5000);
+}
+
+// Regroupe les messages enregistrés en tours « toi » / « Claude » (avec les résultats des outils).
+function chatTurns(messages) {
+  const turns = [];
+  const results = {};
+  for (const m of messages) {
+    if (m.role === 'user') {
+      for (const b of m.content) if (b.type === 'tool_result') results[b.tool_use_id] = b;
+      const real = m.content.filter((b) => b.type !== 'tool_result');
+      if (real.length) turns.push({ role: 'user', blocks: real });
+    } else {
+      const last = turns[turns.length - 1];
+      if (last && last.role === 'assistant') last.blocks.push(...m.content);
+      else turns.push({ role: 'assistant', blocks: [...m.content] });
+    }
+  }
+  return { turns, results };
+}
+
+const userHtml = (blocks) => {
+  const imgs = blocks.filter((b) => b.type === 'image').length;
+  const text = blocks.filter((b) => b.type === 'text').map((b) => b.text).join('\n');
+  return `<div class="msg user"><div class="bubble">${imgs ? `<span class="msg-imgs">🖼️ ${t('chat.images', { n: imgs })}</span>` : ''}${esc(text).replace(/\n/g, '<br>')}</div></div>`;
+};
+const thinkHtml = (text, open) => `<details class="think" ${open ? 'open' : ''}><summary><span class="think-ic">💭</span>${t('chat.thought')}</summary><div class="think-body">${esc(text).replace(/\n/g, '<br>')}</div></details>`;
+function toolHtml(b, r) {
+  const st = !r ? 'run' : r.error ? 'err' : 'ok';
+  return `<details class="ctool ${st}" data-tool="${esc(b.id)}"><summary><i class="tool-st"></i><b>${esc(toolLabel(b.name))}</b><small class="tool-args">${esc(toolArgs(b.input))}</small><small class="tool-ms"></small></summary>
+    <div class="tool-io"><small>${t('chat.input')}</small><pre class="tool-in">${esc(prettyJson(b.input))}</pre><small>${t('chat.result')}</small><pre class="tool-out">${esc(r ? r.text : '…')}</pre></div></details>`;
+}
+function botHtml(blocks, results) {
+  return `<div class="msg bot"><span class="bot-av"><img src="logo.png" alt=""></span><div class="bot-body">${blocks.map((b) => {
+    if (b.type === 'thinking') return b.thinking ? thinkHtml(b.thinking) : '';
+    if (b.type === 'text') return b.text ? `<div class="md">${md(b.text)}</div>` : '';
+    if (b.type === 'tool_use') return toolHtml(b, results[b.tool_use_id || b.id]);
+    return '';
+  }).join('')}</div></div>`;
+}
+
+// Panneau « Ce que fait Claude » : le raisonnement et les actions du dernier tour.
+function sideReset() {
+  const s = $('#chat-steps');
+  if (s) s.innerHTML = `<p class="muted small chat-side-empty">${t('chat.sideEmpty')}</p>`;
+  CHAT.tokens = { input: 0, output: 0 };
+  sideUsage();
+}
+function sideAdd(html) {
+  const s = $('#chat-steps');
+  if (!s) return null;
+  $('.chat-side-empty', s)?.remove();
+  s.insertAdjacentHTML('beforeend', html);
+  s.scrollTop = s.scrollHeight;
+  return s.lastElementChild;
+}
+const sideStep = (kind, label, sub = '', st = '') => `<div class="side-step ${kind} ${st}"><i class="tool-st"></i><div><b>${esc(label)}</b>${sub ? `<small>${esc(sub)}</small>` : ''}</div></div>`;
+function sideUsage() {
+  const u = $('#chat-usage');
+  if (u) u.innerHTML = CHAT.tokens && (CHAT.tokens.input || CHAT.tokens.output) ? t('chat.tokens', { i: num(CHAT.tokens.input), o: num(CHAT.tokens.output) }) : '';
+}
+function sideFromTurn(turn, results) {
+  sideReset();
+  if (!turn || turn.role !== 'assistant') return;
+  for (const b of turn.blocks) {
+    if (b.type === 'thinking' && b.thinking) sideAdd(sideStep('think', t('chat.thinking'), b.thinking.slice(-220), 'ok'));
+    if (b.type === 'tool_use') {
+      const r = results[b.id];
+      sideAdd(sideStep('act', toolLabel(b.name), toolArgs(b.input), !r ? '' : r.error ? 'err' : 'ok'));
+    }
+    if (b.type === 'text' && b.text) sideAdd(sideStep('say', t('chat.answering'), '', 'ok'));
+  }
+}
+
+const nearBottom = (el) => el.scrollHeight - el.scrollTop - el.clientHeight < 140;
+function chatScroll(force) {
+  const box = $('#chat-msgs');
+  if (box && (force || CHAT.stick)) box.scrollTop = box.scrollHeight;
+}
+
+function chatWelcome() {
+  const ideas = ['chat.idea1', 'chat.idea2', 'chat.idea3', 'chat.idea4'];
+  return `<div class="chat-welcome"><span class="logo big"><img src="logo.png" alt=""></span><h2>${t('chat.hello')}</h2><p>${t('chat.helloSub')}</p>
+    <div class="chat-ideas">${ideas.map((k) => `<button class="chip" data-idea="${esc(t(k))}">${esc(t(k))}</button>`).join('')}</div></div>`;
+}
+
+async function chatConvs() {
+  const box = $('#chat-convs');
+  if (!box) return;
+  const d = await api('/chat').catch(() => null);
+  if (!d || !$('#chat-convs')) return;
+  box.innerHTML = d.chats.length ? d.chats.map((c) => `<a class="chat-conv ${c.id === CHAT.id ? 'active' : ''}" href="#/chat?id=${esc(c.id)}" data-id="${esc(c.id)}">
+      ${c.running ? '<i class="spinner"></i>' : ''}<span>${esc(c.title || t('chat.untitled'))}</span><small>${ago(c.updated)}</small>
+      <button class="chat-conv-x" data-del="${esc(c.id)}" title="${t('delete')}">×</button></a>`).join('')
+    : `<p class="muted small">${t('chat.noConvs')}</p>`;
+  $$('[data-del]', box).forEach((b) => b.onclick = async (e) => {
+    e.preventDefault(); e.stopPropagation();
+    if (!confirm(t('chat.delConfirm'))) return;
+    await api('/chat/' + b.dataset.del, { method: 'DELETE' }).catch((er) => toast(er.message, true));
+    if (b.dataset.del === CHAT.id) location.hash = '#/chat'; else chatConvs();
+  });
+}
+
+function setRunning(on) {
+  CHAT.running = on;
+  const send = $('#chat-send');
+  const stop = $('#chat-stop');
+  if (send) send.hidden = on;
+  if (stop) stop.hidden = !on;
+  const dot = $('#chat-live');
+  if (dot) dot.hidden = !on;
+  if (on) chatDot(true);
+}
+
+async function chatOpen(id) {
+  chatClose();
+  CHAT.id = id || '';
+  const c = id ? await api('/chat/' + id).catch(() => null) : null;
+  if (id && !c) CHAT.id = '';
+  const box = $('#chat-msgs');
+  if (!box) return;
+  $('#chat-title').textContent = c ? c.title || t('chat.untitled') : t('chat.newTitle');
+  $('#chat-model-tag').textContent = MODEL_LABEL[c ? c.model : CHAT.status.model] || '';
+  let msgs = c ? c.messages : [];
+  // Réponse en cours : on affiche jusqu'au dernier message, la suite arrive en direct.
+  if (c && c.running) {
+    let last = -1;
+    msgs.forEach((m, i) => { if (m.role === 'user' && m.content.some((b) => b.type !== 'tool_result')) last = i; });
+    msgs = msgs.slice(0, last + 1);
+  }
+  const { turns, results } = chatTurns(msgs);
+  box.innerHTML = turns.length ? turns.map((tr) => (tr.role === 'user' ? userHtml(tr.blocks) : botHtml(tr.blocks, results))).join('') : chatWelcome();
+  bindCopy(box);
+  $$('[data-idea]', box).forEach((b) => b.onclick = () => { $('#chat-text').value = b.dataset.idea; chatSend(); });
+  sideFromTurn(c && !c.running ? [...turns].reverse().find((x) => x.role === 'assistant') : null, results);
+  setRunning(false);
+  CHAT.stick = true;
+  chatScroll(true);
+  $$('.chat-conv').forEach((a) => a.classList.toggle('active', a.dataset.id === CHAT.id));
+  if (c && c.running) chatListen(c.id);
+}
+
+// Suit la réponse de Claude en direct (texte, raisonnement, actions).
+function chatListen(id) {
+  chatClose();
+  setRunning(true);
+  sideReset();
+  const box = $('#chat-msgs');
+  $('.chat-welcome', box)?.remove();
+  box.insertAdjacentHTML('beforeend', `<div class="msg bot live"><span class="bot-av"><img src="logo.png" alt=""></span><div class="bot-body"><div class="typing"><i></i><i></i><i></i></div></div></div>`);
+  const body = box.lastElementChild.querySelector('.bot-body');
+  const cur = { think: null, thinkSide: null, text: null, raw: '', tools: {}, sides: {}, frame: 0 };
+  const typing = () => { const el = $('.typing', body); if (el) body.append(el); };
+  const drop = () => $('.typing', body)?.remove();
+  const renderText = () => {
+    cur.frame = 0;
+    if (cur.text) { cur.text.innerHTML = md(cur.raw); bindCopy(cur.text); }
+    chatScroll();
+  };
+  const es = new EventSource(`/api/chat/${encodeURIComponent(id)}/events?from=0`);
+  CHAT.es = es;
+  const finish = () => {
+    drop();
+    if (cur.frame) cancelAnimationFrame(cur.frame);
+    renderText();
+    $$('.think[open]', body).forEach((d) => d.open = false);
+    $$('.ctool.run', body).forEach((d) => d.classList.replace('run', 'err'));
+    box.lastElementChild?.classList.remove('live');
+    setRunning(false);
+    chatConvs();
+  };
+  es.onmessage = (e) => {
+    const ev = JSON.parse(e.data);
+    switch (ev.type) {
+      case 'thinking_start':
+        cur.text = null;
+        body.insertAdjacentHTML('beforeend', thinkHtml('', true));
+        cur.think = $('.think-body', body.lastElementChild);
+        cur.thinkText = '';
+        cur.thinkSide = sideAdd(sideStep('think', t('chat.thinking'), '', ''));
+        typing();
+        break;
+      case 'thinking':
+        if (!cur.think) break;
+        cur.thinkText += ev.text;
+        cur.think.textContent = cur.thinkText;
+        if (cur.thinkSide) { cur.thinkSide.querySelector('small')?.remove(); cur.thinkSide.querySelector('div').insertAdjacentHTML('beforeend', `<small>${esc(cur.thinkText.slice(-220))}</small>`); }
+        chatScroll();
+        break;
+      case 'text_start':
+        if (cur.think) { cur.think.parentElement.open = false; cur.thinkSide?.classList.add('ok'); cur.think = null; }
+        body.insertAdjacentHTML('beforeend', '<div class="md"></div>');
+        cur.text = body.lastElementChild;
+        cur.raw = '';
+        sideAdd(sideStep('say', t('chat.answering'), '', 'ok'));
+        typing();
+        break;
+      case 'text':
+        cur.raw += ev.text;
+        if (!cur.frame) cur.frame = requestAnimationFrame(renderText);
+        break;
+      case 'tool_start':
+        if (cur.think) { cur.think.parentElement.open = false; cur.thinkSide?.classList.add('ok'); cur.think = null; }
+        cur.text = null;
+        body.insertAdjacentHTML('beforeend', toolHtml({ id: ev.id, name: ev.name, input: '' }, null));
+        cur.tools[ev.id] = body.lastElementChild;
+        cur.sides[ev.id] = sideAdd(sideStep('act', toolLabel(ev.name), t('chat.preparing'), ''));
+        typing();
+        chatScroll();
+        break;
+      case 'tool_call': {
+        const el = cur.tools[ev.id];
+        if (el) { $('.tool-args', el).textContent = toolArgs(ev.input); $('.tool-in', el).textContent = prettyJson(ev.input); }
+        const s = cur.sides[ev.id];
+        if (s) s.querySelector('small').textContent = toolArgs(ev.input) || t('chat.running');
+        break;
+      }
+      case 'tool_time': {
+        const el = cur.tools[ev.id];
+        if (el) $('.tool-ms', el).textContent = ev.ms >= 1000 ? (ev.ms / 1000).toFixed(1) + ' s' : ev.ms + ' ms';
+        break;
+      }
+      case 'tool_result': {
+        const el = cur.tools[ev.id];
+        if (el) { el.classList.replace('run', ev.error ? 'err' : 'ok'); $('.tool-out', el).textContent = ev.text; }
+        cur.sides[ev.id]?.classList.add(ev.error ? 'err' : 'ok');
+        break;
+      }
+      case 'usage':
+        CHAT.tokens.input += ev.input;
+        CHAT.tokens.output += ev.output;
+        sideUsage();
+        break;
+      case 'notice':
+        body.insertAdjacentHTML('beforeend', `<div class="chat-note">${t('chat.n.' + ev.key)}</div>`);
+        break;
+      case 'error': {
+        const msg = ev.key && has('err.' + ev.key) ? t('err.' + ev.key) : ev.message;
+        body.insertAdjacentHTML('beforeend', `<div class="chat-err">⚠️ ${esc(msg)}${['chatBadKey', 'chatCredits'].includes(ev.key) ? ` <button class="btn small" data-fixkey>${t('chat.keyBtn')}</button>` : ''}</div>`);
+        $('[data-fixkey]', body)?.addEventListener('click', chatKeyModal);
+        break;
+      }
+      case 'stopped':
+        body.insertAdjacentHTML('beforeend', `<div class="chat-note">${t('chat.stopped')}</div>`);
+        break;
+      case 'done':
+        es.close();
+        if (CHAT.es === es) CHAT.es = null;
+        finish();
+        return;
+    }
+    chatScroll();
+  };
+  es.onerror = () => {
+    es.close();
+    if (CHAT.es !== es) return;
+    CHAT.es = null;
+    finish();
+  };
+}
+
+async function chatSend() {
+  const ta = $('#chat-text');
+  const text = ta.value.trim();
+  if ((!text && !CHAT.atts.length) || CHAT.running) return;
+  const images = CHAT.atts.map((a) => ({ type: a.type, data: a.data }));
+  $('#chat-send').disabled = true;
+  try {
+    const r = await api('/chat/send', { method: 'POST', body: { chatId: CHAT.id, text, images } });
+    const box = $('#chat-msgs');
+    $('.chat-welcome', box)?.remove();
+    box.insertAdjacentHTML('beforeend', userHtml([...images.map(() => ({ type: 'image' })), { type: 'text', text }]));
+    ta.value = '';
+    ta.style.height = '';
+    CHAT.atts = [];
+    chatAtts();
+    if (!CHAT.id) {
+      CHAT.id = r.chatId;
+      history.replaceState(null, '', '#/chat?id=' + r.chatId);
+      $('#chat-title').textContent = r.title || t('chat.untitled');
+    }
+    CHAT.stick = true;
+    chatListen(r.chatId);
+    chatScroll(true);
+    chatConvs();
+  } catch (e) {
+    toast(e.message, true);
+  } finally {
+    $('#chat-send').disabled = false;
+  }
+}
+
+// Images jointes (bouton, coller, glisser) : 5 au plus, 5 Mo chacune.
+function chatAtts() {
+  const box = $('#chat-atts');
+  if (!box) return;
+  box.innerHTML = CHAT.atts.map((a, i) => `<span class="chat-att"><img src="data:${a.type};base64,${a.data}" alt=""><button type="button" data-rm="${i}">×</button></span>`).join('');
+  $$('[data-rm]', box).forEach((b) => b.onclick = () => { CHAT.atts.splice(Number(b.dataset.rm), 1); chatAtts(); });
+}
+function chatAddFiles(files) {
+  for (const f of files) {
+    if (!/^image\/(png|jpeg|gif|webp)$/.test(f.type)) continue;
+    if (CHAT.atts.length >= 5) { toast(t('chat.maxImages'), true); break; }
+    if (f.size > 5 * 1024 * 1024) { toast(t('chat.imageTooBig'), true); continue; }
+    const rd = new FileReader();
+    rd.onload = () => { CHAT.atts.push({ type: f.type, data: String(rd.result).split(',')[1] }); chatAtts(); };
+    rd.readAsDataURL(f);
+  }
+}
+
+// Clé Claude : changer ou retirer.
+function chatKeyModal() {
+  const st = CHAT.status || {};
+  openModal(`<h2>🔑 ${t('chat.keyTitle')}</h2>
+    <p>${st.hasKey ? t('chat.keyCurrent', { k: esc(st.keyHint) }) : t('chat.setupSub')}</p>
+    <div class="field"><input class="input" id="ck-key" type="password" placeholder="sk-ant-…" autocomplete="off" spellcheck="false"></div>
+    <p class="muted small">${t(st.encrypted ? 'chat.keySafe' : 'chat.keyLocal')}</p>
+    <div class="row"><button class="btn primary" id="ck-save">${t('chat.keySave')}</button>${st.hasKey ? `<button class="btn danger" id="ck-del">${t('chat.keyRemove')}</button>` : ''}
+    <a class="btn" href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">${t('chat.openConsole')}</a></div>`);
+  $('#ck-save').onclick = async (e) => {
+    e.currentTarget.disabled = true;
+    try { CHAT.status = { ...CHAT.status, ...(await api('/chat/key', { method: 'PUT', body: { key: $('#ck-key').value } })) }; toast(t('chat.keyOk')); closeModal(); route(); }
+    catch (er) { toast(er.message, true); e.currentTarget.disabled = false; }
+  };
+  $('#ck-del') && ($('#ck-del').onclick = async () => {
+    if (!confirm(t('chat.keyRemoveConfirm'))) return;
+    await api('/chat/key', { method: 'DELETE' });
+    closeModal();
+    route();
+  });
+}
+
+// Première fois : brancher sa clé Claude.
+function chatSetup() {
+  view.innerHTML = `
+    ${pageHead('CLAUDE', t('chat.setupTitle'), t('chat.setupSub'))}
+    <div class="steps">
+      <div class="panel step" data-spot><span class="num">1</span><h3>${t('chat.step1')}</h3><p>${t('chat.step1Text')}</p>
+        <a class="btn" href="https://console.anthropic.com/" target="_blank" rel="noopener">${t('chat.openConsole')}</a></div>
+      <div class="panel step" data-spot><span class="num">2</span><h3>${t('chat.step2')}</h3><p>${t('chat.step2Text')}</p>
+        <a class="btn" href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">${t('chat.openKeys')}</a></div>
+      <div class="panel step" data-spot><span class="num">3</span><h3>${t('chat.step3')}</h3><p>${t('chat.step3Text')}</p>
+        <div class="field"><input class="input" id="cs-key" type="password" placeholder="sk-ant-api03-…" autocomplete="off" spellcheck="false"></div>
+        <button class="btn primary" id="cs-save">${t('chat.keySave')}</button></div>
+    </div>
+    <div class="panel chat-why" data-spot><h3>💡 ${t('chat.whyTitle')}</h3><p>${t('chat.whyText')}</p></div>`;
+  $('#cs-save').onclick = async (e) => {
+    const b = e.currentTarget;
+    b.disabled = true;
+    b.innerHTML = '<i class="spinner"></i>';
+    try { await api('/chat/key', { method: 'PUT', body: { key: $('#cs-key').value } }); toast(t('chat.keyOk')); route(); }
+    catch (er) { toast(er.message, true); b.disabled = false; b.textContent = t('chat.keySave'); }
+  };
+}
+
+async function renderChat(params) {
+  document.body.classList.add('chat-mode');
+  const st = await api('/chat');
+  CHAT.status = st;
+  if (!st.hasKey) return chatSetup();
+  view.innerHTML = `
+    <div class="chat ${CHAT.hideSide ? 'no-side' : ''}" id="chat">
+      <aside class="chat-list">
+        <a class="btn primary" href="#/chat" id="chat-new">${PLUS}<span>${t('chat.new')}</span></a>
+        <div class="chat-convs" id="chat-convs"></div>
+        <div class="chat-cfg">
+          <label><small>${t('chat.model')}</small><select class="select" id="chat-model">${st.models.map((m) => `<option value="${m}" ${m === st.model ? 'selected' : ''}>${MODEL_LABEL[m] || m}</option>`).join('')}</select></label>
+          <label><small>${t('chat.effort')}</small><select class="select" id="chat-effort">${st.efforts.map((x) => `<option value="${x}" ${x === st.effort ? 'selected' : ''}>${t('chat.eff.' + x)}</option>`).join('')}</select></label>
+          <button class="btn small" id="chat-key">🔑 ${t('chat.keyBtn')}</button>
+        </div>
+      </aside>
+      <section class="chat-main">
+        <div class="chat-head"><div><b id="chat-title"></b><small id="chat-model-tag"></small></div><i class="chat-live" id="chat-live" hidden></i>
+          <button class="icon-btn" id="chat-side-btn" title="${t('chat.activity')}"><svg class="line" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M15 4v16"/></svg></button></div>
+        <div class="chat-msgs" id="chat-msgs"></div>
+        <form class="chat-input" id="chat-form">
+          <div class="chat-atts" id="chat-atts"></div>
+          <textarea id="chat-text" rows="1" placeholder="${t('chat.ph')}"></textarea>
+          <div class="chat-input-row">
+            <label class="icon-btn" title="${t('chat.attach')}">${CLIP}<input type="file" id="chat-file" accept="image/png,image/jpeg,image/gif,image/webp" multiple hidden></label>
+            <small class="muted">${t('chat.hint')}</small>
+            <button class="btn primary chat-send" id="chat-send" title="${t('chat.send')}">${SEND_ICON}</button>
+            <button class="btn danger chat-send" id="chat-stop" type="button" title="${t('chat.stop')}" hidden><svg class="fill" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></svg></button>
+          </div>
+        </form>
+      </section>
+      <aside class="chat-side">
+        <h3>${t('chat.activity')}</h3>
+        <p class="muted small">${t('chat.activitySub')}</p>
+        <div class="chat-steps" id="chat-steps"></div>
+        <div class="chat-usage" id="chat-usage"></div>
+      </aside>
+    </div>`;
+  const ta = $('#chat-text');
+  ta.oninput = () => { ta.style.height = ''; ta.style.height = Math.min(ta.scrollHeight, 260) + 'px'; };
+  ta.onkeydown = (e) => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); chatSend(); } };
+  ta.onpaste = (e) => { const f = [...(e.clipboardData?.files || [])]; if (f.length) { e.preventDefault(); chatAddFiles(f); } };
+  $('#chat-form').onsubmit = (e) => { e.preventDefault(); chatSend(); };
+  $('#chat-form').ondragover = (e) => e.preventDefault();
+  $('#chat-form').ondrop = (e) => { e.preventDefault(); e.stopPropagation(); chatAddFiles([...e.dataTransfer.files]); };
+  $('#chat-file').onchange = (e) => { chatAddFiles([...e.target.files]); e.target.value = ''; };
+  $('#chat-stop').onclick = () => CHAT.id && api(`/chat/${CHAT.id}/stop`, { method: 'POST' }).catch(() => {});
+  $('#chat-key').onclick = chatKeyModal;
+  $('#chat-side-btn').onclick = () => {
+    // Écran étroit : le panneau s'ouvre par-dessus ; écran large : on le masque ou on le montre.
+    if (innerWidth <= 1250) return $('#chat').classList.toggle('side-open');
+    CHAT.hideSide = !CHAT.hideSide;
+    $('#chat').classList.toggle('no-side', CHAT.hideSide);
+  };
+  const saveCfg = async () => {
+    CHAT.status = { ...CHAT.status, ...(await api('/chat/settings', { method: 'PUT', body: { model: $('#chat-model').value, effort: $('#chat-effort').value } }).catch(() => ({}))) };
+    if (!CHAT.id) $('#chat-model-tag').textContent = MODEL_LABEL[CHAT.status.model] || '';
+    else if (CHAT.status.model !== $('#chat-model').value) return;
+    toast(t('chat.cfgSaved'));
+  };
+  $('#chat-model').onchange = saveCfg;
+  $('#chat-effort').onchange = saveCfg;
+  $('#chat-msgs').addEventListener('scroll', (e) => { CHAT.stick = nearBottom(e.currentTarget); }, { passive: true });
+  CHAT.atts = [];
+  await chatConvs();
+  await chatOpen(params.get('id') || '');
+  ta.focus();
 }
 
 // ---------- Deux espaces : Création (skills, textures, prompts…) et Ressources (bibliothèque, open source…) ----------
@@ -2286,13 +2806,17 @@ async function route() {
   $$('#side-places-list a').forEach((a) => a.classList.toggle('active', path === 'place' && a.dataset.s === (params.get('s') || '')));
   movePill();
   document.body.classList.remove('menu');
+  // En quittant le chat, Claude continue de travailler ; on arrête seulement de suivre le flux.
+  if (path !== 'chat') { chatClose(); document.body.classList.remove('chat-mode'); }
   if (!SESSION || !SESSION.loggedIn) return;
   if (!isAdmin() && ADMIN_PAGES.includes(path)) { location.hash = '#/'; return; }
   const pages = {
     library: () => renderLibrary(params), favorites: () => renderLibrary(params, true), examples: renderExamples,
     youtube: () => renderYoutube(params), channels: () => renderChannels(params), explore: renderExplore,
-    connect: renderConnect, admin: renderAdmin, settings: renderSettings, update: renderUpdate, robloxstudio: renderRobloxStudio, custom: renderCustom, dev: renderDev, textures: () => renderTextures(params), place: () => renderPlace(params), level: renderLevel, opensource: renderOpenSource, skills: renderSkills, prompts: renderPrompts, studio: renderStudio,
+    chat: () => renderChat(params), connect: renderConnect, admin: renderAdmin, settings: renderSettings, update: renderUpdate, robloxstudio: renderRobloxStudio, custom: renderCustom, dev: renderDev, textures: () => renderTextures(params), place: () => renderPlace(params), level: renderLevel, opensource: renderOpenSource, skills: renderSkills, prompts: renderPrompts, studio: renderStudio,
   };
+  // Changer de conversation sans recharger toute la page du chat.
+  if (path === 'chat' && $('#chat')) return chatOpen(params.get('id') || '');
   try {
     await transition(pages[path] || renderHome);
   } catch (e) {
