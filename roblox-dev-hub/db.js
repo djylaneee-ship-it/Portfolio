@@ -9,6 +9,9 @@ const BASE = process.env.ROVEX_DATA || ROOT;
 const DATA_DIR = path.join(BASE, 'data');
 const MEDIA_DIR = path.join(BASE, 'media');
 const DB_FILE = path.join(DATA_DIR, 'library.json');
+// La grande bibliothèque en ligne (source « cloud », des centaines de milliers de ressources) vit dans son propre
+// fichier : enregistrer un favori ou un réglage ne réécrit plus tout, et ce fichier s'écrit sans bloquer l'app.
+const CLOUD_FILE = path.join(DATA_DIR, 'cloud-library.json');
 const SEED_FILE = path.join(ROOT, 'seed.json');
 
 const CATEGORIES = [
@@ -52,7 +55,70 @@ function load() {
   }
   const db = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
   if (!db.examples) db.examples = seedExamples(); // bases créées avant les exemples
+  const cloud = readCloud();
+  if (cloud) {
+    db.resources = db.resources.filter((r) => r.source !== 'cloud').concat(cloud.items);
+    db.cloudSeq = cloud.seq;
+  } else if (db.resources.some((r) => r.source === 'cloud')) {
+    cloudDirty = true; // ancienne base : les ressources en ligne passeront dans leur fichier au prochain enregistrement
+    db.cloudSeq = Number((db.settings || {}).libSeq) || 0;
+  }
   return db;
+}
+
+// Fichier de la bibliothèque en ligne, gardé en mémoire tant qu'il ne change pas (mcp.js relit souvent la base).
+let cloudCache = { mtime: 0, data: null };
+let cloudDirty = false;
+function readCloud() {
+  try {
+    const m = fs.statSync(CLOUD_FILE).mtimeMs;
+    if (cloudCache.data && cloudCache.mtime === m) return cloudCache.data;
+    const data = JSON.parse(fs.readFileSync(CLOUD_FILE, 'utf8'));
+    cloudCache = { mtime: m, data };
+    return data;
+  } catch { return null; }
+}
+const markCloudDirty = () => { cloudDirty = true; };
+
+// Prépare les textes de recherche en arrière-plan (par paquets) : la première recherche est déjà rapide.
+function warm(db) {
+  const list = db.resources;
+  let i = 0;
+  const step = () => {
+    const end = Math.min(list.length, i + 4000);
+    for (; i < end; i++) hay(list[i]);
+    if (i < list.length) setTimeout(step, 5);
+  };
+  setTimeout(step, 3000);
+}
+
+// Écriture par morceaux, en rendant la main entre chaque : l'app reste fluide pendant l'enregistrement.
+let cloudWriting = null;
+let cloudAgain = null;
+function writeCloud(db) {
+  if (cloudWriting) { cloudAgain = db; return cloudWriting; }
+  cloudWriting = (async () => {
+    let cur = db;
+    while (cur) {
+      cloudAgain = null;
+      cloudDirty = false;
+      const items = cur.resources.filter((r) => r.source === 'cloud');
+      const seq = Number(cur.cloudSeq) || 0;
+      const tmp = CLOUD_FILE + '.tmp';
+      const fh = await fs.promises.open(tmp, 'w');
+      try {
+        await fh.write(`{"seq":${seq},"items":[`);
+        for (let i = 0; i < items.length; i += 3000) {
+          await fh.write((i ? ',' : '') + items.slice(i, i + 3000).map((r) => JSON.stringify(r)).join(','));
+        }
+        await fh.write(']}');
+      } finally { await fh.close(); }
+      await fs.promises.rename(tmp, CLOUD_FILE);
+      cloudCache = { mtime: fs.statSync(CLOUD_FILE).mtimeMs, data: { seq, items } };
+      cur = cloudAgain;
+    }
+  })().catch(() => { cloudDirty = true; }).finally(() => { cloudWriting = null; });
+  return cloudWriting;
 }
 
 function seedExamples() {
@@ -82,9 +148,20 @@ function normalizeExample(e) {
 
 function save(db) {
   ensureDirs();
+  const { resources, cloudSeq, ...rest } = db;
+  const own = resources.filter((r) => r.source !== 'cloud');
+  // Première séparation (ancienne base) : écrite tout de suite, pour ne rien perdre si l'app se ferme.
+  if (cloudDirty && !fs.existsSync(CLOUD_FILE)) {
+    const items = resources.filter((r) => r.source === 'cloud');
+    fs.writeFileSync(CLOUD_FILE + '.tmp', JSON.stringify({ seq: Number(cloudSeq) || 0, items }));
+    fs.renameSync(CLOUD_FILE + '.tmp', CLOUD_FILE);
+    cloudCache = { mtime: fs.statSync(CLOUD_FILE).mtimeMs, data: { seq: Number(cloudSeq) || 0, items } };
+    cloudDirty = false;
+  }
   const tmp = DB_FILE + '.tmp';
-  fs.writeFileSync(tmp, JSON.stringify(db, null, 2));
+  fs.writeFileSync(tmp, JSON.stringify({ ...rest, resources: own }));
   fs.renameSync(tmp, DB_FILE);
+  if (cloudDirty) writeCloud(db);
 }
 
 function normalize(r) {
@@ -127,6 +204,20 @@ function strip(s) {
   return String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 }
 
+// Textes de recherche (minuscules, sans accents) calculés une fois par ressource, refaits si elle change.
+const HAY = new WeakMap();
+function hay(r) {
+  const h = HAY.get(r);
+  if (h && h.t === r.title && h.d === r.description && h.n === r.notes && h.g === r.tags && h.c === r.category) return h;
+  const v = {
+    t: r.title, d: r.description, n: r.notes, g: r.tags, c: r.category,
+    title: strip(r.title), tags: strip((r.tags || []).join(' ')),
+    rest: strip(`${r.author} ${r.description} ${r.notes} ${r.category} ${r.type}`),
+  };
+  HAY.set(r, v);
+  return v;
+}
+
 // Recherche plein texte avec score : titre > tags > auteur > description > notes.
 // `types` : liste de types acceptés ; `exclude` : types à écarter ; `tag` : tag requis ;
 // `sort: 'stars'` trie l'open source par étoiles GitHub.
@@ -143,9 +234,7 @@ function search(db, { q = '', category = '', type = '', types = [], exclude = []
     if (favorite && !r.favorite) continue;
     let score = 0;
     if (terms.length) {
-      const title = strip(r.title);
-      const tags = strip(r.tags.join(' '));
-      const rest = strip(`${r.author} ${r.description} ${r.notes} ${r.category} ${r.type}`);
+      const { title, tags, rest } = hay(r);
       let all = true;
       for (const t of terms) {
         let s = 0;
@@ -160,7 +249,8 @@ function search(db, { q = '', category = '', type = '', types = [], exclude = []
     out.push({ r, score });
   }
   if (sort === 'stars') out.sort((a, b) => b.score - a.score || (b.r.stars || 0) - (a.r.stars || 0));
-  else out.sort((a, b) => b.score - a.score || (b.r.favorite - a.r.favorite) || b.r.createdAt.localeCompare(a.r.createdAt));
+  // Dates ISO : comparaison directe des textes (bien plus rapide que localeCompare sur des centaines de milliers).
+  else out.sort((a, b) => b.score - a.score || (b.r.favorite - a.r.favorite) || (a.r.createdAt < b.r.createdAt ? 1 : a.r.createdAt > b.r.createdAt ? -1 : 0));
   out = out.map((x) => x.r);
   return limit ? out.slice(0, limit) : out;
 }
@@ -196,5 +286,5 @@ function upsert(db, data, { fresh = false } = {}) {
 
 module.exports = {
   CATEGORIES, TYPES, DATA_DIR, MEDIA_DIR,
-  load, save, normalize, normalizeExample, search, stats, upsert, newId, youtubeId, youtubeThumb,
+  load, save, normalize, normalizeExample, search, stats, upsert, newId, youtubeId, youtubeThumb, markCloudDirty, CLOUD_FILE, warm,
 };

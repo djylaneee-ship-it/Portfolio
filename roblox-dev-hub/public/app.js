@@ -87,13 +87,21 @@ document.addEventListener('pointerdown', (e) => {
 });
 
 // Halo lumineux qui suit la souris sur les cartes.
+// Une mise à jour par image au plus (pas à chaque mouvement de souris).
+let spotEv = null;
 document.addEventListener('pointermove', (e) => {
-  const el = e.target.closest('[data-spot], .card, .cat-tile, .stat');
-  if (!el) return;
-  const r = el.getBoundingClientRect();
-  el.style.setProperty('--mx', `${e.clientX - r.left}px`);
-  el.style.setProperty('--my', `${e.clientY - r.top}px`);
-});
+  if (spotEv) { spotEv = e; return; }
+  spotEv = e;
+  requestAnimationFrame(() => {
+    const ev = spotEv;
+    spotEv = null;
+    const el = ev.target.closest && ev.target.closest('[data-spot], .card, .cat-tile, .stat');
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    el.style.setProperty('--mx', `${ev.clientX - r.left}px`);
+    el.style.setProperty('--my', `${ev.clientY - r.top}px`);
+  });
+}, { passive: true });
 
 // Compteurs qui défilent jusqu'à leur valeur.
 function countUp(root = document) {

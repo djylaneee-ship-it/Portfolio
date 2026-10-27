@@ -40,7 +40,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 
 /* Fond animé : halos violets qui dérivent lentement. */
 .aurora { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
-.aurora i { position: absolute; width: 46vw; height: 46vw; border-radius: 50%; filter: blur(90px); opacity: .16; animation: drift 26s ease-in-out infinite alternate; }
+.aurora i { position: absolute; width: 46vw; height: 46vw; border-radius: 50%; filter: blur(90px); opacity: .16; animation: drift 26s ease-in-out infinite alternate; will-change: transform; }
 .aurora i:nth-child(1) { background: #7C3AED; top: -18vw; right: -8vw; }
 .aurora i:nth-child(2) { background: #A21CAF; bottom: -22vw; left: 10vw; animation-duration: 32s; animation-delay: -8s; opacity: .1; }
 .aurora i:nth-child(3) { background: #2563EB; top: 30vh; right: 20vw; width: 30vw; height: 30vw; animation-duration: 38s; opacity: .07; }
@@ -118,9 +118,9 @@ kbd { font-family: var(--mono); font-size: 11px; padding: 4px 8px; border-radius
 
 /* ---------- Transitions de page ---------- */
 .view { position: relative; display: flex; flex-direction: column; gap: 28px; transition: opacity .18s ease, transform .22s var(--out), filter .18s; }
-.view.leaving { opacity: 0; transform: translateY(14px) scale(.985); filter: blur(6px); }
+.view.leaving { opacity: 0; transform: translateY(14px) scale(.985); }
 .view.entering > * { animation: rise .6s var(--out) both; animation-delay: calc(var(--i, 0) * 70ms); }
-@keyframes rise { from { opacity: 0; transform: translateY(26px) scale(.98); filter: blur(4px); } }
+@keyframes rise { from { opacity: 0; transform: translateY(26px) scale(.98); } }
 .stagger > * { animation: pop .5s var(--spring) both; animation-delay: calc(var(--i, 0) * 45ms + 120ms); }
 @keyframes pop { from { opacity: 0; transform: translateY(16px) scale(.94); } }
 
@@ -215,7 +215,7 @@ kbd { font-family: var(--mono); font-size: 11px; padding: 4px 8px; border-radius
 .play { position: absolute; inset: 0; margin: auto; width: 54px; height: 54px; border-radius: 50%; background: rgba(124, 58, 237, .85); color: #fff; display: grid; place-items: center; opacity: 0; transform: scale(.6); transition: .35s var(--spring); }
 .play svg { fill: currentColor; }
 .card:hover .play { opacity: 1; transform: scale(1); }
-.badge { position: absolute; top: 10px; left: 10px; font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; background: rgba(9, 7, 15, .8); backdrop-filter: blur(6px); padding: 4px 9px; border-radius: 8px; color: var(--soft); border: 1px solid var(--line2); }
+.badge { position: absolute; top: 10px; left: 10px; font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; background: rgba(9, 7, 15, .8); padding: 4px 9px; border-radius: 8px; color: var(--soft); border: 1px solid var(--line2); }
 .star { position: absolute; top: 8px; right: 8px; width: 34px; height: 34px; border-radius: 10px; border: 0; cursor: pointer; background: rgba(9, 7, 15, .75); color: #fff; display: grid; place-items: center; opacity: 0; transition: .35s var(--spring); }
 .star svg { fill: currentColor; width: 17px; height: 17px; }
 .card:hover .star, .star.on { opacity: 1; }
@@ -505,7 +505,7 @@ body.locked .app { filter: blur(10px) saturate(.6); pointer-events: none; transf
 .app-card .state.warn { color: var(--warn); }
 .app-card .state.warn .pulse { background: var(--warn); }
 
-.stars { position: absolute; top: 10px; right: 10px; font-family: var(--mono); font-size: 11.5px; font-weight: 700; color: var(--warn); background: rgba(9, 7, 15, .82); backdrop-filter: blur(6px); padding: 4px 9px; border-radius: 8px; border: 1px solid #3A2F12; }
+.stars { position: absolute; top: 10px; right: 10px; font-family: var(--mono); font-size: 11.5px; font-weight: 700; color: var(--warn); background: rgba(9, 7, 15, .82); padding: 4px 9px; border-radius: 8px; border: 1px solid #3A2F12; }
 .os-desc { margin: 0; color: var(--muted2); font-size: 13px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 a.stat { display: block; }
 
@@ -692,7 +692,8 @@ body.desktop .modal, body.desktop .login { padding-top: 40px; }
   animation: bgflow 24s ease-in-out infinite alternate; }
 @keyframes bgflow { 0% { transform: translate(0, 0) rotate(0deg) scale(1); } 50% { transform: translate(-4%, 3%) rotate(8deg) scale(1.08); } 100% { transform: translate(3%, -4%) rotate(-6deg) scale(1.02); } }
 body.has-bg { background: #000; }
-body.has-bg .sidebar, body.has-bg .panel, body.has-bg .card, body.has-bg .modal-card { backdrop-filter: blur(14px) saturate(1.2); }
+/* Flou seulement sur le menu et les fenêtres : un flou derrière chaque carte (avec un fond vidéo) fait ramer l'app. */
+body.has-bg .sidebar, body.has-bg .modal-card { backdrop-filter: blur(14px) saturate(1.2); }
 body.no-anim *, body.no-anim *::before, body.no-anim *::after { animation: none !important; transition: none !important; }
 
 /* ---------- Deux espaces ---------- */

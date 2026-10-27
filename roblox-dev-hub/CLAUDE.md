@@ -35,7 +35,7 @@ Travail à plusieurs : une branche par dev (`dev/<pseudo>-<sujet>`), une PR, rel
 | `electron.js` | Fenêtre, icône de la barre des tâches, mises à jour, démarrage du serveur. |
 | `server.js` | Serveur HTTP local (API `/api/*`, MCP HTTP `/mcp`, médias). Contrôle d'accès : `USER_ROUTES` (lecture membres), `MEMBER_ACTIONS` (actions membres), le reste admin. |
 | `mcp.js` | Serveur MCP (stdio pour Claude Desktop, HTTP via le serveur) : outils, prompts, journal d'activité (`data/activity.json`). |
-| `db.js` | Bibliothèque locale (`data/library.json`), catégories, recherche. |
+| `db.js` | Bibliothèque locale : `data/library.json` (ressources de l'utilisateur, réglages) + `data/cloud-library.json` (bibliothèque en ligne, écrite en arrière-plan ; appelle `db.markCloudDirty()` quand tu modifies une ressource `source: 'cloud'`), catégories, recherche (textes normalisés en cache). |
 | `auth.js` / `cloud.js` | IDs d'accès en ligne (Supabase, RPC `rovex_*`), un appareil par ID, contenu partagé par les admins. |
 | `skills.js` / `skill-texts.js` | Skills Claude (socle `rovex-core` + un par catégorie). |
 | `agents.js` | Chat Claude par MCP : une conversation de Claude Desktop écoute le chat (outils `chat_listen` / `chat_reply` / `chat_status` de `mcp.js`) ; `agents.js` garde la conversation et les messages en attente, `/agent/*` (clé locale) et `/api/agents/*`. |

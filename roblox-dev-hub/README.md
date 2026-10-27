@@ -124,7 +124,8 @@ Outils exposés (activables dans **Connexion Claude**) : `load_skill`, `list_ski
 
 ## Où sont mes données ?
 
-- `data/library.json` : toute ta base (ressources, chaînes, réglages).
+- `data/library.json` : ta base (tes ressources, chaînes, exemples, réglages).
+- `data/cloud-library.json` : la grande bibliothèque en ligne (ressources trouvées par l'exploration), dans son propre fichier écrit en arrière-plan pour que l'app reste fluide.
 - `media/` : les fichiers que tu as ajoutés.
 
 Pour sauvegarder, copie ces deux dossiers. Ils ne sont jamais envoyés sur GitHub.

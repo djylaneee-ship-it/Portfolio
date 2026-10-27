@@ -147,6 +147,7 @@ const routes = [
     const r = state.resources.find((x) => x.id === m[1]);
     if (!r) throw Object.assign(new Error('Not found'), { code: 404, key: 'notFound' });
     Object.assign(r, db.normalize({ ...r, ...(await json(req)), id: r.id, createdAt: r.createdAt }));
+    if (r.source === 'cloud') db.markCloudDirty();
     persist();
     return r;
   }],
@@ -154,6 +155,7 @@ const routes = [
     const i = state.resources.findIndex((x) => x.id === m[1]);
     if (i < 0) throw Object.assign(new Error('Not found'), { code: 404, key: 'notFound' });
     const [r] = state.resources.splice(i, 1);
+    if (r.source === 'cloud') db.markCloudDirty();
     if (r.file) fs.rm(path.join(db.MEDIA_DIR, r.file), () => {});
     persist();
     return { ok: true };
@@ -303,7 +305,7 @@ const routes = [
     return skills.getSkill(state, m[1]);
   }],
   ['POST', /^\/api\/skills\/install-code$/, () => skills.installForClaudeCode(state)],
-  ['POST', /^\/api\/clean$/, () => { const r = quality.purge(state); persist(); return r; }],
+  ['POST', /^\/api\/clean$/, () => { const r = quality.purge(state); db.markCloudDirty(); persist(); return r; }],
   // Exemples d'apprentissage : les membres voient les exemples validés, l'admin voit tout.
   ['GET', /^\/api\/examples$/, (req, m, url, session) => (state.examples || []).filter((e) => session.role === 'admin' || e.status === 'validated')],
   ['POST', /^\/api\/examples$/, async (req, m, url, session) => {
@@ -624,6 +626,7 @@ async function cloudSync() {
       state.channels.push({ ...c, id: db.newId() });
       chans++;
     }
+    if (added) db.markCloudDirty();
     Object.assign(state.settings, { lastCloudSync: new Date().toISOString(), lastCloudAdded: added, cloudUpdatedAt: cloud.updatedAt || null });
     persist();
     return { added, channels: chans, total: (cloud.resources || []).length, cloudUpdatedAt: cloud.updatedAt };
@@ -740,6 +743,7 @@ server.listen(PORT, HOST, () => {
   console.log(`  (saved in ${KEY_FILE})\n  Ctrl+C to stop\n`);
   readyOk(PORT);
   try { agents.init(PORT); } catch (e) { console.log('  Claude chat: ' + e.message); }
+  db.warm(state);
   autoConnectClaude();
   sharedPull().catch(() => {});
 });
@@ -759,7 +763,8 @@ async function librarySync() {
   if (!c || libBusy) return { added: 0 };
   libBusy = true;
   try {
-    let since = Number(state.settings.libSeq || 0);
+    // Le numéro de suivi est rangé avec les ressources en ligne (cloud-library.json) : toujours cohérents.
+    let since = Number(state.cloudSeq ?? state.settings.libSeq ?? 0);
     const urls = new Set(state.resources.map((r) => r.url).filter(Boolean));
     let added = 0;
     for (let i = 0; i < 500; i++) {
@@ -773,7 +778,9 @@ async function librarySync() {
         state.resources.push(db.normalize({ ...rest, id: undefined, source: 'cloud', favorite: false }));
         added++;
       }
+      state.cloudSeq = since;
       state.settings.libSeq = since;
+      if (added) db.markCloudDirty();
       if (items.length < 2000) break;
       if (i % 20 === 19) persist(); // gros premier téléchargement : on enregistre en route
     }

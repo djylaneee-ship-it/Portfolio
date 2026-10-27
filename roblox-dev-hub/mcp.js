@@ -30,7 +30,14 @@ const CAT_IDS = db.CATEGORIES.map((c) => c.id);
 // En mode stdio, la base est relue seulement si le fichier a changé (elle peut peser des centaines de Mo).
 const DB_FILE = path.join(db.DATA_DIR, 'library.json');
 let cached = { key: '', st: null };
-const fileKey = () => { try { const s = fs.statSync(DB_FILE); return `${s.mtimeMs}:${s.size}`; } catch { return ''; } };
+const fileKey = () => {
+  try {
+    const s = fs.statSync(DB_FILE);
+    let c = '';
+    try { c = String(fs.statSync(db.CLOUD_FILE).mtimeMs); } catch {}
+    return `${s.mtimeMs}:${s.size}:${c}`;
+  } catch { return ''; }
+};
 let store = {
   load: () => {
     const k = fileKey();
