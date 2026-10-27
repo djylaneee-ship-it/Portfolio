@@ -11,6 +11,7 @@ const gen = require('./gen');
 const studio = require('./studio');
 const blender = require('./blender');
 const rbxupload = require('./rbxupload');
+const rbxassets = require('./rbxassets');
 const textures = require('./vfx-textures');
 const vm = require('vm');
 
@@ -74,9 +75,10 @@ function clients() {
 // Toujours ajouté aux consignes : passer par le skill de la catégorie avant toute tâche Roblox.
 const SKILL_RULE = `
 
-Skills: for every Roblox task, first identify the domains it needs (scripting, vfx, animation, cutscenes, gui, gfx, modeling, building, audio, design, tools) and call load_skill once with only those categories and the task keywords (an attack = scripting + animation + vfx; a boss intro = cutscenes + animation + vfx, + audio if needed; a menu = gui + scripting). Read all of it before working: the core rules (rovex-core) apply to every task. Project art direction: VFX are built from custom-textured ParticleEmitters, never the Fire, Smoke or Sparkles classes. Their textures MUST come from the Rovex VFX textures (find_vfx_textures): no other texture ID is allowed, never from memory, never invented; if nothing fits after several searches, tell the user instead of using another texture.
+Skills: for every Roblox task, first identify the domains it needs (scripting, vfx, animation, cutscenes, gui, gfx, modeling, building, audio, design, tools) and call load_skill once with only those categories and the task keywords (an attack = scripting + animation + vfx; a boss intro = cutscenes + animation + vfx, + audio if needed; a menu = gui + scripting). Read all of it before working: the core rules (rovex-core) apply to every task. Project art direction: VFX are built from custom-textured ParticleEmitters, never the Fire, Smoke or Sparkles classes. Their textures MUST come from the Rovex VFX textures (find_vfx_textures): no other texture ID is allowed, never from memory, never invented; if nothing fits after several searches, tell the user instead of using another texture. The ready-made VFX templates of ReplicatedStorage.RovexAssets.VFX (see rovex_assets) are also allowed, with their own textures.
 
 Roblox Studio: when tools starting with studio_ are available, Rovex is connected to the place open in Roblox Studio. Before writing code for the user's game, use them to read the real scripts, the Explorer structure and the data, and follow the existing architecture. Only change the place (edit scripts, run code that modifies it, insert models) when the user asked for it, and say what you changed. To put an image in the game (icon, UI, decal), make or pick it (generate_image), then call upload_image_to_roblox with a target path: Rovex uploads it to Roblox and sets it in Studio.
+Rovex assets: every place connected to Rovex gets ReplicatedStorage.RovexAssets (Environment = stylized trees, plants, rocks, clouds, water; VFX/Combat and VFX/Fire = 130+ ready VFX templates; UI/StudUI = a stud-style HUD and windows). Call rovex_assets (with keywords) to see what is there and reuse these assets (Clone them) before building from scratch.
 
 Images: you cannot draw yourself, but Rovex can. When the user asks for an icon, an image, a UI element, a thumbnail, a texture or a VFX sprite, load the skill of the category, then call generate_image. Describe only the subject: Rovex applies the skill's style and the user's reference images, and saves the PNG in the library. Give the user the file path, and remind them to upload it to Roblox (Creator Hub or Asset Manager) to get its rbxassetid.`;
 
@@ -202,6 +204,17 @@ const TOOLS = [
     description: 'Rovex chat: show what you are doing right now (one short sentence) in the Rovex chat, during a long task.',
     inputSchema: { type: 'object', properties: { text: { type: 'string' } }, required: ['text'] },
     annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false },
+  },
+  {
+    name: 'rovex_assets',
+    description: 'List the Rovex asset packs imported into the open Roblox Studio place, in ReplicatedStorage.RovexAssets: Environment (stylized trees, plants, rocks, clouds, rays, water), VFX/Combat and VFX/Fire (ready VFX templates with their particle emitters, beams and trails), UI/StudUI (stud-style HUD, overlays and windows). Returns each item path (relative to RovexAssets), class and what it contains. Use it before building a model, effect or UI from scratch.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        query: { type: 'string', description: 'Optional keywords, e.g. "fire", "Combat", "palm", "HUD".' },
+        limit: { type: 'number', description: 'Max items (default 120).' },
+      },
+    },
   },
   {
     name: 'search_opensource',
@@ -380,6 +393,8 @@ async function call(name, a = {}) {
       const results = textures.search(list, a);
       return { count: results.length, results, note: 'Flipbook textures need ParticleEmitter.FlipbookLayout set to their grid; for a one-shot burst use FlipbookMode OneShot and a framerate of frames / Lifetime. Ask the user to check the look in Studio.' };
     }
+    case 'rovex_assets':
+      return rbxassets.list(a.query, a.limit);
     case 'upload_image_to_roblox':
       return rbxupload.upload(state, a);
     case 'chat_listen': {

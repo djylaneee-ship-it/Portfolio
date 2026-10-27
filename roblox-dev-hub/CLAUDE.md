@@ -18,6 +18,7 @@ Variables utiles pour tester sans toucher à la vraie base :
 - `ROVEX_LOCAL_AUTH=1` : IDs locaux seulement (clé admin affichée au démarrage, dans `data/CLE-ADMIN.txt`).
 - `ROVEX_NO_AUTOCONNECT=1` : ne pas écrire dans la config de Claude Desktop.
 - `PORT=4790` : autre port.
+- `ROVEX_STUDIO_CONTENT=/un/dossier` : faux dossier « content » de Roblox Studio (tests de l'import des packs d'assets).
 - `ROVEX_SUPABASE_URL` / `ROVEX_SUPABASE_KEY` : une autre base Supabase (ou un faux serveur de test).
 
 Avant chaque commit : `for f in *.js public/app.js; do node --check $f; done`. Pour l'interface, une capture Playwright de la page modifiée (`require('playwright')`, `chromium.launch()`).
@@ -42,6 +43,7 @@ Travail à plusieurs : une branche par dev (`dev/<pseudo>-<sujet>`), une PR, rel
 | `gen.js` | Studio IA (images gratuites : Cloudflare FLUX, sinon Pollinations ; détourage des icônes avec `nativeImage`) et Prompt Booster (texte), par la fonction Supabase `rovex-gen`. |
 | `crawler.js` / `cloud-crawl.js` | Exploration (YouTube, DevForum, Bluesky, Reddit, Sketchfab, dev.to, Creator Store, GitHub) ; `cloud-crawl.js` tourne en continu sur GitHub Actions et remplit la bibliothèque en ligne. |
 | `studio.js` / `place.js` / `rbxupload.js` | Pont vers le serveur MCP de Roblox Studio, scripts et réglages de la place ouverte, envoi d'images sur Roblox. |
+| `rbxassets.js` / `roblox-assets/` | Packs d'assets (.rbxm) importés dans `ReplicatedStorage.RovexAssets` de chaque place ouverte : copie dans le dossier `content/rovex` de Studio puis `game:GetObjects("rbxasset://rovex/…")` par `execute_luau` ; résumé pour l'outil MCP `rovex_assets` (`data/rovex-assets.json`). Monter `VERSION` quand un pack change. |
 | `blender.js` / `blender/` | Pont vers Blender : add-on Claude Blender MCP (TCP 127.0.0.1:9876, une ligne JSON par commande), schémas des 25 outils dans `blender/tools.json`, réglage `data/blender.json`. |
 | `vfx-textures.js` | Bibliothèque de textures VFX (IDs Roblox, grilles de flipbook). |
 | `public/` | Interface : `index.html`, `app.js` (pages), `i18n.js` (textes en/fr/es/pt), `custom.js` (thèmes et fonds), `style.css`. |

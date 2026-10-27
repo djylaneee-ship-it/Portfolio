@@ -866,3 +866,5 @@ body.chat-mode .view { gap: 0; }
 .chat-boost { min-height: 40px; padding: 0 14px; border-radius: 12px; font-size: 13px; border-color: var(--accent); color: var(--accent3); }
 .chat-boost .spinner { width: 13px; height: 13px; border-color: var(--line2); border-top-color: var(--accent2); }
 @media (max-width: 700px) { .chat-boost span { display: none; } }
+.ra-packs { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 12px; } .ra-packs code { font: 11.5px var(--mono); padding: 4px 8px; border-radius: 8px; background: var(--panel2); border: 1px solid var(--line2); }
+.ra-places { display: flex; flex-direction: column; gap: 6px; } .ra-place { font-size: 13px; } .ra-place small { color: var(--muted2); margin-left: 6px; } .ra-place.err small { color: var(--danger); }

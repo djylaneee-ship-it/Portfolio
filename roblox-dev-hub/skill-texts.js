@@ -116,6 +116,7 @@ Des Beam, Trail, meshes ou lumières peuvent servir de compléments lorsque le b
 
 TEXTURES ROVEX OBLIGATOIRES
 Toutes les textures des ParticleEmitter (et des Beam / Trail éventuels) viennent OBLIGATOIREMENT de la catégorie Textures VFX de Rovex, récupérées avec l'outil find_vfx_textures, avant d'écrire le moindre effet. Aucune autre texture n'est permise : ni ID trouvé ailleurs, ni ID de mémoire, ni texture par défaut de Roblox, ni ID inventé. Pour chaque couche, indiquer l'ID choisi, son nom et son groupe dans Rovex.
+Les modèles VFX tout faits de la place (ReplicatedStorage.RovexAssets.VFX, packs Combat et Fire, listés par l'outil rovex_assets) sont aussi autorisés : les cloner ou reprendre leurs ParticleEmitter avec leurs textures d'origine.
 Seule exception : si aucune texture Rovex ne convient vraiment après plusieurs recherches (mots différents, groupes, grilles), le dire clairement à l'utilisateur, expliquer ce qui manque et lui proposer d'en ajouter dans la page Textures VFX (ou d'en générer une avec generate_image) ; ne jamais remplacer en silence.
 
 ANALYSER AVANT DE CONSTRUIRE

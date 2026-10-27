@@ -12,6 +12,7 @@ const claude = require('./claude');
 const studio = require('./studio');
 const place = require('./place');
 const rbxupload = require('./rbxupload');
+const rbxassets = require('./rbxassets');
 const textures = require('./vfx-textures');
 const level = require('./level');
 const quality = require('./quality');
@@ -511,6 +512,20 @@ const routes = [
     return { added: fresh.length, total: textures.all(state).length };
   }],
   // La place ouverte dans Studio : scripts (lire / modifier) et réglages du jeu (valeurs du code).
+  // Packs d'assets Rovex importés dans ReplicatedStorage.RovexAssets de chaque place ouverte.
+  ['GET', /^\/api\/robloxstudio\/assets$/, () => rbxassets.status()],
+  ['PUT', /^\/api\/robloxstudio\/assets$/, async (req) => rbxassets.setAuto((await json(req)).auto)],
+  ['POST', /^\/api\/robloxstudio\/assets$/, async (req) => {
+    const b = await json(req);
+    const list = b.studioId ? [{ id: String(b.studioId) }] : await place.studios(true);
+    if (!list.length) throw Object.assign(new Error('No place open in Roblox Studio'), { key: 'rsNoPlace' });
+    const out = [];
+    for (const s of list) {
+      try { const r = await rbxassets.importInto(s.id, { force: b.force !== false }); out.push({ id: s.id, ok: true, report: r.report, items: (r.summary || []).length }); }
+      catch (e) { out.push({ id: s.id, ok: false, error: e.message }); }
+    }
+    return { places: out };
+  }],
   ['GET', /^\/api\/place\/studios$/, async (req, m, url) => ({ ready: studio.bridge.state === 'ready', studios: await place.studios(url.searchParams.get('force') === '1') })],
   ['GET', /^\/api\/place\/scripts$/, (req, m, url) => place.scripts(url.searchParams.get('s') || '')],
   ['POST', /^\/api\/place\/read$/, async (req) => { const b = await json(req); return place.readScript(b.s || '', b.path); }],
@@ -559,8 +574,8 @@ routes.push(
   ['POST', /^\/api\/agents\/clear$/, (req) => { agentLocal(req); return agents.clear(); }],
 );
 
-const MEMBER_ACTIONS = [/^\/api\/agents(\/[\w-]+)?$/, /^\/api\/blender(\/addon)?$/, /^\/api\/custom(\/background)?$/, /^\/api\/textures\/thumbs$/, /^\/api\/place\/(read|write|value)$/, /^\/api\/robloxstudio(\/restart)?$/, /^\/api\/claude\/(desktop|code|send)$/, /^\/api\/mcp\/test$/, /^\/api\/update\/(check|install)$/, /^\/api\/gen(\/.*)?$/];
-const USER_ROUTES = [/^\/api\/custom$/, /^\/api\/textures$/, /^\/api\/place\/(studios|scripts|values)$/, /^\/api\/robloxstudio$/, /^\/api\/claude$/, /^\/api\/version$/, /^\/api\/prompts$/, /^\/api\/skills$/, /^\/api\/skills\/\w+$/, /^\/api\/level$/, /^\/api\/meta$/, /^\/api\/stats$/, /^\/api\/resources$/, /^\/api\/channels$/, /^\/api\/youtube$/, /^\/api\/crawl$/, /^\/api\/examples$/, /^\/api\/mcp$/];
+const MEMBER_ACTIONS = [/^\/api\/agents(\/[\w-]+)?$/, /^\/api\/blender(\/addon)?$/, /^\/api\/custom(\/background)?$/, /^\/api\/textures\/thumbs$/, /^\/api\/place\/(read|write|value)$/, /^\/api\/robloxstudio(\/restart|\/assets)?$/, /^\/api\/claude\/(desktop|code|send)$/, /^\/api\/mcp\/test$/, /^\/api\/update\/(check|install)$/, /^\/api\/gen(\/.*)?$/];
+const USER_ROUTES = [/^\/api\/custom$/, /^\/api\/textures$/, /^\/api\/place\/(studios|scripts|values)$/, /^\/api\/robloxstudio(\/assets)?$/, /^\/api\/claude$/, /^\/api\/version$/, /^\/api\/prompts$/, /^\/api\/skills$/, /^\/api\/skills\/\w+$/, /^\/api\/level$/, /^\/api\/meta$/, /^\/api\/stats$/, /^\/api\/resources$/, /^\/api\/channels$/, /^\/api\/youtube$/, /^\/api\/crawl$/, /^\/api\/examples$/, /^\/api\/mcp$/];
 
 const cookies = (req) => Object.fromEntries(String(req.headers.cookie || '').split(';').map((c) => c.trim().split('=')).filter((p) => p[0]).map(([k, ...v]) => [k, decodeURIComponent(v.join('='))]));
 const clientIp = (req) => req.socket.remoteAddress || '';
@@ -744,6 +759,7 @@ server.listen(PORT, HOST, () => {
   readyOk(PORT);
   try { agents.init(PORT); } catch (e) { console.log('  Claude chat: ' + e.message); }
   db.warm(state);
+  rbxassets.start();
   autoConnectClaude();
   sharedPull().catch(() => {});
 });

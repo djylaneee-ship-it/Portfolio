@@ -1218,7 +1218,7 @@ async function renderBlender() {
 
 // ---------- Roblox Studio : Rovex se branche sur le serveur MCP de Studio et repasse ses outils à Claude ----------
 async function renderRobloxStudio() {
-  const d = await api('/robloxstudio');
+  const [d, ra] = await Promise.all([api('/robloxstudio'), api('/robloxstudio/assets').catch(() => null)]);
   const st = d.status || {};
   const state = d.enabled ? st.state : 'off';
   const steps = [['rs.s1', 'rs.s1t'], ['rs.s2', 'rs.s2t'], ['rs.s3', 'rs.s3t']];
@@ -1245,7 +1245,13 @@ async function renderRobloxStudio() {
         <select class="select" id="rs-oc-type"><option value="user" ${d.creatorType === 'user' ? 'selected' : ''}>${t('rs.ocUser')}</option><option value="group" ${d.creatorType === 'group' ? 'selected' : ''}>${t('rs.ocGroup')}</option></select>
         <input class="input" id="rs-oc-id" style="flex:1;min-width:140px" inputmode="numeric" placeholder="${t('rs.ocId')}" value="${esc(d.creatorId)}">
         <button class="btn primary">${t('save')}</button>
-      </form></div>`;
+      </form></div>
+    ${ra ? `<div class="panel" data-spot><div class="row" style="justify-content:space-between"><h3 style="margin:0">📦 ${t('ra.title')}</h3>
+        <label class="row" style="gap:10px"><span class="sub" style="font-size:13px">${t('ra.auto')}</span><label class="switch"><input type="checkbox" id="ra-auto" ${ra.auto ? 'checked' : ''}><span></span></label></label></div>
+      <p>${t('ra.text')}</p>
+      <div class="ra-packs">${ra.packs.map((p) => `<code>${esc(p.path)}</code>`).join('')}</div>
+      ${ra.places.length ? `<div class="ra-places">${ra.places.map((p) => `<div class="ra-place ${p.ok ? 'ok' : 'err'}">${p.ok ? '✓' : '⚠️'} <b>${esc(p.name || p.id)}</b> <small>${p.ok ? t(p.skipped ? 'ra.already' : 'ra.done') : esc(p.error || '')}</small></div>`).join('')}</div>` : `<p class="sub" style="font-size:13px">${t(ra.contentDirs ? 'ra.waiting' : 'ra.noStudio')}</p>`}
+      <div class="row" style="margin-top:12px"><button class="btn primary" id="ra-now">${t('ra.now')}</button><span class="sub" style="font-size:12.5px">${t('ra.help')}</span></div></div>` : ''}`;
   const run = async (b, fn) => {
     b.disabled = true;
     const old = b.innerHTML;
@@ -1254,6 +1260,18 @@ async function renderRobloxStudio() {
   };
   $('#rs-save').onclick = (e) => run(e.currentTarget, () => api('/robloxstudio', { method: 'PUT', body: { config: $('#rs-cfg').value, enabled: true } }));
   $('#rs-retry').onclick = (e) => run(e.currentTarget, () => api('/robloxstudio/restart', { method: 'POST' }));
+  if ($('#ra-auto')) $('#ra-auto').onchange = (e) => api('/robloxstudio/assets', { method: 'PUT', body: { auto: e.target.checked } }).catch((er) => toast(er.message, true));
+  if ($('#ra-now')) $('#ra-now').onclick = async (e) => {
+    const b = e.currentTarget;
+    b.disabled = true;
+    b.innerHTML = `<i class="spinner"></i> ${t('ra.importing')}`;
+    try {
+      const r = await api('/robloxstudio/assets', { method: 'POST', body: { force: true } });
+      const bad = r.places.filter((x) => !x.ok);
+      if (bad.length) toast(bad[0].error, true); else toast(t('ra.ok', { n: r.places.length }));
+    } catch (er) { toast(er.message, true); }
+    renderRobloxStudio();
+  };
   $('#rs-on').onchange = (e) => run($('#rs-retry'), () => api('/robloxstudio', { method: 'PUT', body: { enabled: e.target.checked } }));
   $('#rs-default').onclick = () => { $('#rs-cfg').value = d.defaultConfig; };
   $('#rs-oc').onsubmit = async (e) => {
