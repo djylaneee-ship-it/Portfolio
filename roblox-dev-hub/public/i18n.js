@@ -5,6 +5,10 @@ const LOCALES = { en: 'en-US', fr: 'fr-FR', es: 'es-ES', pt: 'pt-BR' };
 
 const I18N = {
   en: {
+    "ag.boost": "Improve & send",
+    "ag.boostTitle": "Groq rewrites your message into a precise prompt for Claude, then sends it (Ctrl+Enter)",
+    "ag.boosting": "Improving…",
+    "ag.hint2": "Enter to send · Ctrl+Enter to improve then send · Shift+Enter new line",
     "ag.listening": "Listening",
     "ag.notConnected": "Not connected",
     "ag.subtitle": "Your Claude Desktop, linked by MCP",
@@ -485,6 +489,10 @@ const I18N = {
   },
 
   fr: {
+    "ag.boost": "Améliorer et envoyer",
+    "ag.boostTitle": "Groq réécrit ton message en prompt précis pour Claude, puis l’envoie (Ctrl+Entrée)",
+    "ag.boosting": "Amélioration…",
+    "ag.hint2": "Entrée pour envoyer · Ctrl+Entrée pour améliorer puis envoyer · Maj+Entrée nouvelle ligne",
     "ag.listening": "À l’écoute",
     "ag.notConnected": "Pas connecté",
     "ag.subtitle": "Ton Claude Desktop, relié par MCP",
@@ -965,6 +973,10 @@ const I18N = {
   },
 
   es: {
+    "ag.boost": "Mejorar y enviar",
+    "ag.boostTitle": "Groq reescribe tu mensaje como un prompt preciso para Claude y luego lo envía (Ctrl+Enter)",
+    "ag.boosting": "Mejorando…",
+    "ag.hint2": "Enter para enviar · Ctrl+Enter para mejorar y enviar · Mayús+Enter nueva línea",
     "ag.listening": "Escuchando",
     "ag.notConnected": "No conectado",
     "ag.subtitle": "Tu Claude Desktop, conectado por MCP",
@@ -1445,6 +1457,10 @@ const I18N = {
   },
 
   pt: {
+    "ag.boost": "Melhorar e enviar",
+    "ag.boostTitle": "O Groq reescreve sua mensagem como um prompt preciso para o Claude e depois envia (Ctrl+Enter)",
+    "ag.boosting": "Melhorando…",
+    "ag.hint2": "Enter para enviar · Ctrl+Enter para melhorar e enviar · Shift+Enter nova linha",
     "ag.listening": "Ouvindo",
     "ag.notConnected": "Não conectado",
     "ag.subtitle": "Seu Claude Desktop, ligado por MCP",

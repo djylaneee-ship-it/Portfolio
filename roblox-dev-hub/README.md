@@ -98,6 +98,7 @@ L'app récupère ce fichier toutes les 30 minutes (**Réglages → Source cloud*
 La page **Chat Claude** permet de parler à Claude **dans Rovex, avec ton abonnement Claude**, seulement par MCP : une conversation de Claude Desktop écoute le chat avec l'outil `chat_listen` (attend le prochain message, 40 s au plus), répond avec `chat_reply` et annonce ses étapes avec `chat_status`, puis réécoute. On discute dans Rovex, Claude Desktop reste réduit.
 
 - **Connecter Claude Desktop** ouvre une nouvelle conversation avec la consigne déjà écrite (aussi en prompt MCP `rovex-chat`, menu **+**). La première fois, choisir « Toujours autoriser » pour les trois outils du chat.
+- **✨ Améliorer et envoyer** (ou Ctrl+Entrée) : Groq (Prompt Booster, `/api/gen/enhance`) réécrit le message en prompt précis pour Claude, puis l'envoie.
 - Les messages écrits quand Claude n'écoute pas l'attendent. Si la conversation s'arrête (fermée ou trop longue), on la rebranche : l'historique reste dans Rovex (`data/agent-chat.json`).
 - Code : `agents.js` (conversation, file d'attente, requête longue `/agent/inbox`, clé locale `data/agent.json`) et les outils `chat_*` de `mcp.js`. Le chat ne marche que sur le PC où Rovex est installé.
 

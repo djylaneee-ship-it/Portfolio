@@ -1692,6 +1692,31 @@ function agListen() {
   };
 }
 
+// « Améliorer puis envoyer » : Groq (Prompt Booster) réécrit le message en prompt précis, puis il part tout seul.
+async function agBoostSend() {
+  const ta = $('#chat-text');
+  const text = ta.value.trim();
+  const b = $('#chat-boost');
+  if (!text || b.disabled) return;
+  b.disabled = true;
+  ta.disabled = true;
+  b.innerHTML = `<i class="spinner"></i> <span>${t('ag.boosting')}</span>`;
+  try {
+    const r = await api('/gen/enhance', { method: 'POST', body: { text } });
+    ta.value = r.text;
+    ta.style.height = '';
+    ta.style.height = Math.min(ta.scrollHeight, 260) + 'px';
+    ta.disabled = false;
+    await agSend();
+  } catch (e) {
+    toast(e.message, true);
+  } finally {
+    ta.disabled = false;
+    b.disabled = false;
+    b.innerHTML = `✨ <span>${t('ag.boost')}</span>`;
+  }
+}
+
 async function agSend() {
   const ta = $('#chat-text');
   const text = ta.value.trim();
@@ -1722,7 +1747,8 @@ async function renderChat() {
         <div class="ag-offbar" id="ag-offbar" hidden>${t('ag.offbar')} <button class="btn small" data-connect>${t('ag.connectDesktop')}</button></div>
         <form class="chat-input" id="chat-form">
           <textarea id="chat-text" rows="1" placeholder="${t('ag.ph', { name: 'Claude' })}"></textarea>
-          <div class="chat-input-row"><small class="muted">${t('ag.hint')}</small>
+          <div class="chat-input-row"><small class="muted">${t('ag.hint2')}</small>
+            <button class="btn chat-boost" type="button" id="chat-boost" title="${t('ag.boostTitle')}">✨ <span>${t('ag.boost')}</span></button>
             <button class="btn primary chat-send" id="chat-send" title="${t('ag.send')}"><svg class="line" viewBox="0 0 24 24" style="stroke-width:2.4"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button></div>
         </form>
       </section>
@@ -1734,8 +1760,13 @@ async function renderChat() {
     </div>`;
   const ta = $('#chat-text');
   ta.oninput = () => { ta.style.height = ''; ta.style.height = Math.min(ta.scrollHeight, 260) + 'px'; };
-  ta.onkeydown = (e) => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); agSend(); } };
+  ta.onkeydown = (e) => {
+    if (e.key !== 'Enter' || e.shiftKey || e.isComposing) return;
+    e.preventDefault();
+    if (e.ctrlKey || e.metaKey) agBoostSend(); else agSend();
+  };
   $('#chat-form').onsubmit = (e) => { e.preventDefault(); agSend(); };
+  $('#chat-boost').onclick = agBoostSend;
   $('#ag-connect').onclick = agConnect;
   $$('#ag-offbar [data-connect]').forEach((b) => b.onclick = agConnect);
   $('#ag-clear').onclick = async () => {

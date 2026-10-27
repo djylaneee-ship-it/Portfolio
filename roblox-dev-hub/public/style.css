@@ -863,3 +863,6 @@ body.chat-mode .view { gap: 0; }
 .ag-setup > h2, .ag-setup > p { text-align: center; }
 @media (max-width: 1250px) { .chat.solo, .chat.solo.no-side { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 860px) { .chat.solo .chat-list { display: none; } }
+.chat-boost { min-height: 40px; padding: 0 14px; border-radius: 12px; font-size: 13px; border-color: var(--accent); color: var(--accent3); }
+.chat-boost .spinner { width: 13px; height: 13px; border-color: var(--line2); border-top-color: var(--accent2); }
+@media (max-width: 700px) { .chat-boost span { display: none; } }
