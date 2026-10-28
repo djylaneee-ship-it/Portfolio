@@ -1,7 +1,7 @@
 {
  "version": 2,
- "cursor": 169,
- "runs": 41,
+ "cursor": 175,
+ "runs": 42,
  "channels": [
   {
    "id": "ff1bc5c8316c",
@@ -5456,7 +5456,7 @@
    "channelId": "UCABAQID2xmChxHzEDW_UbVw",
    "category": "tools",
    "subscribers": "1.24M subscribers",
-   "lastFetch": "2026-10-27T21:04:53.357Z",
+   "lastFetch": "2026-10-28T02:06:02.693Z",
    "auto": true
   },
   {
@@ -6864,7 +6864,7 @@
    "channelId": "UCuve004574dLEfMMaNRJDhg",
    "category": "tools",
    "subscribers": "1.36K subscribers",
-   "lastFetch": "2026-10-27T21:05:52.300Z",
+   "lastFetch": "2026-10-28T02:06:54.069Z",
    "auto": true
   },
   {
@@ -10329,7 +10329,7 @@
    "channelId": "UCzvddM3EImtQ_5vRBmKSjLA",
    "category": "scripting",
    "subscribers": "190K subscribers",
-   "lastFetch": null,
+   "lastFetch": "2026-10-28T02:09:13.787Z",
    "auto": true
   },
   {
@@ -10873,54 +10873,15 @@
   }
  ],
  "cursors": {
-  "forum:help-and-feedback/scripting-support": 1260,
-  "forum:help-and-feedback/creations-feedback": 1259,
-  "forum:help-and-feedback/art-design-support": 600,
-  "sketchfab:roblox": "9840",
-  "forum:resources/community-resources": 235,
-  "forum:help-and-feedback/game-design-support": 80,
-  "devto:gamedev": 80,
-  "forum:resources/community-tutorials": 55,
-  "sketchfab:roblox low poly": "1320",
-  "forum:updates/announcements": 45,
-  "sketchfab:roblox character": "1080",
-  "forum:help-and-feedback/building-support": 10,
-  "sketchfab:roblox ugc": "240",
-  "sketchfab:roblox map": "240",
-  "sketchfab:roblox weapon": "240",
-  "sketchfab:roblox pet": "240",
-  "store:decal:ui": "MTBfMV8xXzMw_41872fe8f64c2c45bac875d16b88ed95",
-  "store:decal:icon": "MTBfMV8xXzMw_ac73895a948bcbb76450c2c0f26debec",
-  "store:decal:button": "MTBfMV8xXzMw_5c8ae2ca89b60cdc414321d3ced98244",
-  "store:decal:frame": "MTBfMV8xXzMw_2421d2db40f9fd00d441ea836d1aa8d1",
-  "store:decal:background": "MTBfMV8xXzMw_a574aad5f14652e7daf4c360a3130954",
-  "store:decal:texture": "MTBfMV8xXzMw_4bb7b74fd992c4011dce38ed1be687d7",
-  "store:decal:particle": "MTBfMV8xXzMw_012e3344259a06438d9fdadcbf7d975a",
-  "store:decal:vfx": "MTBfMV8xXzMw_9e4a0ac7e752347f1caab942c3b12b62",
-  "store:decal:slash": "MTBfMV8xXzMw_0bd7b39e9d48a6c3043d6d4583e0819d",
-  "store:decal:smoke": "MTBfMV8xXzMw_78fb0dc832f820317e52961dc3b415d3",
-  "store:decal:fire": "MTBfMV8xXzMw_63dcaf1f99fcbd86f56123ae31899a46",
-  "store:decal:glow": "MTBfMV8xXzMw_43c8ce564a9390e04cd5bf2f7f6c9470",
-  "store:decal:sparkle": "MTBfMV8xXzMw_4244162d0e2c1716f17325bb95572674",
-  "store:decal:aura": "MTBfMV8xXzMw_83bd7c91a022b57e578f0dc4d0515a9c",
-  "store:decal:gradient": "MTBfMV8xXzMw_1ca8bc484c4ea08588f41879cc5762ea",
-  "store:decal:logo": "MTBfMV8xXzMw_ca292db5c9bd64891b03a302fe1f073c",
-  "store:decal:emoji": "MTBfMV8xXzMw_aaaa0cbca9fc890f91773d296147e433",
-  "store:decal:sky": "MTBfMV8xXzMw_6750a3db89074d543a98725d324da671",
-  "store:decal:grass": "MTBfMV8xXzMw_4a97ada93c0febae009f874d9bdc506c",
-  "store:decal:stone": "MTBfMV8xXzMw_aef9a78e0e6759e2cb9fa7360317906a",
-  "store:decal:wood": "MTBfMV8xXzMw_6b87ff3c3dbd502adee5e6d62b59b62f",
-  "store:decal:brick": "MTBfMV8xXzMw_4c82b359dabc32806976de64b70b1f6e",
-  "store:decal:anime": "MTBfMV8xXzMw_502d4d1346c77bb815e67e4e0197a035",
-  "store:decal:cartoon": "MTBfMV8xXzMw_449ee4c1f9c80295fd70808e104505a5",
-  "store:mesh:sword": "MTBfMV8xXzMw_69c7f86decf2072dcad7f7f8ee1384ab",
-  "store:mesh:gun": "MTBfMV8xXzMw_ea1de00b6323ef2b10b517bffda19397",
-  "store:mesh:tree": "MTBfMV8xXzMw_be56d90c1b2f98defbdc42815f0047c2",
-  "store:mesh:rock": "MTBfMV8xXzMw_fce304b2032c7d0deca17b7d6a8831e6",
-  "store:mesh:house": "MTBfMV8xXzMw_2c22625097ecc99832a9a8655f2f79e4",
-  "store:mesh:car": "MTBfMV8xXzMw_81fad5e80f2da6d93860ea91168c7bda",
-  "store:mesh:pet": "NF8xXzFfMzA=_d45448a9bbd41c8a5e82d18a86c32cfa"
+  "forum:help-and-feedback/scripting-support": 1295,
+  "forum:help-and-feedback/creations-feedback": 1294,
+  "forum:help-and-feedback/art-design-support": 635,
+  "forum:resources/community-resources": 270,
+  "forum:help-and-feedback/game-design-support": 115,
+  "forum:resources/community-tutorials": 90,
+  "forum:help-and-feedback/building-support": 45,
+  "sketchfab:roblox": "600"
  },
  "migrated": false,
- "updatedAt": "2026-10-28T01:44:10.976Z"
+ "updatedAt": "2026-10-28T02:37:04.527Z"
 }
