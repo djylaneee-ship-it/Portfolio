@@ -35,7 +35,7 @@ Travail à plusieurs : une branche par dev (`dev/<pseudo>-<sujet>`), une PR, rel
 |---|---|
 | `electron.js` | Fenêtre, icône de la barre des tâches, mises à jour, démarrage du serveur. |
 | `server.js` | Serveur HTTP local (API `/api/*`, MCP HTTP `/mcp`, médias). Contrôle d'accès : `USER_ROUTES` (lecture membres), `MEMBER_ACTIONS` (actions membres), le reste admin. |
-| `mcp.js` | Serveur MCP (stdio pour Claude Desktop, HTTP via le serveur) : outils, prompts, journal d'activité (`data/activity.json`). |
+| `mcp.js` | Serveur MCP (stdio pour Claude Desktop, HTTP via le serveur) : outils, prompts, journal d'activité (`data/activity.json`). En stdio, les appels d'outils passent par l'app ouverte (`/mcp`, port dans `data/agent.json`) pour ne pas recharger la bibliothèque en ligne ; sans l'app, ils tournent sur place. |
 | `db.js` | Bibliothèque locale : `data/library.json` (ressources de l'utilisateur, réglages) + `data/cloud-library.json` (bibliothèque en ligne, écrite en arrière-plan ; appelle `db.markCloudDirty()` quand tu modifies une ressource `source: 'cloud'`), catégories, recherche (textes normalisés en cache). |
 | `auth.js` / `cloud.js` | IDs d'accès en ligne (Supabase, RPC `rovex_*`), un appareil par ID, contenu partagé par les admins. |
 | `skills.js` / `skill-texts.js` / `skill-pack/` | Skills Claude (socle `rovex-core` + un par catégorie). Les skills VFX, Animation, GUI, Modeling et Building sont les textes complets de `skill-pack/*.txt` + une courte note d'outils Rovex (`ROVEX_NOTES`) ; monter leur numéro dans `SKILL_VERSIONS` quand le texte change. |

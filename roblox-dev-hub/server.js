@@ -125,12 +125,23 @@ function refresh() {
   } catch {}
 }
 
+let statsCache = { state: null, key: '', out: null };
 const routes = [
   ['GET', /^\/api\/meta$/, () => ({ categories: db.CATEGORIES, types: db.TYPES })],
   ['GET', /^\/api\/info$/, () => ({ mcpPath: path.join(__dirname, 'mcp.js'), node: process.execPath, port: PORT })],
-  ['GET', /^\/api\/stats$/, () => ({ ...db.stats(state), opensource: state.resources.filter((r) => r.type === 'opensource' || r.type === 'asset').length,
-    // Compteurs de la bibliothèque d'apprentissage (sans l'open source, qui a sa page).
-    learnByCategory: state.resources.reduce((acc, r) => { if (r.type !== 'opensource' && r.type !== 'asset') acc[r.category] = (acc[r.category] || 0) + 1; return acc; }, {}), examples: (state.examples || []).filter((e) => e.status === 'validated').length })],
+  ['GET', /^\/api\/stats$/, () => {
+    const key = `${db.revKey(state)}:${(state.examples || []).length}`;
+    if (statsCache.state === state && statsCache.key === key) return statsCache.out;
+    let opensource = 0;
+    const learnByCategory = {}; // compteurs de la bibliothèque d'apprentissage (sans l'open source, qui a sa page)
+    for (const r of state.resources) {
+      if (r.type === 'opensource' || r.type === 'asset') opensource++;
+      else learnByCategory[r.category] = (learnByCategory[r.category] || 0) + 1;
+    }
+    const out = { ...db.stats(state), opensource, learnByCategory, examples: (state.examples || []).filter((e) => e.status === 'validated').length };
+    statsCache = { state, key, out };
+    return out;
+  }],
   ['GET', /^\/api\/resources$/, (req, m, url) => {
     const p = url.searchParams;
     const list = (k) => (p.get(k) || '').split(',').filter(Boolean);
@@ -330,7 +341,7 @@ const routes = [
   ['GET', /^\/api\/skills$/, () => ({
     codeInstalled: skills.codeInstalled(), codeDir: skills.CODE_SKILLS,
     core: skills.getSkill(state, skills.CORE_ID),
-    skills: skills.SKILL_CATS.map((c) => ({ ...skills.getSkill(state, c), totals: skills.context(state, c).totals })),
+    skills: (() => { const tot = skills.totalsAll(state); return skills.SKILL_CATS.map((c) => ({ ...skills.getSkill(state, c), totals: tot[c] })); })(),
   })],
   ['GET', /^\/api\/skills\/(\w+)$/, (req, m) => {
     if (m[1] === skills.CORE_ID) return { ...skills.getSkill(state, m[1]), defaultInstructions: skills.DEFAULTS[m[1]], defaultArt: '' };
@@ -838,6 +849,7 @@ function tombstone(kind, id) {
 }
 // Bibliothèque en ligne : les nouveautés trouvées par l'exploration (toutes les 5 minutes, par paquets).
 let libBusy = false;
+let urlCache = { set: null, size: 0 };
 async function librarySync() {
   const c = auth.online && state.auth && state.auth.lastCred;
   if (!c || libBusy) return { added: 0 };
@@ -845,7 +857,9 @@ async function librarySync() {
   try {
     // Le numéro de suivi est rangé avec les ressources en ligne (cloud-library.json) : toujours cohérents.
     let since = Number(state.cloudSeq ?? state.settings.libSeq ?? 0);
-    const urls = new Set(state.resources.map((r) => r.url).filter(Boolean));
+    // Les liens déjà connus : gardés d'une synchro à l'autre (refaits seulement si la bibliothèque a changé ailleurs).
+    if (!urlCache.set || urlCache.size !== state.resources.length) urlCache = { set: new Set(state.resources.map((r) => r.url).filter(Boolean)), size: state.resources.length };
+    const urls = urlCache.set;
     let added = 0;
     for (let i = 0; i < 500; i++) {
       const out = cloud.must(await cloud.rpc('rovex_lib_since', { p_code: c.code, p_since: since, p_limit: 2000 }, 60000));
@@ -858,6 +872,7 @@ async function librarySync() {
         state.resources.push(db.normalize({ ...rest, id: undefined, source: 'cloud', favorite: false }));
         added++;
       }
+      urlCache.size = state.resources.length;
       state.cloudSeq = since;
       state.settings.libSeq = since;
       if (added) db.markCloudDirty();

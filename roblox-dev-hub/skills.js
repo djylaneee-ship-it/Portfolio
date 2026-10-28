@@ -63,6 +63,24 @@ function context(state, cat, { query = '' } = {}) {
   };
 }
 
+// Totaux de toutes les catégories en un seul passage (page Skills) : gardés tant que la bibliothèque ne change pas.
+let totalsCache = { key: '', out: null };
+const LEARN_OUT = new Set(['opensource', 'asset', 'chaine', 'recherche']);
+function totalsAll(state) {
+  const key = `${state.resources.length}:${state.cloudSeq || 0}:${(state.examples || []).length}:${(state.examples || []).filter((e) => e.status === 'validated').length}`;
+  if (totalsCache.key === key) return totalsCache.out;
+  const out = Object.fromEntries(SKILL_CATS.map((c) => [c, { examples: 0, resources: 0, opensource: 0 }]));
+  for (const r of state.resources) {
+    const o = out[r.category];
+    if (!o) continue;
+    if (r.type === 'opensource' || r.type === 'asset') o.opensource++;
+    if (!LEARN_OUT.has(r.type)) o.resources++;
+  }
+  for (const e of state.examples || []) if (e.status === 'validated' && out[e.category]) out[e.category].examples++;
+  totalsCache = { key, out };
+  return out;
+}
+
 // Pour les VFX : un résumé de la bibliothèque de textures (les IDs se récupèrent avec find_vfx_textures).
 // Règle fixe (même si l'admin a modifié le texte du skill) : textures uniquement depuis Rovex.
 function vfxTextures(state) {
@@ -199,4 +217,4 @@ function codeInstalled() {
   return SKILL_CATS.filter((cat) => fs.existsSync(path.join(CODE_SKILLS, `rovex-${cat}`, 'SKILL.md'))).length;
 }
 
-module.exports = { SKILL_CATS, CORE_ID, VERSION: TEXTS.VERSION, versionOf: TEXTS.versionOf, DEFAULTS, ART, getSkill, context, load, loadMany, skillMd, skillZip, installForClaudeCode, codeInstalled, CODE_SKILLS };
+module.exports = { totalsAll, SKILL_CATS, CORE_ID, VERSION: TEXTS.VERSION, versionOf: TEXTS.versionOf, DEFAULTS, ART, getSkill, context, load, loadMany, skillMd, skillZip, installForClaudeCode, codeInstalled, CODE_SKILLS };

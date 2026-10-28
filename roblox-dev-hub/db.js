@@ -146,7 +146,12 @@ function normalizeExample(e) {
   };
 }
 
+// Compteur de modifications : les résultats en cache (recherches, statistiques) se recalculent après chaque enregistrement.
+let rev = 0;
+const revKey = (db) => `${rev}:${db.resources.length}`;
+
 function save(db) {
+  rev++;
   ensureDirs();
   const { resources, cloudSeq, ...rest } = db;
   const own = resources.filter((r) => r.source !== 'cloud');
@@ -221,7 +226,7 @@ function hay(r) {
 // Recherche plein texte avec score : titre > tags > auteur > description > notes.
 // `types` : liste de types acceptés ; `exclude` : types à écarter ; `tag` : tag requis ;
 // `sort: 'stars'` trie l'open source par étoiles GitHub.
-function search(db, { q = '', category = '', type = '', types = [], exclude = [], tag = '', sort = '', favorite = false, level = '', limit = 0 } = {}) {
+function searchAll(db, { q = '', category = '', type = '', types = [], exclude = [], tag = '', sort = '', favorite = false, level = '', limit = 0 } = {}) {
   const terms = strip(q).split(/\s+/).filter(Boolean);
   let out = [];
   for (const r of db.resources) {
@@ -255,6 +260,20 @@ function search(db, { q = '', category = '', type = '', types = [], exclude = []
   return limit ? out.slice(0, limit) : out;
 }
 
+// Les dernières recherches restent en cache (pages suivantes, retour sur une page) tant que rien n'a changé.
+const memo = { db: null, key: '', list: new Map() };
+function search(db, opts = {}) {
+  if (memo.db !== db || memo.key !== revKey(db)) Object.assign(memo, { db, key: revKey(db), list: new Map() });
+  const key = JSON.stringify({ ...opts, limit: 0 });
+  let out = memo.list.get(key);
+  if (!out) {
+    out = searchAll(db, { ...opts, limit: 0 });
+    memo.list.set(key, out);
+    if (memo.list.size > 12) memo.list.delete(memo.list.keys().next().value);
+  }
+  return out.slice(0, opts.limit || out.length);
+}
+
 function stats(db) {
   const byCategory = Object.fromEntries(CATEGORIES.map((c) => [c.id, 0]));
   const byType = {};
@@ -286,5 +305,5 @@ function upsert(db, data, { fresh = false } = {}) {
 
 module.exports = {
   CATEGORIES, TYPES, DATA_DIR, MEDIA_DIR,
-  load, save, normalize, normalizeExample, search, stats, upsert, newId, youtubeId, youtubeThumb, markCloudDirty, CLOUD_FILE, warm,
+  load, save, normalize, normalizeExample, search, stats, revKey, upsert, newId, youtubeId, youtubeThumb, markCloudDirty, CLOUD_FILE, warm,
 };

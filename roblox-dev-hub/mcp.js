@@ -55,6 +55,42 @@ let store = {
 };
 const useStore = (s) => { store = s; };
 
+// Réglages, skills, exemples et modèles de prompts seulement (library.json, petit) : sans charger la grande
+// bibliothèque en ligne. En mode HTTP (serveur de l'app), tout est déjà en mémoire.
+let ownCache = { key: '', st: null };
+function light() {
+  if (MODE !== 'stdio') return store.load();
+  if (cached.st && cached.key === fileKey()) return cached.st;
+  let key = '';
+  try { const st = fs.statSync(DB_FILE); key = `${st.mtimeMs}:${st.size}`; } catch {}
+  if (ownCache.st && ownCache.key === key) return ownCache.st;
+  let st = { resources: [], examples: [], settings: {} };
+  try { st = { resources: [], examples: [], settings: {}, ...JSON.parse(fs.readFileSync(DB_FILE, 'utf8')) }; } catch {}
+  ownCache = { key, st };
+  return st;
+}
+
+// Mode stdio avec l'app ouverte : les appels d'outils et de prompts passent par le serveur de l'app, qui a déjà
+// la bibliothèque en mémoire (pas de 2e copie de plusieurs centaines de Mo, pas d'attente au démarrage).
+// App fermée (connexion refusée) : on répond ici, comme avant.
+async function viaApp(msg) {
+  let port = 0;
+  try { port = Number(JSON.parse(fs.readFileSync(path.join(db.DATA_DIR, 'agent.json'), 'utf8')).port) || 0; } catch {}
+  if (!port) return null;
+  try {
+    const res = await fetch(`http://127.0.0.1:${port}/mcp`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(msg), signal: AbortSignal.timeout(30 * 60e3),
+    });
+    if (res.status === 202) return null;
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (e) {
+    const code = (e && e.cause && e.cause.code) || e.code;
+    if (['ECONNREFUSED', 'ECONNRESET', 'EHOSTUNREACH'].includes(code)) return null;
+    return { jsonrpc: '2.0', id: msg.id, result: { content: [{ type: 'text', text: 'Error: the Rovex Hub app did not answer (' + (e.message || e) + ')' }], isError: true } };
+  }
+}
+
 // Clients MCP vus récemment (Claude Desktop, Claude Code…), pour savoir s'ils sont vraiment branchés.
 // Fichier à part pour ne pas réécrire toute la base à chaque battement.
 const CLIENTS_FILE = path.join(db.DATA_DIR, 'clients.json');
@@ -813,7 +849,7 @@ async function call(name, a = {}) {
 
 // Outils activés dans la page « Connexion Claude » (tous par défaut).
 function enabledTools() {
-  const settings = store.load().settings || {};
+  const settings = light().settings || {};
   const off = settings.mcpTools || {};
   // Les outils dev_* n'existent qu'en mode développeur, les meshy_* quand une clé Meshy est enregistrée.
   const hasMeshy = meshy.enabled();
@@ -864,6 +900,11 @@ async function handle(msg) {
   if (!msg || msg.jsonrpc !== '2.0' || typeof method !== 'string') return fail(-32600, 'Invalid request');
   if (id === undefined) return null;
   try {
+    if (MODE === 'stdio' && (method === 'tools/call' || method === 'prompts/get' || method === 'prompts/list')
+      && !(method === 'tools/call' && (blender.owns(params.name) || studio.bridge.owns(params.name)))) {
+      const out = await viaApp(msg);
+      if (out) { seen(); return out; }
+    }
     if (method === 'initialize') {
       CLIENT = { name: String((params.clientInfo && params.clientInfo.name) || 'unknown').slice(0, 60), version: String((params.clientInfo && params.clientInfo.version) || '').slice(0, 30) };
       seen();
@@ -871,7 +912,7 @@ async function handle(msg) {
         protocolVersion: params.protocolVersion || '2025-06-18',
         capabilities: { tools: { listChanged: true }, prompts: {} },
         serverInfo: { name: 'rovex-hub', version: '2.0.0' },
-        instructions: ((store.load().settings || {}).mcpInstructions || DEFAULT_INSTRUCTIONS) + SKILL_RULE + (blender.enabled() ? blender.INSTRUCTIONS : ''),
+        instructions: ((light().settings || {}).mcpInstructions || DEFAULT_INSTRUCTIONS) + SKILL_RULE + (blender.enabled() ? blender.INSTRUCTIONS : ''),
       });
     }
     if (method === 'ping') return ok({});
