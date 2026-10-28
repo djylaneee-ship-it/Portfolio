@@ -2961,13 +2961,14 @@ async function renderFolders(params) {
   };
 }
 
-// ---------- Directives des prompts : !reference / !skill / !software, insérées par des boutons ----------
+// ---------- Directives des prompts : !reference / !skill / !software / !texture / !recipe, insérées par des boutons ----------
 const SOFTWARES = ['Roblox Studio', 'Blender', 'Meshy'];
 const dirBar = () => `<div class="dir-bar"><span class="sub">${t('dir.label')}</span>
   <button type="button" class="chip" data-dir="reference">📁 ${t('dir.ref')}</button>
   <button type="button" class="chip" data-dir="skill">🧠 ${t('dir.skill')}</button>
   <button type="button" class="chip" data-dir="software">🛠 ${t('dir.soft')}</button>
-  <button type="button" class="chip" data-dir="texture">🎨 ${t('dir.tex')}</button></div>`;
+  <button type="button" class="chip" data-dir="texture">🎨 ${t('dir.tex')}</button>
+  <button type="button" class="chip" data-dir="recipe">📖 ${t('dir.recipe')}</button></div>`;
 
 // Ajoute une valeur : nouvelle ligne pour une référence, à la suite de la ligne existante pour skill / software.
 function dirInsert(ta, kind, value) {
@@ -3018,12 +3019,44 @@ async function dirTextureMenu(b, ta) {
   setTimeout(() => document.addEventListener('click', function off(ev) { if (!menu.contains(ev.target)) { menu.remove(); document.removeEventListener('click', off); } }), 0);
 }
 
+// Menu des recettes (leçons de l'Atelier d'apprentissage) : validées d'abord, insère « ID (Titre) ».
+async function dirRecipeMenu(b, ta) {
+  const all = (await api('/lessons')).items.filter((l) => l.steps)
+    .sort((a, c) => (c.status === 'validated') - (a.status === 'validated'));
+  const menu = document.createElement('div');
+  menu.className = 'dir-menu dir-tex';
+  menu.innerHTML = `<input class="input" placeholder="${t('dir.recipePh')}"><div class="dir-tex-list"></div>`;
+  b.parentElement.appendChild(menu);
+  menu.style.left = b.offsetLeft + 'px';
+  const inp = $('input', menu);
+  let rows = [];
+  const draw = () => {
+    const w = inp.value.toLowerCase().split(/\s+/).filter(Boolean);
+    rows = all.filter((l) => w.every((k) => `${l.title} ${l.category} ${l.software} ${l.tags.join(' ')}`.toLowerCase().includes(k))).slice(0, 40);
+    $('.dir-tex-list', menu).innerHTML = rows.length ? rows.map((l, n) => `<button type="button" data-n="${n}"><span class="dir-tex-img" ${l.cover ? `style="background-image:url('/media/${esc(l.cover)}')"` : ''}>${l.cover ? '' : '📖'}</span>
+      <span>${esc(l.title)}<small>${esc(cat(l.category).label)} · ${l.steps} ${esc(t('ln.steps').toLowerCase())} · ${esc(t('ln.st.' + l.status))}</small></span></button>`).join('')
+      : `<p>${t('dir.recipeNone')} <a href="#/learn">${t('nav.learn')} →</a></p>`;
+    $$('.dir-tex-list button', menu).forEach((x) => x.onclick = (ev) => {
+      ev.stopPropagation();
+      const l = rows[Number(x.dataset.n)];
+      menu.remove();
+      dirInsert(ta, 'recipe', `${l.id} (${l.title.replace(/[,;+()]/g, ' ').replace(/\s+/g, ' ').trim()})`);
+    });
+  };
+  inp.oninput = draw;
+  inp.onclick = (ev) => ev.stopPropagation();
+  draw();
+  inp.focus();
+  setTimeout(() => document.addEventListener('click', function off(ev) { if (!menu.contains(ev.target)) { menu.remove(); document.removeEventListener('click', off); } }), 0);
+}
+
 function bindDirBar(root, ta) {
   $$('[data-dir]', root).forEach((b) => b.onclick = async (e) => {
     e.stopPropagation();
     $$('.dir-menu').forEach((m) => m.remove());
     const kind = b.dataset.dir;
     if (kind === 'texture') return dirTextureMenu(b, ta);
+    if (kind === 'recipe') return dirRecipeMenu(b, ta);
     let opts = [];
     if (kind === 'reference') opts = (await fdList()).map((f) => ({ v: f.path, label: `📁 ${f.path}`, sub: f.count }));
     if (kind === 'skill') opts = META.categories.filter((c) => c.id !== 'gameplay').map((c) => ({ v: c.id, label: c.label }));

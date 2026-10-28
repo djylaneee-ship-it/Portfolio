@@ -3,14 +3,16 @@
 //   !skill: vfx, animation            → charger exactement ces skills
 //   !software: Roblox Studio, Blender → travailler seulement dans ces logiciels
 //   !texture: 10024120805 (Wood Planks), ToonFire → utiliser ces textures (VFX ou build), par ID ou par nom
+//   !recipe: 3f7649c58e01 (Épée low poly), Slash de feu → suivre ces recettes de l'Atelier d'apprentissage, par ID ou par titre
 // parse() les lit, resolve() les vérifie (dossier existant, skill connu), forClaude() / forBooster() les redonnent
 // en consignes claires, ensure() les remet dans le prompt amélioré si Groq les a perdues.
 const db = require('./db');
 const skills = require('./skills');
 const folders = require('./folders');
 const textures = require('./vfx-textures');
+const lessons = require('./lessons');
 
-const RE = /!\s*(r[ée]f[ée]rences?|refs?|skills?|softwares?|logiciels?|soft|app|textures?|tex)\s*:\s*([^!\n]*)/gi;
+const RE = /!\s*(r[ée]f[ée]rences?|refs?|skills?|softwares?|logiciels?|soft|app|textures?|tex|recipes?|recettes?|lessons?|le[cç]ons?)\s*:\s*([^!\n]*)/gi;
 const norm = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '');
 
 // Noms de skills acceptés (id, nom affiché, mots courants en français).
@@ -35,10 +37,10 @@ const SOFTWARE = [
 ];
 
 function parse(text) {
-  const out = { reference: [], skill: [], software: [], texture: [], raw: [] };
+  const out = { reference: [], skill: [], software: [], texture: [], recipe: [], raw: [] };
   for (const m of String(text || '').matchAll(RE)) {
     const k = norm(m[1]);
-    const kind = k.startsWith('r') ? 'reference' : k.startsWith('skill') ? 'skill' : k.startsWith('tex') ? 'texture' : 'software';
+    const kind = /^(recipe|recette|lesson|lecon)/.test(k) ? 'recipe' : k.startsWith('r') ? 'reference' : k.startsWith('skill') ? 'skill' : k.startsWith('tex') ? 'texture' : 'software';
     let value = m[2].trim();
     // Chemin suivi de texte sur la même ligne : « library/Épées/ fais une épée » → « library/Épées/ ».
     if (kind === 'reference') value = (value.match(/^(.*?\/)(?=\s|$)/) || [, value])[1];
@@ -46,9 +48,9 @@ function parse(text) {
     if (!value) continue;
     out.raw.push(`!${kind}: ${value}`);
     if (kind === 'reference') out.reference.push(value.replace(/^["'`]|["'`]$/g, ''));
-    else out[kind].push(...value.split(kind === 'texture' ? /[,;+]/ : /[,;+&]|\s(?:et|and)\s/i).map((x) => x.trim()).filter(Boolean));
+    else out[kind].push(...value.split(kind === 'texture' || kind === 'recipe' ? /[,;+]/ : /[,;+&]|\s(?:et|and)\s/i).map((x) => x.trim()).filter(Boolean));
   }
-  for (const k of ['reference', 'skill', 'software', 'texture', 'raw']) out[k] = [...new Set(out[k])];
+  for (const k of ['reference', 'skill', 'software', 'texture', 'recipe', 'raw']) out[k] = [...new Set(out[k])];
   out.any = out.raw.length > 0;
   return out;
 }
@@ -85,6 +87,16 @@ function textureOf(asked, list) {
   return list.find((t) => full(t) === n) || list.find((t) => norm(t.name) === n) || (best && list.find((t) => t.id === best.id)) || null;
 }
 
+// Une recette (leçon) par ID (« 3f7649c58e01 ») ou par titre (« Épée low poly »), sinon la plus proche.
+function recipeOf(asked) {
+  const all = lessons.read().items.filter((l) => l.recipe);
+  const id = (asked.match(/\b[0-9a-f]{12}\b/) || [])[0];
+  if (id) return all.find((l) => l.id === id) || null;
+  const n = norm(asked);
+  const best = lessons.search({ query: asked, all: true, limit: 1 })[0];
+  return all.find((l) => norm(l.title) === n) || all.find((l) => norm(l.title).includes(n)) || (best && all.find((l) => l.id === best.id)) || null;
+}
+
 // Vérifie chaque directive : dossier trouvé (avec son contenu), skill connu, logiciel reconnu, texture connue.
 function resolve(p, state = null) {
   const refs = p.reference.map((r) => {
@@ -97,7 +109,8 @@ function resolve(p, state = null) {
   const sw = p.software.map(softwareOf).filter((s, i, a) => a.findIndex((x) => x.name === s.name) === i);
   const all = p.texture.length ? textures.all(state) : [];
   const tx = p.texture.map((asked) => ({ asked, t: textureOf(asked, all) }));
-  return { refs, skills: sk, software: sw, textures: tx };
+  const rc = p.recipe.map((asked) => ({ asked, l: recipeOf(asked) }));
+  return { refs, skills: sk, software: sw, textures: tx, recipes: rc };
 }
 
 function itemLine(i) {
@@ -124,6 +137,10 @@ function forClaude(p, r = resolve(p)) {
   }
   for (const x of r.textures.filter((y) => y.t && y.t.unknown)) lines.push(`- !texture: ${x.t.id} → not in the Rovex texture library; use it anyway since the user asked for it explicitly.`);
   for (const x of r.textures.filter((y) => !y.t)) lines.push(`- !texture: "${x.asked}" → no Rovex texture with this name: search with find_vfx_textures / find_build_textures, propose the closest ones and say which you used.`);
+  for (const { asked, l } of r.recipes) {
+    if (!l) lines.push(`- !recipe: "${asked}" → no lesson with this name in the Rovex learning workshop: search with find_lessons, propose the closest ones and say which you followed.`);
+    else lines.push(`- !recipe: ${l.id} "${l.title}" (${l.category}${l.software ? `, ${l.software}` : ''}, ${l.recipe.steps.length} steps${l.status === 'validated' ? '' : ', not validated yet'}) → call lesson_get("${l.id}") FIRST and follow this recipe step by step (same order, techniques and code), adapting it only to what the task asks.`);
+  }
   if (r.software.length) lines.push(`- !software: ${r.software.map((s) => s.name).join(', ')} → do the work ONLY in ${r.software.map((s) => s.name + (s.tools ? ` (${s.tools})` : '')).join(' and ')}. Do not use other software; if a needed tool is not connected, say so instead of switching.`);
   return lines.join('\n');
 }
@@ -139,6 +156,7 @@ ${lines(p, r).join('\n')}
 - !skill: in step 1, call load_skill with ONLY these categories (not the ones you would have picked).
 - !reference: tell Claude to call rovex_folder on that path before anything else and to follow those references (shapes, colors, style, timing); never invent other references.
 - !texture: use exactly those texture IDs where the task needs textures (write the IDs in the prompt), no other texture.
+- !recipe: tell Claude to open each recipe with lesson_get (write its ID in the prompt) before starting, and to follow its steps in order.
 - !software: the whole workflow happens only in those software; do not mention or use others (e.g. no Blender if only Roblox Studio is listed, no Roblox parts modeling if only Blender is listed).`;
 }
 
@@ -150,6 +168,7 @@ function lines(p, r = resolve(p)) {
   if (sk.length) out.push(`!skill: ${sk.join(', ')}`);
   if (r.software.length) out.push(`!software: ${r.software.map((x) => x.name).join(', ')}`);
   if (r.textures.length) out.push(`!texture: ${r.textures.map((x) => (x.t && !x.t.unknown ? `${x.t.id} (${[x.t.name, x.t.variant].filter(Boolean).join(' ') || 'unnamed'})` : x.t ? x.t.id : x.asked)).join(', ')}`);
+  if (r.recipes.length) out.push(`!recipe: ${r.recipes.map((x) => (x.l ? `${x.l.id} (${x.l.title.replace(/[,;+()]/g, ' ').replace(/\s+/g, ' ').trim()})` : x.asked)).join(', ')}`);
   return out;
 }
 
