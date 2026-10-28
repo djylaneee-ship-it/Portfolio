@@ -1860,7 +1860,8 @@ function agOpenFile(m, i) {
   openModal(`<h2 class="att-title">${esc(f.name || '')}</h2><div class="att-view ${f.frames.length > 1 ? 'multi' : ''}">${f.frames.map((src, n) => `<figure><img src="/media/${esc(src)}" alt="">${f.times ? `<figcaption>${f.times[n]} s</figcaption>` : ''}</figure>`).join('')}</div>`);
 }
 
-// « Améliorer puis envoyer » : Groq (Prompt Booster) réécrit le message en prompt précis, puis il part tout seul.
+// « Améliorer puis envoyer » : Groq (Prompt Booster) réécrit le message en prompt précis, puis il part tout seul
+// (s'il échoue, le message part sans amélioration).
 async function agBoostSend() {
   const ta = $('#chat-text');
   const text = ta.value.trim();
@@ -1878,7 +1879,10 @@ async function agBoostSend() {
     ta.disabled = false;
     await agSend();
   } catch (e) {
-    toast(e.message, true);
+    // Groq indisponible : le message part quand même, tel quel.
+    toast(t('ag.boostFailed', { msg: e.message }), true);
+    ta.disabled = false;
+    if (ta.value.trim() === text) await agSend();
   } finally {
     ta.disabled = false;
     b.disabled = false;

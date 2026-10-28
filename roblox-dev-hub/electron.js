@@ -1,9 +1,11 @@
 // Rovex Hub en vraie application Windows : une fenêtre, une icône dans la barre des tâches
-// et la zone de notification, aucun terminal. Le serveur tourne à l'intérieur de l'app.
+// et la zone de notification, aucun terminal. Le serveur tourne dans son propre processus (Rovex Hub.exe en
+// mode Node, voir desktop.js) : la fenêtre reste fluide pendant les gros calculs, un serveur planté redémarre.
 const { app, BrowserWindow, Tray, Menu, shell, dialog, nativeImage } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const { execFile } = require('child_process');
+const desktop = require('./desktop');
 
 const APP_ID = 'com.rovexhub.app';
 const ICON = path.join(__dirname, 'rovex.ico');
@@ -21,6 +23,8 @@ let splash = null;
 let tray = null;
 let quitting = false;
 let url = '';
+let server = null;
+let restarts = [];
 
 // Données dans %APPDATA%\Rovex Hub : elles survivent aux mises à jour et à la désinstallation.
 function prepareData() {
@@ -137,14 +141,15 @@ global.rovexCheckUpdates = () => checkUpdates(false);
 global.rovexInstallUpdate = () => { if (updater && global.rovexUpdate.state === 'ready') { quitting = true; updater.quitAndInstall(true, true); } };
 let updater = null;
 global.rovexUpdate = { state: 'idle' };
+const setUpdate = (v) => { global.rovexUpdate = v; if (server) server.sendUpdate(v); };
 function checkUpdates(manual) {
-  if (!app.isPackaged) { global.rovexUpdate = { state: 'dev' }; return; }
+  if (!app.isPackaged) { setUpdate({ state: 'dev' }); return; }
   try {
     if (!updater) {
       updater = require('electron-updater').autoUpdater;
       updater.autoDownload = true;
       updater.autoInstallOnAppQuit = true;
-      const set = (state, extra = {}) => { global.rovexUpdate = { state, at: Date.now(), ...extra }; };
+      const set = (state, extra = {}) => setUpdate({ state, at: Date.now(), ...extra });
       updater.on('checking-for-update', () => set('checking'));
       updater.on('update-available', (i) => set('downloading', { version: i.version, percent: 0 }));
       updater.on('download-progress', (p) => set('downloading', { ...global.rovexUpdate, percent: Math.round(p.percent) }));
@@ -173,9 +178,7 @@ async function start() {
   cleanLegacyShortcuts();
   await freePort(Number(process.env.PORT) || 4747);
   try {
-    const srv = require('./server.js');
-    const port = await srv.ready;
-    url = `http://127.0.0.1:${port}`;
+    await startServer();
   } catch (e) {
     if (splash) splash.destroy();
     dialog.showErrorBox('Rovex Hub', `Rovex Hub n’a pas pu démarrer.\n\n${e.code === 'EADDRINUSE' ? 'Le port 4747 est déjà utilisé par un autre programme. Ferme-le puis relance Rovex Hub.' : e.message}`);
@@ -189,5 +192,29 @@ async function start() {
   setInterval(() => checkUpdates(false), 3600e3);
 }
 
+// Serveur dans son processus ; s'il s'arrête tout seul (plantage), il est relancé et la fenêtre rechargée.
+async function startServer() {
+  server = desktop.startServer({ script: path.join(__dirname, 'server.js'), onExit: serverStopped, quiet: app.isPackaged });
+  const port = await server.ready;
+  url = `http://127.0.0.1:${port}`;
+  server.sendUpdate(global.rovexUpdate);
+}
+async function serverStopped() {
+  if (quitting) return;
+  restarts = restarts.filter((t) => Date.now() - t < 10 * 60e3).concat(Date.now());
+  if (restarts.length > 5) {
+    dialog.showErrorBox('Rovex Hub', 'Le serveur de Rovex Hub s’arrête sans cesse. Relance l’app ; si ça continue, envoie le dossier des données (menu de l’icône) à un admin.');
+    return;
+  }
+  try {
+    await new Promise((r) => setTimeout(r, 1000));
+    await startServer();
+    if (main) main.loadURL(url + '/?app=1');
+  } catch (e) {
+    dialog.showErrorBox('Rovex Hub', `Rovex Hub n’a pas pu redémarrer.\n\n${e.message}`);
+  }
+}
+
 app.on('before-quit', () => { quitting = true; });
+app.on('will-quit', () => { if (server && server.child.exitCode === null) server.child.kill(); });
 app.on('window-all-closed', (e) => e.preventDefault());

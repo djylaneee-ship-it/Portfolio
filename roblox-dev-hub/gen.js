@@ -9,6 +9,7 @@ const skills = require('./skills');
 const cloud = require('./cloud');
 const blender = require('./blender');
 const directives = require('./directives');
+const desktop = require('./desktop');
 
 const SIZES = ['1024x1024', '1536x1024', '1024x1536'];
 
@@ -26,18 +27,21 @@ const err = (key, message, vars) => Object.assign(new Error(message), { key, var
 
 // ---------- Fonction Supabase « rovex-gen » ----------
 const SHARED_URL = () => `${cloud.URL}/functions/v1/rovex-gen`;
-let shared = { at: 0, info: null };
+// Une coupure réseau ne fait pas oublier ce qui marchait : on garde les dernières infos et on réessaie vite.
+let shared = { at: 0, info: null, down: false };
 async function refreshShared(force = false) {
   if (!cloud.enabled) return null;
-  if (!force && Date.now() - shared.at < 10 * 60e3) return shared.info;
+  if (!force && Date.now() - shared.at < (shared.down ? 30e3 : 10 * 60e3)) return shared.info;
   try {
-    const r = await fetch(SHARED_URL(), { headers: { apikey: cloud.KEY }, signal: AbortSignal.timeout(8000) });
-    shared = { at: Date.now(), info: r.ok ? await r.json() : null };
+    const r = await fetch(SHARED_URL(), { headers: { apikey: cloud.KEY }, signal: AbortSignal.timeout(15000) });
+    shared = r.ok ? { at: Date.now(), info: await r.json(), down: false } : { at: Date.now(), info: r.status === 404 ? null : shared.info, down: r.status !== 404 };
   } catch {
-    shared = { at: Date.now(), info: null };
+    shared = { ...shared, at: Date.now(), down: true };
   }
   return shared.info;
 }
+// Service pas prêt : serveur injoignable (réessayer) ou vraiment pas installé.
+const notReady = (key, msg) => (shared.down ? err('cloudDown', 'Cannot reach the Rovex server') : err(key, msg));
 const credOf = (state) => (state.auth && state.auth.lastCred && state.auth.lastCred.code) || '';
 
 async function callShared(body) {
@@ -70,20 +74,18 @@ function status(state) {
   };
 }
 
-// Réduit une image de référence avant de l'envoyer (dans l'app de bureau uniquement).
-function shrink(buf) {
+// Réduit une image de référence avant de l'envoyer (dans l'app de bureau uniquement, par la fenêtre).
+async function shrink(buf) {
   try {
-    const { nativeImage } = require('electron');
-    if (!nativeImage) return buf;
-    const img = nativeImage.createFromBuffer(buf);
-    return img.getSize().width > 768 ? img.resize({ width: 768 }).toPNG() : buf;
+    const out = await desktop.call('shrink', { buf, width: 768 });
+    return out ? Buffer.from(out) : buf;
   } catch {
     return buf;
   }
 }
 
 // Images de référence : celles que l'utilisateur a choisies, sinon ses images (favoris d'abord) de la catégorie.
-function references(state, { category, ids = [] }) {
+async function references(state, { category, ids = [] }) {
   const local = (r) => r.type === 'image' && r.file && /\.(png|jpe?g|webp)$/i.test(r.file) && fs.existsSync(path.join(db.MEDIA_DIR, r.file));
   let refs = ids.length ? state.resources.filter((r) => ids.includes(r.id) && local(r)) : [];
   if (!refs.length && !ids.length) {
@@ -92,12 +94,12 @@ function references(state, { category, ids = [] }) {
       .sort((a, b) => (b.favorite ? 1 : 0) - (a.favorite ? 1 : 0))
       .slice(0, 2);
   }
-  return refs.slice(0, 2).map((r) => {
+  return (await Promise.all(refs.slice(0, 2).map(async (r) => {
     const raw = fs.readFileSync(path.join(db.MEDIA_DIR, r.file));
-    const data = shrink(raw);
+    const data = await shrink(raw);
     const ext = data !== raw ? 'png' : path.extname(r.file).slice(1).toLowerCase().replace('jpg', 'jpeg');
     return { id: r.id, title: r.title, notes: r.notes || '', data, mime: 'image/' + ext, ext: ext === 'jpeg' ? 'jpg' : ext };
-  }).filter((r) => r.data.length < 1.5 * 1024 * 1024);
+  }))).filter((r) => r.data.length < 1.5 * 1024 * 1024);
 }
 
 function imagePrompt(state, { prompt, kind, category, transparent, refs }) {
@@ -111,15 +113,14 @@ function imagePrompt(state, { prompt, kind, category, transparent, refs }) {
 }
 
 // Les générateurs gratuits ne savent pas faire de fond transparent : on demande un fond blanc uni, puis on
-// l'efface (remplissage depuis les bords, bord adouci). Seulement dans l'app de bureau (nativeImage d'Electron).
-function cutout(buf) {
-  let ni;
-  try { ni = require('electron').nativeImage; } catch {}
-  if (!ni || typeof ni.createFromBuffer !== 'function') return null;
-  const img = ni.createFromBuffer(buf);
-  const { width: w, height: h } = img.getSize();
-  if (!w || !h) return null;
-  const px = Buffer.from(img.toBitmap()); // BGRA
+// l'efface (remplissage depuis les bords, bord adouci). Seulement dans l'app de bureau (nativeImage d'Electron,
+// par la fenêtre : décodage et encodage là-bas, calcul ici).
+async function cutout(buf) {
+  let img = null;
+  try { img = await desktop.call('decode', { buf }); } catch {}
+  if (!img) return null;
+  const { width: w, height: h } = img;
+  const px = Buffer.from(img.px); // BGRA
   const at = (i) => [px[i * 4], px[i * 4 + 1], px[i * 4 + 2]];
   // Couleur du fond : moyenne des quatre coins.
   const corners = [0, w - 1, (h - 1) * w, h * w - 1].map(at);
@@ -157,7 +158,7 @@ function cutout(buf) {
   }
   // Fond pas uni (rien ou presque tout effacé) : on garde l'image telle quelle.
   if (removed < w * h * 0.05 || removed > w * h * 0.97) return null;
-  return ni.createFromBitmap(px, { width: w, height: h }).toPNG();
+  try { return Buffer.from(await desktop.call('encode', { px, width: w, height: h })); } catch { return null; }
 }
 
 const isJpeg = (buf) => buf[0] === 0xff && buf[1] === 0xd8;
@@ -191,17 +192,17 @@ async function generateImage(state, a = {}) {
   if (!credOf(state)) throw err('loginRequired', 'Sign in with your access ID');
   // Fonction pas encore vue : on redemande tout de suite (elle a pu être installée entre-temps).
   if (!((await refreshShared()) && shared.info.image) && !((await refreshShared(true)) && shared.info.image)) {
-    throw err('genShared', 'Image generation is not set up yet');
+    throw notReady('genShared', 'Image generation is not set up yet');
   }
   // Images de référence : seulement si le générateur sait les lire (OpenAI) ; sinon leur description suffit.
-  const refs = a.use_references === false || !shared.info.refs ? [] : references(state, { category, ids: Array.isArray(a.reference_ids) ? a.reference_ids : [] });
+  const refs = a.use_references === false || !shared.info.refs ? [] : await references(state, { category, ids: Array.isArray(a.reference_ids) ? a.reference_ids : [] });
   const finalPrompt = imagePrompt(state, { prompt, kind, category, transparent, refs });
   const j = await callShared({
     type: 'image', code: credOf(state), prompt: finalPrompt, n, size, transparent,
     refs: refs.map((r) => ({ b64: r.data.toString('base64'), mime: r.mime, name: r.title.replace(/[^\w.-]+/g, '_') + '.' + r.ext })),
   });
   let images = (j.images || []).map((b) => Buffer.from(b, 'base64'));
-  if (transparent && !j.transparent) images = images.map((b) => cutout(b) || b);
+  if (transparent && !j.transparent) images = await Promise.all(images.map(async (b) => (await cutout(b)) || b));
   if (!images.length) throw err('genEmpty', 'No image returned');
   const title = a.title ? String(a.title).slice(0, 80) : titleOf(prompt);
   const items = images.map((buf, i) => save(state, buf, { title: images.length > 1 ? `${title} (${i + 1})` : title, category, kind, prompt }));
@@ -262,7 +263,7 @@ async function enhancePrompt(state, a = {}) {
   if (!request) throw err('genPrompt', 'Describe what you want');
   if (!credOf(state)) throw err('loginRequired', 'Sign in with your access ID');
   if (!((await refreshShared()) && shared.info.text) && !((await refreshShared(true)) && shared.info.text)) {
-    throw err('genShared', 'Prompt improvement is not set up yet');
+    throw notReady('genShared', 'Prompt improvement is not set up yet');
   }
   // Directives de l'utilisateur (!reference, !skill, !software) : Groq doit les respecter et les garder.
   const dir = directives.parse(request);

@@ -5,6 +5,7 @@ const path = require('path');
 const db = require('./db');
 const web = require('./web');
 const mcp = require('./mcp');
+const desktop = require('./desktop');
 const { Crawler, youtubeSearch } = require('./crawler');
 const { Auth, KEY_FILE } = require('./auth');
 const os = require('os');
@@ -329,8 +330,8 @@ const routes = [
   }],
   // Version de l'app et mises à jour (app de bureau).
   ['GET', /^\/api\/version$/, () => ({ version: APP_VERSION, desktop: Boolean(process.versions.electron), online: auth.online, update: global.rovexUpdate || null })],
-  ['POST', /^\/api\/update\/check$/, () => { if (global.rovexCheckUpdates) global.rovexCheckUpdates(); return { ok: Boolean(global.rovexCheckUpdates) }; }],
-  ['POST', /^\/api\/update\/install$/, () => { if (global.rovexInstallUpdate) global.rovexInstallUpdate(); return { ok: true }; }],
+  ['POST', /^\/api\/update\/check$/, async () => ({ ok: Boolean(await desktop.call('checkUpdates').catch(() => false)) })],
+  ['POST', /^\/api\/update\/install$/, async () => { await desktop.call('installUpdate').catch(() => {}); return { ok: true }; }],
   ['GET', /^\/api\/export$/, () => ({ ...state, auth: undefined })],
   ['POST', /^\/api\/cloud\/sync$/, async () => {
     const lib = await librarySync().catch(() => ({ added: 0 }));
@@ -472,12 +473,11 @@ const routes = [
     const link = target === 'code' ? `claude-cli://open?q=${q}` : target === 'web' ? `https://claude.ai/new?q=${q}` : `claude://claude.ai/new?q=${q}`;
     let opened = false;
     let plain = false;
-    if (process.versions.electron) {
-      const { shell } = require('electron');
-      try { await shell.openExternal(link); opened = true; } catch {
+    if (desktop.available()) {
+      try { opened = Boolean(await desktop.call('openExternal', { url: link })); } catch {
         // Lien refusé (trop long pour Windows) : on ouvre Claude sans texte, le prompt est dans le presse-papiers.
         const bare = target === 'code' ? 'claude-cli://open' : target === 'web' ? 'https://claude.ai/new' : 'claude://claude.ai/new';
-        try { await shell.openExternal(bare); opened = true; plain = true; } catch {}
+        try { opened = Boolean(await desktop.call('openExternal', { url: bare })); plain = opened; } catch {}
       }
     }
     return { opened, plain, link, truncated: text.length > max };
@@ -627,11 +627,11 @@ routes.push(
   // Blender (add-on Claude Blender MCP sur ce PC).
   ['GET', /^\/api\/blender$/, async (req) => { agentLocal(req); return blender.status(); }],
   ['PUT', /^\/api\/blender$/, async (req) => { agentLocal(req); blender.writeSettings(await json(req)); return blender.status(); }],
-  ['POST', /^\/api\/blender\/addon$/, (req) => {
+  ['POST', /^\/api\/blender\/addon$/, async (req) => {
     agentLocal(req);
     // Montre le zip de l'add-on dans l'explorateur, prêt pour « Install from Disk… » dans Blender.
     let shown = false;
-    try { const { shell } = require('electron'); if (shell && shell.showItemInFolder) { shell.showItemInFolder(blender.ADDON_ZIP); shown = true; } } catch {}
+    try { shown = Boolean(await desktop.call('showItem', { file: blender.ADDON_ZIP })); } catch {}
     return { shown, path: blender.ADDON_ZIP };
   }],
   ['POST', /^\/api\/agents\/clear$/, (req) => { agentLocal(req); return agents.clear(); }],
@@ -814,7 +814,7 @@ server.on('error', (e) => {
     console.log(`\n  Rovex Hub is already running  →  http://localhost:${PORT}\n`);
     process.exit(0);
   }
-  if (process.versions.electron) return readyFail(e);
+  if (process.versions.electron) { desktop.failed(e); return readyFail(e); }
   throw e;
 });
 
@@ -832,6 +832,7 @@ server.listen(PORT, HOST, () => {
   console.log(`\n  Admin key (permanent) / Clé admin : ${auth.masterKey()}`);
   console.log(`  (saved in ${KEY_FILE})\n  Ctrl+C to stop\n`);
   readyOk(PORT);
+  desktop.ready(PORT);
   try { agents.init(PORT); } catch (e) { console.log('  Claude chat: ' + e.message); }
   db.warm(state);
   rbxassets.start();

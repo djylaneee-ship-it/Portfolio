@@ -33,7 +33,7 @@ Travail à plusieurs : une branche par dev (`dev/<pseudo>-<sujet>`), une PR, rel
 
 | Fichier | Rôle |
 |---|---|
-| `electron.js` | Fenêtre, icône de la barre des tâches, mises à jour, démarrage du serveur. |
+| `electron.js` / `desktop.js` | Fenêtre, icône de la barre des tâches, mises à jour. Le serveur tourne dans son propre processus (`Rovex Hub.exe` en mode Node, relancé s'il plante) pour que la fenêtre reste fluide ; ce qui demande Electron côté serveur (ouvrir un lien, montrer un fichier, images natives, mises à jour) passe par `desktop.call()`. N'appelle jamais `require('electron')` dans le code du serveur. |
 | `server.js` | Serveur HTTP local (API `/api/*`, MCP HTTP `/mcp`, médias). Contrôle d'accès : `USER_ROUTES` (lecture membres), `MEMBER_ACTIONS` (actions membres), le reste admin. |
 | `mcp.js` | Serveur MCP (stdio pour Claude Desktop, HTTP via le serveur) : outils, prompts, journal d'activité (`data/activity.json`). En stdio, les appels d'outils passent par l'app ouverte (`/mcp`, port dans `data/agent.json`) pour ne pas recharger la bibliothèque en ligne ; sans l'app, ils tournent sur place. |
 | `db.js` | Bibliothèque locale : `data/library.json` (ressources de l'utilisateur, réglages) + `data/cloud-library.json` (bibliothèque en ligne, écrite en arrière-plan ; appelle `db.markCloudDirty()` quand tu modifies une ressource `source: 'cloud'`), catégories, recherche (textes normalisés en cache). |
