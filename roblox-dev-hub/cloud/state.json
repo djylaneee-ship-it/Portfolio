@@ -1,7 +1,7 @@
 {
  "version": 2,
- "cursor": 159,
- "runs": 39,
+ "cursor": 163,
+ "runs": 40,
  "channels": [
   {
    "id": "ff1bc5c8316c",
@@ -10609,19 +10609,21 @@
   }
  ],
  "cursors": {
-  "forum:help-and-feedback/scripting-support": 1180,
-  "forum:help-and-feedback/creations-feedback": 1179,
-  "forum:help-and-feedback/building-support": 555,
-  "forum:help-and-feedback/art-design-support": 520,
-  "sketchfab:roblox": "7920",
-  "forum:resources/community-resources": 155,
-  "forum:resources/community-tutorials": 95,
-  "forum:updates/announcements": 53,
-  "sketchfab:roblox low poly": "1440",
-  "sketchfab:roblox ugc": "840",
-  "sketchfab:roblox map": "840",
-  "sketchfab:roblox character": "840",
-  "store:decal:fire": "MTlfMV8xXzMw_40ab7447caeeaa56aa1c12db5c05223f",
+  "forum:help-and-feedback/scripting-support": 1215,
+  "forum:help-and-feedback/creations-feedback": 1214,
+  "forum:help-and-feedback/building-support": 590,
+  "forum:help-and-feedback/art-design-support": 555,
+  "sketchfab:roblox": "8760",
+  "forum:resources/community-resources": 190,
+  "forum:help-and-feedback/game-design-support": 35,
+  "devto:gamedev": 35,
+  "forum:resources/community-tutorials": 10,
+  "sketchfab:roblox low poly": "240",
+  "sketchfab:roblox ugc": "240",
+  "sketchfab:roblox map": "240",
+  "sketchfab:roblox pet": "240",
+  "store:decal:texture": "MTBfMV8xXzMw_4bb7b74fd992c4011dce38ed1be687d7",
+  "store:decal:fire": "MTBfMV8xXzMw_63dcaf1f99fcbd86f56123ae31899a46",
   "store:decal:glow": "MTBfMV8xXzMw_43c8ce564a9390e04cd5bf2f7f6c9470",
   "store:decal:sparkle": "MTBfMV8xXzMw_4244162d0e2c1716f17325bb95572674",
   "store:decal:aura": "MTBfMV8xXzMw_83bd7c91a022b57e578f0dc4d0515a9c",
@@ -10635,21 +10637,8 @@
   "store:decal:brick": "MTBfMV8xXzMw_4c82b359dabc32806976de64b70b1f6e",
   "store:decal:anime": "MTBfMV8xXzMw_502d4d1346c77bb815e67e4e0197a035",
   "store:decal:cartoon": "MTBfMV8xXzMw_449ee4c1f9c80295fd70808e104505a5",
-  "store:mesh:sword": "MTBfMV8xXzMw_69c7f86decf2072dcad7f7f8ee1384ab",
-  "store:mesh:gun": "MTBfMV8xXzMw_ea1de00b6323ef2b10b517bffda19397",
-  "store:mesh:tree": "MTBfMV8xXzMw_be56d90c1b2f98defbdc42815f0047c2",
-  "store:mesh:rock": "MTBfMV8xXzMw_fce304b2032c7d0deca17b7d6a8831e6",
-  "store:mesh:house": "MTBfMV8xXzMw_2c22625097ecc99832a9a8655f2f79e4",
-  "store:mesh:car": "MTBfMV8xXzMw_81fad5e80f2da6d93860ea91168c7bda",
-  "store:mesh:pet": "MTBfMV8xXzMw_55349eedf813d501b9b9ea3a6a647a74",
-  "store:mesh:egg": "MTBfMV8xXzMw_0471c6ab6db52fdb23c087c6b56115b3",
-  "store:mesh:crystal": "MTBfMV8xXzMw_d4730e8d3f4a04239b88a6700e9014ce",
-  "store:mesh:chest": "MTBfMV8xXzMw_8074213b8b873a99498d5c168de09ed0",
-  "store:mesh:weapon": "MTBfMV8xXzMw_232bd806545e807cb612435a1806b46b",
-  "store:mesh:low poly": "MTBfMV8xXzMw_19046767010deee2ef96e6985d3ceef5",
-  "store:mesh:furniture": "MTBfMV8xXzMw_b747e33c444cc07de35a4a1e5ec40b36",
-  "store:decal:texture": "MjVfMV8xXzMw_1860ddf0ae964ee0dde2768916c1e7e7"
+  "store:mesh:sword": "OF8xXzFfMzA=_960943b39197cb1bf550e86c51c8dd43"
  },
  "migrated": false,
- "updatedAt": "2026-10-27T23:57:52.191Z"
+ "updatedAt": "2026-10-28T00:50:49.974Z"
 }
