@@ -70,9 +70,24 @@ async function pull(state, cred) {
     del.prompts = m.deleted;
   }
   if (sh.skills) state.skills = mergeSkills(state.skills, sh.skills.data);
+  // Leçons partagées par les admins (atelier d'apprentissage) : dans leur propre fichier.
+  let lessonsChanged = false;
+  if (sh.lessons) { try { lessonsChanged = require('./lessons').mergeShared(sh.lessons.data); } catch {} }
   // Textures VFX ajoutées par l'admin : la version la plus récente gagne.
   if (sh.textures && sh.textures.data && (!state.textures || stamp(sh.textures.data) > stamp(state.textures))) state.textures = sh.textures.data;
-  return before !== JSON.stringify([state.examples, state.skills, state.prompts, state.textures]);
+  return lessonsChanged || before !== JSON.stringify([state.examples, state.skills, state.prompts, state.textures]);
+}
+
+// Publie (ou retire) une leçon validée pour tout le monde (admins). Le reste du contenu partagé ne bouge pas.
+async function shareLesson(cred, item, remove = false) {
+  const out = must(await rpc('rovex_get_shared', { p_code: cred }));
+  const cur = ((out.shared || {}).lessons || {}).data || { items: [] };
+  const items = (cur.items || []).filter((x) => x && x.id !== (remove ? item : item.id));
+  if (!remove) items.unshift(item);
+  const r = await rpc('rovex_put_shared', { p_key: cred, p_name: 'lessons', p_data: { items: items.slice(0, 300) } });
+  if (r && r.err === 'badName') throw Object.assign(new Error('lessonsSetup'), { key: 'lessonsSetup', code: 503 });
+  must(r);
+  return { shared: items.length };
 }
 
 // Publie le contenu local (admins seulement) après l'avoir fusionné avec ce qui est en ligne.
@@ -86,4 +101,4 @@ async function push(state, cred) {
   if (state.textures) { try { await rpc('rovex_put_shared', { p_key: cred, p_name: 'textures', p_data: state.textures }); } catch {} }
 }
 
-module.exports = { enabled, rpc, must, pull, push, mergeList, URL: URL_, KEY };
+module.exports = { enabled, rpc, must, pull, push, shareLesson, mergeList, URL: URL_, KEY };

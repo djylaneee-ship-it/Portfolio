@@ -24,6 +24,7 @@ const blender = require('./blender');
 const folders = require('./folders');
 const cowork = require('./cowork');
 const meshy = require('./meshy');
+const lessons = require('./lessons');
 const APP_VERSION = require('./package.json').version;
 
 const PORT = Number(process.env.PORT) || 4747;
@@ -189,6 +190,28 @@ const routes = [
     });
     persist();
     return r.resource;
+  }],
+  // Atelier d'apprentissage : leçons (vidéos / images → recettes pas à pas que Claude réutilise).
+  ['GET', /^\/api\/lessons$/, (req, m, url) => ({ items: lessons.list({ category: url.searchParams.get('category') || '', status: url.searchParams.get('status') || '' }) })],
+  ['POST', /^\/api\/lessons$/, async (req) => lessons.create(await json(req))],
+  ['GET', /^\/api\/lessons\/([\w-]+)$/, (req, m) => lessons.find(m[1])],
+  ['PUT', /^\/api\/lessons\/([\w-]+)$/, async (req, m, url, session) => {
+    if (lessons.find(m[1]).fromShare && session.role !== 'admin') throw Object.assign(new Error('Shared lessons cannot be edited'), { key: 'lessonShared', code: 403 });
+    return lessons.update(m[1], await json(req));
+  }],
+  ['DELETE', /^\/api\/lessons\/([\w-]+)$/, (req, m) => lessons.remove(m[1])],
+  ['POST', /^\/api\/lessons\/([\w-]+)\/frames$/, async (req, m) => lessons.addFrames(m[1], await json(req))],
+  ['POST', /^\/api\/lessons\/([\w-]+)\/analyze$/, (req, m) => {
+    const l = lessons.find(m[1]);
+    return agents.send({ text: `Study the Rovex lesson "${l.title}" (id ${l.id}, ${l.category}${l.software ? ', ' + l.software : ''}): call lesson_frames to look at all its key frames in order, then write the step-by-step recipe and save it with lesson_save. Reply to me in my language when it is saved.` });
+  }],
+  // Partage d'une leçon validée avec tous les membres (admins seulement : route absente de MEMBER_ACTIONS).
+  ['POST', /^\/api\/lessons\/([\w-]+)\/share$/, async (req, m, url, session) => {
+    const b = await json(req);
+    if (!session.cred || !auth.online) throw Object.assign(new Error('Needs the online server'), { key: 'cwOffline' });
+    const out = b.remove ? await cloud.shareLesson(session.cred, m[1], true) : await cloud.shareLesson(session.cred, lessons.shareData(m[1], b.thumbs, b.picks));
+    lessons.markShared(m[1], !b.remove);
+    return out;
   }],
   // Meshy AI : la clé de l'utilisateur (gardée sur ce PC), ses crédits et ses derniers modèles.
   ['GET', /^\/api\/meshy$/, () => meshy.status()],
@@ -603,7 +626,7 @@ routes.push(
   ['POST', /^\/api\/agents\/clear$/, (req) => { agentLocal(req); return agents.clear(); }],
 );
 
-const MEMBER_ACTIONS = [/^\/api\/meshy(\/thumb\/[\w-]+)?$/, /^\/api\/cowork(\/[\w-]+(\/(sync|nodes|files|members)(\/[\w-]+)?)?)?$/, /^\/api\/folders(\/[\w-]+(\/(items|upload))?)?$/, /^\/api\/folder-items\/[\w-]+(\/previews)?$/, /^\/api\/agents(\/[\w-]+)?$/, /^\/api\/blender(\/addon)?$/, /^\/api\/custom(\/background)?$/, /^\/api\/textures\/thumbs$/, /^\/api\/place\/(read|write|value)$/, /^\/api\/robloxstudio(\/restart|\/assets)?$/, /^\/api\/claude\/(desktop|code|send)$/, /^\/api\/mcp\/test$/, /^\/api\/update\/(check|install)$/, /^\/api\/gen(\/.*)?$/];
+const MEMBER_ACTIONS = [/^\/api\/lessons(\/[\w-]+(\/(frames|analyze))?)?$/, /^\/api\/meshy(\/thumb\/[\w-]+)?$/, /^\/api\/cowork(\/[\w-]+(\/(sync|nodes|files|members)(\/[\w-]+)?)?)?$/, /^\/api\/folders(\/[\w-]+(\/(items|upload))?)?$/, /^\/api\/folder-items\/[\w-]+(\/previews)?$/, /^\/api\/agents(\/[\w-]+)?$/, /^\/api\/blender(\/addon)?$/, /^\/api\/custom(\/background)?$/, /^\/api\/textures\/thumbs$/, /^\/api\/place\/(read|write|value)$/, /^\/api\/robloxstudio(\/restart|\/assets)?$/, /^\/api\/claude\/(desktop|code|send)$/, /^\/api\/mcp\/test$/, /^\/api\/update\/(check|install)$/, /^\/api\/gen(\/.*)?$/];
 const USER_ROUTES = [/^\/api\/custom$/, /^\/api\/textures$/, /^\/api\/place\/(studios|scripts|values)$/, /^\/api\/robloxstudio(\/assets)?$/, /^\/api\/claude$/, /^\/api\/version$/, /^\/api\/prompts$/, /^\/api\/skills$/, /^\/api\/skills\/\w+$/, /^\/api\/level$/, /^\/api\/meta$/, /^\/api\/stats$/, /^\/api\/resources$/, /^\/api\/channels$/, /^\/api\/youtube$/, /^\/api\/crawl$/, /^\/api\/examples$/, /^\/api\/mcp$/];
 
 const cookies = (req) => Object.fromEntries(String(req.headers.cookie || '').split(';').map((c) => c.trim().split('=')).filter((p) => p[0]).map(([k, ...v]) => [k, decodeURIComponent(v.join('='))]));

@@ -1090,3 +1090,43 @@ body.chat-mode .view { gap: 0; }
 .my-item img, .my-noimg { width: 100%; aspect-ratio: 1; object-fit: contain; border-radius: 8px; background: #0b0814; display: grid; place-items: center; font-size: 28px; }
 .my-item b { font-size: 12.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .my-item small { color: var(--muted); font-size: 11px; }
+
+/* ---------- Apprentissage ---------- */
+.ln-new { display: grid; gap: 12px; }
+.ln-new h3 { margin: 0; }
+.ln-drop { display: grid; gap: 4px; place-items: center; text-align: center; padding: 26px 16px; border: 2px dashed var(--line2); border-radius: 16px; cursor: pointer; transition: border-color .2s, background .2s; }
+.ln-drop:hover, .ln-drop.over { border-color: var(--accent); background: rgba(124, 58, 237, .06); }
+.ln-drop small { color: var(--muted); }
+.ln-drop span { color: var(--accent3); font-size: 13px; overflow-wrap: anywhere; }
+.ln-fields { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 12px; }
+@media (max-width: 900px) { .ln-fields { grid-template-columns: 1fr 1fr; } }
+.ln-fields label, .ln-note, .ln-l { display: grid; gap: 6px; font-size: 12.5px; color: var(--muted2); font-weight: 600; min-width: 0; }
+.ln-filters { justify-content: space-between; margin: 22px 0 14px; gap: 10px; flex-wrap: wrap; }
+.ln-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
+.ln-card { position: relative; display: grid; gap: 5px; padding: 10px 10px 14px; border-radius: 16px; border: 1px solid var(--line); background: var(--panel); transition: transform .3s var(--spring), border-color .2s; min-width: 0; }
+.ln-card:hover { transform: translateY(-4px); border-color: color-mix(in srgb, var(--c) 60%, var(--line)); }
+.ln-cover { display: grid; place-items: center; aspect-ratio: 16 / 9; border-radius: 11px; background: #0b0814 center / cover no-repeat; font-size: 30px; margin-bottom: 4px; }
+.ln-badge { position: absolute; top: 18px; left: 18px; }
+.ln-card b { font-size: 14.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ln-card small { color: var(--muted); font-size: 12px; display: flex; align-items: center; gap: 6px; }
+.ln-card .dot, .ln-head .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; }
+.ln-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.ln-head small { flex-basis: 100%; }
+.ln-actions { gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+.ln-tip { font-size: 14px; margin-bottom: 14px; }
+.ln-strip { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 18px; }
+.ln-frame { position: relative; flex: none; width: 150px; padding: 0; border: 1px solid var(--line2); border-radius: 10px; overflow: hidden; background: #0b0814; cursor: zoom-in; }
+.ln-frame img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
+.ln-frame i { position: absolute; left: 5px; top: 5px; font: 700 10.5px var(--mono); font-style: normal; padding: 1px 6px; border-radius: 6px; background: rgba(9, 7, 15, .82); color: #fff; }
+.ln-frame.sm { width: 104px; }
+.ln-recipe { display: grid; gap: 14px; }
+.ln-recipe h3 { margin: 6px 0 0; }
+.ln-step { display: grid; gap: 8px; padding: 12px; border-radius: 14px; border: 1px solid var(--line); background: var(--panel2); margin-bottom: 10px; }
+.ln-step-head { display: flex; gap: 8px; align-items: center; }
+.ln-step-head .input { flex: 1; font-weight: 700; }
+.ln-num { flex: none; width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; background: var(--accent-bg); color: var(--accent3); font: 700 13px var(--display); }
+.ln-step .icon-btn { width: 30px; height: 30px; }
+.ln-step-frames { display: flex; gap: 6px; flex-wrap: wrap; }
+.ln-step details summary { cursor: pointer; font-size: 12.5px; color: var(--muted2); font-weight: 600; }
+.ln-step details textarea { margin-top: 6px; font-family: var(--mono); font-size: 12.5px; }
+.ln-badge.st { background: rgba(9, 7, 15, .88); border-color: rgba(255, 255, 255, .18); }

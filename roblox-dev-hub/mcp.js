@@ -15,6 +15,7 @@ const rbxassets = require('./rbxassets');
 const folders = require('./folders');
 const directives = require('./directives');
 const meshy = require('./meshy');
+const lessons = require('./lessons');
 const textures = require('./vfx-textures');
 const vm = require('vm');
 
@@ -81,6 +82,7 @@ const SKILL_RULE = `
 Skills: for every Roblox task, first identify the domains it needs (scripting, vfx, animation, cutscenes, gui, gfx, modeling, building, audio, design, tools) and call load_skill once with only those categories and the task keywords (an attack = scripting + animation + vfx; a boss intro = cutscenes + animation + vfx, + audio if needed; a menu = gui + scripting). Read all of it before working: the core rules (rovex-core) apply to every task. Project art direction: VFX are built from custom-textured ParticleEmitters, never the Fire, Smoke or Sparkles classes. Their textures MUST come from the Rovex VFX textures (find_vfx_textures): no other texture ID is allowed, never from memory, never invented; if nothing fits after several searches, tell the user instead of using another texture. The ready-made VFX templates of ReplicatedStorage.RovexAssets.VFX (see rovex_assets) are also allowed, with their own textures.
 
 Roblox Studio: when tools starting with studio_ are available, Rovex is connected to the place open in Roblox Studio. Before writing code for the user's game, use them to read the real scripts, the Explorer structure and the data, and follow the existing architecture. Only change the place (edit scripts, run code that modifies it, insert models) when the user asked for it, and say what you changed. To put an image in the game (icon, UI, decal), make or pick it (generate_image), then call upload_image_to_roblox with a target path: Rovex uploads it to Roblox and sets it in Studio.
+Learned lessons: the user teaches you methods with videos and images (Rovex learning workshop). Before a 3D model, VFX, animation, UI or system, call find_lessons with what you are about to make (load_skill also lists them) and follow the closest validated recipe with lesson_get. When asked to study a lesson: lesson_frames until you have seen every frame, then lesson_save.
 Meshy AI: when the meshy_* tools are available (the user saved their own Meshy key), you can start a complex or organic model (creature, character, detailed prop) from a Meshy base shape: meshy_text_to_3d or meshy_image_to_3d (shape only unless a texture is asked), it lands in Blender, then rework it there (proportions, low poly cleanup with rx.decimate / rx.remesh or meshy_remesh, flat colors with rx.paint, rig, animate). Meshy spends the user's credits: one generation per request, never batches the user did not ask for.
 Build textures: for any surface texture on a build or map (ground, grass, sand, wood, planks, fence, cobblestone, rock walls…), call find_build_textures: it shows the user's build textures with their rbxassetid; use those, never invented IDs.
 Rovex assets: every place connected to Rovex gets ReplicatedStorage.RovexAssets (Environment = stylized trees, plants, rocks, clouds, water; VFX/Combat and VFX/Fire = 130+ ready VFX templates; UI/StudUI = a stud-style HUD and windows). Call rovex_assets (with keywords) to see what is there and reuse these assets (Clone them) before building from scratch.
@@ -297,6 +299,46 @@ const TOOLS = [
     annotations: { readOnlyHint: true, openWorldHint: true },
   },
   {
+    name: 'find_lessons',
+    description: 'Rovex learning workshop: the user\'s validated lessons, step-by-step recipes Claude wrote from speed-modeling timelapses, VFX, animation, UI or scripting videos (how a pro does it: order of steps, techniques, Blender rx / Luau code). Search them before a 3D model, VFX, animation, UI… and follow the closest recipe. Returns titles, summaries and step titles; open one with lesson_get.',
+    inputSchema: { type: 'object', properties: { query: { type: 'string', description: 'What you are about to make, e.g. "low poly sword", "fire slash vfx", "idle animation".' }, category: { type: 'string', enum: skills.SKILL_CATS } } },
+    annotations: { readOnlyHint: true, openWorldHint: false },
+  },
+  {
+    name: 'lesson_get',
+    description: 'Rovex learning workshop: one lesson in full (summary, every step with its explanation and code, tips) and, with frames=true, the key frames its steps point to, to see what each step looks like.',
+    inputSchema: { type: 'object', properties: { id: { type: 'string' }, frames: { type: 'boolean', description: 'Also show the key frames of the steps (default true).' } }, required: ['id'] },
+    annotations: { readOnlyHint: true, openWorldHint: false },
+  },
+  {
+    name: 'lessons_todo',
+    description: 'Rovex learning workshop: lessons the user added (videos or images) that are waiting to be studied, with their number of key frames.',
+    inputSchema: { type: 'object', properties: {} },
+    annotations: { readOnlyHint: true, openWorldHint: false },
+  },
+  {
+    name: 'lesson_frames',
+    description: 'Rovex learning workshop: look at the key frames of a lesson (in order, with their time in the video), about 10 per call: call again with the returned "next" until you have seen them all. Then write the recipe with lesson_save.',
+    inputSchema: { type: 'object', properties: { id: { type: 'string' }, from: { type: 'number', description: 'First frame index (default 0).' } }, required: ['id'] },
+    annotations: { readOnlyHint: true, openWorldHint: false },
+  },
+  {
+    name: 'lesson_save',
+    description: 'Rovex learning workshop: save the recipe you wrote for a lesson after studying all its frames. It is a reusable method, not a description of the video: an overall summary (what is made and the approach), then ordered steps (title, precise explanation of what to do and why: tools, modifiers, settings, proportions, timing; the frame numbers that show it; and when useful the code to do it: Blender rx toolkit for modeling, Luau for Roblox), tips (the pro tricks you noticed) and tags. The user then checks and validates it.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        id: { type: 'string' },
+        summary: { type: 'string' },
+        steps: { type: 'array', items: { type: 'object', properties: { title: { type: 'string' }, detail: { type: 'string' }, frames: { type: 'array', items: { type: 'number' } }, code: { type: 'string' } }, required: ['title', 'detail'] } },
+        tips: { type: 'array', items: { type: 'string' } },
+        tags: { type: 'array', items: { type: 'string' } },
+      },
+      required: ['id', 'summary', 'steps'],
+    },
+    annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false },
+  },
+  {
     name: 'rovex_folder',
     description: 'Open one of the user\'s Rovex folders of references (library folders the user made: imported images, videos as key frames, VFX textures, saved tutorials and resources). Use it when a prompt contains "!reference: library/<path>/" (call it FIRST with that path) or when the user mentions their references. Returns the items (with file paths on this PC, VFX texture IDs, resource links) and shows the images. No path: lists every folder.',
     inputSchema: { type: 'object', properties: { path: { type: 'string', description: 'Folder path, e.g. "library/Swords/Fire/" (case and accents ignored). Empty = list the folders.' } } },
@@ -507,6 +549,47 @@ function folderView(p) {
   };
 }
 
+// Atelier d'apprentissage : images clés d'une leçon (≈10 par appel, ~900 Ko max) et leçon complète.
+const readMedia = (rel) => { try { return fs.readFileSync(path.join(db.MEDIA_DIR, rel)); } catch { return null; } };
+function lessonFrames(id, from) {
+  const l = lessons.find(String(id || ''));
+  const images = [];
+  const shown = [];
+  let budget = 900 * 1024;
+  for (let i = Math.max(0, from); i < l.frames.length && images.length < 12; i++) {
+    const buf = readMedia(l.frames[i].file);
+    if (!buf) continue;
+    if (buf.length > budget && images.length) break;
+    images.push(buf);
+    budget -= buf.length;
+    shown.push({ frame: i, at: l.frames[i].t ? `${l.frames[i].t} s` : undefined });
+  }
+  const last = shown.length ? shown[shown.length - 1].frame : from - 1;
+  return {
+    lesson: { id: l.id, title: l.title, category: l.category, software: l.software, source: l.source, note: l.note || undefined, totalFrames: l.frames.length },
+    shown, ...(last + 1 < l.frames.length ? { next: last + 1 } : { done: 'All frames seen: write the recipe with lesson_save.' }),
+    note: `The ${images.length} image(s) below are frames ${shown.map((x) => x.frame).join(', ')} in order.`,
+    images,
+  };
+}
+function lessonView(id, withFrames) {
+  const l = lessons.find(String(id || ''));
+  if (!l.recipe) return { id: l.id, title: l.title, status: l.status, note: 'Not studied yet.' };
+  const images = [];
+  const used = [];
+  let budget = 800 * 1024;
+  if (withFrames) {
+    const wanted = [...new Set(l.recipe.steps.map((st) => (st.frames || [])[0]).filter((n) => n !== undefined))];
+    if (!wanted.length && l.frames.length) wanted.push(...l.frames.map((_, i) => i).filter((i) => i % Math.ceil(l.frames.length / 4) === 0));
+    for (const n of wanted) {
+      const buf = l.frames[n] && readMedia(l.frames[n].file);
+      if (buf && buf.length <= budget) { images.push(buf); budget -= buf.length; used.push(n); }
+    }
+  }
+  return { id: l.id, title: l.title, category: l.category, software: l.software, status: l.status, recipe: l.recipe,
+    ...(used.length && { note: `The ${used.length} image(s) below are frames ${used.join(', ')} (the first frame of the steps).` }), images };
+}
+
 // Chat Claude de Rovex depuis Claude Desktop : on passe par le serveur local de l'app (clé de data/agent.json).
 async function agentApi(pathname, { method = 'GET', body, timeout = 15e3 } = {}) {
   let link = null;
@@ -588,6 +671,19 @@ async function call(name, a = {}) {
       return rbxassets.list(a.query, a.limit);
     case 'rovex_folder':
       return folderView(a.path);
+    case 'find_lessons':
+      return { lessons: lessons.search({ query: a.query || '', category: a.category || '', limit: 10 }), how: 'Open the closest one with lesson_get and follow its steps.' };
+    case 'lesson_get':
+      return lessonView(a.id, a.frames !== false);
+    case 'lessons_todo': {
+      const todo = lessons.list().filter((l) => l.status === 'pending' && l.frames);
+      return { lessons: todo.map((l) => ({ id: l.id, title: l.title, category: l.category, software: l.software, frames: l.frames })), how: todo.length ? 'Study one with lesson_frames, then lesson_save.' : 'Nothing waiting.' };
+    }
+    case 'lesson_frames':
+      return lessonFrames(a.id, Number(a.from) || 0);
+    case 'lesson_save':
+      lessons.update(String(a.id || ''), { recipe: { summary: a.summary, steps: a.steps, tips: a.tips, tags: a.tags } });
+      return { saved: true, note: 'Saved as a draft: the user checks and validates it in Rovex (Learning page).' };
     case 'meshy_text_to_3d': return meshy.textTo3d(a);
     case 'meshy_image_to_3d': return meshy.imageTo3d(a);
     case 'meshy_remesh': return meshy.remesh(a);
@@ -628,7 +724,10 @@ async function call(name, a = {}) {
     case 'load_skill': {
       const cats = [...(Array.isArray(a.categories) ? a.categories : []), ...(a.category ? [a.category] : [])].filter((c) => skills.SKILL_CATS.includes(c)).slice(0, 4);
       if (!cats.length) throw new Error('Give one or more categories: ' + skills.SKILL_CATS.join(', '));
-      return skills.loadMany(state, cats, { query: a.query || '' });
+      const out = skills.loadMany(state, cats, { query: a.query || '' });
+      const learned = lessons.search({ query: a.query || '', category: cats, limit: 6 });
+      if (learned.length) out.lessons = { note: 'Recipes learned from the user\'s videos for these domains: open the closest with lesson_get and follow its steps.', items: learned };
+      return out;
     }
     case 'list_skills':
       return skills.SKILL_CATS.map((c) => {

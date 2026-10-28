@@ -1976,7 +1976,7 @@ async function renderChat() {
 
 // ---------- Deux espaces : Création (skills, textures, prompts…) et Ressources (bibliothèque, open source…) ----------
 const SPACES = {
-  create: ['examples', 'textures', 'buildtex', 'skills', 'prompts', 'studio', 'level', 'connect', 'robloxstudio', 'blender', 'place', 'dev'],
+  create: ['examples', 'learn', 'textures', 'buildtex', 'skills', 'prompts', 'studio', 'level', 'connect', 'robloxstudio', 'blender', 'place', 'dev'],
   resources: ['library', 'folders', 'opensource', 'channels', 'youtube', 'favorites', 'explore'],
   cowork: ['cowork', 'project'],
 };
@@ -3094,7 +3094,7 @@ async function route() {
     library: () => renderLibrary(params), favorites: () => renderLibrary(params, true), examples: renderExamples,
     youtube: () => renderYoutube(params), channels: () => renderChannels(params), explore: renderExplore,
     chat: renderChat, connect: renderConnect, admin: renderAdmin, settings: renderSettings, update: renderUpdate, robloxstudio: renderRobloxStudio, blender: renderBlender, custom: renderCustom, dev: renderDev, textures: () => renderTextures(params), buildtex: () => renderTextures(params, true), place: () => renderPlace(params), level: renderLevel, opensource: renderOpenSource, skills: renderSkills, prompts: renderPrompts, studio: renderStudio, folders: () => renderFolders(params),
-    cowork: renderCowork, project: () => renderProject(params),
+    cowork: renderCowork, project: () => renderProject(params), learn: () => renderLearn(params),
   };
   if (path === 'chat' && $('#chat')) return;
   try {
