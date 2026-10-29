@@ -1,7 +1,7 @@
 {
  "version": 2,
- "cursor": 309,
- "runs": 73,
+ "cursor": 314,
+ "runs": 74,
  "channels": [
   {
    "id": "ff1bc5c8316c",
@@ -4642,7 +4642,7 @@
    "channelId": "UCCXp8nSHuYPxl78dad_zSSw",
    "category": "scripting",
    "subscribers": "18 subscribers",
-   "lastFetch": "2026-10-28T20:45:16.430Z",
+   "lastFetch": "2026-10-29T06:27:53.877Z",
    "auto": true
   },
   {
@@ -5456,7 +5456,7 @@
    "channelId": "UCABAQID2xmChxHzEDW_UbVw",
    "category": "tools",
    "subscribers": "1.24M subscribers",
-   "lastFetch": "2026-10-28T20:45:54.092Z",
+   "lastFetch": "2026-10-29T06:28:26.390Z",
    "auto": true
   },
   {
@@ -5588,7 +5588,7 @@
    "channelId": "UCM88Du8q1ZlY7oRE8Eh589Q",
    "category": "tools",
    "subscribers": "357K subscribers",
-   "lastFetch": "2026-10-28T20:46:00.267Z",
+   "lastFetch": "2026-10-29T06:28:31.865Z",
    "auto": true
   },
   {
@@ -6193,7 +6193,7 @@
    "channelId": "UCVCwokpRDNht4S7XkaXBR_A",
    "category": "tools",
    "subscribers": "80 subscribers",
-   "lastFetch": "2026-10-28T20:46:29.301Z",
+   "lastFetch": "2026-10-29T06:28:56.219Z",
    "auto": true
   },
   {
@@ -8360,7 +8360,7 @@
    "channelId": "UCcDyFieBDrQQuF71BzdhTBg",
    "category": "gui",
    "subscribers": "19 subscribers",
-   "lastFetch": "2026-10-28T20:48:12.324Z",
+   "lastFetch": "2026-10-29T06:30:21.610Z",
    "auto": true
   },
   {
@@ -10780,7 +10780,7 @@
    "channelId": "UCumYBB63__kuzGhzj_Tegtg",
    "category": "scripting",
    "subscribers": "",
-   "lastFetch": "2026-10-28T20:50:04.741Z",
+   "lastFetch": "2026-10-29T06:32:02.045Z",
    "auto": true
   },
   {
@@ -12413,38 +12413,23 @@
   }
  ],
  "cursors": {
-  "forum:help-and-feedback/scripting-support": 2405,
-  "forum:help-and-feedback/creations-feedback": 763,
-  "forum:help-and-feedback/building-support": 520,
-  "forum:help-and-feedback/art-design-support": 415,
-  "forum:resources/community-resources": 320,
-  "sketchfab:roblox": "6240",
-  "forum:resources/community-tutorials": 70,
-  "devto:gamedev": 70,
-  "forum:help-and-feedback/game-design-support": 60,
-  "forum:updates/announcements": 60,
-  "sketchfab:roblox low poly": "840",
-  "sketchfab:roblox ugc": "840",
-  "sketchfab:roblox map": "840",
+  "forum:help-and-feedback/scripting-support": 2440,
+  "forum:help-and-feedback/creations-feedback": 798,
+  "forum:help-and-feedback/building-support": 555,
+  "forum:help-and-feedback/art-design-support": 450,
+  "sketchfab:roblox": "7080",
+  "forum:resources/community-tutorials": 105,
+  "forum:help-and-feedback/game-design-support": 95,
+  "sketchfab:roblox low poly": "1680",
+  "sketchfab:roblox character": "840",
+  "sketchfab:roblox ugc": "600",
+  "sketchfab:roblox map": "600",
   "store:mesh:egg": "MjVfMV8xXzMw_d2ee7fcd78262ce54540a46dc27577b4",
   "store:mesh:crystal": "MjVfMV8xXzMw_133c488aeebd37a1c7766098da3211df",
   "store:mesh:chest": "MjVfMV8xXzMw_ca76b61f635b7b7541608adc94dd5815",
   "store:mesh:weapon": "MjVfMV8xXzMw_c147a34069df74f9e08df92ff5a5f611",
-  "store:mesh:low poly": "MjVfMV8xXzMw_2fa7bd44025e75c98bf606befd4efdac",
-  "sketchfab:roblox weapon": "240",
-  "sketchfab:roblox pet": "240",
-  "store:decal:ui": "MTBfMV8xXzMw_41872fe8f64c2c45bac875d16b88ed95",
-  "store:decal:icon": "MTBfMV8xXzMw_ac73895a948bcbb76450c2c0f26debec",
-  "store:decal:button": "MTBfMV8xXzMw_5c8ae2ca89b60cdc414321d3ced98244",
-  "store:decal:frame": "MTBfMV8xXzMw_2421d2db40f9fd00d441ea836d1aa8d1",
-  "store:decal:background": "MTBfMV8xXzMw_a574aad5f14652e7daf4c360a3130954",
-  "store:decal:grass": "MTBfMV8xXzMw_4a97ada93c0febae009f874d9bdc506c",
-  "store:decal:wood": "MTBfMV8xXzMw_6b87ff3c3dbd502adee5e6d62b59b62f",
-  "store:decal:brick": "MTBfMV8xXzMw_4c82b359dabc32806976de64b70b1f6e",
-  "store:decal:anime": "MTBfMV8xXzMw_502d4d1346c77bb815e67e4e0197a035",
-  "store:decal:cartoon": "MTBfMV8xXzMw_449ee4c1f9c80295fd70808e104505a5",
-  "store:mesh:sword": "Ml8xXzFfMzA=_929ac0d91db8cd47e139b452100b26bb"
+  "store:mesh:low poly": "MjVfMV8xXzMw_2fa7bd44025e75c98bf606befd4efdac"
  },
  "migrated": false,
- "updatedAt": "2026-10-29T06:06:11.565Z"
+ "updatedAt": "2026-10-29T06:58:46.477Z"
 }
