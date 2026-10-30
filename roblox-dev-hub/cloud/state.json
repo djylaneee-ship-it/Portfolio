@@ -1,7 +1,7 @@
 {
  "version": 2,
- "cursor": 391,
- "runs": 94,
+ "cursor": 395,
+ "runs": 95,
  "channels": [
   {
    "id": "ff1bc5c8316c",
@@ -12886,16 +12886,20 @@
   }
  ],
  "cursors": {
-  "forum:help-and-feedback/scripting-support": 3095,
-  "forum:help-and-feedback/creations-feedback": 1453,
-  "forum:help-and-feedback/building-support": 585,
-  "forum:help-and-feedback/art-design-support": 445,
-  "forum:resources/community-resources": 315,
-  "forum:help-and-feedback/game-design-support": 150,
-  "sketchfab:roblox": "2520",
-  "forum:updates/announcements": 45,
-  "sketchfab:roblox low poly": "1080",
-  "forum:resources/community-tutorials": 35,
+  "forum:help-and-feedback/scripting-support": 3130,
+  "forum:help-and-feedback/creations-feedback": 1488,
+  "forum:help-and-feedback/art-design-support": 480,
+  "forum:help-and-feedback/game-design-support": 185,
+  "sketchfab:roblox": "3360",
+  "forum:resources/community-tutorials": 70,
+  "devto:gamedev": 60,
+  "sketchfab:roblox ugc": "840",
+  "sketchfab:roblox map": "840",
+  "sketchfab:roblox character": "840",
+  "forum:resources/community-resources": 10,
+  "sketchfab:roblox pet": "240",
+  "store:decal:logo": "MTBfMV8xXzMw_ca292db5c9bd64891b03a302fe1f073c",
+  "store:decal:emoji": "MTBfMV8xXzMw_aaaa0cbca9fc890f91773d296147e433",
   "store:decal:grass": "MTBfMV8xXzMw_4a97ada93c0febae009f874d9bdc506c",
   "store:decal:stone": "MTBfMV8xXzMw_aef9a78e0e6759e2cb9fa7360317906a",
   "store:decal:wood": "MTBfMV8xXzMw_6b87ff3c3dbd502adee5e6d62b59b62f",
@@ -12909,12 +12913,8 @@
   "store:mesh:egg": "MTBfMV8xXzMw_0471c6ab6db52fdb23c087c6b56115b3",
   "store:mesh:crystal": "MTBfMV8xXzMw_d4730e8d3f4a04239b88a6700e9014ce",
   "store:mesh:chest": "MTBfMV8xXzMw_8074213b8b873a99498d5c168de09ed0",
-  "store:mesh:furniture": "MTBfMV8xXzMw_b747e33c444cc07de35a4a1e5ec40b36",
-  "devto:gamedev": 25,
-  "store:decal:logo": "MjVfMV8xXzMw_f86b6d73709c17209fa3e35d91480645",
-  "store:decal:emoji": "MjVfMV8xXzMw_a669f172459ea6e4b6e25b08be30709e",
-  "store:decal:sky": "N18xXzFfMzA=_0f45dc5767711fcdb570bc9e86e716f4"
+  "store:mesh:furniture": "MTBfMV8xXzMw_b747e33c444cc07de35a4a1e5ec40b36"
  },
  "migrated": false,
- "updatedAt": "2026-10-30T00:43:19.809Z"
+ "updatedAt": "2026-10-30T01:36:34.708Z"
 }
