@@ -118,7 +118,9 @@ Installation : bouton **Montrer l'add-on** → Blender **Edit › Preferences �
 
 ## Relier en MCP
 
-L'app expose un serveur MCP (`rovex-hub`), à brancher dans Claude ou tout autre client MCP. La page **Connexion Claude** affiche la config exacte, prête à copier, et la commande Claude Code : `claude mcp add --transport http rovex-hub http://localhost:4747/mcp`.
+L'app expose un serveur MCP (`rovex-hub`), à brancher dans Claude ou tout autre client MCP. La page **Connexion Claude** affiche la config exacte, prête à copier.
+
+**Claude Code** (terminal, extension VS Code, onglet Code de Claude Desktop) : branché comme Claude Desktop (`Rovex Hub.exe` en mode Node sur `mcp.js`, serveur « user » dans `~/.claude.json`, par `claude mcp add` si la commande est là, sinon directement dans le fichier), donc il marche même app fermée. L'ancien branchement par adresse http est réparé tout seul. Carte Claude Code de **Connexion Claude** : Connecter / Réparer / Déconnecter et un **guide d'installation** pas à pas (abonnement, installation Windows, connexion, `/mcp` pour vérifier, commande à la main, dépannage).
 
 - **Mode HTTP** (l'app doit être ouverte) : `http://localhost:4747/mcp` — libre depuis ton PC ; depuis un autre appareil, ajoute l'en-tête `Authorization: Bearer <ID ou clé admin>`.
 - **Mode stdio** (marche même app fermée) : Claude Desktop lance `Rovex Hub.exe` en mode Node sur `resources\app\mcp.js` (variable `ELECTRON_RUN_AS_NODE=1`). L'app écrit cette config toute seule.

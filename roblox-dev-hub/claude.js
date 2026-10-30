@@ -89,28 +89,101 @@ function unlinkDesktop() {
   return desktopStatus();
 }
 
-// Claude Code : on passe par sa propre commande, qui gère son fichier de config.
+// ---------- Claude Code (terminal, extension VS Code, onglet Code de Claude Desktop) ----------
+// Même branchement que Claude Desktop (Rovex Hub.exe en mode Node sur mcp.js) : marche même app fermée,
+// et les outils passent par l'app quand elle est ouverte. Ses serveurs MCP « user » sont dans ~/.claude.json.
+const CODE_FILE = path.join(os.homedir(), '.claude.json');
+const CODE_DIR = path.join(os.homedir(), '.claude');
+const codeEntry = () => ({ type: 'stdio', env: {}, ...entry() });
+
 function run(cmd) {
   return new Promise((resolve) => {
-    exec(cmd, { timeout: 20000, windowsHide: true }, (err, stdout, stderr) => resolve({ ok: !err, out: String(stdout || '') + String(stderr || '') }));
+    exec(cmd, { timeout: 30000, windowsHide: true }, (err, stdout, stderr) => resolve({ ok: !err, out: String(stdout || '') + String(stderr || '') }));
   });
 }
 
-async function codeStatus() {
-  const v = await run('claude --version');
-  if (!v.ok) return { installed: false, linked: false };
-  const g = await run(`claude mcp get ${NAME}`);
-  return { installed: true, version: v.out.trim().split('\n')[0], linked: g.ok };
+// La commande claude : dans le PATH, sinon aux endroits où ses installateurs la mettent.
+function codeExePaths() {
+  const home = os.homedir();
+  if (process.platform === 'win32') {
+    return [
+      path.join(home, '.local', 'bin', 'claude.exe'),
+      process.env.APPDATA && path.join(process.env.APPDATA, 'npm', 'claude.cmd'),
+      process.env.LOCALAPPDATA && path.join(process.env.LOCALAPPDATA, 'Microsoft', 'WinGet', 'Links', 'claude.exe'),
+    ].filter(Boolean);
+  }
+  return [path.join(home, '.local', 'bin', 'claude'), '/opt/homebrew/bin/claude', '/usr/local/bin/claude', '/usr/bin/claude'];
+}
+let cli = { at: 0, cmd: null, version: '' };
+async function codeCli() {
+  if (Date.now() - cli.at < 60e3) return cli;
+  let found = { cmd: null, version: '' };
+  for (const cmd of ['claude', ...codeExePaths().filter((p) => fs.existsSync(p)).map((p) => `"${p}"`)]) {
+    const v = await run(`${cmd} --version`);
+    if (v.ok) { found = { cmd, version: v.out.trim().split('\n')[0] }; break; }
+  }
+  cli = { at: Date.now(), ...found };
+  return cli;
 }
 
-async function linkCode(url) {
+// Commande à coller soi-même (Invite de commandes), si le bouton ne peut pas le faire.
+function codeCommand(cmd = 'claude') {
+  const e = codeEntry();
+  const q = (x) => `"${x}"`;
+  const envs = Object.entries(e.env).map(([k, v]) => `--env ${q(`${k}=${v}`)}`).join(' ');
+  // --env avant --transport : juste avant le nom, la commande le prendrait pour une variable de plus.
+  return `${cmd} mcp add --scope user ${envs ? envs + ' ' : ''}--transport stdio ${NAME} -- ${[e.command, ...e.args].map(q).join(' ')}`;
+}
+
+async function codeStatus() {
+  const c = await codeCli();
+  let cur = null;
+  let error = '';
+  try { cur = (readConfig(CODE_FILE).mcpServers || {})[NAME] || null; } catch (e) { error = e.message; }
+  const want = codeEntry();
+  const same = cur && cur.command === want.command && JSON.stringify(cur.args || []) === JSON.stringify(want.args) && JSON.stringify(cur.env || {}) === JSON.stringify(want.env);
+  return {
+    installed: Boolean(c.cmd) || fs.existsSync(CODE_DIR) || fs.existsSync(CODE_FILE),
+    cli: Boolean(c.cmd), version: c.version, linked: Boolean(cur), outdated: Boolean(cur) && !same,
+    file: CODE_FILE, command: codeCommand(), error,
+  };
+}
+
+// Ajoute (ou répare) Rovex Hub : par la commande claude si elle est là, sinon directement dans ~/.claude.json.
+async function linkCode() {
   const st = await codeStatus();
   if (!st.installed) throw Object.assign(new Error('Claude Code not found'), { key: 'codeMissing' });
-  if (!st.linked) {
-    const r = await run(`claude mcp add --scope user --transport http ${NAME} ${url}`);
-    if (!r.ok) throw new Error(r.out.trim().slice(0, 300) || 'claude mcp add failed');
+  const c = await codeCli();
+  if (c.cmd) {
+    await run(`${c.cmd} mcp remove --scope user ${NAME}`);
+    const r = await run(codeCommand(c.cmd));
+    const after = await codeStatus();
+    if (after.linked && !after.outdated) return after;
+    if (!r.ok && !fs.existsSync(CODE_FILE)) throw new Error(r.out.trim().slice(0, 300) || 'claude mcp add failed');
   }
+  let cfg = {};
+  if (fs.existsSync(CODE_FILE)) {
+    try { cfg = readConfig(CODE_FILE); } catch { throw Object.assign(new Error('Claude Code config unreadable'), { key: 'codeConfig' }); }
+    if (!fs.existsSync(CODE_FILE + '.rovex-backup')) fs.copyFileSync(CODE_FILE, CODE_FILE + '.rovex-backup');
+  }
+  cfg.mcpServers = { ...(cfg.mcpServers || {}), [NAME]: codeEntry() };
+  fs.writeFileSync(CODE_FILE + '.tmp', JSON.stringify(cfg, null, 2));
+  fs.renameSync(CODE_FILE + '.tmp', CODE_FILE);
   return codeStatus();
 }
 
-module.exports = { desktopStatus, linkDesktop, unlinkDesktop, codeStatus, linkCode, entry };
+async function unlinkCode() {
+  const c = await codeCli();
+  if (c.cmd) await run(`${c.cmd} mcp remove --scope user ${NAME}`);
+  try {
+    const cfg = readConfig(CODE_FILE);
+    if (cfg.mcpServers && cfg.mcpServers[NAME]) {
+      delete cfg.mcpServers[NAME];
+      fs.writeFileSync(CODE_FILE + '.tmp', JSON.stringify(cfg, null, 2));
+      fs.renameSync(CODE_FILE + '.tmp', CODE_FILE);
+    }
+  } catch {}
+  return codeStatus();
+}
+
+module.exports = { desktopStatus, linkDesktop, unlinkDesktop, codeStatus, linkCode, unlinkCode, entry, codeEntry, CODE_FILE };

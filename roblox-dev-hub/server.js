@@ -482,7 +482,14 @@ const routes = [
     }
     return { opened, plain, link, truncated: text.length > max };
   }],
-  ['POST', /^\/api\/claude\/code$/, () => claude.linkCode(`http://localhost:${PORT}/mcp`)],
+  ['POST', /^\/api\/claude\/code$/, async () => {
+    state.settings.autoConnectCode = true;
+    persist();
+    const st = await claude.linkCode();
+    try { skills.installForClaudeCode(state); } catch {}
+    return st;
+  }],
+  ['DELETE', /^\/api\/claude\/code$/, () => { state.settings.autoConnectCode = false; persist(); return claude.unlinkCode(); }],
   // Pont Roblox Studio : le JSON MCP de Studio, l'état de la connexion et les outils repassés à Claude.
   ['GET', /^\/api\/robloxstudio$/, () => robloxStudioInfo()],
   ['PUT', /^\/api\/robloxstudio$/, async (req) => {
@@ -944,9 +951,10 @@ async function autoConnectClaude() {
     }
   } catch (e) { console.log('  Claude Desktop: ' + e.message); }
   try {
+    // Claude Code : ajouté (ou réparé, ex. l'ancien branchement par adresse http) sauf si l'utilisateur l'a retiré.
     const code = await claude.codeStatus();
-    if (code.installed && !code.linked) {
-      await claude.linkCode(`http://localhost:${PORT}/mcp`);
+    if (code.installed && state.settings.autoConnectCode !== false && (!code.linked || code.outdated)) {
+      await claude.linkCode();
       console.log('  Claude Code detected: Rovex Hub added.');
     }
     if (code.installed) {

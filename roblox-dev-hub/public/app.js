@@ -2338,10 +2338,13 @@ async function loadClaudeApps() {
       ${d.linked && !dOn ? `<p style="margin:12px 0 0;font-size:12.5px">${t('cl.logs')}</p>` : ''}
     </div></div>
     <div class="panel app-card" data-spot><span class="ico">⌨️</span><div style="flex:1">
-      <h3>Claude Code</h3>
-      ${!c.installed ? state(false, t('cl.notFound')) : cOn ? state(true, t('cl.active') + seen(c.client)) : c.linked ? `<span class="state warn"><span class="pulse"></span>${t('cl.addedCode')}</span>` : state(false, t('cl.notLinked'))}
-      <p>${!c.installed ? t('cl.codeMissing') : c.linked ? t('cl.codeOk') : t('cl.codeFound')}</p>
-      <div class="row">${c.installed && !c.linked ? `<button class="btn primary" id="cl-code">${t('cl.link')}</button>` : ''}</div>
+      <h3>Claude Code${c.version ? ` <small class="sub">${esc(c.version)}</small>` : ''}</h3>
+      ${!c.installed ? state(false, t('cl.notFound')) : c.outdated ? `<span class="state warn"><span class="pulse"></span>${t('cl.broken')}</span>` : cOn ? state(true, t('cl.active') + seen(c.client)) : c.linked ? `<span class="state warn"><span class="pulse"></span>${t('cl.addedCode')}</span>` : state(false, t('cl.notLinked'))}
+      <p>${!c.installed ? t('cl.codeMissing') : c.outdated ? t('cl.codeBroken') : c.linked ? t('cl.codeOk') : t('cl.codeFound')}</p>
+      <div class="row">${c.installed && (!c.linked || c.outdated) ? `<button class="btn primary" id="cl-code">${c.outdated ? t('cl.repair') : t('cl.link')}</button>` : ''}
+        <button class="btn ${c.installed ? '' : 'primary'}" id="cl-guide">📘 ${t('cg.open')}</button>
+        ${c.linked && !c.outdated ? `<button class="btn" id="cl-code-off">${t('cl.unlink')}</button>` : ''}
+        ${!cOn ? `<button class="btn" id="cl-recheck2">${t('cl.recheck')}</button>` : ''}</div>
     </div></div>`;
   stagger(box); box.classList.add('stagger');
   const act = (id, fn) => { const b = $('#' + id); if (b) b.onclick = async () => { b.disabled = true; try { await fn(); toast(t('toast.saved')); } catch (e) { toast(e.message, true); } loadClaudeApps(); }; };
@@ -2349,7 +2352,35 @@ async function loadClaudeApps() {
   act('cl-unlink', () => api('/claude/desktop', { method: 'DELETE' }));
   act('cl-repair', () => api('/claude/desktop', { method: 'POST' }));
   act('cl-code', () => api('/claude/code', { method: 'POST' }));
-  if ($('#cl-recheck')) $('#cl-recheck').onclick = () => { loadClaudeApps(); refreshMcp(); };
+  act('cl-code-off', () => api('/claude/code', { method: 'DELETE' }));
+  for (const id of ['cl-recheck', 'cl-recheck2']) if ($('#' + id)) $('#' + id).onclick = () => { loadClaudeApps(); refreshMcp(); };
+  if ($('#cl-guide')) $('#cl-guide').onclick = () => codeGuide(c);
+}
+
+// Guide pas à pas : installer Claude Code sur Windows, le brancher à Rovex, vérifier, s'en servir.
+function codeGuide(c) {
+  const box = (code) => `<div class="codebox"><code>${esc(code)}</code><button class="btn small" data-copy="${esc(code)}">${t('copy')}</button></div>`;
+  const step = (n, title, body) => `<div class="cg-step"><span class="num">${n}</span><div><h3>${title}</h3>${body}</div></div>`;
+  openModal(`<div class="cg">
+    <h2>📘 ${t('cg.title')}</h2>
+    <p class="sub">${t('cg.intro')}</p>
+    ${step(1, t('cg.s1'), `<p>${t('cg.s1t')}</p>`)}
+    ${step(2, t('cg.s2'), `<p>${t('cg.s2t')}</p>${box('irm https://claude.ai/install.ps1 | iex')}
+      <p class="sub">${t('cg.s2cmd')}</p>${box('curl -fsSL https://claude.ai/install.cmd -o install.cmd && install.cmd && del install.cmd')}
+      <p>${t('cg.s2check')}</p>${box('claude --version')}<p class="sub">${t('cg.s2alt')}</p>`)}
+    ${step(3, t('cg.s3'), `<p>${t('cg.s3t')}</p>${box('claude')}`)}
+    ${step(4, t('cg.s4'), `<p>${t('cg.s4t')}</p>${c.installed ? `<button class="btn primary" id="cg-link">${c.linked && !c.outdated ? '✓ ' + t('cl.addedCode') : t('cl.link')}</button>` : `<p class="sub">${t('cg.s4wait')}</p>`}`)}
+    ${step(5, t('cg.s5'), `<p>${t('cg.s5t')}</p>${box('/mcp')}<p class="sub">${t('cg.s5cli')}</p>${box('claude mcp list')}`)}
+    ${step(6, t('cg.s6'), `<p>${t('cg.s6t')}</p>${box(t('cg.s6ex'))}`)}
+    <details class="cg-more"><summary>${t('cg.manual')}</summary><p>${t('cg.manualT')}</p>${box(c.command || '')}</details>
+    <details class="cg-more"><summary>${t('cg.trouble')}</summary><ul>${['cg.t1', 'cg.t2', 'cg.t3', 'cg.t4'].map((k) => `<li>${t(k)}</li>`).join('')}</ul></details>
+  </div>`);
+  const b = $('#cg-link');
+  if (b) b.onclick = async () => {
+    b.disabled = true;
+    try { await api('/claude/code', { method: 'POST' }); b.textContent = '✓ ' + t('cl.addedCode'); toast(t('toast.saved')); loadClaudeApps(); }
+    catch (e) { b.disabled = false; toast(e.message, true); }
+  };
 }
 
 // ---------- Admin ----------
