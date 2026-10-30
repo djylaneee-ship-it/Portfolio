@@ -1,7 +1,7 @@
 {
  "version": 2,
- "cursor": 429,
- "runs": 107,
+ "cursor": 433,
+ "runs": 108,
  "channels": [
   {
    "id": "ff1bc5c8316c",
@@ -13103,21 +13103,103 @@
    "subscribers": "4 subscribers",
    "lastFetch": "2026-10-30T10:59:19.060Z",
    "auto": true
+  },
+  {
+   "id": "383461eae986",
+   "handle": "@katoscripts",
+   "name": "Kato",
+   "avatar": "https://yt3.ggpht.com/b5xTw1I9GYzwDF1UDgc9E43PfSdNW7EFutCssjFsAEgbO-BXFjyTeQPBWxSlx7UjnJ-4hNNWrK0=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UC039N-T0PJaIXvqVp5e6mYg",
+   "category": "scripting",
+   "subscribers": "73.1K subscribers",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "3ff773360753",
+   "handle": "@StreenMann",
+   "name": "StreenMan",
+   "avatar": "https://yt3.ggpht.com/KeDEfQgYg9mKAYuokViWz1IV61fBMGbEKLuLlOlGmxbQ4hA9mOiOlzuChUehR5--7rDst6UI=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCEkXfTlFuvdFp03_44m1xVA",
+   "category": "animation",
+   "subscribers": "1.02M subscribers",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "3c10995d3579",
+   "handle": "@ZinisterAnimations",
+   "name": "Zinister",
+   "avatar": "https://yt3.ggpht.com/DBLwoitNpwt7YUjtL5Xl9RdYU-2J0VKngMu26MPqd6hr5ZKwWbI954UID46rv9AaWCibXmE5Pw=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCJuIw7cATJmKR4FhiVbjAMQ",
+   "category": "animation",
+   "subscribers": "212K subscribers",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "8032b75be93b",
+   "handle": "@leynsammy",
+   "name": "Sammy",
+   "avatar": "https://yt3.ggpht.com/2qe4rbS2dyEQX7J-oMCCCmU1ULTy75gMKd0LMBhDUYj8WyJiHPSfol3JDL_gTRs8JLYRpOUhGw=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCyRec7ryQCITIn7BkwDF8bQ",
+   "category": "gui",
+   "subscribers": "95 subscribers",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "7a7598caa913",
+   "handle": "@DriveWorldRBLX",
+   "name": "Drive World",
+   "avatar": "https://yt3.ggpht.com/-IjnHbC2ruVbGhq9NKwyrXtcFewclZBik4UzDDApkAy86WuOxIis2SgUs3fJtxtvg5me9ZvK=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UChkKIQz0MLceqnQJiN54Z-w",
+   "category": "gui",
+   "subscribers": "26.3K subscribers",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "ab58fcc7b769",
+   "handle": "@EDevv",
+   "name": "EDevv",
+   "avatar": "https://yt3.ggpht.com/gzSVubYxd7163ywPCfBZCXMeorJhtBtqQtkAQRKBOJ1RaeWw2lWChbZa4tXbB1l2yUry7I2riQ=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCv11tCbwZx130DYtp9a0jkg",
+   "category": "gui",
+   "subscribers": "41 subscribers",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "b116bb2c8c6d",
+   "handle": "@devrbxnovato",
+   "name": "DevLog Roblox",
+   "avatar": "https://yt3.ggpht.com/KO8M8d3D9Mcsu_s-G7oXmlIkEgpThwnDh6dkmZBlSgQxVDT6s9tJCiPzDltkbGTS7iy-mAA5Jw=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCv5i9WlcddVbtK8MoDKQAzg",
+   "category": "tools",
+   "subscribers": "2 subscribers",
+   "lastFetch": null,
+   "auto": true
   }
  ],
  "cursors": {
-  "forum:help-and-feedback/scripting-support": 3520,
-  "forum:help-and-feedback/game-design-support": 575,
-  "forum:help-and-feedback/building-support": 390,
-  "forum:help-and-feedback/creations-feedback": 245,
-  "forum:help-and-feedback/art-design-support": 200,
-  "forum:resources/community-tutorials": 105,
-  "sketchfab:roblox": "2520",
-  "forum:resources/community-resources": 60,
-  "sketchfab:roblox character": "1440",
-  "sketchfab:roblox ugc": "840",
-  "sketchfab:roblox map": "840",
-  "store:decal:ui": "MjlfMV8xXzMw_201a22a8629ba98c324851b4a382e306",
+  "forum:help-and-feedback/scripting-support": 3555,
+  "forum:help-and-feedback/building-support": 425,
+  "forum:help-and-feedback/creations-feedback": 280,
+  "forum:help-and-feedback/art-design-support": 235,
+  "sketchfab:roblox": "3360",
+  "forum:resources/community-resources": 95,
+  "forum:updates/announcements": 45,
+  "sketchfab:roblox low poly": "1080",
+  "devto:gamedev": 35,
+  "store:mesh:chest": "MTNfMV8xXzMw_bfffec39cfb2bdfc709cd91a1a8afa57",
+  "store:mesh:weapon": "MTBfMV8xXzMw_232bd806545e807cb612435a1806b46b",
+  "store:mesh:furniture": "MTBfMV8xXzMw_b747e33c444cc07de35a4a1e5ec40b36",
+  "forum:help-and-feedback/game-design-support": 25,
+  "forum:resources/community-tutorials": 25,
+  "sketchfab:roblox map": "600",
+  "sketchfab:roblox character": "600",
+  "store:decal:ui": "MjVfMV8xXzMw_6d8248cd962fcd00977cd0db5fee54aa",
   "store:decal:icon": "MjVfMV8xXzMw_bde172587fad596c9c9480317dd8a5b0",
   "store:decal:button": "MjVfMV8xXzMw_cb33c955263f10ef0c51d08daae87c1b",
   "store:decal:frame": "MjVfMV8xXzMw_0492e38f71d6c1549b3e356cd1bf3f2b",
@@ -13135,12 +13217,8 @@
   "store:decal:cartoon": "MjVfMV8xXzMw_6ee2ffb528f0263fd7fc177c3dfd1937",
   "store:mesh:sword": "MjVfMV8xXzMw_0974aaf75792b2ef7aebeab5baec57f1",
   "store:mesh:gun": "MjVfMV8xXzMw_ad28e297bc6a94ceae63c29de6f1d262",
-  "store:mesh:rock": "MjVfMV8xXzMw_92c847e986a6e720154c48755b26062a",
-  "store:mesh:low poly": "MjVfMV8xXzMw_2fa7bd44025e75c98bf606befd4efdac",
-  "forum:updates/announcements": 10,
-  "sketchfab:roblox low poly": "240",
-  "sketchfab:roblox pet": "240"
+  "store:mesh:rock": "MjVfMV8xXzMw_92c847e986a6e720154c48755b26062a"
  },
  "migrated": false,
- "updatedAt": "2026-10-30T12:14:49.847Z"
+ "updatedAt": "2026-10-30T13:08:07.537Z"
 }
