@@ -1,7 +1,7 @@
 {
  "version": 2,
- "cursor": 503,
- "runs": 125,
+ "cursor": 509,
+ "runs": 126,
  "channels": [
   {
    "id": "ff1bc5c8316c",
@@ -5137,7 +5137,7 @@
    "channelId": "UCUXi4OoRhI1U_lQRU0p_bkg",
    "category": "tools",
    "subscribers": "98 subscribers",
-   "lastFetch": "2026-10-30T21:56:17.339Z",
+   "lastFetch": "2026-10-31T06:32:06.266Z",
    "auto": true
   },
   {
@@ -8635,7 +8635,7 @@
    "channelId": "UC6iMO8J5WrvJ2IOg6_BuTzw",
    "category": "scripting",
    "subscribers": "294 subscribers",
-   "lastFetch": "2026-10-30T21:59:01.321Z",
+   "lastFetch": "2026-10-31T06:34:25.744Z",
    "auto": true
   },
   {
@@ -13579,16 +13579,25 @@
   }
  ],
  "cursors": {
-  "forum:help-and-feedback/scripting-support": 4145,
-  "forum:help-and-feedback/creations-feedback": 870,
-  "forum:help-and-feedback/building-support": 390,
-  "sketchfab:roblox": "6720",
-  "forum:help-and-feedback/art-design-support": 165,
-  "forum:resources/community-tutorials": 105,
-  "sketchfab:roblox character": "1440",
-  "devto:gamedev": 60,
-  "forum:help-and-feedback/game-design-support": 35,
-  "sketchfab:roblox ugc": "840",
+  "forum:help-and-feedback/scripting-support": 4205,
+  "forum:help-and-feedback/creations-feedback": 930,
+  "forum:help-and-feedback/building-support": 450,
+  "sketchfab:roblox": "8064",
+  "forum:help-and-feedback/art-design-support": 225,
+  "devto:gamedev": 95,
+  "forum:help-and-feedback/game-design-support": 95,
+  "sketchfab:roblox low poly": "1440",
+  "forum:resources/community-resources": 60,
+  "sketchfab:roblox map": "840",
+  "forum:resources/community-tutorials": 35,
+  "sketchfab:roblox ugc": "240",
+  "sketchfab:roblox weapon": "240",
+  "sketchfab:roblox character": "240",
+  "sketchfab:roblox pet": "240",
+  "store:decal:ui": "MTBfMV8xXzMw_41872fe8f64c2c45bac875d16b88ed95",
+  "store:decal:icon": "MTBfMV8xXzMw_ac73895a948bcbb76450c2c0f26debec",
+  "store:decal:button": "MTBfMV8xXzMw_5c8ae2ca89b60cdc414321d3ced98244",
+  "store:decal:frame": "MTBfMV8xXzMw_2421d2db40f9fd00d441ea836d1aa8d1",
   "store:decal:fire": "MTBfMV8xXzMw_63dcaf1f99fcbd86f56123ae31899a46",
   "store:decal:glow": "MTBfMV8xXzMw_43c8ce564a9390e04cd5bf2f7f6c9470",
   "store:decal:sparkle": "MTBfMV8xXzMw_4244162d0e2c1716f17325bb95572674",
@@ -13608,16 +13617,8 @@
   "store:mesh:car": "MTBfMV8xXzMw_81fad5e80f2da6d93860ea91168c7bda",
   "store:mesh:pet": "MTBfMV8xXzMw_55349eedf813d501b9b9ea3a6a647a74",
   "store:mesh:low poly": "MTBfMV8xXzMw_19046767010deee2ef96e6985d3ceef5",
-  "store:mesh:furniture": "MTBfMV8xXzMw_b747e33c444cc07de35a4a1e5ec40b36",
-  "forum:updates/announcements": 25,
-  "sketchfab:roblox low poly": "600",
-  "sketchfab:roblox weapon": "600",
-  "store:decal:ui": "MjVfMV8xXzMw_6d8248cd962fcd00977cd0db5fee54aa",
-  "store:decal:icon": "MjVfMV8xXzMw_bde172587fad596c9c9480317dd8a5b0",
-  "store:decal:button": "MjVfMV8xXzMw_cb33c955263f10ef0c51d08daae87c1b",
-  "store:decal:frame": "MjVfMV8xXzMw_0492e38f71d6c1549b3e356cd1bf3f2b",
-  "store:decal:background": "Ml8xXzFfMzA=_1c91e6ac6aba56962a6a1ff1e7a6ddeb"
+  "store:mesh:furniture": "MTBfMV8xXzMw_b747e33c444cc07de35a4a1e5ec40b36"
  },
  "migrated": false,
- "updatedAt": "2026-10-31T05:50:00.749Z"
+ "updatedAt": "2026-10-31T06:43:37.502Z"
 }
