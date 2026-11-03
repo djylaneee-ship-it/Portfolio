@@ -1,7 +1,7 @@
 {
  "version": 2,
- "cursor": 891,
- "runs": 222,
+ "cursor": 896,
+ "runs": 223,
  "channels": [
   {
    "id": "ff1bc5c8316c",
@@ -16524,21 +16524,156 @@
    "subscribers": "9.57K subscribers",
    "lastFetch": "2026-11-03T18:41:40.198Z",
    "auto": true
+  },
+  {
+   "id": "e5db44c8b6f7",
+   "handle": "@Devy_Studio",
+   "name": "Devy Studio",
+   "avatar": "https://yt3.ggpht.com/f_F9CcjvjHa6gNFM19MXXCI3sQ77K7G7ordDhfh9gYW7u4PbUFSpa2sR5zTBR1tTfKkUbQbh=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCFoMwsSPOLZ2TyPIGZFrGNA",
+   "category": "tools",
+   "subscribers": "3.6K subscribers",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "4a8f3ebe3455",
+   "handle": "@studioaxoy",
+   "name": "STUDIO AXOY",
+   "avatar": "https://yt3.ggpht.com/UdZybAoy5TKQIHi92rFaPg0ga2icyFO10_0Ysn5ua499NbiaRgfXYiLIizUEsRObhKg-mtJxYw0=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCDyIcrrZ6cX-EYJh1Q7gZTA",
+   "category": "tools",
+   "subscribers": "2.53K subscribers",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "a87bb322935c",
+   "handle": "@C.HStudios",
+   "name": "C.H Studio",
+   "avatar": "https://yt3.ggpht.com/ztUM4S5xv7hb_tPkBCIFaFp7H27RDSq37u7Y01Q_rO6qt_zeYYcEjkmoW05v2c7uCneFtEwd3w=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCluQwaZE4QLNgvJq5Wp6XAA",
+   "category": "tools",
+   "subscribers": "360 subscribers",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "3d3774271cd9",
+   "handle": "@nicknamed-studio",
+   "name": "Nicknamed-Studio",
+   "avatar": "https://yt3.ggpht.com/dWQ72YOzqCWJuuwuR_OfFwj9l6T1OJOauJBaS0lY5fcVDxCQxu07-ZV9GZz83ia25V9cOYPkMQ=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCL-SczlI7yWYPRLEzagM6Cg",
+   "category": "tools",
+   "subscribers": "755 subscribers",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "279913f8b6e6",
+   "handle": "@chukroidstudio",
+   "name": "Chukroid Studio",
+   "avatar": "https://yt3.ggpht.com/Lexf_bEQCUWXtgio1YFm8h4eQxaWO8jqqcA4HGsqo_hwde4O5taDxE2FHiBzPeZKyyhS_5N8=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCi89wlj1CWrirMpV078-hZg",
+   "category": "tools",
+   "subscribers": "588 subscribers",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "8a786b953044",
+   "handle": "@michaelstudio579",
+   "name": "Michael Studio",
+   "avatar": "https://yt3.googleusercontent.com/ytc/AIdro_nJ36x44A-7CjXEZfrRGZJA4KqXnVLu2WDPrTF9_x0PPWw=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCKUvhHG64brjlnSSTTnZwrQ",
+   "category": "animation",
+   "subscribers": "2.16K subscribers",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "9e8c94c5ee8f",
+   "handle": "@WaddleStudioX",
+   "name": "Waddle Studio",
+   "avatar": "https://yt3.ggpht.com/HVtOdyGiQHAEGC7XAa2MMS80ePjvI4aq6zhKdwRbzSX97u4NXreO6mcY2te2Vw2XCztoczHL7w=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCKQdVPoeIc03u9M8QFxKhgw",
+   "category": "building",
+   "subscribers": "71 subscribers",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "08c4e33c74f3",
+   "handle": "@ExtractionB",
+   "name": "Extraction B: The Enseada",
+   "avatar": "https://yt3.ggpht.com/iE_hFp8hZQyAm_Fd-QSGVUtsD_SY9U6ARivzimDYRumGLAkGau6PglHwX5k8AJ6ncE6eYMqQM-c=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCFI-JHBx_UF3BOhBQSXft-A",
+   "category": "tools",
+   "subscribers": "402 subscribers",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "8d002ce63a71",
+   "handle": "@Arcane_Atelier",
+   "name": "Arcane Atelier",
+   "avatar": "https://yt3.ggpht.com/Ue3GqekhN409-59JpkgKInAmpGmmltvTkot6c7EE0cBY8h5pYrtdEofDfEjoIH8Jexoa-JC2=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCidWh2EfuklkS1hoFB9AMNg",
+   "category": "tools",
+   "subscribers": "649 subscribers",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "159f40593c62",
+   "handle": "@robloxmanpo",
+   "name": "Roblox Tutorials",
+   "avatar": "https://yt3.ggpht.com/hCFj3nutIkUlt9jaR197iWXRpTNHk5ZXlvaiq-YmOI99VhLRVkALEYDyXKlMQqJHkN55_pKe75k=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UC-s5FrajqogkSpJCenx2-OQ",
+   "category": "tools",
+   "subscribers": "",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "b1c579e09cc0",
+   "handle": "@RobloxStudio369",
+   "name": "Roblox Studio Tutorial ",
+   "avatar": "https://yt3.ggpht.com/ytc/AIdro_lAyCmPuPTcTtYpOA4QnUiNiel5MSi2UOypDgNoiTtaAGtGVrLt1wtS6foazk69LW0x-w=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCgxq-smq6v6zi8stGmC-nUA",
+   "category": "tools",
+   "subscribers": "1 subscriber",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "cb663b900a04",
+   "handle": "@robloxstudiotutorials6157",
+   "name": "Roblox Studio Tutorials",
+   "avatar": "https://yt3.ggpht.com/Rv5QslnpszV31uBjN9ZJKJFfUkuJg6iDAq9WuzI_L2cuVTqK4iUcQbqCF3Ppuhbts18wQeHm=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCXrJypoIjgWRlSM-Fzp1xaA",
+   "category": "tools",
+   "subscribers": "9 subscribers",
+   "lastFetch": null,
+   "auto": true
   }
  ],
  "cursors": {
-  "forum:help-and-feedback/scripting-support": 7315,
-  "forum:help-and-feedback/creations-feedback": 780,
-  "forum:help-and-feedback/building-support": 425,
-  "forum:help-and-feedback/game-design-support": 260,
-  "forum:resources/community-tutorials": 60,
-  "sketchfab:roblox": "1440",
-  "forum:resources/community-resources": 25,
-  "forum:updates/announcements": 25,
-  "sketchfab:roblox low poly": "600",
+  "forum:help-and-feedback/scripting-support": 7350,
+  "forum:help-and-feedback/creations-feedback": 815,
+  "forum:help-and-feedback/building-support": 460,
+  "forum:help-and-feedback/game-design-support": 295,
+  "forum:resources/community-tutorials": 95,
+  "sketchfab:roblox": "2280",
+  "forum:resources/community-resources": 60,
+  "forum:updates/announcements": 60,
+  "sketchfab:roblox low poly": "1440",
+  "sketchfab:roblox character": "1440",
+  "devto:gamedev": 60,
+  "forum:help-and-feedback/art-design-support": 35,
+  "sketchfab:roblox ugc": "840",
+  "sketchfab:roblox map": "840",
   "sketchfab:roblox weapon": "600",
-  "sketchfab:roblox character": "600",
-  "devto:gamedev": 25,
   "store:decal:ui": "MjVfMV8xXzMw_6d8248cd962fcd00977cd0db5fee54aa",
   "store:decal:icon": "MjVfMV8xXzMw_bde172587fad596c9c9480317dd8a5b0",
   "store:decal:button": "MjVfMV8xXzMw_cb33c955263f10ef0c51d08daae87c1b",
@@ -16568,5 +16703,5 @@
   "store:mesh:low poly": "MjVfMV8xXzMw_2fa7bd44025e75c98bf606befd4efdac"
  },
  "migrated": false,
- "updatedAt": "2026-11-03T19:59:58.028Z"
+ "updatedAt": "2026-11-03T20:52:50.291Z"
 }
