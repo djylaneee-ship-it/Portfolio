@@ -1,7 +1,7 @@
 {
  "version": 2,
- "cursor": 867,
- "runs": 216,
+ "cursor": 869,
+ "runs": 217,
  "channels": [
   {
    "id": "ff1bc5c8316c",
@@ -16373,17 +16373,21 @@
   }
  ],
  "cursors": {
-  "forum:help-and-feedback/scripting-support": 7115,
-  "forum:help-and-feedback/creations-feedback": 580,
-  "forum:help-and-feedback/art-design-support": 470,
-  "sketchfab:roblox": "6840",
-  "forum:help-and-feedback/building-support": 225,
-  "forum:resources/community-resources": 165,
-  "forum:resources/community-tutorials": 105,
-  "devto:gamedev": 60,
-  "forum:help-and-feedback/game-design-support": 60,
-  "sketchfab:roblox ugc": "696",
-  "sketchfab:roblox map": "240",
+  "forum:help-and-feedback/scripting-support": 7150,
+  "forum:help-and-feedback/creations-feedback": 615,
+  "forum:help-and-feedback/art-design-support": 505,
+  "sketchfab:roblox": "7680",
+  "forum:help-and-feedback/building-support": 260,
+  "forum:resources/community-resources": 200,
+  "devto:gamedev": 95,
+  "forum:help-and-feedback/game-design-support": 95,
+  "forum:updates/announcements": 35,
+  "sketchfab:roblox low poly": "840",
+  "sketchfab:roblox character": "840",
+  "store:mesh:chest": "MjVfMV8xXzMw_ca76b61f635b7b7541608adc94dd5815",
+  "store:mesh:low poly": "MjVfMV8xXzMw_2fa7bd44025e75c98bf606befd4efdac",
+  "forum:resources/community-tutorials": 10,
+  "sketchfab:roblox ugc": "240",
   "sketchfab:roblox pet": "240",
   "store:mesh:sword": "MTBfMV8xXzMw_69c7f86decf2072dcad7f7f8ee1384ab",
   "store:mesh:gun": "MTBfMV8xXzMw_ea1de00b6323ef2b10b517bffda19397",
@@ -16391,12 +16395,8 @@
   "store:mesh:rock": "MTBfMV8xXzMw_fce304b2032c7d0deca17b7d6a8831e6",
   "store:mesh:house": "MTBfMV8xXzMw_2c22625097ecc99832a9a8655f2f79e4",
   "store:mesh:car": "MTBfMV8xXzMw_81fad5e80f2da6d93860ea91168c7bda",
-  "store:mesh:pet": "MTBfMV8xXzMw_55349eedf813d501b9b9ea3a6a647a74",
-  "store:mesh:egg": "MTBfMV8xXzMw_0471c6ab6db52fdb23c087c6b56115b3",
-  "store:mesh:crystal": "MTBfMV8xXzMw_d4730e8d3f4a04239b88a6700e9014ce",
-  "store:mesh:weapon": "MTBfMV8xXzMw_232bd806545e807cb612435a1806b46b",
-  "store:mesh:furniture": "MTBfMV8xXzMw_b747e33c444cc07de35a4a1e5ec40b36"
+  "store:mesh:pet": "Nl8xXzFfMzA=_adf303c418228a7a1d73bf766ca8f89c"
  },
  "migrated": false,
- "updatedAt": "2026-11-03T14:36:44.530Z"
+ "updatedAt": "2026-11-03T15:30:34.931Z"
 }
