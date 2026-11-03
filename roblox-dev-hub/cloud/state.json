@@ -1,7 +1,7 @@
 {
  "version": 2,
- "cursor": 827,
- "runs": 206,
+ "cursor": 831,
+ "runs": 207,
  "channels": [
   {
    "id": "ff1bc5c8316c",
@@ -814,7 +814,7 @@
    "channelId": "UCwN3kT66SOPOdvaV-WfLGdw",
    "category": "tools",
    "subscribers": "28 subscribers",
-   "lastFetch": "2026-11-02T21:17:04.399Z",
+   "lastFetch": "2026-11-03T06:08:57.195Z",
    "auto": true
   },
   {
@@ -4158,7 +4158,7 @@
    "channelId": "UCIFs2owOImT8YupLMyfyR3A",
    "category": "tools",
    "subscribers": "4 subscribers",
-   "lastFetch": "2026-11-02T21:19:30.800Z",
+   "lastFetch": "2026-11-03T06:10:56.937Z",
    "auto": true
   },
   {
@@ -5291,7 +5291,7 @@
    "channelId": "UCO_8hF-oulap_6lXy0oXLjg",
    "category": "tools",
    "subscribers": "20.4M subscribers",
-   "lastFetch": "2026-11-03T03:23:31.626Z",
+   "lastFetch": "2026-11-03T06:11:37.783Z",
    "auto": true
   },
   {
@@ -12023,7 +12023,7 @@
    "channelId": "UCsA57c8OT0JfnX_yL3Ev1ZQ",
    "category": "scripting",
    "subscribers": "3.26M subscribers",
-   "lastFetch": "2026-11-02T21:25:10.780Z",
+   "lastFetch": "2026-11-03T06:15:38.910Z",
    "auto": true
   },
   {
@@ -12716,7 +12716,7 @@
    "channelId": "UC7shc_oxyFUx3UbP-TASzKw",
    "category": "tools",
    "subscribers": "1 subscriber",
-   "lastFetch": "2026-11-02T21:25:40.922Z",
+   "lastFetch": "2026-11-03T06:16:05.544Z",
    "auto": true
   },
   {
@@ -13827,7 +13827,7 @@
    "channelId": "UC8LByDiB5aECnF_71sD-XHw",
    "category": "building",
    "subscribers": "1.14M subscribers",
-   "lastFetch": "2026-11-03T03:29:08.808Z",
+   "lastFetch": "2026-11-03T06:16:45.930Z",
    "auto": true
   },
   {
@@ -15455,7 +15455,7 @@
    "channelId": "UCP2Hu_zEhoBx6FwmPdHDBPQ",
    "category": "tools",
    "subscribers": "27 subscribers",
-   "lastFetch": "2026-11-02T21:27:37.936Z",
+   "lastFetch": "2026-11-03T06:17:44.624Z",
    "auto": true
   },
   {
@@ -15944,33 +15944,39 @@
   }
  ],
  "cursors": {
-  "forum:help-and-feedback/scripting-support": 6760,
-  "forum:help-and-feedback/building-support": 505,
-  "forum:help-and-feedback/game-design-support": 305,
-  "sketchfab:roblox": "8520",
-  "forum:help-and-feedback/creations-feedback": 225,
-  "forum:resources/community-resources": 165,
-  "forum:help-and-feedback/art-design-support": 115,
-  "forum:updates/announcements": 73,
-  "sketchfab:roblox low poly": "1680",
-  "sketchfab:roblox ugc": "1080",
-  "sketchfab:roblox character": "1080",
-  "devto:gamedev": 45,
-  "store:decal:logo": "MjVfMV8xXzMw_f86b6d73709c17209fa3e35d91480645",
-  "store:decal:emoji": "MjVfMV8xXzMw_a669f172459ea6e4b6e25b08be30709e",
-  "store:decal:sky": "MjVfMV8xXzMw_3767ec32820cd0c4c38677f705695deb",
-  "store:decal:grass": "MjVfMV8xXzMw_8529e8c6eb3339b2e4a3079648f2f266",
-  "store:decal:cartoon": "MjVfMV8xXzMw_6ee2ffb528f0263fd7fc177c3dfd1937",
-  "store:mesh:sword": "MjVfMV8xXzMw_0974aaf75792b2ef7aebeab5baec57f1",
-  "store:mesh:gun": "MjVfMV8xXzMw_ad28e297bc6a94ceae63c29de6f1d262",
-  "store:mesh:chest": "MjVfMV8xXzMw_ca76b61f635b7b7541608adc94dd5815",
-  "sketchfab:roblox weapon": "240",
-  "sketchfab:roblox pet": "240",
-  "store:decal:ui": "MTBfMV8xXzMw_41872fe8f64c2c45bac875d16b88ed95",
-  "store:decal:icon": "MTBfMV8xXzMw_ac73895a948bcbb76450c2c0f26debec",
-  "store:decal:button": "MTBfMV8xXzMw_5c8ae2ca89b60cdc414321d3ced98244",
-  "store:decal:frame": "MTBfMV8xXzMw_2421d2db40f9fd00d441ea836d1aa8d1"
+  "forum:help-and-feedback/scripting-support": 6795,
+  "forum:help-and-feedback/building-support": 540,
+  "forum:help-and-feedback/game-design-support": 340,
+  "sketchfab:roblox": "9360",
+  "forum:help-and-feedback/creations-feedback": 260,
+  "forum:resources/community-resources": 200,
+  "forum:help-and-feedback/art-design-support": 150,
+  "devto:gamedev": 80,
+  "forum:resources/community-tutorials": 35,
+  "sketchfab:roblox map": "840",
+  "store:decal:fire": "MjdfMV8xXzMw_1c77eb6fb1f87b635d53567131ba7f7b",
+  "store:decal:glow": "MTBfMV8xXzMw_43c8ce564a9390e04cd5bf2f7f6c9470",
+  "store:decal:sparkle": "MTBfMV8xXzMw_4244162d0e2c1716f17325bb95572674",
+  "store:decal:aura": "MTBfMV8xXzMw_83bd7c91a022b57e578f0dc4d0515a9c",
+  "store:decal:gradient": "MTBfMV8xXzMw_1ca8bc484c4ea08588f41879cc5762ea",
+  "store:decal:stone": "MTBfMV8xXzMw_aef9a78e0e6759e2cb9fa7360317906a",
+  "store:decal:wood": "MTBfMV8xXzMw_6b87ff3c3dbd502adee5e6d62b59b62f",
+  "store:decal:brick": "MTBfMV8xXzMw_4c82b359dabc32806976de64b70b1f6e",
+  "store:decal:anime": "MTBfMV8xXzMw_502d4d1346c77bb815e67e4e0197a035",
+  "store:mesh:tree": "MTBfMV8xXzMw_be56d90c1b2f98defbdc42815f0047c2",
+  "store:mesh:rock": "MTBfMV8xXzMw_fce304b2032c7d0deca17b7d6a8831e6",
+  "store:mesh:house": "MTBfMV8xXzMw_2c22625097ecc99832a9a8655f2f79e4",
+  "store:mesh:car": "MTBfMV8xXzMw_81fad5e80f2da6d93860ea91168c7bda",
+  "store:mesh:pet": "MTBfMV8xXzMw_55349eedf813d501b9b9ea3a6a647a74",
+  "store:mesh:egg": "MTBfMV8xXzMw_0471c6ab6db52fdb23c087c6b56115b3",
+  "store:mesh:crystal": "MTBfMV8xXzMw_d4730e8d3f4a04239b88a6700e9014ce",
+  "store:mesh:weapon": "MTBfMV8xXzMw_232bd806545e807cb612435a1806b46b",
+  "store:mesh:low poly": "MTBfMV8xXzMw_19046767010deee2ef96e6985d3ceef5",
+  "store:mesh:furniture": "MTBfMV8xXzMw_b747e33c444cc07de35a4a1e5ec40b36",
+  "forum:updates/announcements": 25,
+  "sketchfab:roblox low poly": "600",
+  "sketchfab:roblox ugc": "600"
  },
  "migrated": false,
- "updatedAt": "2026-11-03T05:43:13.702Z"
+ "updatedAt": "2026-11-03T06:36:30.844Z"
 }
