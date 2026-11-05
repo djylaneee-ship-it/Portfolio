@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Roblox Shorts Studio</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Roblox Shorts Studio</h1>
+      <p class="sub">Shorts Roblox creepypasta montés et publiés automatiquement</p>
+    </div>
+    <nav>
+      <button data-tab="board" class="active">Générateur</button>
+      <button data-tab="schedule">Planning</button>
+      <button data-tab="gameplay">Gameplay</button>
+      <button data-tab="settings">Réglages</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Générateur : comme la vidéo de référence -->
+    <section id="board" class="tab active">
+      <div class="panel">
+        <h2>Génération manuelle</h2>
+        <label>Shorts à générer
+          <select id="count"><option>1</option><option>2</option><option>3</option><option>5</option></select>
+        </label>
+        <label>Sujet de l'histoire (optionnel)
+          <textarea id="topicPrompt" rows="3" placeholder="Vide = thèmes creepypasta Roblox automatiques. {theme} = thème aléatoire."></textarea>
+        </label>
+        <label>Style des images
+          <textarea id="imageStyle" rows="2"></textarea>
+        </label>
+        <button id="generate" class="primary">Générer les Shorts</button>
+      </div>
+      <div class="panel grow">
+        <h2>Tableau des Shorts</h2>
+        <div id="jobs"><p class="empty">Aucun Short pour l'instant.</p></div>
+      </div>
+    </section>
+
+    <!-- Planning : N vidéos par jour aux heures choisies -->
+    <section id="schedule" class="tab">
+      <div class="panel">
+        <h2>Publication automatique</h2>
+        <label class="row"><input type="checkbox" id="schEnabled"> Activer le planning</label>
+        <label>Vidéos par jour <input type="number" id="perDay" min="1" max="6"></label>
+        <label>Heures de publication <span class="hint">(une par vidéo, ex. 12:00, 18:00)</span>
+          <div id="times"></div>
+        </label>
+        <label>Fuseau horaire <input id="timezone"></label>
+        <label>Jours préparés d'avance <input type="number" id="bufferDays" min="0" max="7"></label>
+        <button id="saveSchedule" class="primary">Enregistrer</button>
+      </div>
+      <div class="panel grow">
+        <h2>Prochaines publications</h2>
+        <ul id="nextSlots"></ul>
+        <p id="schError" class="error"></p>
+      </div>
+    </section>
+
+    <!-- Banque de gameplay -->
+    <section id="gameplay" class="tab">
+      <div class="panel grow">
+        <h2>Banque de gameplay <span id="gpCount" class="hint"></span></h2>
+        <input type="file" id="gpFiles" accept="video/*" multiple>
+        <p class="hint">Dépose tes enregistrements (≈ 50). Chaque Short prend un passage différent, le clip le moins utilisé en premier.</p>
+        <table id="gpTable"><thead><tr><th>Fichier</th><th>Durée</th><th>Utilisations</th></tr></thead><tbody></tbody></table>
+      </div>
+    </section>
+
+    <!-- Réglages : clés API, voix, YouTube -->
+    <section id="settings" class="tab">
+      <div class="panel">
+        <h2>Groq (histoires)</h2>
+        <label>Clé API <input id="keyGroq" type="password"></label>
+        <label>Modèle <input id="groqModel"></label>
+        <label>Langue <select id="language"><option value="fr">Français</option><option value="en">English</option></select></label>
+      </div>
+      <div class="panel">
+        <h2>ElevenLabs (voix)</h2>
+        <label>Clé API <input id="keyEleven" type="password"></label>
+        <label>Voix <select id="voiceId"></select></label>
+        <label>Vitesse du Short <input type="number" id="speed" step="0.05" min="1" max="1.5"></label>
+      </div>
+      <div class="panel">
+        <h2>YouTube</h2>
+        <label>Client ID OAuth <input id="ytClientId"></label>
+        <label>Client secret <input id="ytClientSecret" type="password"></label>
+        <p>Compte : <b id="ytStatus">non connecté</b></p>
+        <a href="/api/youtube/connect" target="_blank" class="button">Connecter YouTube</a>
+      </div>
+      <button id="saveSettings" class="primary">Enregistrer les réglages</button>
+    </section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
