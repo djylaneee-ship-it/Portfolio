@@ -45,3 +45,9 @@ th { color: var(--muted); font-weight: normal; }
 #nextSlots { padding-left: 18px; }
 #settings > button.primary { width: 340px; max-width: 100%; }
 .update { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+details { margin-bottom: 14px; }
+summary { cursor: pointer; color: var(--accent); }
+.guide { padding-left: 18px; color: var(--muted); }
+.guide li { margin: 6px 0; }
+.guide a { color: var(--accent); }
+[hidden] { display: none !important; }

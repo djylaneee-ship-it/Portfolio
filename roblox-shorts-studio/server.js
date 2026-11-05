@@ -25,6 +25,14 @@ function readJson(req) {
     req.on('end', () => { try { resolve(JSON.parse(b || '{}')); } catch { resolve({}); } });
   });
 }
+// Petite page lisible pour les étapes de connexion qui s'ouvrent dans le navigateur.
+function page(title, body) {
+  return `<!doctype html><meta charset="utf-8"><title>${title}</title>
+<body style="margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0f17;color:#e6ebf5;font:16px/1.5 Segoe UI,system-ui,sans-serif">
+<div style="max-width:520px;padding:32px;background:#121826;border:1px solid #222c40;border-radius:14px">
+<h2 style="margin-top:0;color:#4fd1ff">${title}</h2><p>${body}</p></div></body>`;
+}
+
 function serveFile(res, file) {
   if (!fs.existsSync(file)) return send(res, 404, { error: 'introuvable' });
   res.writeHead(200, { 'Content-Type': TYPES[path.extname(file)] || 'application/octet-stream' });
@@ -92,12 +100,23 @@ async function api(req, res, url) {
   if (route === 'POST /api/update/install') { global.rssInstallUpdate?.(); return send(res, 200, { ok: true }); }
   if (route === 'GET /api/voices') return send(res, 200, await listVoices(s()));
   if (route === 'GET /api/youtube/connect') {
-    res.writeHead(302, { Location: youtube.authUrl(PORT) });
-    return res.end();
+    try {
+      res.writeHead(302, { Location: youtube.authUrl(PORT) });
+      return res.end();
+    } catch (e) {
+      return send(res, 400, page('Connexion YouTube impossible', `${e.message}.<br>Dans l'app : Réglages → YouTube, colle ton Client ID et ton Client secret (le guide est juste au-dessus), puis reclique sur « Connecter YouTube ».`), 'text/html; charset=utf-8');
+    }
   }
   if (route === 'GET /api/youtube/callback') {
-    await youtube.handleCallback(PORT, url.searchParams.get('code'));
-    return send(res, 200, '<h2>YouTube connecté ✅ Tu peux fermer cette page.</h2>', 'text/html; charset=utf-8');
+    if (url.searchParams.get('error')) {
+      return send(res, 400, page('Connexion annulée', `Google a répondu : ${url.searchParams.get('error')}. Reclique sur « Connecter YouTube » dans l'app.`), 'text/html; charset=utf-8');
+    }
+    try {
+      await youtube.handleCallback(PORT, url.searchParams.get('code'));
+    } catch (e) {
+      return send(res, 400, page('Connexion YouTube impossible', e.message), 'text/html; charset=utf-8');
+    }
+    return send(res, 200, page('YouTube connecté ✅', 'Tu peux fermer cette page et revenir dans Roblox Shorts Studio.'), 'text/html; charset=utf-8');
   }
   if (route === 'GET /api/youtube/channel') return send(res, 200, { channel: await youtube.channel(PORT) });
   return send(res, 404, { error: 'route inconnue' });

@@ -90,10 +90,22 @@
       </div>
       <div class="panel">
         <h2>YouTube</h2>
-        <label>Client ID OAuth <input id="ytClientId"></label>
-        <label>Client secret <input id="ytClientSecret" type="password"></label>
+        <details id="ytGuide">
+          <summary>Comment obtenir le Client ID et le secret (une seule fois, ~10 min)</summary>
+          <ol class="guide">
+            <li>Ouvre <a href="https://console.cloud.google.com/projectcreate" target="_blank">console.cloud.google.com</a> et crée un projet (ex. « Shorts Studio »).</li>
+            <li>Active <a href="https://console.cloud.google.com/apis/library/youtube.googleapis.com" target="_blank">YouTube Data API v3</a> (bouton « Activer »).</li>
+            <li><a href="https://console.cloud.google.com/auth/overview" target="_blank">Écran de consentement OAuth</a> : type « Externe », nom de l'app, ton e-mail. Dans « Audience », clique sur <b>Publier l'application</b> (« En production »), sinon la connexion expire tous les 7 jours.</li>
+            <li><a href="https://console.cloud.google.com/auth/clients/create" target="_blank">Crée un client OAuth</a> de type <b>Application de bureau</b>.</li>
+            <li>Copie le <b>Client ID</b> et le <b>Code secret</b> ci-dessous, puis clique sur <b>Connecter YouTube</b>.</li>
+            <li>Google affiche « Application non validée » : clique sur <b>Paramètres avancés → Accéder à …</b> (c'est ta propre app).</li>
+          </ol>
+        </details>
+        <label>Client ID OAuth <input id="ytClientId" placeholder="xxxxx.apps.googleusercontent.com"></label>
+        <label>Client secret <input id="ytClientSecret" type="password" placeholder="GOCSPX-…"></label>
         <p>Compte : <b id="ytStatus">non connecté</b></p>
-        <a href="/api/youtube/connect" target="_blank" class="button">Connecter YouTube</a>
+        <button id="ytConnect" class="button">Connecter YouTube</button>
+        <p id="ytError" class="error"></p>
       </div>
       <button id="saveSettings" class="primary">Enregistrer les réglages</button>
     </section>

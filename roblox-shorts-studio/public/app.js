@@ -92,14 +92,32 @@ function renderGameplay(list) {
 }
 
 // Réglages
-$('saveSettings').onclick = async () => {
-  await api('/api/settings', {
+const settingsPatch = () => ({
     keys: { groq: $('keyGroq').value, elevenlabs: $('keyEleven').value },
     groqModel: $('groqModel').value, language: $('language').value,
     voiceId: $('voiceId').value, speed: Number($('speed').value),
-    youtube: { clientId: $('ytClientId').value, clientSecret: $('ytClientSecret').value },
-  });
+    youtube: { clientId: $('ytClientId').value.trim(), clientSecret: $('ytClientSecret').value.trim() },
+});
+$('saveSettings').onclick = async () => {
+  await api('/api/settings', settingsPatch());
   load();
+};
+// Enregistre d'abord ce qui est saisi, puis ouvre la connexion Google dans le navigateur.
+$('ytConnect').onclick = async () => {
+  $('ytError').textContent = '';
+  if (!$('ytClientId').value.trim() || !$('ytClientSecret').value.trim()) {
+    $('ytGuide').open = true;
+    $('ytError').textContent = 'Colle d\'abord ton Client ID et ton Client secret (voir le guide ci-dessus).';
+    return;
+  }
+  await api('/api/settings', settingsPatch());
+  window.open(`${location.origin}/api/youtube/connect`, '_blank');
+  $('ytStatus').textContent = 'connexion en cours… termine dans le navigateur';
+  const wait = setInterval(async () => {
+    const { settings } = await api('/api/state');
+    if (settings.youtube.refreshToken) { clearInterval(wait); load(); }
+  }, 3000);
+  setTimeout(() => clearInterval(wait), 5 * 60e3);
 };
 
 async function load() {
