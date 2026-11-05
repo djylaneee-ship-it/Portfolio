@@ -16,7 +16,7 @@ Variables : `RSS_DATA=/un/dossier` (données, sinon `data/` ou `%APPDATA%\Roblox
 
 ## Publier une version (installateur Windows)
 
-Le workflow `.github/workflows/shorts-studio-desktop.yml` construit `Roblox-Shorts-Studio-Setup-x.y.z.exe` sur Windows et le publie dans la release fixe **`shorts-studio`** du dépôt **quand `roblox-shorts-studio/package.json` change**. Pour sortir une version : monter `"version"` (0.1.0 → 0.2.0). Les apps installées se mettent à jour toutes seules (electron-updater, fournisseur `generic` pointé sur cette release, vérification toutes les heures).
+Le workflow `.github/workflows/shorts-studio-desktop.yml` construit `Roblox-Shorts-Studio-Setup-x.y.z.exe` sur Windows et le publie dans la release fixe **`shorts-studio`** du dépôt **quand `roblox-shorts-studio/package.json` change**. Pour sortir une version : monter `"version"` (0.1.1 → 0.2.0). Les apps installées se mettent à jour toutes seules (electron-updater, fournisseur `generic` pointé sur cette release, vérification toutes les heures).
 
 Ne jamais marquer cette release « Latest » ni la publier avec un tag `v*` : la release « Latest » du dépôt est celle de Rovex Hub, dont les mises à jour automatiques en dépendent.
 

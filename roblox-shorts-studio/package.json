@@ -8,7 +8,7 @@
   "scripts": {
     "app": "electron .",
     "start": "node server.js",
-    "check": "for f in *.js src/*.js src/*/*.js public/*.js; do node --check $f || exit 1; done",
+    "check": "node tools/check.js",
     "dist": "electron-builder --win nsis --publish never"
   },
   "engines": { "node": ">=18" },
