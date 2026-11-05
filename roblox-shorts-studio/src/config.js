@@ -17,11 +17,11 @@ const FILE = path.join(DATA, 'settings.json');
 
 const DEFAULTS = {
   keys: { groq: '', elevenlabs: '' },
-  voiceId: '',                   // voix ElevenLabs
+  voiceId: 'nPczCjzI2devNBz1zQrb', // voix ElevenLabs (Brian, grave, anglais américain)
   groqModel: 'openai/gpt-oss-120b',
-  language: 'fr',                // langue des histoires
+  language: 'en',                // langue des vidéos (en / fr)
   topicPrompt: '',               // vide = thèmes creepypasta Roblox automatiques ; {theme} = thème aléatoire
-  imageStyle: '3D Roblox render, colorful, expressive, dramatic lighting, digital art, high quality',
+  imageStyle: 'Roblox game screenshot style, blocky Roblox avatars, 3D Roblox render, dark eerie atmosphere, dramatic lighting, high quality',
   speed: 1.15,                   // accélération du Short (voix + gameplay)
   concurrent: 1,                 // Shorts générés en parallèle
   schedule: {

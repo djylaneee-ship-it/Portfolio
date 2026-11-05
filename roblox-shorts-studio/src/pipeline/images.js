@@ -4,7 +4,7 @@
 const fs = require('fs');
 
 async function generate(prompt, style, outFile, seed) {
-  const full = `${prompt}, ${style}, vertical 9:16, no text`;
+  const full = `${prompt}, ${style}, vertical 9:16, no text, no realistic people`;
   const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(full)}?width=1080&height=1920&nologo=true&seed=${seed}`;
   for (let attempt = 1; attempt <= 3; attempt++) {
     const res = await fetch(url);

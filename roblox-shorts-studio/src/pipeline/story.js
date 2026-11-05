@@ -1,31 +1,36 @@
 // Étape 1 : Groq écrit l'histoire creepypasta, le titre, la description et
-// les prompts d'images (une image par scène).
+// les prompts d'images (une image par scène). Les vidéos sont en anglais.
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
 const THEMES = [
-  'un joueur qui ne se déconnecte jamais', 'un serveur vide à 3 h du matin', 'un ami ajouté par erreur',
-  'un jeu retiré de la plateforme', 'un PNJ qui connaît ton vrai prénom', 'une place qui change à chaque visite',
-  'un message privé envoyé depuis ton propre compte', 'un badge impossible à obtenir',
+  'a player who never logs off', 'an empty server at 3 AM', 'a friend request from a deleted account',
+  'a game that was taken down', 'an NPC that knows your real name', 'a place that changes every time you join',
+  'a private message sent from your own account', 'a badge that is impossible to get', 'a glitched avatar that follows you',
+  'an old 2008 game that still has one player online', 'a chat message that predicts what happens next',
+  'a teleporter to a place that does not exist', 'an admin who bans everyone at midnight',
 ];
 
 function buildPrompt(s) {
   const theme = THEMES[Math.floor(Math.random() * THEMES.length)];
-  const topic = s.topicPrompt ? s.topicPrompt.replaceAll('{theme}', theme) : `une histoire creepypasta Roblox sur : ${theme}`;
+  const topic = s.topicPrompt ? s.topicPrompt.replaceAll('{theme}', theme) : `a Roblox creepypasta story about: ${theme}`;
   return [
     {
       role: 'system',
       content:
-        'Tu écris des scripts de YouTube Shorts creepypasta Roblox, racontés à la première personne. ' +
-        'Accroche forte dans la première phrase, suspense, chute inattendue. 130 à 170 mots (≈ 50 s lues). ' +
-        'Pas de gore explicite, adapté à YouTube. Réponds uniquement en JSON.',
+        'You write scripts for viral Roblox creepypasta YouTube Shorts, told in the first person. ' +
+        'Hook the viewer in the very first sentence, build suspense, end with an unexpected twist. ' +
+        '130 to 170 words (about 50 seconds read aloud). Simple spoken language, short sentences. ' +
+        'No explicit gore, YouTube-safe. Answer only with JSON.',
     },
     {
       role: 'user',
       content:
-        `Langue : ${s.language}. Sujet : ${topic}.\n` +
-        'Format JSON : {"title": "titre accrocheur < 70 caractères", "description": "2 phrases", ' +
-        '"hashtags": ["#roblox", ...], "scenes": [{"text": "phrase(s) lues", "image": "prompt image en anglais"}]}. ' +
-        '5 à 8 scènes ; la concaténation des "text" forme le script complet.',
+        `Language of title, description and story: ${s.language === 'fr' ? 'French' : 'English'}. Topic: ${topic}.\n` +
+        'JSON format: {"title": "catchy title under 70 characters", "description": "2 sentences", ' +
+        '"hashtags": ["#roblox", ...], "scenes": [{"text": "sentence(s) read aloud", "image": "image prompt"}]}. ' +
+        '5 to 8 scenes; joining every "text" gives the full script. ' +
+        'Each "image" is in English and describes a scene INSIDE the Roblox game: blocky Roblox avatars ' +
+        '(no realistic humans), Roblox-style blocky buildings and terrain, eerie mood.',
     },
   ];
 }
