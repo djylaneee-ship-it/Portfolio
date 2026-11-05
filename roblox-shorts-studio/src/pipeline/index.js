@@ -1,5 +1,5 @@
 // File des Shorts : chaque job passe par
-//   story → voice → images → render → ready → (scheduled → uploaded)
+//   story → voice → render → ready → (scheduled → uploaded)
 // État gardé dans data/jobs.json pour survivre à un redémarrage de l'app.
 const fs = require('fs');
 const path = require('path');
@@ -7,12 +7,11 @@ const config = require('../config');
 const library = require('../library');
 const { writeStory } = require('./story');
 const { speak } = require('./voice');
-const images = require('./images');
-const { toAss, sceneStarts } = require('./captions');
+const { toAss } = require('./captions');
 const { render } = require('./render');
 
 const FILE = path.join(config.DIRS.data, 'jobs.json');
-const STEPS = { story: [0, 10], voice: [10, 25], images: [25, 55], render: [55, 100] };
+const STEPS = { story: [0, 15], voice: [15, 35], render: [35, 100] };
 const active = (status) => Boolean(STEPS[status]) || status === 'paused';
 
 let jobs = [];
@@ -62,20 +61,11 @@ async function build(job) {
   fs.writeFileSync(path.join(dir, 'subs.ass'), toAss(words, { speed: s.speed }));
   await checkpoint(job);
 
-  const imgs = [];
-  for (const [i, sc] of story.scenes.entries()) {
-    stepProgress(job, 'images', i / story.scenes.length);
-    const name = `img_${i}.png`;
-    await images.generate(sc.image, s.imageStyle, path.join(dir, name), Number(job.id.slice(-6)) + i);
-    imgs.push(name);
-    await checkpoint(job);
-  }
-
   stepProgress(job, 'render', 0);
   const gameplay = await library.pickSegment(voiceLength / s.speed + 1);
   const out = path.join(config.DIRS.output, `${job.id}.mp4`);
   await render(
-    { dir, gameplay, images: imgs, starts: sceneStarts(story.scenes, words), voiceLength, speed: s.speed, out },
+    { dir, gameplay, voiceLength, speed: s.speed, out },
     (f) => stepProgress(job, 'render', f),
   );
   update(job, { status: 'ready', progress: 100, file: out, gameplay: path.basename(gameplay.file) });

@@ -24,15 +24,4 @@ function toAss(words, { perLine = 3, speed = 1 } = {}) {
   return header.concat(lines).join('\n') + '\n';
 }
 
-// Heure de début de chaque scène, retrouvée dans les mots horodatés.
-function sceneStarts(scenes, words) {
-  const starts = [];
-  let w = 0;
-  for (const sc of scenes) {
-    starts.push(words[w]?.start ?? 0);
-    w += sc.text.trim().split(/\s+/).length;
-  }
-  return starts;
-}
-
-module.exports = { toAss, sceneStarts };
+module.exports = { toAss };

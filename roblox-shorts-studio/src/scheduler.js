@@ -64,7 +64,7 @@ async function tick() {
     const free = upcomingSlots(s.schedule, now).filter((t) => !taken.has(t));
 
     // Assez de Shorts en préparation pour les créneaux libres ?
-    const coming = jobs.filter((j) => !j.publishAt && ['queued', 'story', 'voice', 'images', 'render', 'paused', 'ready'].includes(j.status));
+    const coming = jobs.filter((j) => !j.publishAt && ['queued', 'story', 'voice', 'render', 'paused', 'ready'].includes(j.status));
     if (free.length > coming.length) pipeline.enqueue(free.length - coming.length);
 
     // Envoi des Shorts prêts sur les créneaux libres, dans l'ordre.

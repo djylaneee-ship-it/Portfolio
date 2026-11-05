@@ -1,5 +1,5 @@
 // Étape 1 : Groq écrit l'histoire creepypasta, le titre, la description et
-// les prompts d'images (une image par scène). Les vidéos sont en anglais.
+// les hashtags. Les vidéos sont en anglais.
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
 const THEMES = [
@@ -27,10 +27,7 @@ function buildPrompt(s) {
       content:
         `Language of title, description and story: ${s.language === 'fr' ? 'French' : 'English'}. Topic: ${topic}.\n` +
         'JSON format: {"title": "catchy title under 70 characters", "description": "2 sentences", ' +
-        '"hashtags": ["#roblox", ...], "scenes": [{"text": "sentence(s) read aloud", "image": "image prompt"}]}. ' +
-        '5 to 8 scenes; joining every "text" gives the full script. ' +
-        'Each "image" is in English and describes a scene INSIDE the Roblox game: blocky Roblox avatars ' +
-        '(no realistic humans), Roblox-style blocky buildings and terrain, eerie mood.',
+        '"hashtags": ["#roblox", ...], "script": "the full story read aloud"}.',
     },
   ];
 }
@@ -50,8 +47,8 @@ async function writeStory(s) {
   if (!res.ok) throw new Error(`Groq ${res.status} : ${await res.text()}`);
   const data = await res.json();
   const story = JSON.parse(data.choices[0].message.content);
-  if (!Array.isArray(story.scenes) || !story.scenes.length) throw new Error('Groq : histoire sans scènes');
-  story.script = story.scenes.map((sc) => sc.text.trim()).join(' ');
+  story.script = String(story.script || '').replace(/\s+/g, ' ').trim();
+  if (story.script.split(' ').length < 40) throw new Error('Groq : histoire trop courte');
   return story;
 }
 

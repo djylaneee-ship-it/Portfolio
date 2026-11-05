@@ -8,7 +8,7 @@ const DATA = process.env.RSS_DATA || path.join(__dirname, '..', 'data');
 const DIRS = {
   data: DATA,
   gameplay: path.join(DATA, 'gameplay'), // les ~50 enregistrements de gameplay
-  jobs: path.join(DATA, 'jobs'),         // un dossier par Short en cours (script, voix, images…)
+  jobs: path.join(DATA, 'jobs'),         // un dossier par Short en cours (script, voix, sous-titres)
   output: path.join(DATA, 'output'),     // les Shorts finis (.mp4)
 };
 for (const d of Object.values(DIRS)) fs.mkdirSync(d, { recursive: true });
@@ -21,7 +21,6 @@ const DEFAULTS = {
   groqModel: 'openai/gpt-oss-120b',
   language: 'en',                // langue des vidéos (en / fr)
   topicPrompt: '',               // vide = thèmes creepypasta Roblox automatiques ; {theme} = thème aléatoire
-  imageStyle: 'Roblox game screenshot style, blocky Roblox avatars, 3D Roblox render, dark eerie atmosphere, dramatic lighting, high quality',
   speed: 1.15,                   // accélération du Short (voix + gameplay)
   concurrent: 1,                 // Shorts générés en parallèle
   schedule: {

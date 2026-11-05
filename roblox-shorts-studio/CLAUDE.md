@@ -23,18 +23,17 @@ Ne jamais marquer cette release « Latest » ni la publier avec un tag `v*` : la
 ## Chaîne d'un Short
 
 ```
-gameplay/ (≈50 clips)      Groq             ElevenLabs                Pollinations        FFmpeg            YouTube
-        │                    │                    │                          │                 │                 │
-        │   1. story.js ─────┘  titre, description, hashtags, 5–8 scènes {texte, prompt image}
-        │   2. voice.js ──────────────────────────┘  voice.mp3 + horodatage de chaque mot
-        │   3. captions.js  sous-titres ASS (3 mots), début de chaque scène
-        │   4. images.js ────────────────────────────────────────────────┘  une image 9:16 par scène
-        └─► 5. library.js  passage de gameplay jamais utilisé, clip le moins utilisé d'abord
-            6. render.js  ─────────────────────────────────────────────────────────────────┘  1080×1920 : images en haut, gameplay en bas, sous-titres, accéléré ×speed
-            7. scheduler.js → upload/youtube.js ─────────────────────────────────────────────────────────────┘  privée + publishAt = créneau
+1. story.js     Groq        → titre, description, hashtags, script (130–170 mots)
+2. voice.js     ElevenLabs  → voice.mp3 + horodatage de chaque mot
+3. captions.js              → sous-titres ASS (3 mots à la fois, centrés)
+4. library.js               → passage de gameplay jamais utilisé, clip le moins utilisé d'abord
+5. render.js    FFmpeg      → 1080×1920 : gameplay plein écran, sous-titres, voix accélérée ×speed
+6. scheduler.js → upload/youtube.js → envoyée en privé avec publishAt = son créneau
 ```
 
-Statuts d'un job : `queued → story → voice → images → render → ready → uploading → scheduled → published` (+ `paused`, `stopped`, `error`).
+Pas de génération d'images (retirée en 0.1.2 : Pollinations échouait souvent et le rendu ne faisait pas Roblox).
+
+Statuts d'un job : `queued → story → voice → render → ready → uploading → scheduled → published` (+ `paused`, `stopped`, `error`).
 
 ## Fichiers
 
@@ -47,9 +46,8 @@ Statuts d'un job : `queued → story → voice → images → render → ready �
 | `src/pipeline/index.js` | File des jobs (`data/jobs.json`), parallélisme, pause/stop/retirer. |
 | `src/pipeline/story.js` | Groq (API compatible OpenAI, sortie JSON). Modèle par défaut `openai/gpt-oss-120b` (Llama 3.3 n'est plus proposé). |
 | `src/pipeline/voice.js` | ElevenLabs `text-to-speech/{voice}/with-timestamps`, liste des voix. |
-| `src/pipeline/images.js` | Images Pollinations (gratuit, sans clé). Groq ne génère pas d'images. |
-| `src/pipeline/captions.js` | Sous-titres ASS et calage des scènes. |
-| `src/pipeline/render.js` | Commande FFmpeg (ffmpeg-static). |
+| `src/pipeline/captions.js` | Sous-titres ASS. |
+| `src/pipeline/render.js` | Commande FFmpeg (ffmpeg-static) : gameplay plein écran + sous-titres + voix. |
 | `src/scheduler.js` | Planning : créneaux des `bufferDays` prochains jours, génère ce qui manque, envoie les Shorts prêts avec `publishAt`. |
 | `src/upload/youtube.js` | OAuth (refresh token gardé localement) et envoi `videos.insert`. |
 | `public/` | Interface : Générateur, Planning, Gameplay, Réglages. |

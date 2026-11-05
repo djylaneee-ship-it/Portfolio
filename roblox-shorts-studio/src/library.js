@@ -1,6 +1,6 @@
 // Banque de gameplay : les enregistrements déposés dans data/gameplay/.
 // On retient quels passages ont déjà servi (data/gameplay.json) pour ne pas
-// remettre les mêmes images de fond deux jours de suite.
+// remettre le même passage de fond deux jours de suite.
 const fs = require('fs');
 const path = require('path');
 const { execFile } = require('child_process');

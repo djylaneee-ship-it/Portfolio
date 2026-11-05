@@ -5,7 +5,7 @@ const api = (url, body) =>
     .then(async (r) => { const d = await r.json(); if (!r.ok) throw new Error(d.error || r.status); return d; });
 
 const STATUS = {
-  queued: 'En attente', story: 'Écriture du script…', voice: 'Voix off…', images: 'Images IA…', render: 'Montage…',
+  queued: 'En attente', story: 'Écriture du script…', voice: 'Voix off…', render: 'Montage…',
   paused: 'En pause', ready: 'Prêt', uploading: 'Envoi YouTube…', scheduled: 'Programmé', published: 'Publié',
   stopped: 'Arrêté', error: 'Erreur',
 };
@@ -24,7 +24,7 @@ document.querySelectorAll('nav button').forEach((b) =>
 function renderJobs(jobs) {
   if (!jobs.length) return ($('jobs').innerHTML = '<p class="empty">Aucun Short pour l\'instant.</p>');
   $('jobs').innerHTML = [...jobs].reverse().map((j) => {
-    const busy = ['story', 'voice', 'images', 'render'].includes(j.status);
+    const busy = ['story', 'voice', 'render'].includes(j.status);
     return `<div class="job ${j.status}">
       <div class="job-head">
         <b>${esc(j.title || 'Roblox Short')}</b>
@@ -54,7 +54,7 @@ $('jobs').addEventListener('click', (e) => {
 new EventSource('/api/events').onmessage = (e) => renderJobs(JSON.parse(e.data).jobs);
 
 $('generate').onclick = async () => {
-  await api('/api/settings', { topicPrompt: $('topicPrompt').value, imageStyle: $('imageStyle').value });
+  await api('/api/settings', { topicPrompt: $('topicPrompt').value });
   await api('/api/generate', { count: Number($('count').value) }).catch((err) => alert(err.message));
 };
 
@@ -125,7 +125,6 @@ async function load() {
   renderJobs(jobs);
   renderGameplay(gameplay);
   $('topicPrompt').value = s.topicPrompt;
-  $('imageStyle').value = s.imageStyle;
   $('schEnabled').checked = s.schedule.enabled;
   $('perDay').value = s.schedule.perDay;
   renderTimes(s.schedule.times, s.schedule.perDay);
