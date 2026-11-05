@@ -18,7 +18,7 @@ const FILE = path.join(DATA, 'settings.json');
 const DEFAULTS = {
   keys: { groq: '', elevenlabs: '' },
   voiceId: '',                   // voix ElevenLabs
-  groqModel: 'llama-3.3-70b-versatile',
+  groqModel: 'openai/gpt-oss-120b',
   language: 'fr',                // langue des histoires
   topicPrompt: '',               // vide = thèmes creepypasta Roblox automatiques ; {theme} = thème aléatoire
   imageStyle: '3D Roblox render, colorful, expressive, dramatic lighting, digital art, high quality',
