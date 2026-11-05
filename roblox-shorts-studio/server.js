@@ -87,6 +87,9 @@ async function api(req, res, url) {
     pipeline[action](id);
     return send(res, 200, { ok: true });
   }
+  if (route === 'GET /api/update') return send(res, 200, global.rssUpdate || { state: 'dev' });
+  if (route === 'POST /api/update/check') { global.rssCheckUpdates?.(true); return send(res, 200, { ok: true }); }
+  if (route === 'POST /api/update/install') { global.rssInstallUpdate?.(); return send(res, 200, { ok: true }); }
   if (route === 'GET /api/voices') return send(res, 200, await listVoices(s()));
   if (route === 'GET /api/youtube/connect') {
     res.writeHead(302, { Location: youtube.authUrl(PORT) });
@@ -105,6 +108,7 @@ const server = http.createServer(async (req, res) => {
   try {
     if (url.pathname.startsWith('/api/')) return await api(req, res, url);
     if (url.pathname.startsWith('/output/')) return serveFile(res, path.join(config.DIRS.output, path.basename(url.pathname)));
+    if (url.pathname === '/icon.png') return serveFile(res, path.join(__dirname, 'icon.png'));
     const file = path.join(PUBLIC, path.normalize(url.pathname === '/' ? 'index.html' : url.pathname));
     if (!file.startsWith(PUBLIC)) return send(res, 403, { error: 'interdit' });
     return serveFile(res, file);
@@ -113,10 +117,16 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
-server.listen(PORT, '127.0.0.1', () => {
-  console.log(`Roblox Shorts Studio : http://localhost:${PORT}`);
-  pipeline.pump();
-  scheduler.start(PORT);
+// `ready` se résout quand le serveur écoute ; il est rejeté si le port est déjà pris.
+const ready = new Promise((resolve, reject) => {
+  server.once('error', reject);
+  server.listen(PORT, '127.0.0.1', () => {
+    console.log(`Roblox Shorts Studio : http://localhost:${PORT}`);
+    pipeline.pump();
+    scheduler.start(PORT);
+    resolve(PORT);
+  });
 });
+if (require.main === module) ready.catch((e) => { console.error(e.message); process.exit(1); });
 
-module.exports = { PORT };
+module.exports = { PORT, ready };

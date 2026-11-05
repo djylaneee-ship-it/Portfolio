@@ -14,6 +14,12 @@ npm run check    # vérification de syntaxe, avant chaque commit
 
 Variables : `RSS_DATA=/un/dossier` (données, sinon `data/` ou `%APPDATA%\Roblox Shorts Studio\data` dans l'app), `PORT=4800`. Clés : onglet Réglages, ou `.env` (voir `.env.example`).
 
+## Publier une version (installateur Windows)
+
+Le workflow `.github/workflows/shorts-studio-desktop.yml` construit `Roblox-Shorts-Studio-Setup-x.y.z.exe` sur Windows et le publie dans la release fixe **`shorts-studio`** du dépôt **quand `roblox-shorts-studio/package.json` change**. Pour sortir une version : monter `"version"` (0.1.0 → 0.2.0). Les apps installées se mettent à jour toutes seules (electron-updater, fournisseur `generic` pointé sur cette release, vérification toutes les heures).
+
+Ne jamais marquer cette release « Latest » ni la publier avec un tag `v*` : la release « Latest » du dépôt est celle de Rovex Hub, dont les mises à jour automatiques en dépendent.
+
 ## Chaîne d'un Short
 
 ```
@@ -34,7 +40,7 @@ Statuts d'un job : `queued → story → voice → images → render → ready �
 
 | Fichier | Rôle |
 |---|---|
-| `electron.js` | Fenêtre, icône de la barre des tâches, lancement au démarrage de Windows. Fermer = cacher (le planning continue). |
+| `electron.js` | Fenêtre, icône de la barre des tâches, lancement au démarrage de Windows, mises à jour automatiques. Fermer = cacher (le planning continue). Données : `%APPDATA%\Roblox Shorts Studio\data`. |
 | `server.js` | Serveur local 127.0.0.1 : interface, API `/api/*`, flux temps réel `/api/events`, OAuth YouTube. |
 | `src/config.js` | Dossiers (`data/gameplay`, `data/jobs/<id>`, `data/output`) et réglages `data/settings.json` (secrets masqués vers l'interface). |
 | `src/library.js` | Banque de gameplay, index des passages déjà utilisés (`data/gameplay.json`). |

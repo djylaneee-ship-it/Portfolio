@@ -1,0 +1,67 @@
+# Construit l'application Windows Roblox Shorts Studio (Roblox-Shorts-Studio-Setup-x.y.z.exe) et la publie
+# dans la release GitHub fixe « shorts-studio ». Les apps installées se mettent à jour toutes seules depuis
+# cette release (electron-updater, fournisseur generic).
+# Cette release n'est jamais marquée « Latest » : la release « Latest » du dépôt reste celle de Rovex Hub,
+# dont les mises à jour automatiques en dépendent.
+# Pour sortir une nouvelle version : augmenter "version" dans roblox-shorts-studio/package.json.
+name: Roblox Shorts Studio — application Windows
+
+on:
+  push:
+    paths:
+      - 'roblox-shorts-studio/package.json'
+      - '.github/workflows/shorts-studio-desktop.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: shorts-studio-desktop
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: roblox-shorts-studio
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Dépendances
+        run: npm install --no-audit --no-fund
+
+      - name: Vérification
+        shell: bash
+        run: npm run check
+
+      - name: Construire l'installeur
+        run: npx electron-builder --win nsis --publish never
+
+      # On remplace la release « shorts-studio » (et son tag) par la nouvelle version :
+      # installeur, .blockmap et latest.yml (lu par les mises à jour automatiques).
+      - name: Publier la release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          V="$(node -p "require('./package.json').version")"
+          gh release delete shorts-studio --repo "$REPO" --cleanup-tag --yes || true
+          gh release create shorts-studio dist/*.exe dist/*.blockmap dist/latest.yml --repo "$REPO" \
+            --target "$GITHUB_SHA" --latest=false \
+            --title "Roblox Shorts Studio $V" \
+            --notes "Roblox Shorts Studio $V pour Windows : télécharge Roblox-Shorts-Studio-Setup-$V.exe et double-clique dessus. L'app se met ensuite à jour toute seule."
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Roblox-Shorts-Studio-Setup
+          path: roblox-shorts-studio/dist/*.exe
+          retention-days: 14

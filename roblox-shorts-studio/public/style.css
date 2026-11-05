@@ -44,3 +44,4 @@ th, td { text-align: left; padding: 8px; border-bottom: 1px solid var(--line); }
 th { color: var(--muted); font-weight: normal; }
 #nextSlots { padding-left: 18px; }
 #settings > button.primary { width: 340px; max-width: 100%; }
+.update { display: flex; align-items: center; gap: 8px; margin-left: auto; }

@@ -135,3 +135,17 @@ async function load() {
   }
 }
 load();
+
+// Mises à jour de l'app (seulement dans l'app installée)
+const UPDATE = { dev: '', idle: '', checking: 'Vérification…', latest: 'À jour', error: 'Erreur de mise à jour', ready: 'Prête : redémarre' };
+async function refreshUpdate() {
+  const u = await api('/api/update').catch(() => ({ state: 'dev' }));
+  $('updateBtn').hidden = u.state === 'dev';
+  $('updateState').textContent = u.state === 'downloading' ? `Téléchargement ${u.version} (${u.percent || 0} %)` : UPDATE[u.state] || '';
+  $('updateBtn').textContent = u.state === 'ready' ? `Installer ${u.version}` : 'Mises à jour';
+  $('updateBtn').dataset.state = u.state;
+}
+$('updateBtn').onclick = () =>
+  api($('updateBtn').dataset.state === 'ready' ? '/api/update/install' : '/api/update/check', {}).then(refreshUpdate);
+refreshUpdate();
+setInterval(refreshUpdate, 5000);
