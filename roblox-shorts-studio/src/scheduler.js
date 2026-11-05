@@ -71,6 +71,9 @@ async function tick() {
     const day = now.toISOString().slice(0, 10);
     if (uploadsToday.day !== day) uploadsToday = { day, count: 0 };
     const ready = jobs.filter((j) => j.status === 'ready' && !j.publishAt);
+    if (ready.length && !s.youtube.refreshToken) {
+      throw new Error('YouTube n\'est pas connecté : Réglages → YouTube → « Connecter YouTube ». Les Shorts sont prêts et partiront dès la connexion.');
+    }
     for (const [i, job] of ready.entries()) {
       if (!free[i] || uploadsToday.count >= MAX_UPLOADS_PER_DAY) break;
       pipeline.update(job, { status: 'uploading', publishAt: free[i] });
