@@ -1,7 +1,7 @@
 {
  "version": 2,
- "cursor": 1163,
- "runs": 291,
+ "cursor": 1167,
+ "runs": 292,
  "channels": [
   {
    "id": "ff1bc5c8316c",
@@ -77,7 +77,7 @@
    "channelId": "UCeNeViU3hH59KjOwVO_iTdg",
    "category": "modeling",
    "subscribers": "12.6K subscribers",
-   "lastFetch": "2026-11-06T20:22:56.606Z",
+   "lastFetch": "2026-11-06T23:07:43.449Z",
    "auto": true
   },
   {
@@ -836,7 +836,7 @@
    "channelId": "UCbsVnGtAcd3xA3CL8e_i2Gw",
    "category": "tools",
    "subscribers": "173 subscribers",
-   "lastFetch": "2026-11-06T20:23:29.903Z",
+   "lastFetch": "2026-11-06T23:08:12.949Z",
    "auto": true
   },
   {
@@ -1408,7 +1408,7 @@
    "channelId": "UCyALyEb99nVep21cp4L546A",
    "category": "vfx",
    "subscribers": "10.8K subscribers",
-   "lastFetch": "2026-11-06T20:23:55.269Z",
+   "lastFetch": "2026-11-06T23:08:35.382Z",
    "auto": true
   },
   {
@@ -2167,7 +2167,7 @@
    "channelId": "UCUh5Nd4HBlgAc7w7sculU_g",
    "category": "gui",
    "subscribers": "2.68K subscribers",
-   "lastFetch": "2026-11-06T20:24:29.128Z",
+   "lastFetch": "2026-11-06T23:09:04.378Z",
    "auto": true
   },
   {
@@ -3102,7 +3102,7 @@
    "channelId": "UC8Yg0dQGGb4CjwEMTL0WvLw",
    "category": "building",
    "subscribers": "2 subscribers",
-   "lastFetch": "2026-11-06T20:25:10.361Z",
+   "lastFetch": "2026-11-06T23:09:40.953Z",
    "auto": true
   },
   {
@@ -3388,7 +3388,7 @@
    "channelId": "UCZRLpRdjNAEzkB9IPrXPdiw",
    "category": "modeling",
    "subscribers": "221 subscribers",
-   "lastFetch": "2026-11-06T20:25:23.115Z",
+   "lastFetch": "2026-11-06T23:09:52.123Z",
    "auto": true
   },
   {
@@ -3773,7 +3773,7 @@
    "channelId": "UCDrSC33VMm4VpZD2DaOefYg",
    "category": "tools",
    "subscribers": "27.2K subscribers",
-   "lastFetch": "2026-11-06T20:25:40.249Z",
+   "lastFetch": "2026-11-06T23:10:07.190Z",
    "auto": true
   },
   {
@@ -3905,7 +3905,7 @@
    "channelId": "UCFlnCSU8U9EuGy6giyXMaQA",
    "category": "tools",
    "subscribers": "429 subscribers",
-   "lastFetch": "2026-11-06T20:25:46.046Z",
+   "lastFetch": "2026-11-06T23:10:12.453Z",
    "auto": true
   },
   {
@@ -3916,7 +3916,7 @@
    "channelId": "UCC9qKZefENI351paGzPxLQw",
    "category": "tools",
    "subscribers": "4.71K subscribers",
-   "lastFetch": "2026-11-06T20:25:46.503Z",
+   "lastFetch": "2026-11-06T23:10:13.035Z",
    "auto": true
   },
   {
@@ -5104,7 +5104,7 @@
    "channelId": "UCznofozIhAmq8DLKW8jwUUA",
    "category": "tools",
    "subscribers": "4 subscribers",
-   "lastFetch": "2026-11-06T20:26:38.475Z",
+   "lastFetch": "2026-11-06T23:10:59.379Z",
    "auto": true
   },
   {
@@ -5951,7 +5951,7 @@
    "channelId": "UCUjixmZm6Cxcwzqh5TAX8Ug",
    "category": "scripting",
    "subscribers": "",
-   "lastFetch": "2026-11-06T20:27:14.990Z",
+   "lastFetch": "2026-11-06T23:11:32.809Z",
    "auto": true
   },
   {
@@ -6292,7 +6292,7 @@
    "channelId": "UCeNWc8-UK3ASzIRojNxjrfA",
    "category": "scripting",
    "subscribers": "221 subscribers",
-   "lastFetch": "2026-11-06T20:27:30.139Z",
+   "lastFetch": "2026-11-06T23:11:45.984Z",
    "auto": true
   },
   {
@@ -7634,7 +7634,7 @@
    "channelId": "UCDUBITs5qnAtGcj3YSE2r0Q",
    "category": "building",
    "subscribers": "324K subscribers",
-   "lastFetch": "2026-11-06T20:28:28.911Z",
+   "lastFetch": "2026-11-06T23:12:37.574Z",
    "auto": true
   },
   {
@@ -7777,7 +7777,7 @@
    "channelId": "UCyvyApgW_KxoDq8spgRNuog",
    "category": "tools",
    "subscribers": "899 subscribers",
-   "lastFetch": "2026-11-06T20:28:35.076Z",
+   "lastFetch": "2026-11-06T23:12:43.136Z",
    "auto": true
   },
   {
@@ -7931,7 +7931,7 @@
    "channelId": "UCTmCEoiZdFP9VzkKXwLjd0Q",
    "category": "gui",
    "subscribers": "25 subscribers",
-   "lastFetch": "2026-11-06T20:28:41.765Z",
+   "lastFetch": "2026-11-06T23:12:49.251Z",
    "auto": true
   },
   {
@@ -8030,7 +8030,7 @@
    "channelId": "UC2Tc24jE-m3rP4dQ52Spu5g",
    "category": "tools",
    "subscribers": "",
-   "lastFetch": "2026-11-06T20:28:46.262Z",
+   "lastFetch": "2026-11-06T23:12:53.127Z",
    "auto": true
   },
   {
@@ -8360,7 +8360,7 @@
    "channelId": "UCcDyFieBDrQQuF71BzdhTBg",
    "category": "gui",
    "subscribers": "19 subscribers",
-   "lastFetch": "2026-11-06T20:29:01.261Z",
+   "lastFetch": "2026-11-06T23:13:05.932Z",
    "auto": true
   },
   {
@@ -8558,7 +8558,7 @@
    "channelId": "UCPfvswcJIiPh0kfVaIV3L8Q",
    "category": "modeling",
    "subscribers": "1 subscriber",
-   "lastFetch": "2026-11-06T20:29:10.053Z",
+   "lastFetch": "2026-11-06T23:13:13.632Z",
    "auto": true
   },
   {
@@ -9097,7 +9097,7 @@
    "channelId": "UCppQFme_GMJG36ObIX_GugQ",
    "category": "tools",
    "subscribers": "327 subscribers",
-   "lastFetch": "2026-11-06T20:29:33.618Z",
+   "lastFetch": "2026-11-06T23:13:34.754Z",
    "auto": true
   },
   {
@@ -9680,7 +9680,7 @@
    "channelId": "UCxpGCGSqUC0nbnwSTGgoqbg",
    "category": "scripting",
    "subscribers": "6 subscribers",
-   "lastFetch": "2026-11-06T20:29:59.148Z",
+   "lastFetch": "2026-11-06T23:13:56.999Z",
    "auto": true
   },
   {
@@ -10989,7 +10989,7 @@
    "channelId": "UCojsj6T5tNPGPZSx7wn4coQ",
    "category": "tools",
    "subscribers": "1.43M subscribers",
-   "lastFetch": "2026-11-06T20:30:59.666Z",
+   "lastFetch": "2026-11-06T23:14:47.654Z",
    "auto": true
   },
   {
@@ -11814,7 +11814,7 @@
    "channelId": "UCrRVSBndHddKv1C9KFR2urA",
    "category": "tools",
    "subscribers": "",
-   "lastFetch": "2026-11-06T20:31:36.918Z",
+   "lastFetch": "2026-11-06T23:15:19.541Z",
    "auto": true
   },
   {
@@ -11880,7 +11880,7 @@
    "channelId": "UCsGgJOtLi7XLmlYAbsUz0SA",
    "category": "tools",
    "subscribers": "",
-   "lastFetch": "2026-11-06T20:31:39.869Z",
+   "lastFetch": "2026-11-06T23:15:22.286Z",
    "auto": true
   },
   {
@@ -14564,7 +14564,7 @@
    "channelId": "UC09gTaZ4INDkoAw1aw_kLbg",
    "category": "scripting",
    "subscribers": "481 subscribers",
-   "lastFetch": "2026-11-06T20:33:38.478Z",
+   "lastFetch": "2026-11-06T23:17:06.236Z",
    "auto": true
   },
   {
@@ -14652,7 +14652,7 @@
    "channelId": "UCcaDF3zLJE8W6cETSQa58QQ",
    "category": "tools",
    "subscribers": "1 subscriber",
-   "lastFetch": "2026-11-06T20:33:42.227Z",
+   "lastFetch": "2026-11-06T23:17:09.794Z",
    "auto": true
   },
   {
@@ -15741,7 +15741,7 @@
    "channelId": "UCh4X07oA7J8VVZarSJqc_2g",
    "category": "animation",
    "subscribers": "4.22M subscribers",
-   "lastFetch": "2026-11-06T20:34:35.551Z",
+   "lastFetch": "2026-11-06T23:17:52.213Z",
    "auto": true
   },
   {
@@ -16698,7 +16698,7 @@
    "channelId": "UCRKUFJuZjGEzUPTr3wnPUMA",
    "category": "cutscenes",
    "subscribers": "35 subscribers",
-   "lastFetch": "2026-11-06T20:35:20.170Z",
+   "lastFetch": "2026-11-06T23:18:29.025Z",
    "auto": true
   },
   {
@@ -16852,7 +16852,7 @@
    "channelId": "UCSSFgktiGELxY380BXsm4GQ",
    "category": "building",
    "subscribers": "1 subscriber",
-   "lastFetch": "2026-11-06T20:35:27.250Z",
+   "lastFetch": "2026-11-06T23:18:35.095Z",
    "auto": true
   },
   {
@@ -17435,7 +17435,7 @@
    "channelId": "UCF3gRq4LbNVVR8QfFUyyTCg",
    "category": "tools",
    "subscribers": "1.67M subscribers",
-   "lastFetch": "2026-11-06T20:35:53.568Z",
+   "lastFetch": "2026-11-06T23:18:57.692Z",
    "auto": true
   },
   {
@@ -17523,7 +17523,7 @@
    "channelId": "UCKr3GHkF0HO3sybn8c0OU7w",
    "category": "tools",
    "subscribers": "146K subscribers",
-   "lastFetch": "2026-11-06T20:35:57.594Z",
+   "lastFetch": "2026-11-06T23:19:01.255Z",
    "auto": true
   },
   {
@@ -17963,7 +17963,7 @@
    "channelId": "UCuDRt3M00EZUk2DEkYeyI0g",
    "category": "tools",
    "subscribers": "14 subscribers",
-   "lastFetch": "2026-11-06T20:36:17.328Z",
+   "lastFetch": "2026-11-06T23:19:18.315Z",
    "auto": true
   },
   {
@@ -18419,29 +18419,53 @@
   }
  ],
  "cursors": {
-  "forum:help-and-feedback/scripting-support": 1895,
-  "forum:help-and-feedback/creations-feedback": 1440,
-  "forum:help-and-feedback/art-design-support": 295,
-  "forum:resources/community-resources": 245,
-  "forum:help-and-feedback/game-design-support": 200,
-  "forum:help-and-feedback/building-support": 175,
-  "sketchfab:roblox": "3960",
-  "devto:gamedev": 95,
-  "forum:updates/announcements": 45,
-  "sketchfab:roblox low poly": "1080",
-  "sketchfab:roblox ugc": "1080",
-  "store:decal:brick": "MzBfMV8xXzMw_cf45178e992a776d0f34e2757b386fe4",
-  "store:decal:anime": "MjVfMV8xXzMw_0678e316f0e394c5e6f709cc7cf5d231",
-  "store:mesh:low poly": "MjVfMV8xXzMw_2fa7bd44025e75c98bf606befd4efdac",
-  "sketchfab:roblox map": "240",
-  "sketchfab:roblox character": "240",
-  "sketchfab:roblox pet": "240",
-  "store:decal:background": "MTBfMV8xXzMw_a574aad5f14652e7daf4c360a3130954",
-  "store:decal:texture": "MTBfMV8xXzMw_4bb7b74fd992c4011dce38ed1be687d7",
-  "store:decal:particle": "MTBfMV8xXzMw_012e3344259a06438d9fdadcbf7d975a",
-  "store:decal:vfx": "MTBfMV8xXzMw_9e4a0ac7e752347f1caab942c3b12b62",
-  "store:decal:slash": "MTBfMV8xXzMw_0bd7b39e9d48a6c3043d6d4583e0819d"
+  "forum:help-and-feedback/scripting-support": 1930,
+  "forum:help-and-feedback/creations-feedback": 1475,
+  "forum:help-and-feedback/art-design-support": 330,
+  "forum:resources/community-resources": 280,
+  "forum:help-and-feedback/game-design-support": 235,
+  "forum:help-and-feedback/building-support": 210,
+  "sketchfab:roblox": "4800",
+  "forum:updates/announcements": 80,
+  "sketchfab:roblox character": "1080",
+  "store:decal:background": "MjBfMV8xXzMw_91c394fd72a74726f136c6ce6e379a3e",
+  "store:decal:texture": "MjBfMV8xXzMw_5267dd45bfc447bcdcb8f457a2944eb8",
+  "store:decal:particle": "MjBfMV8xXzMw_d74ec9fa15a37176d78f7c75e7025b78",
+  "store:decal:vfx": "MjBfMV8xXzMw_ef5da50d554567d835049a082b8a9e93",
+  "store:decal:slash": "MjBfMV8xXzMw_f4ca1a8512f8b33c5071ad74d2371019",
+  "forum:resources/community-tutorials": 35,
+  "store:decal:ui": "MTBfMV8xXzMw_41872fe8f64c2c45bac875d16b88ed95",
+  "store:decal:icon": "MTBfMV8xXzMw_ac73895a948bcbb76450c2c0f26debec",
+  "store:decal:button": "MTBfMV8xXzMw_5c8ae2ca89b60cdc414321d3ced98244",
+  "store:decal:frame": "MTBfMV8xXzMw_2421d2db40f9fd00d441ea836d1aa8d1",
+  "store:decal:smoke": "MTBfMV8xXzMw_78fb0dc832f820317e52961dc3b415d3",
+  "store:decal:fire": "MTBfMV8xXzMw_63dcaf1f99fcbd86f56123ae31899a46",
+  "store:decal:glow": "MTBfMV8xXzMw_43c8ce564a9390e04cd5bf2f7f6c9470",
+  "store:decal:sparkle": "MTBfMV8xXzMw_4244162d0e2c1716f17325bb95572674",
+  "store:decal:aura": "MTBfMV8xXzMw_83bd7c91a022b57e578f0dc4d0515a9c",
+  "store:decal:gradient": "MTBfMV8xXzMw_1ca8bc484c4ea08588f41879cc5762ea",
+  "store:decal:logo": "MTBfMV8xXzMw_ca292db5c9bd64891b03a302fe1f073c",
+  "store:decal:emoji": "MTBfMV8xXzMw_aaaa0cbca9fc890f91773d296147e433",
+  "store:decal:sky": "MTBfMV8xXzMw_6750a3db89074d543a98725d324da671",
+  "store:decal:grass": "MTBfMV8xXzMw_4a97ada93c0febae009f874d9bdc506c",
+  "store:decal:stone": "MTBfMV8xXzMw_aef9a78e0e6759e2cb9fa7360317906a",
+  "store:decal:wood": "MTBfMV8xXzMw_6b87ff3c3dbd502adee5e6d62b59b62f",
+  "store:decal:cartoon": "MTBfMV8xXzMw_449ee4c1f9c80295fd70808e104505a5",
+  "store:mesh:sword": "MTBfMV8xXzMw_69c7f86decf2072dcad7f7f8ee1384ab",
+  "store:mesh:gun": "MTBfMV8xXzMw_ea1de00b6323ef2b10b517bffda19397",
+  "store:mesh:tree": "MTBfMV8xXzMw_be56d90c1b2f98defbdc42815f0047c2",
+  "store:mesh:rock": "MTBfMV8xXzMw_fce304b2032c7d0deca17b7d6a8831e6",
+  "store:mesh:house": "MTBfMV8xXzMw_2c22625097ecc99832a9a8655f2f79e4",
+  "store:mesh:car": "MTBfMV8xXzMw_81fad5e80f2da6d93860ea91168c7bda",
+  "store:mesh:pet": "MTBfMV8xXzMw_55349eedf813d501b9b9ea3a6a647a74",
+  "store:mesh:egg": "MTBfMV8xXzMw_0471c6ab6db52fdb23c087c6b56115b3",
+  "store:mesh:crystal": "MTBfMV8xXzMw_d4730e8d3f4a04239b88a6700e9014ce",
+  "store:mesh:chest": "MTBfMV8xXzMw_8074213b8b873a99498d5c168de09ed0",
+  "store:mesh:weapon": "MTBfMV8xXzMw_232bd806545e807cb612435a1806b46b",
+  "store:mesh:furniture": "MTBfMV8xXzMw_b747e33c444cc07de35a4a1e5ec40b36",
+  "sketchfab:roblox ugc": "600",
+  "sketchfab:roblox pet": "48"
  },
  "migrated": false,
- "updatedAt": "2026-11-06T22:36:58.375Z"
+ "updatedAt": "2026-11-06T23:30:15.185Z"
 }
