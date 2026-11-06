@@ -49,8 +49,9 @@ Statuts d'un job : `queued → story → voice → render → ready → uploadin
 | `src/pipeline/captions.js` | Sous-titres ASS. |
 | `src/pipeline/render.js` | Commande FFmpeg (ffmpeg-static) : gameplay plein écran + sous-titres + voix. |
 | `src/scheduler.js` | Planning : créneaux des `bufferDays` prochains jours, génère ce qui manque, envoie les Shorts prêts avec `publishAt`. |
-| `src/upload/youtube.js` | OAuth (refresh token gardé localement) et envoi `videos.insert`. |
-| `public/` | Interface : Générateur, Planning, Gameplay, Réglages. |
+| `src/upload/youtube.js` | OAuth (refresh token gardé localement) et envoi `videos.insert`. Autorisations : upload, readonly, `yt-analytics.readonly` (gardées dans `settings.youtube.scopes`). |
+| `src/stats.js` / `public/stats.js` | Onglet Stats : chaîne et 50 dernières vidéos (Data API), chiffres de la période, vues et abonnés par jour, sources de trafic, rétention par vidéo (YouTube Analytics API, à activer dans le projet Google). Cache 5 min, bouton Actualiser. Données Analytics avec 2–3 jours de retard. |
+| `public/` | Interface : Générateur, Planning, Stats, Gameplay, Réglages. |
 
 ## Points à connaître
 

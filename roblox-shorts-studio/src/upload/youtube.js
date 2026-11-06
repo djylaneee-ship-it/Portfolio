@@ -7,7 +7,8 @@ const fs = require('fs');
 const { google } = require('googleapis');
 const config = require('../config');
 
-const SCOPES = ['https://www.googleapis.com/auth/youtube.upload', 'https://www.googleapis.com/auth/youtube.readonly'];
+const ANALYTICS_SCOPE = 'https://www.googleapis.com/auth/yt-analytics.readonly';
+const SCOPES = ['https://www.googleapis.com/auth/youtube.upload', 'https://www.googleapis.com/auth/youtube.readonly', ANALYTICS_SCOPE];
 
 function client(port) {
   const s = config.load();
@@ -24,7 +25,8 @@ function authUrl(port) {
 async function handleCallback(port, code) {
   const { tokens } = await client(port).getToken(code);
   if (!tokens.refresh_token) throw new Error('Google n\'a pas renvoyé de refresh token : réessaie la connexion');
-  config.save({ youtube: { refreshToken: tokens.refresh_token } });
+  // On garde les autorisations accordées : l'onglet Stats sait ainsi s'il faut se reconnecter.
+  config.save({ youtube: { refreshToken: tokens.refresh_token, scopes: tokens.scope || '' } });
 }
 
 async function channel(port) {
@@ -56,4 +58,4 @@ async function upload(port, job, publishAt) {
   return data.id;
 }
 
-module.exports = { authUrl, handleCallback, channel, upload };
+module.exports = { authUrl, handleCallback, channel, upload, client, ANALYTICS_SCOPE };

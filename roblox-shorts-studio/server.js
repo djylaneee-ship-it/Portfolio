@@ -8,6 +8,7 @@ const library = require('./src/library');
 const pipeline = require('./src/pipeline');
 const scheduler = require('./src/scheduler');
 const youtube = require('./src/upload/youtube');
+const stats = require('./src/stats');
 const { listVoices } = require('./src/pipeline/voice');
 
 const PORT = Number(process.env.PORT) || 4800;
@@ -117,6 +118,23 @@ async function api(req, res, url) {
       return send(res, 400, page('Connexion YouTube impossible', e.message), 'text/html; charset=utf-8');
     }
     return send(res, 200, page('YouTube connecté ✅', 'Tu peux fermer cette page et revenir dans Roblox Shorts Studio.'), 'text/html; charset=utf-8');
+  }
+  if (route === 'GET /api/stats') {
+    const st = s();
+    if (!st.youtube.refreshToken) return send(res, 409, { error: 'YouTube n\'est pas connecté (Réglages → YouTube)' });
+    if (url.searchParams.get('fresh')) stats.clear();
+    const days = [7, 28, 90, 365].includes(Number(url.searchParams.get('days'))) ? Number(url.searchParams.get('days')) : 28;
+    const data = await stats.overview(PORT, days);
+    // Vidéos faites par l'app : on les repère pour les marquer dans le tableau.
+    const mine = new Set(pipeline.list().map((j) => j.youtubeId).filter(Boolean));
+    data.videos = data.videos.map((v) => ({ ...v, fromApp: mine.has(v.id) }));
+    data.analyticsScope = (st.youtube.scopes || '').includes(youtube.ANALYTICS_SCOPE);
+    return send(res, 200, data);
+  }
+  const statVideo = /^GET \/api\/stats\/video\/([\w-]+)$/.exec(route);
+  if (statVideo) {
+    const days = [7, 28, 90, 365].includes(Number(url.searchParams.get('days'))) ? Number(url.searchParams.get('days')) : 28;
+    return send(res, 200, await stats.video(PORT, statVideo[1], days));
   }
   if (route === 'GET /api/youtube/channel') return send(res, 200, { channel: await youtube.channel(PORT) });
   return send(res, 404, { error: 'route inconnue' });

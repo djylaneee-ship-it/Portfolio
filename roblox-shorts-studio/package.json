@@ -1,7 +1,7 @@
 {
   "name": "roblox-shorts-studio",
   "productName": "Roblox Shorts Studio",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "description": "Génère des Shorts Roblox creepypasta (Groq + ElevenLabs + FFmpeg) à partir de tes enregistrements de gameplay et les publie tout seul sur YouTube selon un planning.",
   "author": "Rovex",
   "main": "electron.js",
