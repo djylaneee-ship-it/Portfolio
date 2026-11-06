@@ -1,7 +1,7 @@
 {
  "version": 2,
- "cursor": 1102,
- "runs": 275,
+ "cursor": 1108,
+ "runs": 276,
  "channels": [
   {
    "id": "ff1bc5c8316c",
@@ -17987,24 +17987,56 @@
    "subscribers": "20.1K subscribers",
    "lastFetch": null,
    "auto": true
+  },
+  {
+   "id": "67a46b123735",
+   "handle": "@TurningGlobe",
+   "name": "TurningGlobe",
+   "avatar": "https://yt3.ggpht.com/trMG1C1eclZXfK600KCchTxvTdLkmbg5mIUNXZ0LTQKAXsqx71_cBu5l5xALDyLO2gFR4ExlYQ=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCgdjtXr6MsGPNIWJO2IIIrg",
+   "category": "tools",
+   "subscribers": "134K subscribers",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "3116f1365839",
+   "handle": "@fiveuy",
+   "name": "fiveuy",
+   "avatar": "https://yt3.ggpht.com/sKAcoJvyAWU0Hc3-Osfv9VUmpk1o37RAW9XITo4akHRqBOmY4mVDDTpPstMXHezOzW0yDoOJ7A=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UC8xLdeDcTlpaQAAJHH75hmg",
+   "category": "tools",
+   "subscribers": "761K subscribers",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "71178b7cc33e",
+   "handle": "@GraphyxStudios",
+   "name": "Graphyx Studio",
+   "avatar": "https://yt3.ggpht.com/UAf51Hp9jubxF_uZ-wZlp8ozcKq5TXmEzc3gP2R2ibkHN1Ybg2CtIR17Lb7ASIQQNwLEp7PHP4o=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCQnhWnFUg7D2UxU1ynwaSJg",
+   "category": "modeling",
+   "subscribers": "558K subscribers",
+   "lastFetch": null,
+   "auto": true
   }
  ],
  "cursors": {
-  "forum:help-and-feedback/scripting-support": 1375,
-  "forum:help-and-feedback/creations-feedback": 920,
-  "forum:help-and-feedback/art-design-support": 435,
-  "forum:help-and-feedback/building-support": 295,
-  "forum:help-and-feedback/game-design-support": 260,
-  "forum:resources/community-tutorials": 80,
-  "forum:updates/announcements": 80,
-  "forum:resources/community-resources": 70,
-  "sketchfab:roblox": "1680",
-  "sketchfab:roblox low poly": "1440",
-  "sketchfab:roblox ugc": "840",
-  "sketchfab:roblox map": "840",
-  "sketchfab:roblox character": "240",
+  "forum:help-and-feedback/scripting-support": 1410,
+  "forum:help-and-feedback/creations-feedback": 955,
+  "forum:help-and-feedback/art-design-support": 470,
+  "forum:help-and-feedback/building-support": 330,
+  "forum:help-and-feedback/game-design-support": 295,
+  "forum:resources/community-resources": 105,
+  "sketchfab:roblox": "2520",
+  "sketchfab:roblox character": "1080",
+  "devto:gamedev": 45,
+  "forum:updates/announcements": 10,
+  "sketchfab:roblox low poly": "240",
+  "sketchfab:roblox ugc": "240",
+  "sketchfab:roblox map": "240",
   "sketchfab:roblox pet": "240",
-  "devto:gamedev": 10,
   "store:decal:vfx": "MTBfMV8xXzMw_9e4a0ac7e752347f1caab942c3b12b62",
   "store:decal:smoke": "MTBfMV8xXzMw_78fb0dc832f820317e52961dc3b415d3",
   "store:decal:glow": "MTBfMV8xXzMw_43c8ce564a9390e04cd5bf2f7f6c9470",
@@ -18022,5 +18054,5 @@
   "store:mesh:furniture": "MTBfMV8xXzMw_b747e33c444cc07de35a4a1e5ec40b36"
  },
  "migrated": false,
- "updatedAt": "2026-11-06T01:59:20.054Z"
+ "updatedAt": "2026-11-06T02:52:21.818Z"
 }
