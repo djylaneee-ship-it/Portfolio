@@ -1,7 +1,7 @@
 {
  "version": 2,
- "cursor": 1203,
- "runs": 302,
+ "cursor": 1207,
+ "runs": 303,
  "channels": [
   {
    "id": "ff1bc5c8316c",
@@ -18529,20 +18529,26 @@
   }
  ],
  "cursors": {
-  "forum:help-and-feedback/scripting-support": 2260,
-  "forum:help-and-feedback/game-design-support": 565,
-  "forum:help-and-feedback/building-support": 540,
-  "forum:resources/community-resources": 260,
-  "forum:help-and-feedback/creations-feedback": 190,
-  "sketchfab:roblox": "2280",
-  "sketchfab:roblox low poly": "1080",
-  "sketchfab:roblox ugc": "1080",
-  "store:decal:wood": "MzFfMV8xXzMw_e7077da26cda6af15bbdb6c93dfc09aa",
-  "store:decal:cartoon": "MjBfMV8xXzMw_d9c635c8291dfe6c3af31296f02ffd16",
-  "store:mesh:sword": "MjBfMV8xXzMw_9a2803d61729b6edaf7ccc7dadf0903e",
-  "store:mesh:gun": "MTFfMV8xXzMw_0e8c374387fc5eb65647663199e9e80a",
+  "forum:help-and-feedback/scripting-support": 2295,
+  "forum:help-and-feedback/building-support": 575,
+  "forum:resources/community-resources": 295,
+  "forum:help-and-feedback/creations-feedback": 225,
+  "sketchfab:roblox": "3120",
+  "sketchfab:roblox character": "1440",
+  "forum:help-and-feedback/art-design-support": 35,
+  "forum:resources/community-tutorials": 35,
+  "forum:updates/announcements": 35,
+  "sketchfab:roblox map": "840",
+  "devto:gamedev": 35,
+  "forum:help-and-feedback/game-design-support": 10,
+  "sketchfab:roblox ugc": "240",
+  "sketchfab:roblox pet": "240",
+  "store:decal:wood": "MTBfMV8xXzMw_6b87ff3c3dbd502adee5e6d62b59b62f",
   "store:decal:brick": "MTBfMV8xXzMw_4c82b359dabc32806976de64b70b1f6e",
   "store:decal:anime": "MTBfMV8xXzMw_502d4d1346c77bb815e67e4e0197a035",
+  "store:decal:cartoon": "MTBfMV8xXzMw_449ee4c1f9c80295fd70808e104505a5",
+  "store:mesh:sword": "MTBfMV8xXzMw_69c7f86decf2072dcad7f7f8ee1384ab",
+  "store:mesh:gun": "MTBfMV8xXzMw_ea1de00b6323ef2b10b517bffda19397",
   "store:mesh:tree": "MTBfMV8xXzMw_be56d90c1b2f98defbdc42815f0047c2",
   "store:mesh:rock": "MTBfMV8xXzMw_fce304b2032c7d0deca17b7d6a8831e6",
   "store:mesh:house": "MTBfMV8xXzMw_2c22625097ecc99832a9a8655f2f79e4",
@@ -18550,9 +18556,8 @@
   "store:mesh:pet": "MTBfMV8xXzMw_55349eedf813d501b9b9ea3a6a647a74",
   "store:mesh:chest": "MTBfMV8xXzMw_8074213b8b873a99498d5c168de09ed0",
   "store:mesh:weapon": "MTBfMV8xXzMw_232bd806545e807cb612435a1806b46b",
-  "store:mesh:furniture": "MTBfMV8xXzMw_b747e33c444cc07de35a4a1e5ec40b36",
-  "sketchfab:roblox character": "600"
+  "store:mesh:furniture": "MTBfMV8xXzMw_b747e33c444cc07de35a4a1e5ec40b36"
  },
  "migrated": false,
- "updatedAt": "2026-11-07T08:23:31.199Z"
+ "updatedAt": "2026-11-07T09:16:24.890Z"
 }
