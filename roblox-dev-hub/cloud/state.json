@@ -1,7 +1,7 @@
 {
  "version": 2,
- "cursor": 1191,
- "runs": 298,
+ "cursor": 1195,
+ "runs": 299,
  "channels": [
   {
    "id": "ff1bc5c8316c",
@@ -660,7 +660,7 @@
    "channelId": "UCpOA50K-noS5Uu5v-MlVvUw",
    "category": "tools",
    "subscribers": "74.2K subscribers",
-   "lastFetch": "2026-11-06T20:23:21.965Z",
+   "lastFetch": "2026-11-07T05:11:14.220Z",
    "auto": true
   },
   {
@@ -1782,7 +1782,7 @@
    "channelId": "UCdsiyN91VEFuO_mCg7nV48Q",
    "category": "animation",
    "subscribers": "34.2K subscribers",
-   "lastFetch": "2026-11-06T20:24:11.747Z",
+   "lastFetch": "2026-11-07T05:11:55.480Z",
    "auto": true
   },
   {
@@ -4664,7 +4664,7 @@
    "channelId": "UCzDEaNzNk0pmY_XIwQb-rHw",
    "category": "scripting",
    "subscribers": "4 subscribers",
-   "lastFetch": "2026-11-06T20:26:19.186Z",
+   "lastFetch": "2026-11-07T05:13:39.974Z",
    "auto": true
   },
   {
@@ -4950,7 +4950,7 @@
    "channelId": "UCRMOhNwVfBjLqrsvYzTZpVg",
    "category": "tools",
    "subscribers": "",
-   "lastFetch": "2026-11-06T20:26:31.859Z",
+   "lastFetch": "2026-11-07T05:13:50.435Z",
    "auto": true
   },
   {
@@ -5731,7 +5731,7 @@
    "channelId": "UC4WDVkmTG5HnfrDeI5Z3h5Q",
    "category": "scripting",
    "subscribers": "",
-   "lastFetch": "2026-11-06T20:27:05.458Z",
+   "lastFetch": "2026-11-07T05:14:19.104Z",
    "auto": true
   },
   {
@@ -5830,7 +5830,7 @@
    "channelId": "UC4erIRGyhYR3S2c_6ltfkAw",
    "category": "building",
    "subscribers": "",
-   "lastFetch": "2026-11-06T20:27:09.824Z",
+   "lastFetch": "2026-11-07T05:14:22.751Z",
    "auto": true
   },
   {
@@ -6072,7 +6072,7 @@
    "channelId": "UCGGJGx8NTvyVOOyvTFhzL-g",
    "category": "scripting",
    "subscribers": "",
-   "lastFetch": "2026-11-06T20:27:20.198Z",
+   "lastFetch": "2026-11-07T05:14:32.048Z",
    "auto": true
   },
   {
@@ -6127,7 +6127,7 @@
    "channelId": "UCqqdorOkL5MYc4HtID3F1QA",
    "category": "tools",
    "subscribers": "128 subscribers",
-   "lastFetch": "2026-11-06T20:27:22.712Z",
+   "lastFetch": "2026-11-07T05:14:34.212Z",
    "auto": true
   },
   {
@@ -6292,7 +6292,7 @@
    "channelId": "UCeNWc8-UK3ASzIRojNxjrfA",
    "category": "scripting",
    "subscribers": "221 subscribers",
-   "lastFetch": "2026-11-06T23:11:45.984Z",
+   "lastFetch": "2026-11-07T05:14:40.272Z",
    "auto": true
   },
   {
@@ -7337,7 +7337,7 @@
    "channelId": "UCz07FoRcSyeswNqzpjuM6MA",
    "category": "animation",
    "subscribers": "",
-   "lastFetch": "2026-11-06T20:28:15.909Z",
+   "lastFetch": "2026-11-07T05:15:18.219Z",
    "auto": true
   },
   {
@@ -7414,7 +7414,7 @@
    "channelId": "UCSySWBSPjfiWxNxJOqtG7wg",
    "category": "animation",
    "subscribers": "1.2M subscribers",
-   "lastFetch": "2026-11-06T20:28:19.322Z",
+   "lastFetch": "2026-11-07T05:15:21.055Z",
    "auto": true
   },
   {
@@ -7568,7 +7568,7 @@
    "channelId": "UCjyL-OoQLp2N3NwbMLpziPA",
    "category": "tools",
    "subscribers": "23 subscribers",
-   "lastFetch": "2026-11-06T20:28:26.081Z",
+   "lastFetch": "2026-11-07T05:15:26.635Z",
    "auto": true
   },
   {
@@ -8547,7 +8547,7 @@
    "channelId": "UCZ7ozCKnvvl109VQEeu8M2Q",
    "category": "modeling",
    "subscribers": "44 subscribers",
-   "lastFetch": "2026-11-06T20:29:09.574Z",
+   "lastFetch": "2026-11-07T05:16:02.460Z",
    "auto": true
   },
   {
@@ -13563,7 +13563,7 @@
    "channelId": "UCq6VFHwMzcMXbuKyG7SQYIg",
    "category": "building",
    "subscribers": "18.3M subscribers",
-   "lastFetch": "2026-11-06T20:32:54.366Z",
+   "lastFetch": "2026-11-07T05:19:08.752Z",
    "auto": true
   },
   {
@@ -15730,7 +15730,7 @@
    "channelId": "UCQj4VyBT3jOOTFbTbfR_iCA",
    "category": "animation",
    "subscribers": "528K subscribers",
-   "lastFetch": "2026-11-06T20:34:35.079Z",
+   "lastFetch": "2026-11-07T05:20:26.676Z",
    "auto": true
   },
   {
@@ -18507,42 +18507,28 @@
   }
  ],
  "cursors": {
-  "forum:help-and-feedback/scripting-support": 2130,
-  "forum:help-and-feedback/art-design-support": 530,
-  "forum:help-and-feedback/game-design-support": 435,
-  "forum:help-and-feedback/building-support": 410,
-  "sketchfab:roblox": "9600",
-  "forum:resources/community-resources": 130,
-  "forum:resources/community-tutorials": 105,
-  "devto:gamedev": 95,
-  "forum:updates/announcements": 70,
-  "forum:help-and-feedback/creations-feedback": 60,
-  "sketchfab:roblox ugc": "840",
-  "sketchfab:roblox character": "840",
-  "store:decal:sparkle": "MjhfMV8xXzMw_0cade7662ae33f9306571e51278dd534",
-  "store:decal:aura": "MjVfMV8xXzMw_a588867b7c3c209be5c35d891d70e07a",
-  "store:decal:gradient": "MjVfMV8xXzMw_5ed559e5cf8e407a4721ee5ca9ce724c",
-  "store:decal:logo": "MjVfMV8xXzMw_f86b6d73709c17209fa3e35d91480645",
-  "store:decal:emoji": "MjVfMV8xXzMw_a669f172459ea6e4b6e25b08be30709e",
-  "store:decal:sky": "MjVfMV8xXzMw_3767ec32820cd0c4c38677f705695deb",
-  "store:decal:grass": "MjVfMV8xXzMw_8529e8c6eb3339b2e4a3079648f2f266",
-  "store:decal:stone": "MjVfMV8xXzMw_07dcf90e0ce133433c04ea736373ba7b",
-  "store:decal:wood": "MjVfMV8xXzMw_c857c3757f75c0bca0dcf9fc3f404e00",
-  "store:decal:cartoon": "MjVfMV8xXzMw_6ee2ffb528f0263fd7fc177c3dfd1937",
-  "store:mesh:sword": "MjVfMV8xXzMw_0974aaf75792b2ef7aebeab5baec57f1",
-  "store:mesh:gun": "MjVfMV8xXzMw_ad28e297bc6a94ceae63c29de6f1d262",
-  "store:mesh:tree": "MjVfMV8xXzMw_edab0a182011667ed6c926dee469dafe",
-  "store:mesh:rock": "MjVfMV8xXzMw_92c847e986a6e720154c48755b26062a",
-  "store:mesh:low poly": "MjVfMV8xXzMw_2fa7bd44025e75c98bf606befd4efdac",
-  "sketchfab:roblox low poly": "240",
-  "sketchfab:roblox map": "240",
-  "sketchfab:roblox weapon": "240",
-  "sketchfab:roblox pet": "240",
-  "store:decal:ui": "MTBfMV8xXzMw_41872fe8f64c2c45bac875d16b88ed95",
-  "store:decal:icon": "MTBfMV8xXzMw_ac73895a948bcbb76450c2c0f26debec",
-  "store:decal:button": "MTBfMV8xXzMw_5c8ae2ca89b60cdc414321d3ced98244",
-  "store:decal:frame": "MTBfMV8xXzMw_2421d2db40f9fd00d441ea836d1aa8d1"
+  "forum:help-and-feedback/scripting-support": 2165,
+  "forum:help-and-feedback/art-design-support": 565,
+  "forum:help-and-feedback/game-design-support": 470,
+  "forum:help-and-feedback/building-support": 445,
+  "forum:resources/community-resources": 165,
+  "forum:help-and-feedback/creations-feedback": 95,
+  "sketchfab:roblox low poly": "1080",
+  "store:decal:brick": "MTBfMV8xXzMw_4c82b359dabc32806976de64b70b1f6e",
+  "store:decal:anime": "MTBfMV8xXzMw_502d4d1346c77bb815e67e4e0197a035",
+  "store:mesh:house": "MTBfMV8xXzMw_2c22625097ecc99832a9a8655f2f79e4",
+  "store:mesh:car": "MTBfMV8xXzMw_81fad5e80f2da6d93860ea91168c7bda",
+  "store:mesh:pet": "MTBfMV8xXzMw_55349eedf813d501b9b9ea3a6a647a74",
+  "store:mesh:egg": "MTBfMV8xXzMw_0471c6ab6db52fdb23c087c6b56115b3",
+  "store:mesh:crystal": "MTBfMV8xXzMw_d4730e8d3f4a04239b88a6700e9014ce",
+  "store:mesh:chest": "MTBfMV8xXzMw_8074213b8b873a99498d5c168de09ed0",
+  "store:mesh:weapon": "MTBfMV8xXzMw_232bd806545e807cb612435a1806b46b",
+  "store:mesh:furniture": "MTBfMV8xXzMw_b747e33c444cc07de35a4a1e5ec40b36",
+  "forum:resources/community-tutorials": 25,
+  "devto:gamedev": 25,
+  "store:decal:sparkle": "MjVfMV8xXzMw_47ef3f9339c193d828016c960a558f8b",
+  "store:decal:aura": "MjVfMV8xXzMw_a588867b7c3c209be5c35d891d70e07a"
  },
  "migrated": false,
- "updatedAt": "2026-11-07T04:50:23.789Z"
+ "updatedAt": "2026-11-07T05:43:24.980Z"
 }
