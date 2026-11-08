@@ -434,3 +434,9 @@ create policy pt_files_delete on storage.objects for delete to authenticated usi
 -- Garde la base éveillée (un projet gratuit s'endort après 7 jours sans activité) : appelée par le workflow GitHub.
 create or replace function public.pt_ping() returns text language sql security definer set search_path = public as $$ select 'ok'::text $$;
 grant execute on function public.pt_ping() to anon, authenticated;
+
+-- ---------- Droits d'exécution des fonctions ----------
+alter function public.pt_touch() set search_path = public;
+revoke execute on function public.pt_on_signup(), public.pt_guard_profile(), public.pt_touch() from public, anon, authenticated;
+revoke execute on function public.pt_is_member(), public.pt_is_admin(), public.pt_can_see_channel(uuid), public.pt_invite_code(), public.pt_set_invite_code(text) from public, anon;
+grant execute on function public.pt_is_member(), public.pt_is_admin(), public.pt_can_see_channel(uuid), public.pt_invite_code(), public.pt_set_invite_code(text) to authenticated;

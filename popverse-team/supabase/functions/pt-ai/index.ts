@@ -18,9 +18,10 @@ const cut = (s: string, n: number) => (s.length > n ? s.slice(0, n) + '…' : s)
 Deno.serve(async req => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS });
   try {
-    const auth = req.headers.get('Authorization') || '';
-    const sb = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_ANON_KEY')!, { global: { headers: { Authorization: auth } } });
-    const { data: { user } } = await sb.auth.getUser(auth.replace(/^Bearer\s+/i, ''));
+    const token = (req.headers.get('Authorization') || '').replace(/^Bearer\s+/i, '');
+    // Clé service : on vérifie nous-mêmes que l'appelant est membre de l'équipe (les membres voient tout le projet).
+    const sb = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, { auth: { persistSession: false } });
+    const { data: { user } } = await sb.auth.getUser(token);
     if (!user) return json({ error: 'Connecte-toi pour utiliser le Copilot.' }, 401);
     const { data: me } = await sb.from('pt_profiles').select('*').eq('id', user.id).maybeSingle();
     if (!me || !['owner', 'admin', 'member'].includes(me.role)) return json({ error: 'Réservé aux membres de l\'équipe.' }, 403);

@@ -2,8 +2,8 @@
 // colle ici l'URL du projet et sa clé publique (« publishable » / anon). Ces deux valeurs sont publiques :
 // la sécurité vient des règles RLS du fichier SQL, pas du secret de la clé.
 // Sans ces valeurs, l'app tourne en MODE DÉMO : tout est gardé dans ce navigateur seulement.
-export const SUPABASE_URL = '';
-export const SUPABASE_KEY = '';
+export const SUPABASE_URL = 'https://lkthgkrajobugnzrfnls.supabase.co';
+export const SUPABASE_KEY = 'sb_publishable_h339xj-ATROXi5j6a2fxJA_Usn9vymh';
 
 export const STUDIO = {
   name: 'Popverse Studio',

@@ -1,0 +1,15 @@
+# Garde la base Supabase de Popverse Team éveillée : un projet gratuit s'endort après 7 jours sans activité.
+name: Popverse Team — réveil de la base
+
+on:
+  schedule:
+    - cron: '23 6 */2 * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          curl -fsS -X POST "https://lkthgkrajobugnzrfnls.supabase.co/rest/v1/rpc/pt_ping" \
+            -H "apikey: sb_publishable_h339xj-ATROXi5j6a2fxJA_Usn9vymh" -H "Content-Type: application/json" -d '{}'
