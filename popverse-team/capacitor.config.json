@@ -1,0 +1,8 @@
+{
+  "appId": "com.popversestudio.team",
+  "appName": "Popverse Team",
+  "webDir": "www",
+  "backgroundColor": "#0A0805",
+  "android": { "allowMixedContent": false, "backgroundColor": "#0A0805" },
+  "server": { "androidScheme": "https" }
+}

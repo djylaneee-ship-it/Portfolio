@@ -1,0 +1,142 @@
+# Popverse Team : construit l'installateur Windows (Popverse-Team-Setup.exe) et l'application Android (.apk),
+# puis les publie dans la release GitHub « popverse-team-latest » (la page de téléchargement de l'app).
+# Les apps Windows déjà installées se mettent à jour toutes seules depuis cette release.
+# Pour sortir une nouvelle version : augmenter "version" dans popverse-team/package.json.
+name: Popverse Team — applications
+
+on:
+  push:
+    paths:
+      - 'popverse-team/package.json'
+      - '.github/workflows/popverse-team.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: popverse-team
+  cancel-in-progress: false
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: popverse-team
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-audit --no-fund
+      - run: npm run build
+      - name: Installateur Windows
+        run: npx electron-builder --win nsis --publish never
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: |
+            popverse-team/dist/*.exe
+            popverse-team/dist/*.blockmap
+            popverse-team/dist/latest.yml
+          retention-days: 14
+
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    defaults:
+      run:
+        working-directory: popverse-team
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - run: npm install --no-audit --no-fund
+      - run: npm run build
+      - name: Projet Android (Capacitor)
+        run: |
+          npx cap add android
+          npx --yes @capacitor/assets@3.0.5 generate --android --assetPath resources \
+            --iconBackgroundColor '#0A0805' --iconBackgroundColorDark '#0A0805' \
+            --splashBackgroundColor '#0A0805' --splashBackgroundColorDark '#0A0805' || echo "icônes : on garde celles par défaut"
+          npx cap sync android
+      - name: Compiler l'APK
+        working-directory: popverse-team/android
+        run: |
+          V=$(node -p "require('../package.json').version")
+          CODE=$(node -p "const [a,b,c]=require('../package.json').version.split('.').map(Number); a*10000+b*100+c")
+          sed -i "s/versionCode [0-9]*/versionCode $CODE/; s/versionName \"[^\"]*\"/versionName \"$V\"/" app/build.gradle
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon
+      # Signature : toujours la même clé, sinon Android refuse d'installer une nouvelle version par-dessus l'ancienne.
+      # Mettre la clé dans les secrets GitHub ANDROID_KEYSTORE_B64 (fichier .keystore en base64) et
+      # ANDROID_KEYSTORE_PASSWORD (alias « popverse »). Sans ces secrets, une clé temporaire est créée à chaque
+      # version : il faut alors désinstaller l'ancienne app avant d'installer la nouvelle.
+      - name: Signer l'APK
+        env:
+          KS_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+          KS_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          V=$(node -p "require('./package.json').version")
+          KS=/tmp/release.keystore
+          if [ -n "$KS_B64" ]; then
+            echo "$KS_B64" | base64 -d > "$KS"; PASS="$KS_PASS"
+          else
+            echo "::warning::Pas de secret ANDROID_KEYSTORE_B64 : APK signé avec une clé temporaire."
+            PASS=$(openssl rand -hex 16)
+            keytool -genkeypair -keystore "$KS" -alias popverse -keyalg RSA -keysize 2048 -validity 10000 \
+              -storepass "$PASS" -keypass "$PASS" -dname "CN=Popverse Studio, O=Popverse Studio, C=FR"
+          fi
+          BT=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
+          IN=android/app/build/outputs/apk/release/app-release-unsigned.apk
+          mkdir -p dist
+          "$BT/zipalign" -f -p 4 "$IN" /tmp/aligned.apk
+          "$BT/apksigner" sign --ks "$KS" --ks-pass "pass:$PASS" --ks-key-alias popverse --out "dist/Popverse-Team-$V.apk" /tmp/aligned.apk
+          "$BT/apksigner" verify "dist/Popverse-Team-$V.apk"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android
+          path: popverse-team/dist/*.apk
+          retention-days: 14
+
+  release:
+    needs: [windows, android]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: out
+      - name: Publier
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          V=$(node -p "require('./popverse-team/package.json').version")
+          TAG=popverse-team-latest
+          NOTES="**Popverse Team $V** — l'app des devs de Popverse Studio.
+
+          - **PC Windows** : télécharge \`Popverse-Team-Setup.exe\` et double-clique dessus (les mises à jour sont ensuite automatiques).
+          - **Android** : télécharge \`Popverse-Team.apk\` sur le téléphone et ouvre-le (autorise l'installation d'apps inconnues si Android le demande).
+          - **iPhone / iPad** : ouvre la version web dans Safari puis Partager › « Sur l'écran d'accueil »."
+          if ! gh release view "$TAG" --repo "$REPO" >/dev/null 2>&1; then
+            gh release create "$TAG" --repo "$REPO" --target "$GITHUB_SHA" --title "Popverse Team $V" --notes "$NOTES" --latest=false
+          else
+            gh release edit "$TAG" --repo "$REPO" --title "Popverse Team $V" --notes "$NOTES" --latest=false
+            # Retire les fichiers des versions précédentes.
+            gh release view "$TAG" --repo "$REPO" --json assets --jq '.assets[].name' | while read -r a; do
+              gh release delete-asset "$TAG" "$a" --repo "$REPO" --yes || true
+            done
+          fi
+          cp out/windows/Popverse-Team-Setup-$V.exe out/Popverse-Team-Setup.exe
+          cp out/android/Popverse-Team-$V.apk out/Popverse-Team.apk
+          gh release upload "$TAG" --repo "$REPO" --clobber \
+            out/windows/*.exe out/windows/*.blockmap out/windows/latest.yml \
+            out/android/*.apk out/Popverse-Team-Setup.exe out/Popverse-Team.apk

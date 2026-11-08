@@ -1,0 +1,53 @@
+{
+  "name": "popverse-team",
+  "productName": "Popverse Team",
+  "version": "1.0.0",
+  "description": "Popverse Team : l'espace de travail des devs de Popverse Studio (tâches, tableaux, chat, lore, progrès, stats Roblox, assistant IA).",
+  "author": "Popverse Studio",
+  "license": "UNLICENSED",
+  "main": "electron/main.cjs",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "watch": "node scripts/build.mjs --watch",
+    "serve": "node scripts/serve.mjs",
+    "app": "npm run build && electron .",
+    "dist:win": "npm run build && electron-builder --win nsis --publish never",
+    "android": "npm run build && npx cap sync android"
+  },
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "electron-updater": "6.8.10"
+  },
+  "devDependencies": {
+    "@capacitor/android": "7.4.4",
+    "@capacitor/cli": "7.4.4",
+    "@capacitor/core": "7.4.4",
+    "@supabase/supabase-js": "2.75.0",
+    "dompurify": "3.2.7",
+    "electron": "44.7.0",
+    "electron-builder": "26.17.0",
+    "esbuild": "0.25.11"
+  },
+  "build": {
+    "appId": "com.popversestudio.team",
+    "productName": "Popverse Team",
+    "asar": true,
+    "directories": { "output": "dist", "buildResources": "build" },
+    "files": ["electron/**", "www/**", "package.json"],
+    "win": {
+      "target": [{ "target": "nsis", "arch": ["x64"] }],
+      "icon": "build/icon.ico",
+      "artifactName": "Popverse-Team-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": "always",
+      "shortcutName": "Popverse Team",
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico"
+    },
+    "publish": [{ "provider": "generic", "url": "https://github.com/djylaneee-ship-it/Portfolio/releases/download/popverse-team-latest" }]
+  }
+}

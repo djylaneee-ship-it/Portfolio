@@ -1,10 +1,14 @@
-# Publie le site de présentation de Rovex Hub (dossier site/) sur GitHub Pages.
+# Publie sur GitHub Pages le site de présentation de Rovex Hub (dossier site/) et, dans /team/,
+# la version web de Popverse Team (celle qu'on installe sur iPhone : Safari › Partager › Sur l'écran d'accueil).
 name: Rovex Hub — site
 
 on:
   push:
     paths:
       - 'site/**'
+      - 'popverse-team/src/**'
+      - 'popverse-team/www/**'
+      - 'popverse-team/roblox/**'
       - '.github/workflows/rovex-site.yml'
   workflow_dispatch:
 
@@ -28,8 +32,22 @@ jobs:
       - uses: actions/configure-pages@v5
         with:
           enablement: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Popverse Team (version web)
+        working-directory: popverse-team
+        env:
+          ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
+        run: npm install --no-audit --no-fund && npm run build
+      - name: Assembler le site
+        run: |
+          mkdir -p _site
+          cp -r site/. _site/
+          mkdir -p _site/team
+          cp -r popverse-team/www/. _site/team/
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: site
+          path: _site
       - id: deployment
         uses: actions/deploy-pages@v4
