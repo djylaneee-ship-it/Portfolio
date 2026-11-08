@@ -1,7 +1,7 @@
 {
  "version": 2,
- "cursor": 1315,
- "runs": 333,
+ "cursor": 1319,
+ "runs": 334,
  "channels": [
   {
    "id": "ff1bc5c8316c",
@@ -11,7 +11,7 @@
    "channelId": "UCqJYvfIJL-MHQxIJKUV-tvw",
    "category": "tools",
    "subscribers": "295K subscribers",
-   "lastFetch": "2026-11-08T09:32:21.144Z",
+   "lastFetch": "2026-11-08T12:40:46.105Z",
    "auto": true
   },
   {
@@ -22,7 +22,7 @@
    "channelId": "UClUWdKjK7lG3Lma2NsTVoWQ",
    "category": "tools",
    "subscribers": "211K subscribers",
-   "lastFetch": "2026-11-08T09:32:21.644Z",
+   "lastFetch": "2026-11-08T12:40:46.560Z",
    "auto": true
   },
   {
@@ -33,7 +33,7 @@
    "channelId": "UCjiPEaapiHbJMoAdi_L8fNA",
    "category": "tools",
    "subscribers": "7.52M subscribers",
-   "lastFetch": "2026-11-08T09:32:22.001Z",
+   "lastFetch": "2026-11-08T12:40:47.003Z",
    "auto": true
   },
   {
@@ -44,7 +44,7 @@
    "channelId": "UCGG-SniNENtCrvN-Lu0JQYA",
    "category": "animation",
    "subscribers": "79 subscribers",
-   "lastFetch": "2026-11-08T09:32:22.484Z",
+   "lastFetch": "2026-11-08T12:40:47.496Z",
    "auto": true
   },
   {
@@ -55,7 +55,7 @@
    "channelId": "UCLKsio8yTHeLBEnCDca5G_g",
    "category": "tools",
    "subscribers": "80 subscribers",
-   "lastFetch": "2026-11-08T09:32:22.978Z",
+   "lastFetch": "2026-11-08T12:40:47.959Z",
    "auto": true
   },
   {
@@ -66,7 +66,7 @@
    "channelId": "UCE4hHKx3Qnwo4vz-26xiX0Q",
    "category": "scripting",
    "subscribers": "75.3K subscribers",
-   "lastFetch": "2026-11-08T09:32:23.453Z",
+   "lastFetch": "2026-11-08T12:40:48.414Z",
    "auto": true
   },
   {
@@ -77,7 +77,7 @@
    "channelId": "UCeNeViU3hH59KjOwVO_iTdg",
    "category": "modeling",
    "subscribers": "12.6K subscribers",
-   "lastFetch": "2026-11-08T09:32:23.922Z",
+   "lastFetch": "2026-11-08T12:40:48.869Z",
    "auto": true
   },
   {
@@ -88,7 +88,7 @@
    "channelId": "UCp1R0TBvgM7gj0rwTYULmSA",
    "category": "tools",
    "subscribers": "491K subscribers",
-   "lastFetch": "2026-11-08T09:32:24.460Z",
+   "lastFetch": "2026-11-08T12:40:49.311Z",
    "auto": true
   },
   {
@@ -99,7 +99,7 @@
    "channelId": "UCd0_TaJagxtFRnzQgjUGuXQ",
    "category": "tools",
    "subscribers": "32 subscribers",
-   "lastFetch": "2026-11-08T09:32:24.968Z",
+   "lastFetch": "2026-11-08T12:40:49.758Z",
    "auto": true
   },
   {
@@ -110,7 +110,7 @@
    "channelId": "UCO-mCHBBy7kARMp5nChj3kw",
    "category": "gfx",
    "subscribers": "258 subscribers",
-   "lastFetch": "2026-11-08T09:32:25.483Z",
+   "lastFetch": "2026-11-08T12:40:50.239Z",
    "auto": true
   },
   {
@@ -121,7 +121,7 @@
    "channelId": "UCkHTjWeP_Q_L-eRKdHvgFIA",
    "category": "tools",
    "subscribers": "10 subscribers",
-   "lastFetch": "2026-11-08T09:32:25.980Z",
+   "lastFetch": "2026-11-08T12:40:50.694Z",
    "auto": true
   },
   {
@@ -132,7 +132,7 @@
    "channelId": "UCDGCYuPTejRBST43S930-Qw",
    "category": "tools",
    "subscribers": "1.35K subscribers",
-   "lastFetch": "2026-11-08T09:32:26.544Z",
+   "lastFetch": "2026-11-08T12:40:51.159Z",
    "auto": true
   },
   {
@@ -143,7 +143,7 @@
    "channelId": "UC5IEXnTNq_MA5pOtQpcDZoA",
    "category": "scripting",
    "subscribers": "16.1K subscribers",
-   "lastFetch": "2026-11-08T09:32:27.039Z",
+   "lastFetch": "2026-11-08T12:40:51.652Z",
    "auto": true
   },
   {
@@ -154,7 +154,7 @@
    "channelId": "UCv9psKhDzQGna4zn-BTFlHg",
    "category": "tools",
    "subscribers": "399 subscribers",
-   "lastFetch": "2026-11-08T09:32:27.605Z",
+   "lastFetch": "2026-11-08T12:40:52.115Z",
    "auto": true
   },
   {
@@ -165,7 +165,7 @@
    "channelId": "UCDmuLh_-zAXTXcpm6hXV0MQ",
    "category": "tools",
    "subscribers": "4.87K subscribers",
-   "lastFetch": "2026-11-08T09:32:28.091Z",
+   "lastFetch": "2026-11-08T12:40:52.637Z",
    "auto": true
   },
   {
@@ -176,7 +176,7 @@
    "channelId": "UCI2comVACVAN65uMn4exzeA",
    "category": "tools",
    "subscribers": "43.6K subscribers",
-   "lastFetch": "2026-11-08T09:32:28.561Z",
+   "lastFetch": "2026-11-08T12:40:53.130Z",
    "auto": true
   },
   {
@@ -187,7 +187,7 @@
    "channelId": "UCou-R4X9j8zHUYa_-U1f5-A",
    "category": "tools",
    "subscribers": "364 subscribers",
-   "lastFetch": "2026-11-08T09:32:29.066Z",
+   "lastFetch": "2026-11-08T12:40:53.605Z",
    "auto": true
   },
   {
@@ -198,7 +198,7 @@
    "channelId": "UCtOdHLCm6LaskniviF5MsRA",
    "category": "tools",
    "subscribers": "3.86K subscribers",
-   "lastFetch": "2026-11-08T09:32:29.555Z",
+   "lastFetch": "2026-11-08T12:40:54.096Z",
    "auto": true
   },
   {
@@ -209,7 +209,7 @@
    "channelId": "UCTmcws_nNn7inMLBFC8oAtg",
    "category": "building",
    "subscribers": "12 subscribers",
-   "lastFetch": "2026-11-08T09:32:30.116Z",
+   "lastFetch": "2026-11-08T12:40:54.633Z",
    "auto": true
   },
   {
@@ -220,7 +220,7 @@
    "channelId": "UCWhEL2yGZxwEXR5xJkTsL6w",
    "category": "tools",
    "subscribers": "135 subscribers",
-   "lastFetch": "2026-11-08T09:32:30.627Z",
+   "lastFetch": "2026-11-08T12:40:55.182Z",
    "auto": true
   },
   {
@@ -231,7 +231,7 @@
    "channelId": "UC3AbOMP8Rtz3pCgaLNSOflA",
    "category": "tools",
    "subscribers": "2.07K subscribers",
-   "lastFetch": "2026-11-08T09:32:31.126Z",
+   "lastFetch": "2026-11-08T12:40:55.649Z",
    "auto": true
   },
   {
@@ -242,7 +242,7 @@
    "channelId": "UC59IPcjyebf1kRnpvHbNZ4w",
    "category": "tools",
    "subscribers": "36K subscribers",
-   "lastFetch": "2026-11-08T09:32:31.657Z",
+   "lastFetch": "2026-11-08T12:40:56.088Z",
    "auto": true
   },
   {
@@ -253,7 +253,7 @@
    "channelId": "UCV57M9g28ZHLMvgcasUFSWg",
    "category": "tools",
    "subscribers": "7.99K subscribers",
-   "lastFetch": "2026-11-08T09:32:32.234Z",
+   "lastFetch": "2026-11-08T12:40:56.558Z",
    "auto": true
   },
   {
@@ -264,7 +264,7 @@
    "channelId": "UCsrs1ZYcvXsw6GTeycqWeUg",
    "category": "building",
    "subscribers": "32.4K subscribers",
-   "lastFetch": "2026-11-08T09:32:32.701Z",
+   "lastFetch": "2026-11-08T12:40:57.021Z",
    "auto": true
   },
   {
@@ -275,7 +275,7 @@
    "channelId": "UCdt4g89N0KRn8MIW5DMHgWw",
    "category": "tools",
    "subscribers": "3 subscribers",
-   "lastFetch": "2026-11-08T09:32:33.194Z",
+   "lastFetch": "2026-11-08T12:40:57.459Z",
    "auto": true
   },
   {
@@ -286,7 +286,7 @@
    "channelId": "UC_yCtjGUZ2LNV5Iey7EZC5A",
    "category": "tools",
    "subscribers": "51.2K subscribers",
-   "lastFetch": "2026-11-08T09:32:33.674Z",
+   "lastFetch": "2026-11-08T12:40:57.905Z",
    "auto": true
   },
   {
@@ -297,7 +297,7 @@
    "channelId": "UCsn3ZAnlMlbQmObHRPBbxeg",
    "category": "tools",
    "subscribers": "296K subscribers",
-   "lastFetch": "2026-11-08T09:32:34.277Z",
+   "lastFetch": "2026-11-08T12:40:58.395Z",
    "auto": true
   },
   {
@@ -308,7 +308,7 @@
    "channelId": "UCY894TFzch1kAUyZERb7RyA",
    "category": "tools",
    "subscribers": "33 subscribers",
-   "lastFetch": "2026-11-08T09:32:34.772Z",
+   "lastFetch": "2026-11-08T12:40:58.847Z",
    "auto": true
   },
   {
@@ -319,7 +319,7 @@
    "channelId": "UCsBJGUbbth2qGslEccJBFUA",
    "category": "tools",
    "subscribers": "4 subscribers",
-   "lastFetch": "2026-11-08T09:32:35.263Z",
+   "lastFetch": "2026-11-08T12:40:59.317Z",
    "auto": true
   },
   {
@@ -330,7 +330,7 @@
    "channelId": "UCrBi8QgvE2g7PL-9KnZ__SQ",
    "category": "tools",
    "subscribers": "5 subscribers",
-   "lastFetch": "2026-11-08T09:32:35.763Z",
+   "lastFetch": "2026-11-08T12:40:59.779Z",
    "auto": true
   },
   {
@@ -341,7 +341,7 @@
    "channelId": "UCrjruxa31gUX9rkjWh8qBug",
    "category": "tools",
    "subscribers": "9 subscribers",
-   "lastFetch": "2026-11-08T09:32:36.292Z",
+   "lastFetch": "2026-11-08T12:41:00.259Z",
    "auto": true
   },
   {
@@ -352,7 +352,7 @@
    "channelId": "UClzHgNMRLhdi3TE3dmRWKLA",
    "category": "scripting",
    "subscribers": "86 subscribers",
-   "lastFetch": "2026-11-08T09:32:36.812Z",
+   "lastFetch": "2026-11-08T12:41:00.789Z",
    "auto": true
   },
   {
@@ -363,7 +363,7 @@
    "channelId": "UC8DPnyocHZSQ8gsKaGFD-Bg",
    "category": "tools",
    "subscribers": "20 subscribers",
-   "lastFetch": "2026-11-08T09:32:37.318Z",
+   "lastFetch": "2026-11-08T12:41:01.263Z",
    "auto": true
   },
   {
@@ -374,7 +374,7 @@
    "channelId": "UC59DqxY_Ec3CVz7sV7UuLyQ",
    "category": "scripting",
    "subscribers": "33K subscribers",
-   "lastFetch": "2026-11-08T09:32:37.816Z",
+   "lastFetch": "2026-11-08T12:41:01.800Z",
    "auto": true
   },
   {
@@ -385,7 +385,7 @@
    "channelId": "UCxdKLY-Aj0E_scwYQjIR5Cg",
    "category": "tools",
    "subscribers": "4.85K subscribers",
-   "lastFetch": "2026-11-08T09:32:38.323Z",
+   "lastFetch": "2026-11-08T12:41:02.256Z",
    "auto": true
   },
   {
@@ -396,7 +396,7 @@
    "channelId": "UCA6xO_qlzth0xuP4cidDJ7w",
    "category": "animation",
    "subscribers": "124 subscribers",
-   "lastFetch": "2026-11-08T09:32:38.895Z",
+   "lastFetch": "2026-11-08T12:41:02.752Z",
    "auto": true
   },
   {
@@ -407,7 +407,7 @@
    "channelId": "UC3qQvGlyi85ZuGRlImLN23g",
    "category": "tools",
    "subscribers": "470 subscribers",
-   "lastFetch": "2026-11-08T09:32:39.404Z",
+   "lastFetch": "2026-11-08T12:41:03.219Z",
    "auto": true
   },
   {
@@ -418,7 +418,7 @@
    "channelId": "UC7wPpUvxo7ozuaFRMH06xWg",
    "category": "gfx",
    "subscribers": "53K subscribers",
-   "lastFetch": "2026-11-08T09:32:39.869Z",
+   "lastFetch": "2026-11-08T12:41:03.665Z",
    "auto": true
   },
   {
@@ -429,7 +429,7 @@
    "channelId": "UCa1EmeC2oBvCcb7TqVXurwQ",
    "category": "tools",
    "subscribers": "1.04K subscribers",
-   "lastFetch": "2026-11-08T09:32:40.368Z",
+   "lastFetch": "2026-11-08T12:41:04.138Z",
    "auto": true
   },
   {
@@ -440,7 +440,7 @@
    "channelId": "UCv-Oi1eLpC1r482dFIGfy8A",
    "category": "scripting",
    "subscribers": "16.9K subscribers",
-   "lastFetch": "2026-11-08T09:32:40.869Z",
+   "lastFetch": "2026-11-08T12:41:04.584Z",
    "auto": true
   },
   {
@@ -451,7 +451,7 @@
    "channelId": "UCdnU2b2WoBzf_A9gdO5i6gg",
    "category": "tools",
    "subscribers": "2.68K subscribers",
-   "lastFetch": "2026-11-08T09:32:41.393Z",
+   "lastFetch": "2026-11-08T12:41:05.085Z",
    "auto": true
   },
   {
@@ -462,7 +462,7 @@
    "channelId": "UCRm5g0Xum-pk4mX3lkXo3Wg",
    "category": "modeling",
    "subscribers": "15.1K subscribers",
-   "lastFetch": "2026-11-08T09:32:41.868Z",
+   "lastFetch": "2026-11-08T12:41:05.553Z",
    "auto": true
   },
   {
@@ -473,7 +473,7 @@
    "channelId": "UCS2smVWjNGuRzD6HVWmlWwQ",
    "category": "tools",
    "subscribers": "663K subscribers",
-   "lastFetch": "2026-11-08T09:32:42.349Z",
+   "lastFetch": "2026-11-08T12:41:06.005Z",
    "auto": true
   },
   {
@@ -484,7 +484,7 @@
    "channelId": "UCU09igEAvT74S3z0O1wMcmw",
    "category": "tools",
    "subscribers": "374K subscribers",
-   "lastFetch": "2026-11-08T09:32:42.831Z",
+   "lastFetch": "2026-11-08T12:41:06.447Z",
    "auto": true
   },
   {
@@ -495,7 +495,7 @@
    "channelId": "UCNx-f-FJrz60r10y22WgLVA",
    "category": "tools",
    "subscribers": "22K subscribers",
-   "lastFetch": "2026-11-08T09:32:43.386Z",
+   "lastFetch": "2026-11-08T12:41:06.905Z",
    "auto": true
   },
   {
@@ -506,7 +506,7 @@
    "channelId": "UCnKPvg0hN7i3_U5Geu3-xSA",
    "category": "tools",
    "subscribers": "53.5K subscribers",
-   "lastFetch": "2026-11-08T09:32:43.870Z",
+   "lastFetch": "2026-11-08T12:41:07.411Z",
    "auto": true
   },
   {
@@ -517,7 +517,7 @@
    "channelId": "UCMgNSyYUr0IaByPXCYH61Mw",
    "category": "tools",
    "subscribers": "2.67K subscribers",
-   "lastFetch": "2026-11-08T09:32:44.370Z",
+   "lastFetch": "2026-11-08T12:41:07.872Z",
    "auto": true
   },
   {
@@ -528,7 +528,7 @@
    "channelId": "UC7NoLRTlRnaoGQM2COEU_Ow",
    "category": "tools",
    "subscribers": "188K subscribers",
-   "lastFetch": "2026-11-08T09:32:44.870Z",
+   "lastFetch": "2026-11-08T12:41:08.407Z",
    "auto": true
   },
   {
@@ -539,7 +539,7 @@
    "channelId": "UCN_nYYokQXHP5UUh6eC3C_A",
    "category": "tools",
    "subscribers": "16.9K subscribers",
-   "lastFetch": "2026-11-08T09:32:45.346Z",
+   "lastFetch": "2026-11-08T12:41:08.852Z",
    "auto": true
   },
   {
@@ -550,7 +550,7 @@
    "channelId": "UCt5j01xqbOGXrIYT1L93gAg",
    "category": "tools",
    "subscribers": "4.08K subscribers",
-   "lastFetch": "2026-11-08T09:32:45.841Z",
+   "lastFetch": "2026-11-08T12:41:09.318Z",
    "auto": true
   },
   {
@@ -561,7 +561,7 @@
    "channelId": "UCcH79FapTX2rgV1s3vNcOJA",
    "category": "tools",
    "subscribers": "159K subscribers",
-   "lastFetch": "2026-11-08T09:32:46.322Z",
+   "lastFetch": "2026-11-08T12:41:09.848Z",
    "auto": true
   },
   {
@@ -572,7 +572,7 @@
    "channelId": "UC6vbgSmPsXjPDjBWhtLcmaA",
    "category": "tools",
    "subscribers": "2.9K subscribers",
-   "lastFetch": "2026-11-08T09:32:46.811Z",
+   "lastFetch": "2026-11-08T12:41:10.305Z",
    "auto": true
   },
   {
@@ -583,7 +583,7 @@
    "channelId": "UC8wSkPACqXuC5JGz8VmF6aA",
    "category": "tools",
    "subscribers": "124K subscribers",
-   "lastFetch": "2026-11-08T09:32:47.289Z",
+   "lastFetch": "2026-11-08T12:41:10.823Z",
    "auto": true
   },
   {
@@ -594,7 +594,7 @@
    "channelId": "UC4YZGAP6XGc4uKl-KsIsaEg",
    "category": "tools",
    "subscribers": "15.5K subscribers",
-   "lastFetch": "2026-11-08T09:32:47.772Z",
+   "lastFetch": "2026-11-08T12:41:11.277Z",
    "auto": true
   },
   {
@@ -605,7 +605,7 @@
    "channelId": "UC7S7ohTj_2Bb8HROK1QKpAw",
    "category": "building",
    "subscribers": "158K subscribers",
-   "lastFetch": "2026-11-08T09:32:48.276Z",
+   "lastFetch": "2026-11-08T12:41:11.730Z",
    "auto": true
   },
   {
@@ -616,7 +616,7 @@
    "channelId": "UCHgRpWLnnJRqHFwkOYTu-mw",
    "category": "tools",
    "subscribers": "6.62K subscribers",
-   "lastFetch": "2026-11-08T09:32:48.764Z",
+   "lastFetch": "2026-11-08T12:41:12.183Z",
    "auto": true
   },
   {
@@ -627,7 +627,7 @@
    "channelId": "UCr6BO-I6erk7_pq1zTx_7Fw",
    "category": "tools",
    "subscribers": "13.1K subscribers",
-   "lastFetch": "2026-11-08T09:32:49.238Z",
+   "lastFetch": "2026-11-08T12:41:12.642Z",
    "auto": true
   },
   {
@@ -638,7 +638,7 @@
    "channelId": "UCjT_01eFoyCG-x7q5DGaLjw",
    "category": "tools",
    "subscribers": "3.9K subscribers",
-   "lastFetch": "2026-11-08T09:32:49.732Z",
+   "lastFetch": "2026-11-08T12:41:13.093Z",
    "auto": true
   },
   {
@@ -649,7 +649,7 @@
    "channelId": "UCarUAMyj2NwA77CcV91xByA",
    "category": "tools",
    "subscribers": "33.5K subscribers",
-   "lastFetch": "2026-11-08T09:32:50.203Z",
+   "lastFetch": "2026-11-08T12:41:13.529Z",
    "auto": true
   },
   {
@@ -660,7 +660,7 @@
    "channelId": "UCpOA50K-noS5Uu5v-MlVvUw",
    "category": "tools",
    "subscribers": "74.2K subscribers",
-   "lastFetch": "2026-11-08T09:32:50.752Z",
+   "lastFetch": "2026-11-08T12:41:13.987Z",
    "auto": true
   },
   {
@@ -671,7 +671,7 @@
    "channelId": "UCudFnM5W1lBRhNtI2Cemw9Q",
    "category": "tools",
    "subscribers": "6.69K subscribers",
-   "lastFetch": "2026-11-08T09:32:51.223Z",
+   "lastFetch": "2026-11-08T12:41:14.455Z",
    "auto": true
   },
   {
@@ -682,7 +682,7 @@
    "channelId": "UCwfxBAYlJniCBmnAB5BtK6Q",
    "category": "scripting",
    "subscribers": "85 subscribers",
-   "lastFetch": "2026-11-08T09:32:51.788Z",
+   "lastFetch": "2026-11-08T12:41:14.921Z",
    "auto": true
   },
   {
@@ -693,7 +693,7 @@
    "channelId": "UCa_gfzoVxEzWoiXesgeD2mQ",
    "category": "tools",
    "subscribers": "12.7K subscribers",
-   "lastFetch": "2026-11-08T09:32:52.263Z",
+   "lastFetch": "2026-11-08T12:41:15.448Z",
    "auto": true
   },
   {
@@ -704,7 +704,7 @@
    "channelId": "UCKWqH6euI8-vvP01-9WkC3w",
    "category": "building",
    "subscribers": "82.7K subscribers",
-   "lastFetch": "2026-11-08T09:32:52.759Z",
+   "lastFetch": "2026-11-08T12:41:15.915Z",
    "auto": true
   },
   {
@@ -715,7 +715,7 @@
    "channelId": "UCV1y8nvnWemqj59XD8QiSAA",
    "category": "building",
    "subscribers": "422 subscribers",
-   "lastFetch": "2026-11-08T09:32:53.257Z",
+   "lastFetch": "2026-11-08T12:41:16.389Z",
    "auto": true
   },
   {
@@ -726,7 +726,7 @@
    "channelId": "UC5sOb0MLaNNAUQGGSlUgHeA",
    "category": "tools",
    "subscribers": "2.42K subscribers",
-   "lastFetch": "2026-11-08T09:32:53.745Z",
+   "lastFetch": "2026-11-08T12:41:16.861Z",
    "auto": true
   },
   {
@@ -737,7 +737,7 @@
    "channelId": "UCRcOvhdDcBIbEEVxrlrSTNQ",
    "category": "tools",
    "subscribers": "124K subscribers",
-   "lastFetch": "2026-11-08T09:32:54.219Z",
+   "lastFetch": "2026-11-08T12:41:17.296Z",
    "auto": true
   },
   {
@@ -748,7 +748,7 @@
    "channelId": "UCmqxSp7W5wsiU1SKzFWpZkQ",
    "category": "tools",
    "subscribers": "1.55K subscribers",
-   "lastFetch": "2026-11-08T09:32:54.723Z",
+   "lastFetch": "2026-11-08T12:41:17.888Z",
    "auto": true
   },
   {
@@ -759,7 +759,7 @@
    "channelId": "UCx32i_giPy3gwd_CxauitLg",
    "category": "tools",
    "subscribers": "40.1K subscribers",
-   "lastFetch": "2026-11-08T09:32:55.212Z",
+   "lastFetch": "2026-11-08T12:41:18.324Z",
    "auto": true
   },
   {
@@ -770,7 +770,7 @@
    "channelId": "UCWuqGhdXTCRY1RatNvH5dbA",
    "category": "tools",
    "subscribers": "2.94K subscribers",
-   "lastFetch": "2026-11-08T09:32:55.672Z",
+   "lastFetch": "2026-11-08T12:41:18.766Z",
    "auto": true
   },
   {
@@ -781,7 +781,7 @@
    "channelId": "UCCkZaXDD-SrHvaFM8g63UzA",
    "category": "tools",
    "subscribers": "3.55K subscribers",
-   "lastFetch": "2026-11-08T09:32:56.170Z",
+   "lastFetch": "2026-11-08T12:41:19.291Z",
    "auto": true
   },
   {
@@ -792,7 +792,7 @@
    "channelId": "UC3vF6Yyq9a45MuQhRYp566A",
    "category": "tools",
    "subscribers": "23 subscribers",
-   "lastFetch": "2026-11-08T09:32:56.680Z",
+   "lastFetch": "2026-11-08T12:41:19.827Z",
    "auto": true
   },
   {
@@ -803,7 +803,7 @@
    "channelId": "UCuqJG8vWfUuNSMJ10V2Fxsg",
    "category": "tools",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:32:57.177Z",
+   "lastFetch": "2026-11-08T12:41:20.330Z",
    "auto": true
   },
   {
@@ -814,7 +814,7 @@
    "channelId": "UCwN3kT66SOPOdvaV-WfLGdw",
    "category": "tools",
    "subscribers": "28 subscribers",
-   "lastFetch": "2026-11-08T09:32:57.692Z",
+   "lastFetch": "2026-11-08T12:41:20.801Z",
    "auto": true
   },
   {
@@ -825,7 +825,7 @@
    "channelId": "UC8fecL_VAWRmKlpk_Oz74eg",
    "category": "tools",
    "subscribers": "134K subscribers",
-   "lastFetch": "2026-11-08T09:32:58.222Z",
+   "lastFetch": "2026-11-08T12:41:21.246Z",
    "auto": true
   },
   {
@@ -836,7 +836,7 @@
    "channelId": "UCbsVnGtAcd3xA3CL8e_i2Gw",
    "category": "tools",
    "subscribers": "173 subscribers",
-   "lastFetch": "2026-11-08T09:32:58.734Z",
+   "lastFetch": "2026-11-08T12:41:21.765Z",
    "auto": true
   },
   {
@@ -847,7 +847,7 @@
    "channelId": "UCaeQVAnNHdqDjXT1hHujKiw",
    "category": "tools",
    "subscribers": "139K subscribers",
-   "lastFetch": "2026-11-08T09:32:59.309Z",
+   "lastFetch": "2026-11-08T12:41:22.227Z",
    "auto": true
   },
   {
@@ -858,7 +858,7 @@
    "channelId": "UCUwp-Mc_lHcjI3n6-7gMd3Q",
    "category": "scripting",
    "subscribers": "4.13K subscribers",
-   "lastFetch": "2026-11-08T09:32:59.814Z",
+   "lastFetch": "2026-11-08T12:41:22.732Z",
    "auto": true
   },
   {
@@ -869,7 +869,7 @@
    "channelId": "UCyml5mJ3m5WOZnvuZp1TKeg",
    "category": "scripting",
    "subscribers": "431K subscribers",
-   "lastFetch": "2026-11-08T09:33:00.169Z",
+   "lastFetch": "2026-11-08T12:41:23.251Z",
    "auto": true
   },
   {
@@ -880,7 +880,7 @@
    "channelId": "UCrpUhEGapZKygvPIe2OKf0Q",
    "category": "scripting",
    "subscribers": "11.5K subscribers",
-   "lastFetch": "2026-11-08T09:33:00.648Z",
+   "lastFetch": "2026-11-08T12:41:23.779Z",
    "auto": true
   },
   {
@@ -891,7 +891,7 @@
    "channelId": "UCr60qwRSFb6prnw7VG89XpQ",
    "category": "scripting",
    "subscribers": "117K subscribers",
-   "lastFetch": "2026-11-08T09:33:01.131Z",
+   "lastFetch": "2026-11-08T12:41:24.148Z",
    "auto": true
   },
   {
@@ -902,7 +902,7 @@
    "channelId": "UCh1_cAiNaGXx7rQiUDRspmw",
    "category": "scripting",
    "subscribers": "11.9K subscribers",
-   "lastFetch": "2026-11-08T09:33:01.679Z",
+   "lastFetch": "2026-11-08T12:41:24.596Z",
    "auto": true
   },
   {
@@ -913,7 +913,7 @@
    "channelId": "UCFHJ80WbXDJ7ujsMKa1LHtw",
    "category": "scripting",
    "subscribers": "37.1K subscribers",
-   "lastFetch": "2026-11-08T09:33:02.164Z",
+   "lastFetch": "2026-11-08T12:41:25.118Z",
    "auto": true
   },
   {
@@ -924,7 +924,7 @@
    "channelId": "UCcDlGbc5m4Cs0M9y1wRCS_A",
    "category": "scripting",
    "subscribers": "1.12K subscribers",
-   "lastFetch": "2026-11-08T09:33:02.651Z",
+   "lastFetch": "2026-11-08T12:41:25.616Z",
    "auto": true
   },
   {
@@ -935,7 +935,7 @@
    "channelId": "UCSZI6WeMbndz1HhXSH8YFBg",
    "category": "scripting",
    "subscribers": "5.47K subscribers",
-   "lastFetch": "2026-11-08T09:33:03.138Z",
+   "lastFetch": "2026-11-08T12:41:26.049Z",
    "auto": true
   },
   {
@@ -946,7 +946,7 @@
    "channelId": "UCACVUpXWHNFc0JqJTIX_E4Q",
    "category": "scripting",
    "subscribers": "2.33K subscribers",
-   "lastFetch": "2026-11-08T09:33:03.622Z",
+   "lastFetch": "2026-11-08T12:41:26.506Z",
    "auto": true
   },
   {
@@ -957,7 +957,7 @@
    "channelId": "UCoC_otQrDqvc6IVUynqHzSw",
    "category": "scripting",
    "subscribers": "3.12K subscribers",
-   "lastFetch": "2026-11-08T09:33:04.126Z",
+   "lastFetch": "2026-11-08T12:41:27.052Z",
    "auto": true
   },
   {
@@ -968,7 +968,7 @@
    "channelId": "UC_RJqWQ4jqrg1NG_g5mNZsw",
    "category": "scripting",
    "subscribers": "6.58K subscribers",
-   "lastFetch": "2026-11-08T09:33:04.615Z",
+   "lastFetch": "2026-11-08T12:41:27.507Z",
    "auto": true
   },
   {
@@ -979,7 +979,7 @@
    "channelId": "UCEFK_Y5qRMBG79IxWSABdqg",
    "category": "building",
    "subscribers": "9.99K subscribers",
-   "lastFetch": "2026-11-08T09:33:05.104Z",
+   "lastFetch": "2026-11-08T12:41:27.950Z",
    "auto": true
   },
   {
@@ -990,7 +990,7 @@
    "channelId": "UCgcrdELRXOIxB27ejQ1LPLA",
    "category": "scripting",
    "subscribers": "16.6K subscribers",
-   "lastFetch": "2026-11-08T09:33:05.584Z",
+   "lastFetch": "2026-11-08T12:41:28.381Z",
    "auto": true
   },
   {
@@ -1001,7 +1001,7 @@
    "channelId": "UC8ftgK-RIJQnDfvE5XUHClg",
    "category": "scripting",
    "subscribers": "304K subscribers",
-   "lastFetch": "2026-11-08T09:33:06.113Z",
+   "lastFetch": "2026-11-08T12:41:28.835Z",
    "auto": true
   },
   {
@@ -1012,7 +1012,7 @@
    "channelId": "UC8uRTos03OhqAyRXg_QOauw",
    "category": "scripting",
    "subscribers": "1.02M subscribers",
-   "lastFetch": "2026-11-08T09:33:06.614Z",
+   "lastFetch": "2026-11-08T12:41:29.271Z",
    "auto": true
   },
   {
@@ -1023,7 +1023,7 @@
    "channelId": "UC_asS-uLcjbtXBgnoroG0_Q",
    "category": "scripting",
    "subscribers": "6.77K subscribers",
-   "lastFetch": "2026-11-08T09:33:07.109Z",
+   "lastFetch": "2026-11-08T12:41:29.738Z",
    "auto": true
   },
   {
@@ -1034,7 +1034,7 @@
    "channelId": "UCphNS4kY4aMEnyagqzTcd1Q",
    "category": "scripting",
    "subscribers": "31.7K subscribers",
-   "lastFetch": "2026-11-08T09:33:07.604Z",
+   "lastFetch": "2026-11-08T12:41:30.187Z",
    "auto": true
   },
   {
@@ -1045,7 +1045,7 @@
    "channelId": "UC-HKrBiXlsh9IYnfTYNAl1g",
    "category": "scripting",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:33:08.085Z",
+   "lastFetch": "2026-11-08T12:41:30.625Z",
    "auto": true
   },
   {
@@ -1056,7 +1056,7 @@
    "channelId": "UCjgRFqRxlGgBSAc0xt7gQRw",
    "category": "scripting",
    "subscribers": "12 subscribers",
-   "lastFetch": "2026-11-08T09:33:08.578Z",
+   "lastFetch": "2026-11-08T12:41:31.148Z",
    "auto": true
   },
   {
@@ -1067,7 +1067,7 @@
    "channelId": "UCSLWMELf9s38IKDKOn3BaOg",
    "category": "scripting",
    "subscribers": "995 subscribers",
-   "lastFetch": "2026-11-08T09:33:09.058Z",
+   "lastFetch": "2026-11-08T12:41:31.600Z",
    "auto": true
   },
   {
@@ -1078,7 +1078,7 @@
    "channelId": "UCBDu30TqRRaIkaCPZblJ1lw",
    "category": "scripting",
    "subscribers": "381 subscribers",
-   "lastFetch": "2026-11-08T09:33:09.553Z",
+   "lastFetch": "2026-11-08T12:41:32.142Z",
    "auto": true
   },
   {
@@ -1089,7 +1089,7 @@
    "channelId": "UC3X9EJfDALRbbXD8skKRbNQ",
    "category": "scripting",
    "subscribers": "5.34K subscribers",
-   "lastFetch": "2026-11-08T09:33:10.031Z",
+   "lastFetch": "2026-11-08T12:41:32.589Z",
    "auto": true
   },
   {
@@ -1100,7 +1100,7 @@
    "channelId": "UCp3sN0m1v01_JvPHrWZ9yxA",
    "category": "scripting",
    "subscribers": "8.21K subscribers",
-   "lastFetch": "2026-11-08T09:33:10.614Z",
+   "lastFetch": "2026-11-08T12:41:33.061Z",
    "auto": true
   },
   {
@@ -1111,7 +1111,7 @@
    "channelId": "UC4ONOykLK8UpL0QXoMZxXdA",
    "category": "scripting",
    "subscribers": "903 subscribers",
-   "lastFetch": "2026-11-08T09:33:11.088Z",
+   "lastFetch": "2026-11-08T12:41:33.552Z",
    "auto": true
   },
   {
@@ -1122,7 +1122,7 @@
    "channelId": "UCuRybHxTFvtyquq2Vj0FtuA",
    "category": "scripting",
    "subscribers": "10.7K subscribers",
-   "lastFetch": "2026-11-08T09:33:11.577Z",
+   "lastFetch": "2026-11-08T12:41:34.017Z",
    "auto": true
   },
   {
@@ -1133,7 +1133,7 @@
    "channelId": "UCbJHt5IIyM2AJGF9z5YPr5w",
    "category": "scripting",
    "subscribers": "1 subscriber",
-   "lastFetch": "2026-11-08T09:33:12.068Z",
+   "lastFetch": "2026-11-08T12:41:34.463Z",
    "auto": true
   },
   {
@@ -1144,7 +1144,7 @@
    "channelId": "UCRZZe-5mdN2h2JrrYklPLbw",
    "category": "scripting",
    "subscribers": "5.11K subscribers",
-   "lastFetch": "2026-11-08T09:33:12.590Z",
+   "lastFetch": "2026-11-08T12:41:34.926Z",
    "auto": true
   },
   {
@@ -1155,7 +1155,7 @@
    "channelId": "UCXFeBFcGm5aRNIkLY91CFgQ",
    "category": "scripting",
    "subscribers": "110K subscribers",
-   "lastFetch": "2026-11-08T09:33:13.079Z",
+   "lastFetch": "2026-11-08T12:41:35.386Z",
    "auto": true
   },
   {
@@ -1166,7 +1166,7 @@
    "channelId": "UC2QxP7ajyKToKEM7BYWN5NA",
    "category": "animation",
    "subscribers": "86.4K subscribers",
-   "lastFetch": "2026-11-08T09:33:13.570Z",
+   "lastFetch": "2026-11-08T12:41:35.838Z",
    "auto": true
   },
   {
@@ -1177,7 +1177,7 @@
    "channelId": "UCFwIGLpQp2TVkAO7gycpedw",
    "category": "scripting",
    "subscribers": "1 subscriber",
-   "lastFetch": "2026-11-08T09:33:14.049Z",
+   "lastFetch": "2026-11-08T12:41:36.294Z",
    "auto": true
   },
   {
@@ -1188,7 +1188,7 @@
    "channelId": "UCUC3i1csDpG4Xqg8KBnraEQ",
    "category": "scripting",
    "subscribers": "17.6K subscribers",
-   "lastFetch": "2026-11-08T09:33:14.535Z",
+   "lastFetch": "2026-11-08T12:41:36.746Z",
    "auto": true
   },
   {
@@ -1199,7 +1199,7 @@
    "channelId": "UCGyTsEToXkCNTRTZTJmbnfA",
    "category": "scripting",
    "subscribers": "52 subscribers",
-   "lastFetch": "2026-11-08T09:33:15.079Z",
+   "lastFetch": "2026-11-08T12:41:37.228Z",
    "auto": true
   },
   {
@@ -1210,7 +1210,7 @@
    "channelId": "UCJKJmuFNrtcas7NWQ1GUzfg",
    "category": "vfx",
    "subscribers": "17.6K subscribers",
-   "lastFetch": "2026-11-08T09:33:15.550Z",
+   "lastFetch": "2026-11-08T12:41:37.734Z",
    "auto": true
   },
   {
@@ -1221,7 +1221,7 @@
    "channelId": "UCm4Ina7i3DvSM2aCkUMD_Dw",
    "category": "vfx",
    "subscribers": "3.79K subscribers",
-   "lastFetch": "2026-11-08T09:33:16.056Z",
+   "lastFetch": "2026-11-08T12:41:38.198Z",
    "auto": true
   },
   {
@@ -1232,7 +1232,7 @@
    "channelId": "UCXTMe13g7OyOJATw-WVUj9Q",
    "category": "vfx",
    "subscribers": "3.12K subscribers",
-   "lastFetch": "2026-11-08T09:33:16.548Z",
+   "lastFetch": "2026-11-08T12:41:38.688Z",
    "auto": true
   },
   {
@@ -1243,7 +1243,7 @@
    "channelId": "UC2H00Kilx52tPoLY4Kmse5w",
    "category": "vfx",
    "subscribers": "5.02K subscribers",
-   "lastFetch": "2026-11-08T09:33:17.023Z",
+   "lastFetch": "2026-11-08T12:41:39.131Z",
    "auto": true
   },
   {
@@ -1254,7 +1254,7 @@
    "channelId": "UC-ttlRkLnE3b4_3SBcmYATA",
    "category": "vfx",
    "subscribers": "17.9K subscribers",
-   "lastFetch": "2026-11-08T09:33:17.500Z",
+   "lastFetch": "2026-11-08T12:41:39.573Z",
    "auto": true
   },
   {
@@ -1265,7 +1265,7 @@
    "channelId": "UCItJxEWOw8Rpun1s7G0IqCQ",
    "category": "vfx",
    "subscribers": "4K subscribers",
-   "lastFetch": "2026-11-08T09:33:17.997Z",
+   "lastFetch": "2026-11-08T12:41:40.093Z",
    "auto": true
   },
   {
@@ -1276,7 +1276,7 @@
    "channelId": "UCGVZzVr5c_8iPe2QK50qRzw",
    "category": "vfx",
    "subscribers": "20.8K subscribers",
-   "lastFetch": "2026-11-08T09:33:18.471Z",
+   "lastFetch": "2026-11-08T12:41:40.525Z",
    "auto": true
   },
   {
@@ -1287,7 +1287,7 @@
    "channelId": "UCn43nd4Cl1R6cgHtyXqLczQ",
    "category": "vfx",
    "subscribers": "2.09K subscribers",
-   "lastFetch": "2026-11-08T09:33:18.970Z",
+   "lastFetch": "2026-11-08T12:41:40.990Z",
    "auto": true
   },
   {
@@ -1298,7 +1298,7 @@
    "channelId": "UCwDeXuoPh-9H_N1tEl41HTg",
    "category": "vfx",
    "subscribers": "27 subscribers",
-   "lastFetch": "2026-11-08T09:33:19.483Z",
+   "lastFetch": "2026-11-08T12:41:41.514Z",
    "auto": true
   },
   {
@@ -1309,7 +1309,7 @@
    "channelId": "UCWbwC94IJu1-jwI0gqyJbCg",
    "category": "vfx",
    "subscribers": "46 subscribers",
-   "lastFetch": "2026-11-08T09:33:19.988Z",
+   "lastFetch": "2026-11-08T12:41:41.984Z",
    "auto": true
   },
   {
@@ -1320,7 +1320,7 @@
    "channelId": "UCf772a0BR_lAKRWUSRviaVQ",
    "category": "vfx",
    "subscribers": "118 subscribers",
-   "lastFetch": "2026-11-08T09:33:20.453Z",
+   "lastFetch": "2026-11-08T12:41:42.445Z",
    "auto": true
   },
   {
@@ -1331,7 +1331,7 @@
    "channelId": "UCWnRuolkJQJVlSjZMnS-VSw",
    "category": "vfx",
    "subscribers": "1.14K subscribers",
-   "lastFetch": "2026-11-08T09:33:20.954Z",
+   "lastFetch": "2026-11-08T12:41:42.913Z",
    "auto": true
   },
   {
@@ -1342,7 +1342,7 @@
    "channelId": "UCNGQHCYdkcXhEQzyc8zqCrA",
    "category": "vfx",
    "subscribers": "23K subscribers",
-   "lastFetch": "2026-11-08T09:33:21.420Z",
+   "lastFetch": "2026-11-08T12:41:43.352Z",
    "auto": true
   },
   {
@@ -1353,7 +1353,7 @@
    "channelId": "UCDF0yFFnu2-lJ_HR3-wJ0kg",
    "category": "vfx",
    "subscribers": "41.4K subscribers",
-   "lastFetch": "2026-11-08T09:33:21.926Z",
+   "lastFetch": "2026-11-08T12:41:43.881Z",
    "auto": true
   },
   {
@@ -1364,7 +1364,7 @@
    "channelId": "UC3OPHnTBa6CMwmzsOyq-BLA",
    "category": "vfx",
    "subscribers": "28.3K subscribers",
-   "lastFetch": "2026-11-08T09:33:22.422Z",
+   "lastFetch": "2026-11-08T12:41:44.326Z",
    "auto": true
   },
   {
@@ -1375,7 +1375,7 @@
    "channelId": "UC-fbhjr30pS3rioqZlKF-JQ",
    "category": "vfx",
    "subscribers": "40 subscribers",
-   "lastFetch": "2026-11-08T09:33:22.911Z",
+   "lastFetch": "2026-11-08T12:41:44.790Z",
    "auto": true
   },
   {
@@ -1386,7 +1386,7 @@
    "channelId": "UCo0TeE0ahhgavlrWfs-pIRA",
    "category": "vfx",
    "subscribers": "2K subscribers",
-   "lastFetch": "2026-11-08T09:33:23.395Z",
+   "lastFetch": "2026-11-08T12:41:45.261Z",
    "auto": true
   },
   {
@@ -1397,7 +1397,7 @@
    "channelId": "UC03d98VCEFgLjODtLka2DNQ",
    "category": "vfx",
    "subscribers": "27.8K subscribers",
-   "lastFetch": "2026-11-08T09:33:23.890Z",
+   "lastFetch": "2026-11-08T12:41:45.743Z",
    "auto": true
   },
   {
@@ -1408,7 +1408,7 @@
    "channelId": "UCyALyEb99nVep21cp4L546A",
    "category": "vfx",
    "subscribers": "10.8K subscribers",
-   "lastFetch": "2026-11-08T09:33:24.391Z",
+   "lastFetch": "2026-11-08T12:41:46.231Z",
    "auto": true
   },
   {
@@ -1419,7 +1419,7 @@
    "channelId": "UCmRO09pHPYKFWI2iBKubRvw",
    "category": "vfx",
    "subscribers": "1.14K subscribers",
-   "lastFetch": "2026-11-08T09:33:24.873Z",
+   "lastFetch": "2026-11-08T12:41:46.770Z",
    "auto": true
   },
   {
@@ -1430,7 +1430,7 @@
    "channelId": "UCUw7lqtWFemQnR44Rr42OZQ",
    "category": "vfx",
    "subscribers": "1.86K subscribers",
-   "lastFetch": "2026-11-08T09:33:25.388Z",
+   "lastFetch": "2026-11-08T12:41:47.232Z",
    "auto": true
   },
   {
@@ -1441,7 +1441,7 @@
    "channelId": "UCmu8oddtXr0MjWqM51FfLZw",
    "category": "vfx",
    "subscribers": "2.4K subscribers",
-   "lastFetch": "2026-11-08T09:33:25.894Z",
+   "lastFetch": "2026-11-08T12:41:47.704Z",
    "auto": true
   },
   {
@@ -1452,7 +1452,7 @@
    "channelId": "UC7MuiR-pKUGoA7UWQE7-vVQ",
    "category": "vfx",
    "subscribers": "25 subscribers",
-   "lastFetch": "2026-11-08T09:33:26.393Z",
+   "lastFetch": "2026-11-08T12:41:48.205Z",
    "auto": true
   },
   {
@@ -1463,7 +1463,7 @@
    "channelId": "UCt1BagGjP3nL_aRqB4srxsQ",
    "category": "vfx",
    "subscribers": "139 subscribers",
-   "lastFetch": "2026-11-08T09:33:26.898Z",
+   "lastFetch": "2026-11-08T12:41:48.699Z",
    "auto": true
   },
   {
@@ -1474,7 +1474,7 @@
    "channelId": "UCwUm5lszrP-XWBdNCEo1-8A",
    "category": "vfx",
    "subscribers": "2.75K subscribers",
-   "lastFetch": "2026-11-08T09:33:27.460Z",
+   "lastFetch": "2026-11-08T12:41:49.145Z",
    "auto": true
   },
   {
@@ -1485,7 +1485,7 @@
    "channelId": "UCySZx9Sx-7DaG4DhT15aKzg",
    "category": "vfx",
    "subscribers": "2.93K subscribers",
-   "lastFetch": "2026-11-08T09:33:27.954Z",
+   "lastFetch": "2026-11-08T12:41:49.603Z",
    "auto": true
   },
   {
@@ -1496,7 +1496,7 @@
    "channelId": "UCnvqkvazc_phEnosA87tT1A",
    "category": "vfx",
    "subscribers": "76 subscribers",
-   "lastFetch": "2026-11-08T09:33:28.450Z",
+   "lastFetch": "2026-11-08T12:41:50.043Z",
    "auto": true
   },
   {
@@ -1507,7 +1507,7 @@
    "channelId": "UCt8ip6QdA5RWICDFNCguvDg",
    "category": "vfx",
    "subscribers": "4.88K subscribers",
-   "lastFetch": "2026-11-08T09:33:28.921Z",
+   "lastFetch": "2026-11-08T12:41:50.474Z",
    "auto": true
   },
   {
@@ -1518,7 +1518,7 @@
    "channelId": "UCMFXeEslRgsjRwqFMi83N7g",
    "category": "vfx",
    "subscribers": "792 subscribers",
-   "lastFetch": "2026-11-08T09:33:29.404Z",
+   "lastFetch": "2026-11-08T12:41:50.953Z",
    "auto": true
   },
   {
@@ -1529,7 +1529,7 @@
    "channelId": "UCPFyIxVH0jrY55j-UznGeLg",
    "category": "vfx",
    "subscribers": "11.9K subscribers",
-   "lastFetch": "2026-11-08T09:33:29.984Z",
+   "lastFetch": "2026-11-08T12:41:51.415Z",
    "auto": true
   },
   {
@@ -1540,7 +1540,7 @@
    "channelId": "UCSaZ0C16te0SvP_iLA8raiA",
    "category": "vfx",
    "subscribers": "34 subscribers",
-   "lastFetch": "2026-11-08T09:33:30.504Z",
+   "lastFetch": "2026-11-08T12:41:51.882Z",
    "auto": true
   },
   {
@@ -1551,7 +1551,7 @@
    "channelId": "UCbMpK7bEOrEq9uU68Jcbjqg",
    "category": "vfx",
    "subscribers": "7.7K subscribers",
-   "lastFetch": "2026-11-08T09:33:31.012Z",
+   "lastFetch": "2026-11-08T12:41:52.341Z",
    "auto": true
   },
   {
@@ -1562,7 +1562,7 @@
    "channelId": "UCn-9HAhntju8Pgoss6OO17g",
    "category": "vfx",
    "subscribers": "9 subscribers",
-   "lastFetch": "2026-11-08T09:33:31.507Z",
+   "lastFetch": "2026-11-08T12:41:52.811Z",
    "auto": true
   },
   {
@@ -1573,7 +1573,7 @@
    "channelId": "UCODplpeXHfa9rwUf-ZZatfQ",
    "category": "vfx",
    "subscribers": "19 subscribers",
-   "lastFetch": "2026-11-08T09:33:32.019Z",
+   "lastFetch": "2026-11-08T12:41:53.330Z",
    "auto": true
   },
   {
@@ -1584,7 +1584,7 @@
    "channelId": "UCpx5rfTJIpLedMg9mnep5sw",
    "category": "vfx",
    "subscribers": "53.4K subscribers",
-   "lastFetch": "2026-11-08T09:33:32.536Z",
+   "lastFetch": "2026-11-08T12:41:53.780Z",
    "auto": true
   },
   {
@@ -1595,7 +1595,7 @@
    "channelId": "UCbtea-2mCbRxxMQQKufYHzg",
    "category": "vfx",
    "subscribers": "30 subscribers",
-   "lastFetch": "2026-11-08T09:33:33.063Z",
+   "lastFetch": "2026-11-08T12:41:54.247Z",
    "auto": true
   },
   {
@@ -1606,7 +1606,7 @@
    "channelId": "UCET3qCNGL9YeiLZmMf5tXfw",
    "category": "animation",
    "subscribers": "4.47K subscribers",
-   "lastFetch": "2026-11-08T09:33:33.566Z",
+   "lastFetch": "2026-11-08T12:41:54.698Z",
    "auto": true
   },
   {
@@ -1617,7 +1617,7 @@
    "channelId": "UCjIctE36xq0SPJoeR8LO5kA",
    "category": "animation",
    "subscribers": "436K subscribers",
-   "lastFetch": "2026-11-08T09:33:34.042Z",
+   "lastFetch": "2026-11-08T12:41:55.143Z",
    "auto": true
   },
   {
@@ -1628,7 +1628,7 @@
    "channelId": "UC_FONa06pE5jVjfap5C0MCg",
    "category": "animation",
    "subscribers": "749K subscribers",
-   "lastFetch": "2026-11-08T09:33:34.606Z",
+   "lastFetch": "2026-11-08T12:41:55.666Z",
    "auto": true
   },
   {
@@ -1639,7 +1639,7 @@
    "channelId": "UCj2RJkSyo6Ud2_nWQAhdsrw",
    "category": "animation",
    "subscribers": "6.47M subscribers",
-   "lastFetch": "2026-11-08T09:33:35.114Z",
+   "lastFetch": "2026-11-08T12:41:56.120Z",
    "auto": true
   },
   {
@@ -1650,7 +1650,7 @@
    "channelId": "UCPyziQfUImXpx3OH24n1Y-Q",
    "category": "animation",
    "subscribers": "484K subscribers",
-   "lastFetch": "2026-11-08T09:33:35.608Z",
+   "lastFetch": "2026-11-08T12:41:56.594Z",
    "auto": true
   },
   {
@@ -1661,7 +1661,7 @@
    "channelId": "UCdrBnBNLsN4_cH32HWbr9qg",
    "category": "animation",
    "subscribers": "28.2M subscribers",
-   "lastFetch": "2026-11-08T09:33:36.113Z",
+   "lastFetch": "2026-11-08T12:41:57.061Z",
    "auto": true
   },
   {
@@ -1672,7 +1672,7 @@
    "channelId": "UCD_0d26MdTXc-FapzxTadug",
    "category": "animation",
    "subscribers": "86.2K subscribers",
-   "lastFetch": "2026-11-08T09:33:36.614Z",
+   "lastFetch": "2026-11-08T12:41:57.510Z",
    "auto": true
   },
   {
@@ -1683,7 +1683,7 @@
    "channelId": "UC7TCWdcXWUpB6FEiM6P2UYw",
    "category": "animation",
    "subscribers": "1.73M subscribers",
-   "lastFetch": "2026-11-08T09:33:37.187Z",
+   "lastFetch": "2026-11-08T12:41:57.970Z",
    "auto": true
   },
   {
@@ -1694,7 +1694,7 @@
    "channelId": "UCC_t5nn9cfXk_83lf4YhGjA",
    "category": "animation",
    "subscribers": "18.6K subscribers",
-   "lastFetch": "2026-11-08T09:33:37.678Z",
+   "lastFetch": "2026-11-08T12:41:58.461Z",
    "auto": true
   },
   {
@@ -1705,7 +1705,7 @@
    "channelId": "UCVycbNg9MtedSTmea6PRuNA",
    "category": "animation",
    "subscribers": "555K subscribers",
-   "lastFetch": "2026-11-08T09:33:38.182Z",
+   "lastFetch": "2026-11-08T12:41:58.906Z",
    "auto": true
   },
   {
@@ -1716,7 +1716,7 @@
    "channelId": "UCe3mG_FncuIt8UnF-3ntfGA",
    "category": "animation",
    "subscribers": "2.73M subscribers",
-   "lastFetch": "2026-11-08T09:33:38.712Z",
+   "lastFetch": "2026-11-08T12:41:59.424Z",
    "auto": true
   },
   {
@@ -1727,7 +1727,7 @@
    "channelId": "UCO3VV-hOqzCL-TyTBNm4QXA",
    "category": "animation",
    "subscribers": "613K subscribers",
-   "lastFetch": "2026-11-08T09:33:39.214Z",
+   "lastFetch": "2026-11-08T12:41:59.854Z",
    "auto": true
   },
   {
@@ -1738,7 +1738,7 @@
    "channelId": "UCeWOkLIhGfUAGQPfBvaFmkQ",
    "category": "animation",
    "subscribers": "3.24M subscribers",
-   "lastFetch": "2026-11-08T09:33:39.718Z",
+   "lastFetch": "2026-11-08T12:42:00.313Z",
    "auto": true
   },
   {
@@ -1749,7 +1749,7 @@
    "channelId": "UCVBFbYp4pvnkaumcjq_Vcbw",
    "category": "animation",
    "subscribers": "150K subscribers",
-   "lastFetch": "2026-11-08T09:33:40.190Z",
+   "lastFetch": "2026-11-08T12:42:00.752Z",
    "auto": true
   },
   {
@@ -1760,7 +1760,7 @@
    "channelId": "UCLdZ9wVrDW6XWQNgaVsM4aw",
    "category": "animation",
    "subscribers": "245K subscribers",
-   "lastFetch": "2026-11-08T09:33:40.680Z",
+   "lastFetch": "2026-11-08T12:42:01.201Z",
    "auto": true
   },
   {
@@ -1771,7 +1771,7 @@
    "channelId": "UCshYky_6Rt7hwpe9Yoy8qIg",
    "category": "animation",
    "subscribers": "259K subscribers",
-   "lastFetch": "2026-11-08T09:33:41.143Z",
+   "lastFetch": "2026-11-08T12:42:01.640Z",
    "auto": true
   },
   {
@@ -1782,7 +1782,7 @@
    "channelId": "UCdsiyN91VEFuO_mCg7nV48Q",
    "category": "animation",
    "subscribers": "34.2K subscribers",
-   "lastFetch": "2026-11-08T09:33:41.620Z",
+   "lastFetch": "2026-11-08T12:42:02.077Z",
    "auto": true
   },
   {
@@ -1793,7 +1793,7 @@
    "channelId": "UCuAd4nOvB1PSFiTkZYvYkdQ",
    "category": "animation",
    "subscribers": "3.87M subscribers",
-   "lastFetch": "2026-11-08T09:33:42.114Z",
+   "lastFetch": "2026-11-08T12:42:02.611Z",
    "auto": true
   },
   {
@@ -1804,7 +1804,7 @@
    "channelId": "UCqSx2NgUDqM39WUfUalVK0A",
    "category": "animation",
    "subscribers": "11K subscribers",
-   "lastFetch": "2026-11-08T09:33:42.610Z",
+   "lastFetch": "2026-11-08T12:42:03.082Z",
    "auto": true
   },
   {
@@ -1815,7 +1815,7 @@
    "channelId": "UCcVL4gNuLmbYKIuv-4J6rwA",
    "category": "animation",
    "subscribers": "537 subscribers",
-   "lastFetch": "2026-11-08T09:33:43.117Z",
+   "lastFetch": "2026-11-08T12:42:03.543Z",
    "auto": true
   },
   {
@@ -1826,7 +1826,7 @@
    "channelId": "UCfF7GECIz-rj74KMh9S4ilg",
    "category": "animation",
    "subscribers": "7.09M subscribers",
-   "lastFetch": "2026-11-08T09:33:43.594Z",
+   "lastFetch": "2026-11-08T12:42:04.088Z",
    "auto": true
   },
   {
@@ -1837,7 +1837,7 @@
    "channelId": "UCKTtJQ_usW-sZsFTYz4NPHg",
    "category": "animation",
    "subscribers": "47.5K subscribers",
-   "lastFetch": "2026-11-08T09:33:44.102Z",
+   "lastFetch": "2026-11-08T12:42:04.531Z",
    "auto": true
   },
   {
@@ -1848,7 +1848,7 @@
    "channelId": "UCE0Sn96-8lqUCvQV-IsKXsg",
    "category": "animation",
    "subscribers": "5.42M subscribers",
-   "lastFetch": "2026-11-08T09:33:44.639Z",
+   "lastFetch": "2026-11-08T12:42:04.966Z",
    "auto": true
   },
   {
@@ -1859,7 +1859,7 @@
    "channelId": "UCUASiKF0BExLs7D2vPZ5wcg",
    "category": "animation",
    "subscribers": "92.4K subscribers",
-   "lastFetch": "2026-11-08T09:33:45.125Z",
+   "lastFetch": "2026-11-08T12:42:05.400Z",
    "auto": true
   },
   {
@@ -1870,7 +1870,7 @@
    "channelId": "UCWpSNlR2PyyqulP2wBYOX9Q",
    "category": "animation",
    "subscribers": "1.11M subscribers",
-   "lastFetch": "2026-11-08T09:33:45.593Z",
+   "lastFetch": "2026-11-08T12:42:05.850Z",
    "auto": true
   },
   {
@@ -1881,7 +1881,7 @@
    "channelId": "UCsJ2DKwaFEpQJMkh83DFemQ",
    "category": "animation",
    "subscribers": "22 subscribers",
-   "lastFetch": "2026-11-08T09:33:46.090Z",
+   "lastFetch": "2026-11-08T12:42:06.319Z",
    "auto": true
   },
   {
@@ -1892,7 +1892,7 @@
    "channelId": "UCdQWBcLE_IdSLjNGERpRQ6g",
    "category": "animation",
    "subscribers": "1.62M subscribers",
-   "lastFetch": "2026-11-08T09:33:46.647Z",
+   "lastFetch": "2026-11-08T12:42:06.789Z",
    "auto": true
   },
   {
@@ -1903,7 +1903,7 @@
    "channelId": "UCcLOwzYg78GRrYIu0La3B2w",
    "category": "animation",
    "subscribers": "278K subscribers",
-   "lastFetch": "2026-11-08T09:33:47.127Z",
+   "lastFetch": "2026-11-08T12:42:07.228Z",
    "auto": true
   },
   {
@@ -1914,7 +1914,7 @@
    "channelId": "UC6sYaXoH7cahvRfjw-pHJwQ",
    "category": "animation",
    "subscribers": "61.7K subscribers",
-   "lastFetch": "2026-11-08T09:33:47.598Z",
+   "lastFetch": "2026-11-08T12:42:07.681Z",
    "auto": true
   },
   {
@@ -1925,7 +1925,7 @@
    "channelId": "UCaLB9Euwgkr735-Oxxo_S3w",
    "category": "animation",
    "subscribers": "580K subscribers",
-   "lastFetch": "2026-11-08T09:33:48.095Z",
+   "lastFetch": "2026-11-08T12:42:08.136Z",
    "auto": true
   },
   {
@@ -1936,7 +1936,7 @@
    "channelId": "UCL3JvxRbLGUMXQRel3lKFjg",
    "category": "animation",
    "subscribers": "1.21M subscribers",
-   "lastFetch": "2026-11-08T09:33:48.640Z",
+   "lastFetch": "2026-11-08T12:42:08.606Z",
    "auto": true
   },
   {
@@ -1947,7 +1947,7 @@
    "channelId": "UCZ0JbCRl5NInjlJ9jniKyBA",
    "category": "vfx",
    "subscribers": "606K subscribers",
-   "lastFetch": "2026-11-08T09:33:49.138Z",
+   "lastFetch": "2026-11-08T12:42:09.118Z",
    "auto": true
   },
   {
@@ -1958,7 +1958,7 @@
    "channelId": "UCL77WYW2hOKmDUOey1TPKKw",
    "category": "animation",
    "subscribers": "77 subscribers",
-   "lastFetch": "2026-11-08T09:33:49.652Z",
+   "lastFetch": "2026-11-08T12:42:09.579Z",
    "auto": true
   },
   {
@@ -1969,7 +1969,7 @@
    "channelId": "UCehw6LdDdDwG0fEDh63eiZw",
    "category": "animation",
    "subscribers": "15.2M subscribers",
-   "lastFetch": "2026-11-08T09:33:50.144Z",
+   "lastFetch": "2026-11-08T12:42:10.033Z",
    "auto": true
   },
   {
@@ -1980,7 +1980,7 @@
    "channelId": "UCXHiPsk9KmoY34XAJtirSFA",
    "category": "animation",
    "subscribers": "2.44M subscribers",
-   "lastFetch": "2026-11-08T09:33:50.638Z",
+   "lastFetch": "2026-11-08T12:42:10.507Z",
    "auto": true
   },
   {
@@ -1991,7 +1991,7 @@
    "channelId": "UCr2oFE_5ibrQ7tzSh1ohV3Q",
    "category": "animation",
    "subscribers": "135K subscribers",
-   "lastFetch": "2026-11-08T09:33:51.179Z",
+   "lastFetch": "2026-11-08T12:42:10.953Z",
    "auto": true
   },
   {
@@ -2002,7 +2002,7 @@
    "channelId": "UCy7thcm6ZB9hdzg0zHWIsng",
    "category": "animation",
    "subscribers": "3.99K subscribers",
-   "lastFetch": "2026-11-08T09:33:51.624Z",
+   "lastFetch": "2026-11-08T12:42:11.376Z",
    "auto": true
   },
   {
@@ -2013,7 +2013,7 @@
    "channelId": "UCYC3WWrqFERLEnE9jPkRMvw",
    "category": "animation",
    "subscribers": "770K subscribers",
-   "lastFetch": "2026-11-08T09:33:52.122Z",
+   "lastFetch": "2026-11-08T12:42:11.821Z",
    "auto": true
   },
   {
@@ -2024,7 +2024,7 @@
    "channelId": "UCcnlKh4YNSN8aY3EP6vZhow",
    "category": "animation",
    "subscribers": "566K subscribers",
-   "lastFetch": "2026-11-08T09:33:52.615Z",
+   "lastFetch": "2026-11-08T12:42:12.292Z",
    "auto": true
   },
   {
@@ -2035,7 +2035,7 @@
    "channelId": "UCKSPnFayYrcjo6fdlFYBY0w",
    "category": "gui",
    "subscribers": "4.96K subscribers",
-   "lastFetch": "2026-11-08T09:33:53.115Z",
+   "lastFetch": "2026-11-08T12:42:12.769Z",
    "auto": true
   },
   {
@@ -2046,7 +2046,7 @@
    "channelId": "UCC4elImIi8ZdJy1_LBn4sGA",
    "category": "gui",
    "subscribers": "28.5K subscribers",
-   "lastFetch": "2026-11-08T09:33:53.689Z",
+   "lastFetch": "2026-11-08T12:42:13.234Z",
    "auto": true
   },
   {
@@ -2057,7 +2057,7 @@
    "channelId": "UCmTB2_b2VO0xtV6E_e-C4Mg",
    "category": "gui",
    "subscribers": "169 subscribers",
-   "lastFetch": "2026-11-08T09:33:54.234Z",
+   "lastFetch": "2026-11-08T12:42:13.669Z",
    "auto": true
   },
   {
@@ -2068,7 +2068,7 @@
    "channelId": "UCahwbJVRCmrZKT48AoDn8mQ",
    "category": "gui",
    "subscribers": "3 subscribers",
-   "lastFetch": "2026-11-08T09:33:54.720Z",
+   "lastFetch": "2026-11-08T12:42:14.118Z",
    "auto": true
   },
   {
@@ -2079,7 +2079,7 @@
    "channelId": "UCzuFKUeea5eK3U3ri08pGTw",
    "category": "gui",
    "subscribers": "3 subscribers",
-   "lastFetch": "2026-11-08T09:33:55.202Z",
+   "lastFetch": "2026-11-08T12:42:14.556Z",
    "auto": true
   },
   {
@@ -2090,7 +2090,7 @@
    "channelId": "UC1NsI_OWa8L4M10oMKWBDpQ",
    "category": "gui",
    "subscribers": "783 subscribers",
-   "lastFetch": "2026-11-08T09:33:55.724Z",
+   "lastFetch": "2026-11-08T12:42:15.026Z",
    "auto": true
   },
   {
@@ -2101,7 +2101,7 @@
    "channelId": "UCLInJafktu1MeSJzQ4Yx4DA",
    "category": "gui",
    "subscribers": "740 subscribers",
-   "lastFetch": "2026-11-08T09:33:56.216Z",
+   "lastFetch": "2026-11-08T12:42:15.473Z",
    "auto": true
   },
   {
@@ -2112,7 +2112,7 @@
    "channelId": "UC1gJNY6vI7uWkMEWZKI1gUA",
    "category": "gui",
    "subscribers": "37 subscribers",
-   "lastFetch": "2026-11-08T09:33:56.712Z",
+   "lastFetch": "2026-11-08T12:42:15.933Z",
    "auto": true
   },
   {
@@ -2123,7 +2123,7 @@
    "channelId": "UCcbQplRMu6xzeiAsKOhl0pA",
    "category": "gui",
    "subscribers": "2 subscribers",
-   "lastFetch": "2026-11-08T09:33:57.310Z",
+   "lastFetch": "2026-11-08T12:42:16.377Z",
    "auto": true
   },
   {
@@ -2134,7 +2134,7 @@
    "channelId": "UC4fWrE432T53zB6dDT3aG1A",
    "category": "gui",
    "subscribers": "20 subscribers",
-   "lastFetch": "2026-11-08T09:33:57.808Z",
+   "lastFetch": "2026-11-08T12:42:16.848Z",
    "auto": true
   },
   {
@@ -2145,7 +2145,7 @@
    "channelId": "UCybtm_7e_hUkcnIz_wGoxGA",
    "category": "gui",
    "subscribers": "1.38K subscribers",
-   "lastFetch": "2026-11-08T09:33:58.295Z",
+   "lastFetch": "2026-11-08T12:42:17.291Z",
    "auto": true
   },
   {
@@ -2156,7 +2156,7 @@
    "channelId": "UCMD5VZMrud70IbF7NtleFKQ",
    "category": "gui",
    "subscribers": "110 subscribers",
-   "lastFetch": "2026-11-08T09:33:58.801Z",
+   "lastFetch": "2026-11-08T12:42:17.779Z",
    "auto": true
   },
   {
@@ -2167,7 +2167,7 @@
    "channelId": "UCUh5Nd4HBlgAc7w7sculU_g",
    "category": "gui",
    "subscribers": "2.68K subscribers",
-   "lastFetch": "2026-11-08T09:33:59.274Z",
+   "lastFetch": "2026-11-08T12:42:18.294Z",
    "auto": true
   },
   {
@@ -2178,7 +2178,7 @@
    "channelId": "UC_iZGiQBN94Ca0EK08JnCWg",
    "category": "animation",
    "subscribers": "2.23K subscribers",
-   "lastFetch": "2026-11-08T09:33:59.778Z",
+   "lastFetch": "2026-11-08T12:42:18.771Z",
    "auto": true
   },
   {
@@ -2189,7 +2189,7 @@
    "channelId": "UCDhomFZzVqlEmI8M3WzSfDA",
    "category": "gui",
    "subscribers": "38 subscribers",
-   "lastFetch": "2026-11-08T09:34:00.272Z",
+   "lastFetch": "2026-11-08T12:42:19.295Z",
    "auto": true
   },
   {
@@ -2200,7 +2200,7 @@
    "channelId": "UCh32hGnjLDbVqeSlX9LDSHQ",
    "category": "gui",
    "subscribers": "14 subscribers",
-   "lastFetch": "2026-11-08T09:34:00.791Z",
+   "lastFetch": "2026-11-08T12:42:19.783Z",
    "auto": true
   },
   {
@@ -2211,7 +2211,7 @@
    "channelId": "UC1eF1A3zo7vBCI3UGQRyJ3g",
    "category": "gui",
    "subscribers": "1 subscriber",
-   "lastFetch": "2026-11-08T09:34:01.369Z",
+   "lastFetch": "2026-11-08T12:42:20.235Z",
    "auto": true
   },
   {
@@ -2222,7 +2222,7 @@
    "channelId": "UCPcrNfWqOkB4a53fJl1mEjA",
    "category": "gui",
    "subscribers": "438 subscribers",
-   "lastFetch": "2026-11-08T09:34:01.944Z",
+   "lastFetch": "2026-11-08T12:42:20.700Z",
    "auto": true
   },
   {
@@ -2233,7 +2233,7 @@
    "channelId": "UCtpH08ZuBxLcvQxSSXYwkpw",
    "category": "gui",
    "subscribers": "16 subscribers",
-   "lastFetch": "2026-11-08T09:34:02.450Z",
+   "lastFetch": "2026-11-08T12:42:21.167Z",
    "auto": true
   },
   {
@@ -2244,7 +2244,7 @@
    "channelId": "UCF89KtH-PfFo0DhLNYljuvw",
    "category": "gui",
    "subscribers": "4.45K subscribers",
-   "lastFetch": "2026-11-08T09:34:02.925Z",
+   "lastFetch": "2026-11-08T12:42:21.612Z",
    "auto": true
   },
   {
@@ -2255,7 +2255,7 @@
    "channelId": "UChW7CX1Y8HlyOHzIuioNWJA",
    "category": "gui",
    "subscribers": "4 subscribers",
-   "lastFetch": "2026-11-08T09:34:03.404Z",
+   "lastFetch": "2026-11-08T12:42:22.061Z",
    "auto": true
   },
   {
@@ -2266,7 +2266,7 @@
    "channelId": "UCltYmNaGslEX2_950obocqw",
    "category": "gui",
    "subscribers": "1.4K subscribers",
-   "lastFetch": "2026-11-08T09:34:03.894Z",
+   "lastFetch": "2026-11-08T12:42:22.587Z",
    "auto": true
   },
   {
@@ -2277,7 +2277,7 @@
    "channelId": "UCwTIN9YIktveIlnzCprNitw",
    "category": "gui",
    "subscribers": "5 subscribers",
-   "lastFetch": "2026-11-08T09:34:04.400Z",
+   "lastFetch": "2026-11-08T12:42:23.131Z",
    "auto": true
   },
   {
@@ -2288,7 +2288,7 @@
    "channelId": "UCC1hRhRYJjwI0oP8s85V1rQ",
    "category": "gui",
    "subscribers": "21 subscribers",
-   "lastFetch": "2026-11-08T09:34:04.906Z",
+   "lastFetch": "2026-11-08T12:42:23.593Z",
    "auto": true
   },
   {
@@ -2299,7 +2299,7 @@
    "channelId": "UCRT4Pc7oTLMgvlItMgcvifg",
    "category": "gui",
    "subscribers": "15 subscribers",
-   "lastFetch": "2026-11-08T09:34:05.463Z",
+   "lastFetch": "2026-11-08T12:42:24.089Z",
    "auto": true
   },
   {
@@ -2310,7 +2310,7 @@
    "channelId": "UCJoeyaME-x4vQWKww0wUoMw",
    "category": "gui",
    "subscribers": "55 subscribers",
-   "lastFetch": "2026-11-08T09:34:05.964Z",
+   "lastFetch": "2026-11-08T12:42:24.690Z",
    "auto": true
   },
   {
@@ -2321,7 +2321,7 @@
    "channelId": "UCW0sEG6Qr4xaACG35huPz2g",
    "category": "gui",
    "subscribers": "10 subscribers",
-   "lastFetch": "2026-11-08T09:34:06.457Z",
+   "lastFetch": "2026-11-08T12:42:25.145Z",
    "auto": true
   },
   {
@@ -2332,7 +2332,7 @@
    "channelId": "UCgTv2eE3Doa00-vHQ314qsw",
    "category": "gui",
    "subscribers": "5 subscribers",
-   "lastFetch": "2026-11-08T09:34:06.942Z",
+   "lastFetch": "2026-11-08T12:42:25.593Z",
    "auto": true
   },
   {
@@ -2343,7 +2343,7 @@
    "channelId": "UCVQ2qnw5rmN_8ki61p48Q7Q",
    "category": "gui",
    "subscribers": "14 subscribers",
-   "lastFetch": "2026-11-08T09:34:07.420Z",
+   "lastFetch": "2026-11-08T12:42:26.035Z",
    "auto": true
   },
   {
@@ -2354,7 +2354,7 @@
    "channelId": "UCHYg_6m8KivmwzPqvlzez-w",
    "category": "gui",
    "subscribers": "27 subscribers",
-   "lastFetch": "2026-11-08T09:34:07.925Z",
+   "lastFetch": "2026-11-08T12:42:26.493Z",
    "auto": true
   },
   {
@@ -2365,7 +2365,7 @@
    "channelId": "UC7hvJdS_bOUseNHceQqSgdA",
    "category": "gui",
    "subscribers": "43 subscribers",
-   "lastFetch": "2026-11-08T09:34:08.449Z",
+   "lastFetch": "2026-11-08T12:42:26.970Z",
    "auto": true
   },
   {
@@ -2376,7 +2376,7 @@
    "channelId": "UCtNkSF4284_FDlXCqMerEjA",
    "category": "gui",
    "subscribers": "1 subscriber",
-   "lastFetch": "2026-11-08T09:34:08.935Z",
+   "lastFetch": "2026-11-08T12:42:27.411Z",
    "auto": true
   },
   {
@@ -2387,7 +2387,7 @@
    "channelId": "UCXcOM2oBJ_03QPtgg80NfGA",
    "category": "gui",
    "subscribers": "2 subscribers",
-   "lastFetch": "2026-11-08T09:34:09.426Z",
+   "lastFetch": "2026-11-08T12:42:27.848Z",
    "auto": true
   },
   {
@@ -2398,7 +2398,7 @@
    "channelId": "UCoRaTBeV4jc-Sutfi-kWsJw",
    "category": "gui",
    "subscribers": "66 subscribers",
-   "lastFetch": "2026-11-08T09:34:09.926Z",
+   "lastFetch": "2026-11-08T12:42:28.295Z",
    "auto": true
   },
   {
@@ -2409,7 +2409,7 @@
    "channelId": "UCxVN7liwSAI73ZDJRXBZKvw",
    "category": "gui",
    "subscribers": "2 subscribers",
-   "lastFetch": "2026-11-08T09:34:10.408Z",
+   "lastFetch": "2026-11-08T12:42:28.796Z",
    "auto": true
   },
   {
@@ -2420,7 +2420,7 @@
    "channelId": "UCZsRaLZg_b7W2ni5IfFnDRA",
    "category": "gui",
    "subscribers": "15 subscribers",
-   "lastFetch": "2026-11-08T09:34:10.872Z",
+   "lastFetch": "2026-11-08T12:42:29.237Z",
    "auto": true
   },
   {
@@ -2431,7 +2431,7 @@
    "channelId": "UC7uw1qmudt92XroNVPibzEQ",
    "category": "gui",
    "subscribers": "27 subscribers",
-   "lastFetch": "2026-11-08T09:34:11.366Z",
+   "lastFetch": "2026-11-08T12:42:29.754Z",
    "auto": true
   },
   {
@@ -2442,7 +2442,7 @@
    "channelId": "UCXD2AZrw02en5Ta0Shwv-6w",
    "category": "gfx",
    "subscribers": "17.4K subscribers",
-   "lastFetch": "2026-11-08T09:34:11.845Z",
+   "lastFetch": "2026-11-08T12:42:30.216Z",
    "auto": true
   },
   {
@@ -2453,7 +2453,7 @@
    "channelId": "UCLBryHvRq4r-f0zrN4S5qQw",
    "category": "gfx",
    "subscribers": "4.32K subscribers",
-   "lastFetch": "2026-11-08T09:34:12.404Z",
+   "lastFetch": "2026-11-08T12:42:30.688Z",
    "auto": true
   },
   {
@@ -2464,7 +2464,7 @@
    "channelId": "UCO8z0SnN9bfXVpwzZ5Xc_Eg",
    "category": "gfx",
    "subscribers": "27.3K subscribers",
-   "lastFetch": "2026-11-08T09:34:12.911Z",
+   "lastFetch": "2026-11-08T12:42:31.130Z",
    "auto": true
   },
   {
@@ -2475,7 +2475,7 @@
    "channelId": "UCWY7AE8GUshGzVeP2QIehHA",
    "category": "gfx",
    "subscribers": "175 subscribers",
-   "lastFetch": "2026-11-08T09:34:13.412Z",
+   "lastFetch": "2026-11-08T12:42:31.580Z",
    "auto": true
   },
   {
@@ -2486,7 +2486,7 @@
    "channelId": "UCEoSCSrF2aa-QqlnYHbcC1w",
    "category": "gfx",
    "subscribers": "19.6K subscribers",
-   "lastFetch": "2026-11-08T09:34:13.934Z",
+   "lastFetch": "2026-11-08T12:42:32.079Z",
    "auto": true
   },
   {
@@ -2497,7 +2497,7 @@
    "channelId": "UCYaYsGuJ-8gPUAOBUPPJ4pA",
    "category": "gfx",
    "subscribers": "884 subscribers",
-   "lastFetch": "2026-11-08T09:34:14.460Z",
+   "lastFetch": "2026-11-08T12:42:32.539Z",
    "auto": true
   },
   {
@@ -2508,7 +2508,7 @@
    "channelId": "UCWN8sibRj4IvT0FQrirb-TQ",
    "category": "gfx",
    "subscribers": "268K subscribers",
-   "lastFetch": "2026-11-08T09:34:14.934Z",
+   "lastFetch": "2026-11-08T12:42:32.985Z",
    "auto": true
   },
   {
@@ -2519,7 +2519,7 @@
    "channelId": "UC9BOnPeVCF5tZOjsphnS4cQ",
    "category": "gfx",
    "subscribers": "353 subscribers",
-   "lastFetch": "2026-11-08T09:34:15.380Z",
+   "lastFetch": "2026-11-08T12:42:33.460Z",
    "auto": true
   },
   {
@@ -2530,7 +2530,7 @@
    "channelId": "UCM5v4TW9pCfYKio8UqiXtig",
    "category": "gfx",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:34:15.868Z",
+   "lastFetch": "2026-11-08T12:42:33.963Z",
    "auto": true
   },
   {
@@ -2541,7 +2541,7 @@
    "channelId": "UCt56p3iCwcCVxv3KmlBZZVA",
    "category": "gfx",
    "subscribers": "523 subscribers",
-   "lastFetch": "2026-11-08T09:34:16.383Z",
+   "lastFetch": "2026-11-08T12:42:34.431Z",
    "auto": true
   },
   {
@@ -2552,7 +2552,7 @@
    "channelId": "UC-Ez3NMbiSCVua42LhiBMog",
    "category": "gfx",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:34:16.864Z",
+   "lastFetch": "2026-11-08T12:42:34.873Z",
    "auto": true
   },
   {
@@ -2563,7 +2563,7 @@
    "channelId": "UCo7usT6j3qo_pREQ8HTTgWA",
    "category": "gfx",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:34:17.331Z",
+   "lastFetch": "2026-11-08T12:42:35.321Z",
    "auto": true
   },
   {
@@ -2574,7 +2574,7 @@
    "channelId": "UCYmnubXTuaUz7gSZn5is74A",
    "category": "gfx",
    "subscribers": "1.02K subscribers",
-   "lastFetch": "2026-11-08T09:34:17.830Z",
+   "lastFetch": "2026-11-08T12:42:35.794Z",
    "auto": true
   },
   {
@@ -2585,7 +2585,7 @@
    "channelId": "UCSmp7N5dJWP0ljMOEW_lCMg",
    "category": "gfx",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:34:18.385Z",
+   "lastFetch": "2026-11-08T12:42:36.245Z",
    "auto": true
   },
   {
@@ -2596,7 +2596,7 @@
    "channelId": "UCNDWc3nTPJZ0eLnlMooVlkA",
    "category": "gfx",
    "subscribers": "808 subscribers",
-   "lastFetch": "2026-11-08T09:34:18.912Z",
+   "lastFetch": "2026-11-08T12:42:36.710Z",
    "auto": true
   },
   {
@@ -2607,7 +2607,7 @@
    "channelId": "UC_RdhofHs0x6sCfLYy_3CfA",
    "category": "gfx",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:34:19.398Z",
+   "lastFetch": "2026-11-08T12:42:37.212Z",
    "auto": true
   },
   {
@@ -2618,7 +2618,7 @@
    "channelId": "UCWI3TckZc5joeGR_DhPU-Dg",
    "category": "gfx",
    "subscribers": "1.86K subscribers",
-   "lastFetch": "2026-11-08T09:34:19.909Z",
+   "lastFetch": "2026-11-08T12:42:37.684Z",
    "auto": true
   },
   {
@@ -2629,7 +2629,7 @@
    "channelId": "UC37A0wtANUpky5YWUKZDR0A",
    "category": "gfx",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:34:20.394Z",
+   "lastFetch": "2026-11-08T12:42:38.116Z",
    "auto": true
   },
   {
@@ -2640,7 +2640,7 @@
    "channelId": "UCr3SR9Ol0LJj70e2PiMfSAg",
    "category": "gfx",
    "subscribers": "157 subscribers",
-   "lastFetch": "2026-11-08T09:34:20.902Z",
+   "lastFetch": "2026-11-08T12:42:38.573Z",
    "auto": true
   },
   {
@@ -2651,7 +2651,7 @@
    "channelId": "UCjmjTLSh187zo0TyOmD5ySQ",
    "category": "gfx",
    "subscribers": "1 subscriber",
-   "lastFetch": "2026-11-08T09:34:21.391Z",
+   "lastFetch": "2026-11-08T12:42:39.015Z",
    "auto": true
   },
   {
@@ -2662,7 +2662,7 @@
    "channelId": "UCdaxU05Xdar6tiB7iAAZR8Q",
    "category": "gfx",
    "subscribers": "2 subscribers",
-   "lastFetch": "2026-11-08T09:34:21.884Z",
+   "lastFetch": "2026-11-08T12:42:39.481Z",
    "auto": true
   },
   {
@@ -2673,7 +2673,7 @@
    "channelId": "UCv6dZdgIDWY9Ha1f3ynyGmQ",
    "category": "gfx",
    "subscribers": "126 subscribers",
-   "lastFetch": "2026-11-08T09:34:22.395Z",
+   "lastFetch": "2026-11-08T12:42:39.939Z",
    "auto": true
   },
   {
@@ -2684,7 +2684,7 @@
    "channelId": "UC5gjD6sG2bZc7tSOy1af6MA",
    "category": "gfx",
    "subscribers": "1.85K subscribers",
-   "lastFetch": "2026-11-08T09:34:22.889Z",
+   "lastFetch": "2026-11-08T12:42:40.392Z",
    "auto": true
   },
   {
@@ -2695,7 +2695,7 @@
    "channelId": "UCHqr8DH9qELXSBe3gabJLVQ",
    "category": "gfx",
    "subscribers": "57 subscribers",
-   "lastFetch": "2026-11-08T09:34:23.339Z",
+   "lastFetch": "2026-11-08T12:42:40.877Z",
    "auto": true
   },
   {
@@ -2706,7 +2706,7 @@
    "channelId": "UCRxymGLB2pYoN4_l04ULnAQ",
    "category": "gfx",
    "subscribers": "476 subscribers",
-   "lastFetch": "2026-11-08T09:34:23.812Z",
+   "lastFetch": "2026-11-08T12:42:41.338Z",
    "auto": true
   },
   {
@@ -2717,7 +2717,7 @@
    "channelId": "UCpVxyZYwLtPW3XbWcMOdHRQ",
    "category": "gfx",
    "subscribers": "4 subscribers",
-   "lastFetch": "2026-11-08T09:34:24.299Z",
+   "lastFetch": "2026-11-08T12:42:41.789Z",
    "auto": true
   },
   {
@@ -2728,7 +2728,7 @@
    "channelId": "UC_F4ExnhRIx-gCpklXr1TBg",
    "category": "gfx",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:34:24.799Z",
+   "lastFetch": "2026-11-08T12:42:42.227Z",
    "auto": true
   },
   {
@@ -2739,7 +2739,7 @@
    "channelId": "UCS3RvSLcASYU9gG58g_2Ysw",
    "category": "gfx",
    "subscribers": "3 subscribers",
-   "lastFetch": "2026-11-08T09:34:25.283Z",
+   "lastFetch": "2026-11-08T12:42:42.677Z",
    "auto": true
   },
   {
@@ -2750,7 +2750,7 @@
    "channelId": "UCXTE340fFByQcyFJeuVI6FA",
    "category": "gfx",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:34:25.815Z",
+   "lastFetch": "2026-11-08T12:42:43.130Z",
    "auto": true
   },
   {
@@ -2761,7 +2761,7 @@
    "channelId": "UCMScg335Z1VAWArZkYvvO6g",
    "category": "gfx",
    "subscribers": "5 subscribers",
-   "lastFetch": "2026-11-08T09:34:26.301Z",
+   "lastFetch": "2026-11-08T12:42:43.568Z",
    "auto": true
   },
   {
@@ -2772,7 +2772,7 @@
    "channelId": "UC0TSTaR-smRLugSMxxLmblA",
    "category": "gfx",
    "subscribers": "29 subscribers",
-   "lastFetch": "2026-11-08T09:34:26.823Z",
+   "lastFetch": "2026-11-08T12:42:44.026Z",
    "auto": true
   },
   {
@@ -2783,7 +2783,7 @@
    "channelId": "UC6j9EHE-Ld77X2uqKzn6qig",
    "category": "gfx",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:34:27.301Z",
+   "lastFetch": "2026-11-08T12:42:44.467Z",
    "auto": true
   },
   {
@@ -2794,7 +2794,7 @@
    "channelId": "UCmdhjl41OtbG0zzjN3SMATQ",
    "category": "gfx",
    "subscribers": "44 subscribers",
-   "lastFetch": "2026-11-08T09:34:27.873Z",
+   "lastFetch": "2026-11-08T12:42:44.932Z",
    "auto": true
   },
   {
@@ -2805,7 +2805,7 @@
    "channelId": "UCv_FBPyyn6orWFEJI9Y7YHg",
    "category": "gfx",
    "subscribers": "1 subscriber",
-   "lastFetch": "2026-11-08T09:34:28.428Z",
+   "lastFetch": "2026-11-08T12:42:45.377Z",
    "auto": true
   },
   {
@@ -2816,7 +2816,7 @@
    "channelId": "UCSLza5vI7V7IfHQMmnhiMMA",
    "category": "gfx",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:34:28.915Z",
+   "lastFetch": "2026-11-08T12:42:45.895Z",
    "auto": true
   },
   {
@@ -2827,7 +2827,7 @@
    "channelId": "UCGoBJHyOLErvmT29AotGKOg",
    "category": "gfx",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:34:29.412Z",
+   "lastFetch": "2026-11-08T12:42:46.339Z",
    "auto": true
   },
   {
@@ -2838,7 +2838,7 @@
    "channelId": "UCzICShgMzn2CLD4PYLuHlcg",
    "category": "gfx",
    "subscribers": "222 subscribers",
-   "lastFetch": "2026-11-08T09:34:29.965Z",
+   "lastFetch": "2026-11-08T12:42:46.790Z",
    "auto": true
   },
   {
@@ -2849,7 +2849,7 @@
    "channelId": "UClT-4BJg1BbcFzJzsipFUUw",
    "category": "gfx",
    "subscribers": "4 subscribers",
-   "lastFetch": "2026-11-08T09:34:30.513Z",
+   "lastFetch": "2026-11-08T12:42:47.237Z",
    "auto": true
   },
   {
@@ -2860,7 +2860,7 @@
    "channelId": "UCshbmJ1N9RWA4UgEuw9YlZg",
    "category": "gfx",
    "subscribers": "3 subscribers",
-   "lastFetch": "2026-11-08T09:34:30.994Z",
+   "lastFetch": "2026-11-08T12:42:47.685Z",
    "auto": true
   },
   {
@@ -2871,7 +2871,7 @@
    "channelId": "UCl-BrQMfynC7mpPDsg6MqlQ",
    "category": "building",
    "subscribers": "390K subscribers",
-   "lastFetch": "2026-11-08T09:34:31.458Z",
+   "lastFetch": "2026-11-08T12:42:48.129Z",
    "auto": true
   },
   {
@@ -2882,7 +2882,7 @@
    "channelId": "UCutsRQzKuDcyko7M1QWOzwA",
    "category": "building",
    "subscribers": "117K subscribers",
-   "lastFetch": "2026-11-08T09:34:31.965Z",
+   "lastFetch": "2026-11-08T12:42:48.576Z",
    "auto": true
   },
   {
@@ -2893,7 +2893,7 @@
    "channelId": "UCXGR9wsC3SgpEh9tBhjB6mw",
    "category": "building",
    "subscribers": "34 subscribers",
-   "lastFetch": "2026-11-08T09:34:32.490Z",
+   "lastFetch": "2026-11-08T12:42:49.010Z",
    "auto": true
   },
   {
@@ -2904,7 +2904,7 @@
    "channelId": "UCDZ1EAGuPOhrrm7TZD87bmQ",
    "category": "building",
    "subscribers": "54.1K subscribers",
-   "lastFetch": "2026-11-08T09:34:32.965Z",
+   "lastFetch": "2026-11-08T12:42:49.507Z",
    "auto": true
   },
   {
@@ -2915,7 +2915,7 @@
    "channelId": "UCF-grOhiObq4HaAhDHecosw",
    "category": "building",
    "subscribers": "30 subscribers",
-   "lastFetch": "2026-11-08T09:34:33.470Z",
+   "lastFetch": "2026-11-08T12:42:50.054Z",
    "auto": true
   },
   {
@@ -2926,7 +2926,7 @@
    "channelId": "UCmmY9b1KA56LXq_v9_MfQ6w",
    "category": "building",
    "subscribers": "6 subscribers",
-   "lastFetch": "2026-11-08T09:34:33.962Z",
+   "lastFetch": "2026-11-08T12:42:50.540Z",
    "auto": true
   },
   {
@@ -2937,7 +2937,7 @@
    "channelId": "UC3s2gS8SgIGEETZeHGPKlfg",
    "category": "building",
    "subscribers": "1.84M subscribers",
-   "lastFetch": "2026-11-08T09:34:34.459Z",
+   "lastFetch": "2026-11-08T12:42:51.054Z",
    "auto": true
   },
   {
@@ -2948,7 +2948,7 @@
    "channelId": "UCf73uypCVpVK-j6vH0Pm8Jg",
    "category": "building",
    "subscribers": "2 subscribers",
-   "lastFetch": "2026-11-08T09:34:35.017Z",
+   "lastFetch": "2026-11-08T12:42:51.521Z",
    "auto": true
   },
   {
@@ -2959,7 +2959,7 @@
    "channelId": "UCnak6faP5Xd4KFd6V28UqPQ",
    "category": "building",
    "subscribers": "2 subscribers",
-   "lastFetch": "2026-11-08T09:34:35.556Z",
+   "lastFetch": "2026-11-08T12:42:51.984Z",
    "auto": true
   },
   {
@@ -2970,7 +2970,7 @@
    "channelId": "UCQxoLsw4o5h1EF7ADL_cxhg",
    "category": "building",
    "subscribers": "3 subscribers",
-   "lastFetch": "2026-11-08T09:34:36.062Z",
+   "lastFetch": "2026-11-08T12:42:52.458Z",
    "auto": true
   },
   {
@@ -2981,7 +2981,7 @@
    "channelId": "UCXBbwGX_ClGQ2KJmyw51KIw",
    "category": "building",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:34:36.542Z",
+   "lastFetch": "2026-11-08T12:42:52.914Z",
    "auto": true
   },
   {
@@ -2992,7 +2992,7 @@
    "channelId": "UC7v_vW0H0dBHiITSVOMjszQ",
    "category": "building",
    "subscribers": "8 subscribers",
-   "lastFetch": "2026-11-08T09:34:37.043Z",
+   "lastFetch": "2026-11-08T12:42:53.394Z",
    "auto": true
   },
   {
@@ -3003,7 +3003,7 @@
    "channelId": "UCrJqjFvfUDyFsxgb1zh4oNw",
    "category": "building",
    "subscribers": "2 subscribers",
-   "lastFetch": "2026-11-08T09:34:37.649Z",
+   "lastFetch": "2026-11-08T12:42:53.857Z",
    "auto": true
   },
   {
@@ -3014,7 +3014,7 @@
    "channelId": "UCrof-58NIjGwYGZuDQCUxNQ",
    "category": "modeling",
    "subscribers": "8 subscribers",
-   "lastFetch": "2026-11-08T09:34:38.137Z",
+   "lastFetch": "2026-11-08T12:42:54.370Z",
    "auto": true
   },
   {
@@ -3025,7 +3025,7 @@
    "channelId": "UC-Mi2FOAqTQP0ciwY5Fl4Mg",
    "category": "animation",
    "subscribers": "358K subscribers",
-   "lastFetch": "2026-11-08T09:34:38.629Z",
+   "lastFetch": "2026-11-08T12:42:54.839Z",
    "auto": true
   },
   {
@@ -3036,7 +3036,7 @@
    "channelId": "UChDeckFglcXkaXWiose2QAA",
    "category": "building",
    "subscribers": "9 subscribers",
-   "lastFetch": "2026-11-08T09:34:39.120Z",
+   "lastFetch": "2026-11-08T12:42:55.279Z",
    "auto": true
   },
   {
@@ -3047,7 +3047,7 @@
    "channelId": "UCvE4vSOvzwO4JC5ckw3Iwfg",
    "category": "building",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:34:39.619Z",
+   "lastFetch": "2026-11-08T12:42:55.717Z",
    "auto": true
   },
   {
@@ -3058,7 +3058,7 @@
    "channelId": "UCu35oPRQtTeQnT4MLTuvMNw",
    "category": "building",
    "subscribers": "2 subscribers",
-   "lastFetch": "2026-11-08T09:34:40.108Z",
+   "lastFetch": "2026-11-08T12:42:56.169Z",
    "auto": true
   },
   {
@@ -3069,7 +3069,7 @@
    "channelId": "UCUg6CBwhk4BiPnvPdt_lklA",
    "category": "building",
    "subscribers": "7 subscribers",
-   "lastFetch": "2026-11-08T09:34:40.596Z",
+   "lastFetch": "2026-11-08T12:42:56.615Z",
    "auto": true
   },
   {
@@ -3080,7 +3080,7 @@
    "channelId": "UC48iOjWUXHL4GqHFXm7_Q7w",
    "category": "building",
    "subscribers": "3 subscribers",
-   "lastFetch": "2026-11-08T09:34:41.080Z",
+   "lastFetch": "2026-11-08T12:42:57.102Z",
    "auto": true
   },
   {
@@ -3091,7 +3091,7 @@
    "channelId": "UC7XXkKB1cWcrOZv1Y9wOnCg",
    "category": "building",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:34:41.625Z",
+   "lastFetch": "2026-11-08T12:42:57.548Z",
    "auto": true
   },
   {
@@ -3102,7 +3102,7 @@
    "channelId": "UC8Yg0dQGGb4CjwEMTL0WvLw",
    "category": "building",
    "subscribers": "2 subscribers",
-   "lastFetch": "2026-11-08T09:34:42.126Z",
+   "lastFetch": "2026-11-08T12:42:57.996Z",
    "auto": true
   },
   {
@@ -3113,7 +3113,7 @@
    "channelId": "UCOBCvH1F3Vz_1Fz_y4vmXpQ",
    "category": "building",
    "subscribers": "4 subscribers",
-   "lastFetch": "2026-11-08T09:34:42.626Z",
+   "lastFetch": "2026-11-08T12:42:58.449Z",
    "auto": true
   },
   {
@@ -3124,7 +3124,7 @@
    "channelId": "UCZcmdah5TctkKIJE96prmhQ",
    "category": "building",
    "subscribers": "1 subscriber",
-   "lastFetch": "2026-11-08T09:34:43.154Z",
+   "lastFetch": "2026-11-08T12:42:58.887Z",
    "auto": true
   },
   {
@@ -3135,7 +3135,7 @@
    "channelId": "UC5iziI07eTXMKfc69BqO0Og",
    "category": "building",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:34:43.650Z",
+   "lastFetch": "2026-11-08T12:42:59.331Z",
    "auto": true
   },
   {
@@ -3146,7 +3146,7 @@
    "channelId": "UC6lj-QfW6B7GTYT4NyY-miA",
    "category": "building",
    "subscribers": "2 subscribers",
-   "lastFetch": "2026-11-08T09:34:44.131Z",
+   "lastFetch": "2026-11-08T12:42:59.785Z",
    "auto": true
   },
   {
@@ -3157,7 +3157,7 @@
    "channelId": "UCnhUwDs0Vvf1K2eqMbwcK3Q",
    "category": "building",
    "subscribers": "15 subscribers",
-   "lastFetch": "2026-11-08T09:34:44.632Z",
+   "lastFetch": "2026-11-08T12:43:00.236Z",
    "auto": true
   },
   {
@@ -3168,7 +3168,7 @@
    "channelId": "UCFS_gXIdGlcHMJRTKLgZJWg",
    "category": "building",
    "subscribers": "7.61K subscribers",
-   "lastFetch": "2026-11-08T09:34:45.104Z",
+   "lastFetch": "2026-11-08T12:43:00.677Z",
    "auto": true
   },
   {
@@ -3179,7 +3179,7 @@
    "channelId": "UCRzjFr_h2g0WShsE8ANTSGw",
    "category": "building",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:34:45.594Z",
+   "lastFetch": "2026-11-08T12:43:01.121Z",
    "auto": true
   },
   {
@@ -3190,7 +3190,7 @@
    "channelId": "UC_ORTy9JlPrrhph1YmhQG8g",
    "category": "building",
    "subscribers": "4 subscribers",
-   "lastFetch": "2026-11-08T09:34:46.141Z",
+   "lastFetch": "2026-11-08T12:43:01.568Z",
    "auto": true
   },
   {
@@ -3201,7 +3201,7 @@
    "channelId": "UCzI5RZIJ25eLFHbTJIRppRg",
    "category": "building",
    "subscribers": "39 subscribers",
-   "lastFetch": "2026-11-08T09:34:46.642Z",
+   "lastFetch": "2026-11-08T12:43:02.022Z",
    "auto": true
   },
   {
@@ -3212,7 +3212,7 @@
    "channelId": "UC8pCtPnk3K22QMopWqdKAfg",
    "category": "building",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:34:47.148Z",
+   "lastFetch": "2026-11-08T12:43:02.459Z",
    "auto": true
   },
   {
@@ -3223,7 +3223,7 @@
    "channelId": "UCnK8Kja15RGD3CWjAOOlIKA",
    "category": "building",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:34:47.637Z",
+   "lastFetch": "2026-11-08T12:43:02.914Z",
    "auto": true
   },
   {
@@ -3234,7 +3234,7 @@
    "channelId": "UC8JUDpYMsXBrBVxAtQmha2A",
    "category": "building",
    "subscribers": "1 subscriber",
-   "lastFetch": "2026-11-08T09:34:48.198Z",
+   "lastFetch": "2026-11-08T12:43:03.378Z",
    "auto": true
   },
   {
@@ -3245,7 +3245,7 @@
    "channelId": "UCjnl5o3ZZrkH9l719G1Sk4Q",
    "category": "building",
    "subscribers": "2 subscribers",
-   "lastFetch": "2026-11-08T09:34:48.747Z",
+   "lastFetch": "2026-11-08T12:43:03.834Z",
    "auto": true
   },
   {
@@ -3256,7 +3256,7 @@
    "channelId": "UCscCZ2iMZ5tzmVKkmlXbGyg",
    "category": "building",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:34:49.292Z",
+   "lastFetch": "2026-11-08T12:43:04.277Z",
    "auto": true
   },
   {
@@ -3267,7 +3267,7 @@
    "channelId": "UCg4z8C0pl54zIbYO1O8XbBg",
    "category": "building",
    "subscribers": "7.39K subscribers",
-   "lastFetch": "2026-11-08T09:34:49.783Z",
+   "lastFetch": "2026-11-08T12:43:04.728Z",
    "auto": true
   },
   {
@@ -3278,7 +3278,7 @@
    "channelId": "UCUNNS8ekOBptxGfBQsKbW1g",
    "category": "modeling",
    "subscribers": "8.73K subscribers",
-   "lastFetch": "2026-11-08T09:34:50.256Z",
+   "lastFetch": "2026-11-08T12:43:05.172Z",
    "auto": true
   },
   {
@@ -3289,7 +3289,7 @@
    "channelId": "UCZs9Yjg1s606PHnxLXpk3zQ",
    "category": "modeling",
    "subscribers": "1.4K subscribers",
-   "lastFetch": "2026-11-08T09:34:50.773Z",
+   "lastFetch": "2026-11-08T12:43:05.633Z",
    "auto": true
   },
   {
@@ -3300,7 +3300,7 @@
    "channelId": "UCplFWULrSCyEEHl5SY1TD7g",
    "category": "modeling",
    "subscribers": "4.4K subscribers",
-   "lastFetch": "2026-11-08T09:34:51.365Z",
+   "lastFetch": "2026-11-08T12:43:06.099Z",
    "auto": true
   },
   {
@@ -3311,7 +3311,7 @@
    "channelId": "UCwFBOcLlaGAtaXkJUFS3Y9A",
    "category": "modeling",
    "subscribers": "118 subscribers",
-   "lastFetch": "2026-11-08T09:34:51.873Z",
+   "lastFetch": "2026-11-08T12:43:06.563Z",
    "auto": true
   },
   {
@@ -3322,7 +3322,7 @@
    "channelId": "UCYIecKOnvhwvsoMKQTBEdWw",
    "category": "modeling",
    "subscribers": "299 subscribers",
-   "lastFetch": "2026-11-08T09:34:52.368Z",
+   "lastFetch": "2026-11-08T12:43:07.028Z",
    "auto": true
   },
   {
@@ -3333,7 +3333,7 @@
    "channelId": "UCmmM_BgRwteiluJIM28lrLA",
    "category": "vfx",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:34:52.932Z",
+   "lastFetch": "2026-11-08T12:43:07.501Z",
    "auto": true
   },
   {
@@ -3344,7 +3344,7 @@
    "channelId": "UCn1CJdx_A0Ii1MevcxOat6g",
    "category": "modeling",
    "subscribers": "357 subscribers",
-   "lastFetch": "2026-11-08T09:34:53.445Z",
+   "lastFetch": "2026-11-08T12:43:07.978Z",
    "auto": true
   },
   {
@@ -3355,7 +3355,7 @@
    "channelId": "UCHKDvwfb3uwHhFToZQCGZKQ",
    "category": "modeling",
    "subscribers": "1.1K subscribers",
-   "lastFetch": "2026-11-08T09:34:53.947Z",
+   "lastFetch": "2026-11-08T12:43:08.438Z",
    "auto": true
   },
   {
@@ -3366,7 +3366,7 @@
    "channelId": "UClh4UR92Be1tMbE21Wmn56g",
    "category": "modeling",
    "subscribers": "207 subscribers",
-   "lastFetch": "2026-11-08T09:34:54.420Z",
+   "lastFetch": "2026-11-08T12:43:08.897Z",
    "auto": true
   },
   {
@@ -3377,7 +3377,7 @@
    "channelId": "UC4jVGfu9oKshZE-8sPJHzYw",
    "category": "modeling",
    "subscribers": "14 subscribers",
-   "lastFetch": "2026-11-08T09:34:54.915Z",
+   "lastFetch": "2026-11-08T12:43:09.352Z",
    "auto": true
   },
   {
@@ -3388,7 +3388,7 @@
    "channelId": "UCZRLpRdjNAEzkB9IPrXPdiw",
    "category": "modeling",
    "subscribers": "221 subscribers",
-   "lastFetch": "2026-11-08T09:34:55.428Z",
+   "lastFetch": "2026-11-08T12:43:09.798Z",
    "auto": true
   },
   {
@@ -3399,7 +3399,7 @@
    "channelId": "UCtAhMzUVLjARfZsCrzhEnyw",
    "category": "modeling",
    "subscribers": "177 subscribers",
-   "lastFetch": "2026-11-08T09:34:55.929Z",
+   "lastFetch": "2026-11-08T12:43:10.266Z",
    "auto": true
   },
   {
@@ -3410,7 +3410,7 @@
    "channelId": "UC4S7REVGs6bt9tfBhV7AKhA",
    "category": "modeling",
    "subscribers": "12.2K subscribers",
-   "lastFetch": "2026-11-08T09:34:56.419Z",
+   "lastFetch": "2026-11-08T12:43:10.734Z",
    "auto": true
   },
   {
@@ -3421,7 +3421,7 @@
    "channelId": "UCMb_XgsxtS8yMKDluBzMmuQ",
    "category": "animation",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:34:56.930Z",
+   "lastFetch": "2026-11-08T12:43:11.196Z",
    "auto": true
   },
   {
@@ -3432,7 +3432,7 @@
    "channelId": "UCJh40VyghrVatNR-Igepq_g",
    "category": "modeling",
    "subscribers": "2.95K subscribers",
-   "lastFetch": "2026-11-08T09:34:57.441Z",
+   "lastFetch": "2026-11-08T12:43:11.648Z",
    "auto": true
   },
   {
@@ -3443,7 +3443,7 @@
    "channelId": "UCW7ZZ_UZR0FikT_HVoenNSg",
    "category": "modeling",
    "subscribers": "3 subscribers",
-   "lastFetch": "2026-11-08T09:34:57.937Z",
+   "lastFetch": "2026-11-08T12:43:12.102Z",
    "auto": true
   },
   {
@@ -3454,7 +3454,7 @@
    "channelId": "UCNWK0tBaPNrIAH9kLA6ru8Q",
    "category": "animation",
    "subscribers": "147 subscribers",
-   "lastFetch": "2026-11-08T09:34:58.404Z",
+   "lastFetch": "2026-11-08T12:43:12.554Z",
    "auto": true
   },
   {
@@ -3465,7 +3465,7 @@
    "channelId": "UC0N7OPG3omWM6VqowppfqRg",
    "category": "modeling",
    "subscribers": "38 subscribers",
-   "lastFetch": "2026-11-08T09:34:58.900Z",
+   "lastFetch": "2026-11-08T12:43:13.025Z",
    "auto": true
   },
   {
@@ -3476,7 +3476,7 @@
    "channelId": "UCHTxeljzrxdaS7FhCU2Ka3A",
    "category": "modeling",
    "subscribers": "137 subscribers",
-   "lastFetch": "2026-11-08T09:34:59.354Z",
+   "lastFetch": "2026-11-08T12:43:13.437Z",
    "auto": true
   },
   {
@@ -3487,7 +3487,7 @@
    "channelId": "UCt95i2NjkL7Z4Df1VS2GtyQ",
    "category": "modeling",
    "subscribers": "115 subscribers",
-   "lastFetch": "2026-11-08T09:34:59.852Z",
+   "lastFetch": "2026-11-08T12:43:13.905Z",
    "auto": true
   },
   {
@@ -3498,7 +3498,7 @@
    "channelId": "UCR2ue2ZDebvhksz-F-6oosw",
    "category": "modeling",
    "subscribers": "1.43K subscribers",
-   "lastFetch": "2026-11-08T09:35:00.319Z",
+   "lastFetch": "2026-11-08T12:43:14.328Z",
    "auto": true
   },
   {
@@ -3509,7 +3509,7 @@
    "channelId": "UCPluB2_wwrZE76EhaCCzvVw",
    "category": "modeling",
    "subscribers": "87 subscribers",
-   "lastFetch": "2026-11-08T09:35:00.799Z",
+   "lastFetch": "2026-11-08T12:43:14.772Z",
    "auto": true
   },
   {
@@ -3520,7 +3520,7 @@
    "channelId": "UCfh1u7OWiMMNfbig1CSlFNA",
    "category": "modeling",
    "subscribers": "510 subscribers",
-   "lastFetch": "2026-11-08T09:35:01.314Z",
+   "lastFetch": "2026-11-08T12:43:15.258Z",
    "auto": true
   },
   {
@@ -3531,7 +3531,7 @@
    "channelId": "UCBscszB_6U5VIpwUIadj1ag",
    "category": "animation",
    "subscribers": "14 subscribers",
-   "lastFetch": "2026-11-08T09:35:01.808Z",
+   "lastFetch": "2026-11-08T12:43:15.728Z",
    "auto": true
   },
   {
@@ -3542,7 +3542,7 @@
    "channelId": "UCOUie1UGCscFd62OtycvwXg",
    "category": "modeling",
    "subscribers": "177 subscribers",
-   "lastFetch": "2026-11-08T09:35:02.316Z",
+   "lastFetch": "2026-11-08T12:43:16.190Z",
    "auto": true
   },
   {
@@ -3553,7 +3553,7 @@
    "channelId": "UClxq5DY_ShH-SletRT1CUYA",
    "category": "modeling",
    "subscribers": "6K subscribers",
-   "lastFetch": "2026-11-08T09:35:02.866Z",
+   "lastFetch": "2026-11-08T12:43:16.647Z",
    "auto": true
   },
   {
@@ -3564,7 +3564,7 @@
    "channelId": "UC6kha6x9-sUel-5Ahs6y7Hw",
    "category": "modeling",
    "subscribers": "11 subscribers",
-   "lastFetch": "2026-11-08T09:35:03.442Z",
+   "lastFetch": "2026-11-08T12:43:17.094Z",
    "auto": true
   },
   {
@@ -3575,7 +3575,7 @@
    "channelId": "UCj0QC-TsO3IUh0q1s4LU-_A",
    "category": "modeling",
    "subscribers": "23 subscribers",
-   "lastFetch": "2026-11-08T09:35:03.940Z",
+   "lastFetch": "2026-11-08T12:43:17.553Z",
    "auto": true
   },
   {
@@ -3586,7 +3586,7 @@
    "channelId": "UCUwNiLVzD1Rj6jJ_N_QJlCA",
    "category": "modeling",
    "subscribers": "16 subscribers",
-   "lastFetch": "2026-11-08T09:35:04.448Z",
+   "lastFetch": "2026-11-08T12:43:18.064Z",
    "auto": true
   },
   {
@@ -3597,7 +3597,7 @@
    "channelId": "UC-2jFKWT9OTc3rBv_ReF2Tg",
    "category": "gfx",
    "subscribers": "1.37K subscribers",
-   "lastFetch": "2026-11-08T09:35:04.927Z",
+   "lastFetch": "2026-11-08T12:43:18.572Z",
    "auto": true
   },
   {
@@ -3608,7 +3608,7 @@
    "channelId": "UCrkOhjjeKfB5EUvWMFDS97g",
    "category": "animation",
    "subscribers": "4.76K subscribers",
-   "lastFetch": "2026-11-08T09:35:05.481Z",
+   "lastFetch": "2026-11-08T12:43:19.012Z",
    "auto": true
   },
   {
@@ -3619,7 +3619,7 @@
    "channelId": "UCxCt2d9gYEAszQNqFfInpbQ",
    "category": "modeling",
    "subscribers": "273 subscribers",
-   "lastFetch": "2026-11-08T09:35:06.017Z",
+   "lastFetch": "2026-11-08T12:43:19.489Z",
    "auto": true
   },
   {
@@ -3630,7 +3630,7 @@
    "channelId": "UC7XfQkq_OJ_6C5bJmoEsS4w",
    "category": "modeling",
    "subscribers": "49 subscribers",
-   "lastFetch": "2026-11-08T09:35:06.526Z",
+   "lastFetch": "2026-11-08T12:43:20.005Z",
    "auto": true
   },
   {
@@ -3641,7 +3641,7 @@
    "channelId": "UC4n9xF68QeVkY1eTMwp5QSg",
    "category": "modeling",
    "subscribers": "696 subscribers",
-   "lastFetch": "2026-11-08T09:35:07.035Z",
+   "lastFetch": "2026-11-08T12:43:20.461Z",
    "auto": true
   },
   {
@@ -3652,7 +3652,7 @@
    "channelId": "UCwAq7EIw6c0RkoY_aMQ_P_w",
    "category": "modeling",
    "subscribers": "8 subscribers",
-   "lastFetch": "2026-11-08T09:35:07.536Z",
+   "lastFetch": "2026-11-08T12:43:20.918Z",
    "auto": true
   },
   {
@@ -3663,7 +3663,7 @@
    "channelId": "UC4B9Jezn9NABPS8QAblRB_A",
    "category": "modeling",
    "subscribers": "1.21K subscribers",
-   "lastFetch": "2026-11-08T09:35:08.036Z",
+   "lastFetch": "2026-11-08T12:43:21.384Z",
    "auto": true
   },
   {
@@ -3674,7 +3674,7 @@
    "channelId": "UCmGkeZhZx7zRKKuga2dDRow",
    "category": "modeling",
    "subscribers": "80 subscribers",
-   "lastFetch": "2026-11-08T09:35:08.584Z",
+   "lastFetch": "2026-11-08T12:43:21.829Z",
    "auto": true
   },
   {
@@ -3685,7 +3685,7 @@
    "channelId": "UCu7X164y1hrRI34DnCmZ6bg",
    "category": "modeling",
    "subscribers": "20 subscribers",
-   "lastFetch": "2026-11-08T09:35:09.145Z",
+   "lastFetch": "2026-11-08T12:43:22.282Z",
    "auto": true
   },
   {
@@ -3696,7 +3696,7 @@
    "channelId": "UCcveevPKqqddOrBq3tnrhHA",
    "category": "animation",
    "subscribers": "8 subscribers",
-   "lastFetch": "2026-11-08T09:35:09.626Z",
+   "lastFetch": "2026-11-08T12:43:22.722Z",
    "auto": true
   },
   {
@@ -3707,7 +3707,7 @@
    "channelId": "UCpvhefpUnXilw55Wus9dSpg",
    "category": "tools",
    "subscribers": "5.19K subscribers",
-   "lastFetch": "2026-11-08T09:35:10.085Z",
+   "lastFetch": "2026-11-08T12:43:23.180Z",
    "auto": true
   },
   {
@@ -3718,7 +3718,7 @@
    "channelId": "UCAMZAhqS_6taMyKsUrC1oig",
    "category": "tools",
    "subscribers": "27.8K subscribers",
-   "lastFetch": "2026-11-08T09:35:10.567Z",
+   "lastFetch": "2026-11-08T12:43:23.639Z",
    "auto": true
   },
   {
@@ -3729,7 +3729,7 @@
    "channelId": "UCyhx12WwduQDFYpbUxn70RQ",
    "category": "tools",
    "subscribers": "26.3K subscribers",
-   "lastFetch": "2026-11-08T09:35:11.038Z",
+   "lastFetch": "2026-11-08T12:43:24.091Z",
    "auto": true
   },
   {
@@ -3740,7 +3740,7 @@
    "channelId": "UC2pHFDaynlQcXzA5rj_srdg",
    "category": "tools",
    "subscribers": "287K subscribers",
-   "lastFetch": "2026-11-08T09:35:11.523Z",
+   "lastFetch": "2026-11-08T12:43:24.533Z",
    "auto": true
   },
   {
@@ -3751,7 +3751,7 @@
    "channelId": "UCqCNZ-1o-_cQv6WABhVG6Lw",
    "category": "tools",
    "subscribers": "16.6K subscribers",
-   "lastFetch": "2026-11-08T09:35:12.014Z",
+   "lastFetch": "2026-11-08T12:43:25.108Z",
    "auto": true
   },
   {
@@ -3762,7 +3762,7 @@
    "channelId": "UCq1dvPtW4RYA2fvSBcBUF3g",
    "category": "tools",
    "subscribers": "3.8K subscribers",
-   "lastFetch": "2026-11-08T09:35:12.580Z",
+   "lastFetch": "2026-11-08T12:43:25.567Z",
    "auto": true
   },
   {
@@ -3773,7 +3773,7 @@
    "channelId": "UCDrSC33VMm4VpZD2DaOefYg",
    "category": "tools",
    "subscribers": "27.2K subscribers",
-   "lastFetch": "2026-11-08T09:35:13.051Z",
+   "lastFetch": "2026-11-08T12:43:26.012Z",
    "auto": true
   },
   {
@@ -3784,7 +3784,7 @@
    "channelId": "UCHfokoaIl5-YuRSYRSNTMUg",
    "category": "tools",
    "subscribers": "42.5K subscribers",
-   "lastFetch": "2026-11-08T09:35:13.554Z",
+   "lastFetch": "2026-11-08T12:43:26.456Z",
    "auto": true
   },
   {
@@ -3795,7 +3795,7 @@
    "channelId": "UCrkLOE3tpzB2_Anh2P5E0OQ",
    "category": "tools",
    "subscribers": "1.96K subscribers",
-   "lastFetch": "2026-11-08T09:35:14.151Z",
+   "lastFetch": "2026-11-08T12:43:26.917Z",
    "auto": true
   },
   {
@@ -3806,7 +3806,7 @@
    "channelId": "UCtXgH4K-5JTsAj98EzTG92g",
    "category": "tools",
    "subscribers": "10.3K subscribers",
-   "lastFetch": "2026-11-08T09:35:14.616Z",
+   "lastFetch": "2026-11-08T12:43:27.367Z",
    "auto": true
   },
   {
@@ -3817,7 +3817,7 @@
    "channelId": "UCWejruXwivslzO0uIzFPpMQ",
    "category": "tools",
    "subscribers": "53.1K subscribers",
-   "lastFetch": "2026-11-08T09:35:15.099Z",
+   "lastFetch": "2026-11-08T12:43:27.807Z",
    "auto": true
   },
   {
@@ -3828,7 +3828,7 @@
    "channelId": "UCWYttqm62MtNpZU6k7mzeDQ",
    "category": "tools",
    "subscribers": "30.7K subscribers",
-   "lastFetch": "2026-11-08T09:35:15.581Z",
+   "lastFetch": "2026-11-08T12:43:28.264Z",
    "auto": true
   },
   {
@@ -3839,7 +3839,7 @@
    "channelId": "UCiRSsWLVW2hz_vNPRKYD4qA",
    "category": "tools",
    "subscribers": "12.1K subscribers",
-   "lastFetch": "2026-11-08T09:35:16.091Z",
+   "lastFetch": "2026-11-08T12:43:28.707Z",
    "auto": true
   },
   {
@@ -3850,7 +3850,7 @@
    "channelId": "UCaZO-66UcqyVT9btiqdDryA",
    "category": "tools",
    "subscribers": "33.2K subscribers",
-   "lastFetch": "2026-11-08T09:35:16.584Z",
+   "lastFetch": "2026-11-08T12:43:29.163Z",
    "auto": true
   },
   {
@@ -3861,7 +3861,7 @@
    "channelId": "UC96Fs4Gdg70VhTBmZ7Ksrwg",
    "category": "building",
    "subscribers": "7 subscribers",
-   "lastFetch": "2026-11-08T09:35:17.055Z",
+   "lastFetch": "2026-11-08T12:43:29.602Z",
    "auto": true
   },
   {
@@ -3872,7 +3872,7 @@
    "channelId": "UCnE5qP9uamkjE3MMqBywnpQ",
    "category": "building",
    "subscribers": "4 subscribers",
-   "lastFetch": "2026-11-08T09:35:17.584Z",
+   "lastFetch": "2026-11-08T12:43:30.063Z",
    "auto": true
   },
   {
@@ -3883,7 +3883,7 @@
    "channelId": "UCYeEfN1_YxoV3bp15qpdEoA",
    "category": "scripting",
    "subscribers": "24.5K subscribers",
-   "lastFetch": "2026-11-08T09:35:18.086Z",
+   "lastFetch": "2026-11-08T12:43:30.569Z",
    "auto": true
   },
   {
@@ -3894,7 +3894,7 @@
    "channelId": "UC56-jWieMXj7_fANEHFyKOQ",
    "category": "building",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:35:18.573Z",
+   "lastFetch": "2026-11-08T12:43:31.011Z",
    "auto": true
   },
   {
@@ -3905,7 +3905,7 @@
    "channelId": "UCFlnCSU8U9EuGy6giyXMaQA",
    "category": "tools",
    "subscribers": "429 subscribers",
-   "lastFetch": "2026-11-08T09:35:19.147Z",
+   "lastFetch": "2026-11-08T12:43:31.463Z",
    "auto": true
   },
   {
@@ -3916,7 +3916,7 @@
    "channelId": "UCC9qKZefENI351paGzPxLQw",
    "category": "tools",
    "subscribers": "4.71K subscribers",
-   "lastFetch": "2026-11-08T09:35:19.675Z",
+   "lastFetch": "2026-11-08T12:43:31.945Z",
    "auto": true
   },
   {
@@ -3927,7 +3927,7 @@
    "channelId": "UCqJYBglnWVfJA63XOyeky0g",
    "category": "tools",
    "subscribers": "13.9K subscribers",
-   "lastFetch": "2026-11-08T09:35:20.138Z",
+   "lastFetch": "2026-11-08T12:43:32.381Z",
    "auto": true
   },
   {
@@ -3938,7 +3938,7 @@
    "channelId": "UCICXmIAqFu2QXPwigx4ThAA",
    "category": "tools",
    "subscribers": "28.9K subscribers",
-   "lastFetch": "2026-11-08T09:35:20.618Z",
+   "lastFetch": "2026-11-08T12:43:32.839Z",
    "auto": true
   },
   {
@@ -3949,7 +3949,7 @@
    "channelId": "UCKKjmmLHJJ4EibpiNJQBuCw",
    "category": "tools",
    "subscribers": "312K subscribers",
-   "lastFetch": "2026-11-08T09:35:21.092Z",
+   "lastFetch": "2026-11-08T12:43:33.281Z",
    "auto": true
   },
   {
@@ -3960,7 +3960,7 @@
    "channelId": "UCm9BLn-37SYkHLshq0cPD4Q",
    "category": "building",
    "subscribers": "16 subscribers",
-   "lastFetch": "2026-11-08T09:35:21.599Z",
+   "lastFetch": "2026-11-08T12:43:33.797Z",
    "auto": true
   },
   {
@@ -3971,7 +3971,7 @@
    "channelId": "UCecwOg8dRS1RuvFketTvrQA",
    "category": "tools",
    "subscribers": "4.23K subscribers",
-   "lastFetch": "2026-11-08T09:35:22.089Z",
+   "lastFetch": "2026-11-08T12:43:34.235Z",
    "auto": true
   },
   {
@@ -3982,7 +3982,7 @@
    "channelId": "UCBICbVjxVdl8FXsdwZc_NPQ",
    "category": "tools",
    "subscribers": "17.9K subscribers",
-   "lastFetch": "2026-11-08T09:35:22.633Z",
+   "lastFetch": "2026-11-08T12:43:34.754Z",
    "auto": true
   },
   {
@@ -3993,7 +3993,7 @@
    "channelId": "UCpuej8zYU_XIoUVe4KwjOdQ",
    "category": "tools",
    "subscribers": "3 subscribers",
-   "lastFetch": "2026-11-08T09:35:23.120Z",
+   "lastFetch": "2026-11-08T12:43:35.249Z",
    "auto": true
   },
   {
@@ -4004,7 +4004,7 @@
    "channelId": "UCpdjXLqZaKoYeygkZ1IcoVg",
    "category": "scripting",
    "subscribers": "1.41K subscribers",
-   "lastFetch": "2026-11-08T09:35:23.603Z",
+   "lastFetch": "2026-11-08T12:43:35.694Z",
    "auto": true
   },
   {
@@ -4015,7 +4015,7 @@
    "channelId": "UChtKoy9hN36Oehbx6nESp9A",
    "category": "tools",
    "subscribers": "3.76K subscribers",
-   "lastFetch": "2026-11-08T09:35:24.079Z",
+   "lastFetch": "2026-11-08T12:43:36.238Z",
    "auto": true
   },
   {
@@ -4026,7 +4026,7 @@
    "channelId": "UCswyzjyIijBr51ysVYLhgmA",
    "category": "tools",
    "subscribers": "216 subscribers",
-   "lastFetch": "2026-11-08T09:35:24.650Z",
+   "lastFetch": "2026-11-08T12:43:36.703Z",
    "auto": true
   },
   {
@@ -4037,7 +4037,7 @@
    "channelId": "UCfeZwsfJV03GyTsooTTk5vg",
    "category": "tools",
    "subscribers": "9.34K subscribers",
-   "lastFetch": "2026-11-08T09:35:25.127Z",
+   "lastFetch": "2026-11-08T12:43:37.162Z",
    "auto": true
   },
   {
@@ -4048,7 +4048,7 @@
    "channelId": "UCHE-6ia5yDyMD-THoOtk_zA",
    "category": "tools",
    "subscribers": "38.7K subscribers",
-   "lastFetch": "2026-11-08T09:35:25.625Z",
+   "lastFetch": "2026-11-08T12:43:37.619Z",
    "auto": true
   },
   {
@@ -4059,7 +4059,7 @@
    "channelId": "UCQhMjozxh5HKoejO1_nbPqg",
    "category": "tools",
    "subscribers": "2 subscribers",
-   "lastFetch": "2026-11-08T09:35:26.118Z",
+   "lastFetch": "2026-11-08T12:43:38.062Z",
    "auto": true
   },
   {
@@ -4070,7 +4070,7 @@
    "channelId": "UCx9Hf31l31CR-YPtRIoZXEA",
    "category": "tools",
    "subscribers": "1 subscriber",
-   "lastFetch": "2026-11-08T09:35:26.618Z",
+   "lastFetch": "2026-11-08T12:43:38.504Z",
    "auto": true
   },
   {
@@ -4081,7 +4081,7 @@
    "channelId": "UCnIJEsJmEsuyWObVDE0Ol3Q",
    "category": "animation",
    "subscribers": "21.4K subscribers",
-   "lastFetch": "2026-11-08T09:35:27.097Z",
+   "lastFetch": "2026-11-08T12:43:38.945Z",
    "auto": true
   },
   {
@@ -4092,7 +4092,7 @@
    "channelId": "UCh_0L2HO2gzk2V5eIPgU8JA",
    "category": "tools",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:35:27.589Z",
+   "lastFetch": "2026-11-08T12:43:39.442Z",
    "auto": true
   },
   {
@@ -4103,7 +4103,7 @@
    "channelId": "UC85B-8Z2rLuqgqZ-3KzEjzA",
    "category": "scripting",
    "subscribers": "64 subscribers",
-   "lastFetch": "2026-11-08T09:35:28.091Z",
+   "lastFetch": "2026-11-08T12:43:39.900Z",
    "auto": true
   },
   {
@@ -4114,7 +4114,7 @@
    "channelId": "UCncZh0Mdcbf3RQMw19A7IUA",
    "category": "tools",
    "subscribers": "11 subscribers",
-   "lastFetch": "2026-11-08T09:35:28.545Z",
+   "lastFetch": "2026-11-08T12:43:40.317Z",
    "auto": true
   },
   {
@@ -4125,7 +4125,7 @@
    "channelId": "UCzZQpeYpDMG-6ShC7j8eYng",
    "category": "tools",
    "subscribers": "167 subscribers",
-   "lastFetch": "2026-11-08T09:35:29.029Z",
+   "lastFetch": "2026-11-08T12:43:40.765Z",
    "auto": true
   },
   {
@@ -4136,7 +4136,7 @@
    "channelId": "UCqtTgteHiP9WkbvYA_ApjZg",
    "category": "scripting",
    "subscribers": "144K subscribers",
-   "lastFetch": "2026-11-08T09:35:29.494Z",
+   "lastFetch": "2026-11-08T12:43:41.195Z",
    "auto": true
   },
   {
@@ -4147,7 +4147,7 @@
    "channelId": "UCb0CbfnzYo6mLreJIXDxMtQ",
    "category": "tools",
    "subscribers": "21.1K subscribers",
-   "lastFetch": "2026-11-08T09:35:30.038Z",
+   "lastFetch": "2026-11-08T12:43:41.630Z",
    "auto": true
   },
   {
@@ -4158,7 +4158,7 @@
    "channelId": "UCIFs2owOImT8YupLMyfyR3A",
    "category": "tools",
    "subscribers": "4 subscribers",
-   "lastFetch": "2026-11-08T09:35:30.529Z",
+   "lastFetch": "2026-11-08T12:43:42.098Z",
    "auto": true
   },
   {
@@ -4169,7 +4169,7 @@
    "channelId": "UCn0Rdd884oJppZGRflJpPsA",
    "category": "tools",
    "subscribers": "2 subscribers",
-   "lastFetch": "2026-11-08T09:35:31.019Z",
+   "lastFetch": "2026-11-08T12:43:42.559Z",
    "auto": true
   },
   {
@@ -4180,7 +4180,7 @@
    "channelId": "UCxfPsOrqUlK37cVOp7_eyDw",
    "category": "tools",
    "subscribers": "4 subscribers",
-   "lastFetch": "2026-11-08T09:35:31.511Z",
+   "lastFetch": "2026-11-08T12:43:43.016Z",
    "auto": true
   },
   {
@@ -4191,7 +4191,7 @@
    "channelId": "UC0Ylw4VtXWz6m8mMdhN3dlw",
    "category": "tools",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:35:31.999Z",
+   "lastFetch": "2026-11-08T12:43:43.493Z",
    "auto": true
   },
   {
@@ -4202,7 +4202,7 @@
    "channelId": "UCeTYQBkQmiRqzO43JQpCllA",
    "category": "tools",
    "subscribers": "20.1K subscribers",
-   "lastFetch": "2026-11-08T09:35:32.475Z",
+   "lastFetch": "2026-11-08T12:43:43.937Z",
    "auto": true
   },
   {
@@ -4213,7 +4213,7 @@
    "channelId": "UC3MMwBiq1t2HPUcear07jqQ",
    "category": "tools",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:35:32.972Z",
+   "lastFetch": "2026-11-08T12:43:44.385Z",
    "auto": true
   },
   {
@@ -4224,7 +4224,7 @@
    "channelId": "UCo8NGZchlmUMqypF9cD-Qfg",
    "category": "tools",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:35:33.474Z",
+   "lastFetch": "2026-11-08T12:43:44.836Z",
    "auto": true
   },
   {
@@ -4235,7 +4235,7 @@
    "channelId": "UCdTAiF3tx8-NlH-eUn19E6A",
    "category": "building",
    "subscribers": "107 subscribers",
-   "lastFetch": "2026-11-08T09:35:33.991Z",
+   "lastFetch": "2026-11-08T12:43:45.309Z",
    "auto": true
   },
   {
@@ -4246,7 +4246,7 @@
    "channelId": "UCSj-5UVMfsLjkTWWwd5tiVg",
    "category": "tools",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:35:34.470Z",
+   "lastFetch": "2026-11-08T12:43:45.748Z",
    "auto": true
   },
   {
@@ -4257,7 +4257,7 @@
    "channelId": "UC9KIIGqZFpuyJ5eH7CYbMfw",
    "category": "tools",
    "subscribers": "3 subscribers",
-   "lastFetch": "2026-11-08T09:35:35.020Z",
+   "lastFetch": "2026-11-08T12:43:46.248Z",
    "auto": true
   },
   {
@@ -4268,7 +4268,7 @@
    "channelId": "UCC7T37XFOII2VIKICUixEYQ",
    "category": "tools",
    "subscribers": "1 subscriber",
-   "lastFetch": "2026-11-08T09:35:35.519Z",
+   "lastFetch": "2026-11-08T12:43:46.688Z",
    "auto": true
   },
   {
@@ -4279,7 +4279,7 @@
    "channelId": "UCoJm85yjuPaedvMbOvOn-Nw",
    "category": "tools",
    "subscribers": "1 subscriber",
-   "lastFetch": "2026-11-08T09:35:36.005Z",
+   "lastFetch": "2026-11-08T12:43:47.129Z",
    "auto": true
   },
   {
@@ -4290,7 +4290,7 @@
    "channelId": "UCFhefXdQ1OlmZpCcwWOp22A",
    "category": "scripting",
    "subscribers": "20K subscribers",
-   "lastFetch": "2026-11-08T09:35:36.490Z",
+   "lastFetch": "2026-11-08T12:43:47.598Z",
    "auto": true
   },
   {
@@ -4301,7 +4301,7 @@
    "channelId": "UCluuZm-5prrVeEKlCHWBK6Q",
    "category": "scripting",
    "subscribers": "5.7K subscribers",
-   "lastFetch": "2026-11-08T09:35:37.000Z",
+   "lastFetch": "2026-11-08T12:43:48.142Z",
    "auto": true
   },
   {
@@ -4312,7 +4312,7 @@
    "channelId": "UCBKB8ZachM0npbNtXIQrKvQ",
    "category": "scripting",
    "subscribers": "458 subscribers",
-   "lastFetch": "2026-11-08T09:35:37.483Z",
+   "lastFetch": "2026-11-08T12:43:48.619Z",
    "auto": true
   },
   {
@@ -4323,7 +4323,7 @@
    "channelId": "UCjoOzJhgGvI6j22ORk5YTKw",
    "category": "scripting",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:35:38.022Z",
+   "lastFetch": "2026-11-08T12:43:49.070Z",
    "auto": true
   },
   {
@@ -4334,7 +4334,7 @@
    "channelId": "UCqsw83Cea5Vb44CNBfkTG8Q",
    "category": "scripting",
    "subscribers": "2.64K subscribers",
-   "lastFetch": "2026-11-08T09:35:38.546Z",
+   "lastFetch": "2026-11-08T12:43:49.534Z",
    "auto": true
   },
   {
@@ -4345,7 +4345,7 @@
    "channelId": "UCT4N5Je0491Kw87aRpwEaxA",
    "category": "scripting",
    "subscribers": "19K subscribers",
-   "lastFetch": "2026-11-08T09:35:39.018Z",
+   "lastFetch": "2026-11-08T12:43:49.978Z",
    "auto": true
   },
   {
@@ -4356,7 +4356,7 @@
    "channelId": "UClIi0hfcypktvsZzLMR3juA",
    "category": "scripting",
    "subscribers": "117 subscribers",
-   "lastFetch": "2026-11-08T09:35:39.587Z",
+   "lastFetch": "2026-11-08T12:43:50.438Z",
    "auto": true
   },
   {
@@ -4367,7 +4367,7 @@
    "channelId": "UCj3Rji6BY29xRB2rStI1tBw",
    "category": "scripting",
    "subscribers": "1.02K subscribers",
-   "lastFetch": "2026-11-08T09:35:40.051Z",
+   "lastFetch": "2026-11-08T12:43:50.913Z",
    "auto": true
   },
   {
@@ -4378,7 +4378,7 @@
    "channelId": "UCriYx-QOAbqEuROxYPbq1Cg",
    "category": "scripting",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:35:40.509Z",
+   "lastFetch": "2026-11-08T12:43:51.323Z",
    "auto": true
   },
   {
@@ -4389,7 +4389,7 @@
    "channelId": "UCIM76sEft5VaKiyrj_c9A4A",
    "category": "scripting",
    "subscribers": "43 subscribers",
-   "lastFetch": "2026-11-08T09:35:41.006Z",
+   "lastFetch": "2026-11-08T12:43:51.766Z",
    "auto": true
   },
   {
@@ -4400,7 +4400,7 @@
    "channelId": "UC8z2YK2A8D7K_qgyal2af9Q",
    "category": "scripting",
    "subscribers": "147 subscribers",
-   "lastFetch": "2026-11-08T09:35:41.505Z",
+   "lastFetch": "2026-11-08T12:43:52.229Z",
    "auto": true
   },
   {
@@ -4411,7 +4411,7 @@
    "channelId": "UCupj2NKU_nnitaxXT5tAVZg",
    "category": "scripting",
    "subscribers": "34 subscribers",
-   "lastFetch": "2026-11-08T09:35:41.976Z",
+   "lastFetch": "2026-11-08T12:43:52.700Z",
    "auto": true
   },
   {
@@ -4422,7 +4422,7 @@
    "channelId": "UC3eWMuKelnAyW6n4lO2oIMw",
    "category": "scripting",
    "subscribers": "665 subscribers",
-   "lastFetch": "2026-11-08T09:35:42.489Z",
+   "lastFetch": "2026-11-08T12:43:53.169Z",
    "auto": true
   },
   {
@@ -4433,7 +4433,7 @@
    "channelId": "UCq2zfPWjXZ3_A6T7TCUq4Ow",
    "category": "scripting",
    "subscribers": "397 subscribers",
-   "lastFetch": "2026-11-08T09:35:42.995Z",
+   "lastFetch": "2026-11-08T12:43:53.626Z",
    "auto": true
   },
   {
@@ -4444,7 +4444,7 @@
    "channelId": "UCfTkmvGqGS3WurLqtPg2Tzw",
    "category": "scripting",
    "subscribers": "44 subscribers",
-   "lastFetch": "2026-11-08T09:35:43.508Z",
+   "lastFetch": "2026-11-08T12:43:54.078Z",
    "auto": true
   },
   {
@@ -4455,7 +4455,7 @@
    "channelId": "UCz52BP2rNHf1u_eqYCASQmw",
    "category": "scripting",
    "subscribers": "196 subscribers",
-   "lastFetch": "2026-11-08T09:35:44.044Z",
+   "lastFetch": "2026-11-08T12:43:54.522Z",
    "auto": true
   },
   {
@@ -4466,7 +4466,7 @@
    "channelId": "UChoQWgssSWw2dgACuBV8kyQ",
    "category": "scripting",
    "subscribers": "13 subscribers",
-   "lastFetch": "2026-11-08T09:35:44.552Z",
+   "lastFetch": "2026-11-08T12:43:54.980Z",
    "auto": true
   },
   {
@@ -4477,7 +4477,7 @@
    "channelId": "UCKNBIDnPyYuGJsWvjW2pabw",
    "category": "scripting",
    "subscribers": "7 subscribers",
-   "lastFetch": "2026-11-08T09:35:45.036Z",
+   "lastFetch": "2026-11-08T12:43:55.410Z",
    "auto": true
   },
   {
@@ -4488,7 +4488,7 @@
    "channelId": "UCwnA5oLal_R-oZzUQwZJXaQ",
    "category": "scripting",
    "subscribers": "1 subscriber",
-   "lastFetch": "2026-11-08T09:35:45.532Z",
+   "lastFetch": "2026-11-08T12:43:55.859Z",
    "auto": true
   },
   {
@@ -4499,7 +4499,7 @@
    "channelId": "UCIPzVcZXyjFce5TrzOmQhBA",
    "category": "scripting",
    "subscribers": "90 subscribers",
-   "lastFetch": "2026-11-08T09:35:46.016Z",
+   "lastFetch": "2026-11-08T12:43:56.305Z",
    "auto": true
   },
   {
@@ -4510,7 +4510,7 @@
    "channelId": "UC_7CFqbxu0VkOQ7RN_3mgwA",
    "category": "scripting",
    "subscribers": "8 subscribers",
-   "lastFetch": "2026-11-08T09:35:46.593Z",
+   "lastFetch": "2026-11-08T12:43:56.764Z",
    "auto": true
   },
   {
@@ -4521,7 +4521,7 @@
    "channelId": "UCq2bDtZ49fTAADT-KNYp8gw",
    "category": "scripting",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:35:47.080Z",
+   "lastFetch": "2026-11-08T12:43:57.259Z",
    "auto": true
   },
   {
@@ -4532,7 +4532,7 @@
    "channelId": "UCbphXNFWZ1TaoEyN31rymBg",
    "category": "scripting",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:35:47.557Z",
+   "lastFetch": "2026-11-08T12:43:57.713Z",
    "auto": true
   },
   {
@@ -4543,7 +4543,7 @@
    "channelId": "UCsEKHNLKMIId5TqI6ttf_vA",
    "category": "scripting",
    "subscribers": "1 subscriber",
-   "lastFetch": "2026-11-08T09:35:48.051Z",
+   "lastFetch": "2026-11-08T12:43:58.136Z",
    "auto": true
   },
   {
@@ -4554,7 +4554,7 @@
    "channelId": "UCOdW_muGywXaATj1Vw7LLwg",
    "category": "scripting",
    "subscribers": "102 subscribers",
-   "lastFetch": "2026-11-08T09:35:48.544Z",
+   "lastFetch": "2026-11-08T12:43:58.636Z",
    "auto": true
   },
   {
@@ -4565,7 +4565,7 @@
    "channelId": "UCkPVoMmOR2OtMD3B2uvO1wA",
    "category": "scripting",
    "subscribers": "40 subscribers",
-   "lastFetch": "2026-11-08T09:35:49.045Z",
+   "lastFetch": "2026-11-08T12:43:59.166Z",
    "auto": true
   },
   {
@@ -4576,7 +4576,7 @@
    "channelId": "UCHu7v8q_AopzuR30uz0CSQQ",
    "category": "scripting",
    "subscribers": "441 subscribers",
-   "lastFetch": "2026-11-08T09:35:49.629Z",
+   "lastFetch": "2026-11-08T12:43:59.632Z",
    "auto": true
   },
   {
@@ -4587,7 +4587,7 @@
    "channelId": "UC1TJmVdSeAZzEdHzjEHM29A",
    "category": "scripting",
    "subscribers": "23 subscribers",
-   "lastFetch": "2026-11-08T09:35:50.134Z",
+   "lastFetch": "2026-11-08T12:44:00.105Z",
    "auto": true
   },
   {
@@ -4598,7 +4598,7 @@
    "channelId": "UCdwlgkfagxAXki4bMs-3k8Q",
    "category": "audio",
    "subscribers": "93 subscribers",
-   "lastFetch": "2026-11-08T09:35:50.633Z",
+   "lastFetch": "2026-11-08T12:44:00.693Z",
    "auto": true
   },
   {
@@ -4609,7 +4609,7 @@
    "channelId": "UC1RyINtVmUkfqN1Up8HifmQ",
    "category": "scripting",
    "subscribers": "538 subscribers",
-   "lastFetch": "2026-11-08T09:35:51.113Z",
+   "lastFetch": "2026-11-08T12:44:01.202Z",
    "auto": true
   },
   {
@@ -4620,7 +4620,7 @@
    "channelId": "UCnWNx7zfH1IyLFhb1xzqjlg",
    "category": "scripting",
    "subscribers": "10 subscribers",
-   "lastFetch": "2026-11-08T09:35:51.587Z",
+   "lastFetch": "2026-11-08T12:44:01.644Z",
    "auto": true
   },
   {
@@ -4631,7 +4631,7 @@
    "channelId": "UClKTf8KamD-ChWF4uhsJylQ",
    "category": "scripting",
    "subscribers": "113 subscribers",
-   "lastFetch": "2026-11-08T09:35:52.089Z",
+   "lastFetch": "2026-11-08T12:44:02.105Z",
    "auto": true
   },
   {
@@ -4642,7 +4642,7 @@
    "channelId": "UCCXp8nSHuYPxl78dad_zSSw",
    "category": "scripting",
    "subscribers": "18 subscribers",
-   "lastFetch": "2026-11-08T09:35:52.596Z",
+   "lastFetch": "2026-11-08T12:44:02.544Z",
    "auto": true
   },
   {
@@ -4653,7 +4653,7 @@
    "channelId": "UCa4hv1UDdPCcGlXhdkTUO5w",
    "category": "scripting",
    "subscribers": "21 subscribers",
-   "lastFetch": "2026-11-08T09:35:53.098Z",
+   "lastFetch": "2026-11-08T12:44:03.045Z",
    "auto": true
   },
   {
@@ -4664,7 +4664,7 @@
    "channelId": "UCzDEaNzNk0pmY_XIwQb-rHw",
    "category": "scripting",
    "subscribers": "4 subscribers",
-   "lastFetch": "2026-11-08T09:35:53.554Z",
+   "lastFetch": "2026-11-08T12:44:03.460Z",
    "auto": true
   },
   {
@@ -4675,7 +4675,7 @@
    "channelId": "UC-hPmmEUOiusHopjtmOO-ww",
    "category": "scripting",
    "subscribers": "5 subscribers",
-   "lastFetch": "2026-11-08T09:35:54.056Z",
+   "lastFetch": "2026-11-08T12:44:03.916Z",
    "auto": true
   },
   {
@@ -4686,7 +4686,7 @@
    "channelId": "UCe3HRutMGd2L22y_2dV9CmA",
    "category": "scripting",
    "subscribers": "6 subscribers",
-   "lastFetch": "2026-11-08T09:35:54.549Z",
+   "lastFetch": "2026-11-08T12:44:04.428Z",
    "auto": true
   },
   {
@@ -4697,7 +4697,7 @@
    "channelId": "UCh2fl41aP9iUOvEMOglJITw",
    "category": "scripting",
    "subscribers": "46 subscribers",
-   "lastFetch": "2026-11-08T09:35:55.092Z",
+   "lastFetch": "2026-11-08T12:44:04.872Z",
    "auto": true
   },
   {
@@ -4708,7 +4708,7 @@
    "channelId": "UCLa6ne6OBnOMxkTWlykivfg",
    "category": "scripting",
    "subscribers": "5 subscribers",
-   "lastFetch": "2026-11-08T09:35:55.581Z",
+   "lastFetch": "2026-11-08T12:44:05.312Z",
    "auto": true
   },
   {
@@ -4719,7 +4719,7 @@
    "channelId": "UCJGkWak0hRAGmRvXkxs2a0g",
    "category": "scripting",
    "subscribers": "16 subscribers",
-   "lastFetch": "2026-11-08T09:35:56.054Z",
+   "lastFetch": "2026-11-08T12:44:05.813Z",
    "auto": true
   },
   {
@@ -4730,7 +4730,7 @@
    "channelId": "UCk9qhxcikiOrVazKWFcAv-Q",
    "category": "tools",
    "subscribers": "221 subscribers",
-   "lastFetch": "2026-11-08T09:35:56.520Z",
+   "lastFetch": "2026-11-08T12:44:06.265Z",
    "auto": true
   },
   {
@@ -4741,7 +4741,7 @@
    "channelId": "UCzPHfgjWDADQuR5BNUAk9Vw",
    "category": "tools",
    "subscribers": "131 subscribers",
-   "lastFetch": "2026-11-08T09:35:57.087Z",
+   "lastFetch": "2026-11-08T12:44:06.695Z",
    "auto": true
   },
   {
@@ -4752,7 +4752,7 @@
    "channelId": "UCq1gqUMhE9gOUQDZgQ0JY3w",
    "category": "tools",
    "subscribers": "2.26K subscribers",
-   "lastFetch": "2026-11-08T09:35:57.596Z",
+   "lastFetch": "2026-11-08T12:44:07.153Z",
    "auto": true
   },
   {
@@ -4763,7 +4763,7 @@
    "channelId": "UCJEl24_o8UnrQ2-aIgbYJtg",
    "category": "tools",
    "subscribers": "2 subscribers",
-   "lastFetch": "2026-11-08T09:35:58.100Z",
+   "lastFetch": "2026-11-08T12:44:07.581Z",
    "auto": true
   },
   {
@@ -4774,7 +4774,7 @@
    "channelId": "UCV20YLtyeAGOqf48sNWM4WA",
    "category": "tools",
    "subscribers": "310 subscribers",
-   "lastFetch": "2026-11-08T09:35:58.580Z",
+   "lastFetch": "2026-11-08T12:44:08.006Z",
    "auto": true
   },
   {
@@ -4785,7 +4785,7 @@
    "channelId": "UCFQGKdKaTMhEcRwloH7azOw",
    "category": "tools",
    "subscribers": "762 subscribers",
-   "lastFetch": "2026-11-08T09:35:59.063Z",
+   "lastFetch": "2026-11-08T12:44:08.448Z",
    "auto": true
   },
   {
@@ -4796,7 +4796,7 @@
    "channelId": "UCn9oeBFC8LHNIp2013HezCw",
    "category": "building",
    "subscribers": "84.1K subscribers",
-   "lastFetch": "2026-11-08T09:35:59.566Z",
+   "lastFetch": "2026-11-08T12:44:08.899Z",
    "auto": true
   },
   {
@@ -4807,7 +4807,7 @@
    "channelId": "UCQy8ojmB2YlB3QtHDP-wCwQ",
    "category": "tools",
    "subscribers": "15 subscribers",
-   "lastFetch": "2026-11-08T09:36:00.076Z",
+   "lastFetch": "2026-11-08T12:44:09.361Z",
    "auto": true
   },
   {
@@ -4818,7 +4818,7 @@
    "channelId": "UC0vfb6K62CYD_qEuAheyxow",
    "category": "tools",
    "subscribers": "3.36K subscribers",
-   "lastFetch": "2026-11-08T09:36:00.592Z",
+   "lastFetch": "2026-11-08T12:44:09.823Z",
    "auto": true
   },
   {
@@ -4829,7 +4829,7 @@
    "channelId": "UC82B3mReEqbmaqgw3CTxfKA",
    "category": "tools",
    "subscribers": "131 subscribers",
-   "lastFetch": "2026-11-08T09:36:01.103Z",
+   "lastFetch": "2026-11-08T12:44:10.293Z",
    "auto": true
   },
   {
@@ -4840,7 +4840,7 @@
    "channelId": "UCuJQHgdZ2Oxwhz4YjopWEkQ",
    "category": "tools",
    "subscribers": "1 subscriber",
-   "lastFetch": "2026-11-08T09:36:01.608Z",
+   "lastFetch": "2026-11-08T12:44:10.743Z",
    "auto": true
   },
   {
@@ -4851,7 +4851,7 @@
    "channelId": "UCSWkthzR4YE4eyEyTnigg1Q",
    "category": "tools",
    "subscribers": "25 subscribers",
-   "lastFetch": "2026-11-08T09:36:02.115Z",
+   "lastFetch": "2026-11-08T12:44:11.257Z",
    "auto": true
   },
   {
@@ -4862,7 +4862,7 @@
    "channelId": "UC5IM0Qtd0SkxcTHoI5GV_Yg",
    "category": "tools",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:02.598Z",
+   "lastFetch": "2026-11-08T12:44:11.707Z",
    "auto": true
   },
   {
@@ -4873,7 +4873,7 @@
    "channelId": "UC0867Xsap8QJN3G_gk-p7IQ",
    "category": "building",
    "subscribers": "362 subscribers",
-   "lastFetch": "2026-11-08T09:36:03.104Z",
+   "lastFetch": "2026-11-08T12:44:12.254Z",
    "auto": true
   },
   {
@@ -4884,7 +4884,7 @@
    "channelId": "UCwsZfLZfO6epCJig_4oQ79Q",
    "category": "tools",
    "subscribers": "44 subscribers",
-   "lastFetch": "2026-11-08T09:36:03.609Z",
+   "lastFetch": "2026-11-08T12:44:12.725Z",
    "auto": true
   },
   {
@@ -4895,7 +4895,7 @@
    "channelId": "UCpInJtRLNZ2ow9-RC5I8k0w",
    "category": "tools",
    "subscribers": "2 subscribers",
-   "lastFetch": "2026-11-08T09:36:04.162Z",
+   "lastFetch": "2026-11-08T12:44:13.150Z",
    "auto": true
   },
   {
@@ -4906,7 +4906,7 @@
    "channelId": "UCXHv3oxAjvWx6RZCHGqSQtw",
    "category": "tools",
    "subscribers": "12 subscribers",
-   "lastFetch": "2026-11-08T09:36:04.644Z",
+   "lastFetch": "2026-11-08T12:44:13.596Z",
    "auto": true
   },
   {
@@ -4917,7 +4917,7 @@
    "channelId": "UCqDrhdcjncQwf5vAW13DHFg",
    "category": "tools",
    "subscribers": "1 subscriber",
-   "lastFetch": "2026-11-08T09:36:05.205Z",
+   "lastFetch": "2026-11-08T12:44:14.100Z",
    "auto": true
   },
   {
@@ -4928,7 +4928,7 @@
    "channelId": "UCuIWi_xj_5ZA67SwQf8hJpw",
    "category": "tools",
    "subscribers": "1 subscriber",
-   "lastFetch": "2026-11-08T09:36:05.695Z",
+   "lastFetch": "2026-11-08T12:44:14.541Z",
    "auto": true
   },
   {
@@ -4939,7 +4939,7 @@
    "channelId": "UC96uXS65V8URyeOc5uxhm7A",
    "category": "tools",
    "subscribers": "6 subscribers",
-   "lastFetch": "2026-11-08T09:36:06.214Z",
+   "lastFetch": "2026-11-08T12:44:14.985Z",
    "auto": true
   },
   {
@@ -4950,7 +4950,7 @@
    "channelId": "UCRMOhNwVfBjLqrsvYzTZpVg",
    "category": "tools",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:06.701Z",
+   "lastFetch": "2026-11-08T12:44:15.491Z",
    "auto": true
   },
   {
@@ -4961,7 +4961,7 @@
    "channelId": "UCeDRiECpqKu5VWRfCONR2GA",
    "category": "scripting",
    "subscribers": "6 subscribers",
-   "lastFetch": "2026-11-08T09:36:07.209Z",
+   "lastFetch": "2026-11-08T12:44:16.019Z",
    "auto": true
   },
   {
@@ -4972,7 +4972,7 @@
    "channelId": "UCAe2YxSAoysREqOavhpsoxw",
    "category": "tools",
    "subscribers": "2 subscribers",
-   "lastFetch": "2026-11-08T09:36:07.742Z",
+   "lastFetch": "2026-11-08T12:44:16.474Z",
    "auto": true
   },
   {
@@ -4983,7 +4983,7 @@
    "channelId": "UC92yOq_WLmcOqZv0uAL-2ow",
    "category": "tools",
    "subscribers": "1.42K subscribers",
-   "lastFetch": "2026-11-08T09:36:08.199Z",
+   "lastFetch": "2026-11-08T12:44:16.906Z",
    "auto": true
   },
   {
@@ -4994,7 +4994,7 @@
    "channelId": "UCgOQa5tcH0GCfXVfZEMc9cg",
    "category": "tools",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:08.679Z",
+   "lastFetch": "2026-11-08T12:44:17.346Z",
    "auto": true
   },
   {
@@ -5005,7 +5005,7 @@
    "channelId": "UCsmQppxWNT87NW0kw_L8afQ",
    "category": "tools",
    "subscribers": "33 subscribers",
-   "lastFetch": "2026-11-08T09:36:09.189Z",
+   "lastFetch": "2026-11-08T12:44:17.799Z",
    "auto": true
   },
   {
@@ -5016,7 +5016,7 @@
    "channelId": "UClZF10njbPhXYESQPAckXMw",
    "category": "tools",
    "subscribers": "5 subscribers",
-   "lastFetch": "2026-11-08T09:36:09.696Z",
+   "lastFetch": "2026-11-08T12:44:18.238Z",
    "auto": true
   },
   {
@@ -5027,7 +5027,7 @@
    "channelId": "UCQekxbNRuix_0xz6Au9rx2w",
    "category": "tools",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:10.177Z",
+   "lastFetch": "2026-11-08T12:44:18.750Z",
    "auto": true
   },
   {
@@ -5038,7 +5038,7 @@
    "channelId": "UCSGiYwkGM76c3Cv9xljrlYQ",
    "category": "tools",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:10.680Z",
+   "lastFetch": "2026-11-08T12:44:19.188Z",
    "auto": true
   },
   {
@@ -5049,7 +5049,7 @@
    "channelId": "UC7iNt2pN3CmSqwVtEChavJQ",
    "category": "tools",
    "subscribers": "3 subscribers",
-   "lastFetch": "2026-11-08T09:36:11.160Z",
+   "lastFetch": "2026-11-08T12:44:19.628Z",
    "auto": true
   },
   {
@@ -5060,7 +5060,7 @@
    "channelId": "UCXzl8ZKwjLfnoQmNvZA0cVg",
    "category": "tools",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:11.669Z",
+   "lastFetch": "2026-11-08T12:44:20.072Z",
    "auto": true
   },
   {
@@ -5071,7 +5071,7 @@
    "channelId": "UCOH4Ocz_ed38MHr1KR2mxAw",
    "category": "tools",
    "subscribers": "50.9K subscribers",
-   "lastFetch": "2026-11-08T09:36:12.159Z",
+   "lastFetch": "2026-11-08T12:44:20.532Z",
    "auto": true
   },
   {
@@ -5082,7 +5082,7 @@
    "channelId": "UCfD_XPKRmvIjRIdcawIlGMg",
    "category": "tools",
    "subscribers": "3 subscribers",
-   "lastFetch": "2026-11-08T09:36:12.682Z",
+   "lastFetch": "2026-11-08T12:44:20.959Z",
    "auto": true
   },
   {
@@ -5093,7 +5093,7 @@
    "channelId": "UClO_UxZuWv4p61cVuAlTwvQ",
    "category": "tools",
    "subscribers": "79 subscribers",
-   "lastFetch": "2026-11-08T09:36:13.210Z",
+   "lastFetch": "2026-11-08T12:44:21.411Z",
    "auto": true
   },
   {
@@ -5104,7 +5104,7 @@
    "channelId": "UCznofozIhAmq8DLKW8jwUUA",
    "category": "tools",
    "subscribers": "4 subscribers",
-   "lastFetch": "2026-11-08T09:36:13.709Z",
+   "lastFetch": "2026-11-08T12:44:21.859Z",
    "auto": true
   },
   {
@@ -5115,7 +5115,7 @@
    "channelId": "UCBTUp3UlCV_uLAMNFN5pqaA",
    "category": "tools",
    "subscribers": "61 subscribers",
-   "lastFetch": "2026-11-08T09:36:14.172Z",
+   "lastFetch": "2026-11-08T12:44:22.277Z",
    "auto": true
   },
   {
@@ -5126,7 +5126,7 @@
    "channelId": "UCm2bccoQzGLJwU0qssLO2Ww",
    "category": "tools",
    "subscribers": "4 subscribers",
-   "lastFetch": "2026-11-08T09:36:14.717Z",
+   "lastFetch": "2026-11-08T12:44:22.750Z",
    "auto": true
   },
   {
@@ -5137,7 +5137,7 @@
    "channelId": "UCUXi4OoRhI1U_lQRU0p_bkg",
    "category": "tools",
    "subscribers": "98 subscribers",
-   "lastFetch": "2026-11-08T09:36:15.172Z",
+   "lastFetch": "2026-11-08T12:44:23.169Z",
    "auto": true
   },
   {
@@ -5148,7 +5148,7 @@
    "channelId": "UCgRHSiKSdMX7OvfAvVQek5g",
    "category": "tools",
    "subscribers": "23 subscribers",
-   "lastFetch": "2026-11-08T09:36:15.667Z",
+   "lastFetch": "2026-11-08T12:44:23.623Z",
    "auto": true
   },
   {
@@ -5159,7 +5159,7 @@
    "channelId": "UCrBUSZfiqgd7E4gWhqgN8TQ",
    "category": "tools",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:16.151Z",
+   "lastFetch": "2026-11-08T12:44:24.126Z",
    "auto": true
   },
   {
@@ -5170,7 +5170,7 @@
    "channelId": "UChup26PmKfAsbUeYFuhW3VQ",
    "category": "modeling",
    "subscribers": "117 subscribers",
-   "lastFetch": "2026-11-08T09:36:16.665Z",
+   "lastFetch": "2026-11-08T12:44:24.598Z",
    "auto": true
   },
   {
@@ -5181,7 +5181,7 @@
    "channelId": "UCN1qDYdDbr3Q7uv35tdmp7g",
    "category": "tools",
    "subscribers": "2 subscribers",
-   "lastFetch": "2026-11-08T09:36:17.158Z",
+   "lastFetch": "2026-11-08T12:44:25.043Z",
    "auto": true
   },
   {
@@ -5192,7 +5192,7 @@
    "channelId": "UCZRHWztl0DHWN7TQVwFwO_g",
    "category": "tools",
    "subscribers": "26 subscribers",
-   "lastFetch": "2026-11-08T09:36:17.660Z",
+   "lastFetch": "2026-11-08T12:44:25.513Z",
    "auto": true
   },
   {
@@ -5203,7 +5203,7 @@
    "channelId": "UCcS-qQlvCO1qrbDK12noH-A",
    "category": "gui",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:18.153Z",
+   "lastFetch": "2026-11-08T12:44:25.968Z",
    "auto": true
   },
   {
@@ -5214,7 +5214,7 @@
    "channelId": "UCbsynoWi6OvPh56nYV66Cmw",
    "category": "tools",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:18.699Z",
+   "lastFetch": "2026-11-08T12:44:26.478Z",
    "auto": true
   },
   {
@@ -5225,7 +5225,7 @@
    "channelId": "UCEvxMCmp8A9epPyBepywJrw",
    "category": "tools",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:19.186Z",
+   "lastFetch": "2026-11-08T12:44:26.917Z",
    "auto": true
   },
   {
@@ -5236,7 +5236,7 @@
    "channelId": "UCArmEZUPeWHIt-s5CPVGGgw",
    "category": "tools",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:19.677Z",
+   "lastFetch": "2026-11-08T12:44:27.415Z",
    "auto": true
   },
   {
@@ -5247,7 +5247,7 @@
    "channelId": "UCC-F1NKKWcKt3snHfIad0lw",
    "category": "tools",
    "subscribers": "3 subscribers",
-   "lastFetch": "2026-11-08T09:36:20.153Z",
+   "lastFetch": "2026-11-08T12:44:27.852Z",
    "auto": true
   },
   {
@@ -5258,7 +5258,7 @@
    "channelId": "UCV0_xWAw77hn-YF5pjDKAFA",
    "category": "tools",
    "subscribers": "10 subscribers",
-   "lastFetch": "2026-11-08T09:36:20.602Z",
+   "lastFetch": "2026-11-08T12:44:28.275Z",
    "auto": true
   },
   {
@@ -5269,7 +5269,7 @@
    "channelId": "UCFrLEmpWM00NVBDWxu446FQ",
    "category": "tools",
    "subscribers": "764 subscribers",
-   "lastFetch": "2026-11-08T09:36:21.105Z",
+   "lastFetch": "2026-11-08T12:44:28.736Z",
    "auto": true
   },
   {
@@ -5280,7 +5280,7 @@
    "channelId": "UCyU1EqvTRbidoc-mBO7pQHA",
    "category": "scripting",
    "subscribers": "8.22K subscribers",
-   "lastFetch": "2026-11-08T09:36:21.600Z",
+   "lastFetch": "2026-11-08T12:44:29.206Z",
    "auto": true
   },
   {
@@ -5291,7 +5291,7 @@
    "channelId": "UCO_8hF-oulap_6lXy0oXLjg",
    "category": "tools",
    "subscribers": "20.4M subscribers",
-   "lastFetch": "2026-11-08T09:36:22.110Z",
+   "lastFetch": "2026-11-08T12:44:29.633Z",
    "auto": true
   },
   {
@@ -5302,7 +5302,7 @@
    "channelId": "UCAo9RLXZvUiyRllJ-1Ekefg",
    "category": "tools",
    "subscribers": "2.53M subscribers",
-   "lastFetch": "2026-11-08T09:36:22.693Z",
+   "lastFetch": "2026-11-08T12:44:30.107Z",
    "auto": true
   },
   {
@@ -5313,7 +5313,7 @@
    "channelId": "UC8BxpZRLbK7gbi8QOkXH-vw",
    "category": "tools",
    "subscribers": "241K subscribers",
-   "lastFetch": "2026-11-08T09:36:23.240Z",
+   "lastFetch": "2026-11-08T12:44:30.554Z",
    "auto": true
   },
   {
@@ -5324,7 +5324,7 @@
    "channelId": "UCNLAfCADM_wyL7t3nzIJwSg",
    "category": "animation",
    "subscribers": "86.3K subscribers",
-   "lastFetch": "2026-11-08T09:36:23.718Z",
+   "lastFetch": "2026-11-08T12:44:31.006Z",
    "auto": true
   },
   {
@@ -5335,7 +5335,7 @@
    "channelId": "UCcxuqPErMtJbqpP6ObGc0kA",
    "category": "tools",
    "subscribers": "439K subscribers",
-   "lastFetch": "2026-11-08T09:36:24.223Z",
+   "lastFetch": "2026-11-08T12:44:31.450Z",
    "auto": true
   },
   {
@@ -5346,7 +5346,7 @@
    "channelId": "UCiTWD6Nhb0pVwYyUBS1wI7A",
    "category": "tools",
    "subscribers": "89.7K subscribers",
-   "lastFetch": "2026-11-08T09:36:24.710Z",
+   "lastFetch": "2026-11-08T12:44:31.907Z",
    "auto": true
   },
   {
@@ -5357,7 +5357,7 @@
    "channelId": "UCF5mIe4sSYuoPw9tZoDuiXQ",
    "category": "tools",
    "subscribers": "37 subscribers",
-   "lastFetch": "2026-11-08T09:36:25.280Z",
+   "lastFetch": "2026-11-08T12:44:32.350Z",
    "auto": true
   },
   {
@@ -5368,7 +5368,7 @@
    "channelId": "UCn7VnAnzztxIoKRIuOEssyg",
    "category": "tools",
    "subscribers": "564K subscribers",
-   "lastFetch": "2026-11-08T09:36:25.772Z",
+   "lastFetch": "2026-11-08T12:44:32.865Z",
    "auto": true
   },
   {
@@ -5379,7 +5379,7 @@
    "channelId": "UCVwPQ0VmXRZ1ZhZMhPyhoTg",
    "category": "tools",
    "subscribers": "103K subscribers",
-   "lastFetch": "2026-11-08T09:36:26.301Z",
+   "lastFetch": "2026-11-08T12:44:33.312Z",
    "auto": true
   },
   {
@@ -5390,7 +5390,7 @@
    "channelId": "UCYvBLRoaY2gN-DgaKfYK6EQ",
    "category": "tools",
    "subscribers": "68.5K subscribers",
-   "lastFetch": "2026-11-08T09:36:26.774Z",
+   "lastFetch": "2026-11-08T12:44:33.750Z",
    "auto": true
   },
   {
@@ -5401,7 +5401,7 @@
    "channelId": "UC3kwlzJA9HQ77g9MRJ0d7Gg",
    "category": "tools",
    "subscribers": "429 subscribers",
-   "lastFetch": "2026-11-08T09:36:27.292Z",
+   "lastFetch": "2026-11-08T12:44:34.197Z",
    "auto": true
   },
   {
@@ -5412,7 +5412,7 @@
    "channelId": "UCx8h3FonywyzXKuEOBzjbfg",
    "category": "tools",
    "subscribers": "255K subscribers",
-   "lastFetch": "2026-11-08T09:36:27.797Z",
+   "lastFetch": "2026-11-08T12:44:34.724Z",
    "auto": true
   },
   {
@@ -5423,7 +5423,7 @@
    "channelId": "UC9VujSExl_C0NjfnGak1-GQ",
    "category": "tools",
    "subscribers": "9.11M subscribers",
-   "lastFetch": "2026-11-08T09:36:28.392Z",
+   "lastFetch": "2026-11-08T12:44:35.207Z",
    "auto": true
   },
   {
@@ -5434,7 +5434,7 @@
    "channelId": "UCj9XQgu5sIQdGTzU5Cd7N6A",
    "category": "tools",
    "subscribers": "5.17K subscribers",
-   "lastFetch": "2026-11-08T09:36:28.909Z",
+   "lastFetch": "2026-11-08T12:44:35.688Z",
    "auto": true
   },
   {
@@ -5445,7 +5445,7 @@
    "channelId": "UCJws8kWGUDzny61OJUpzxbQ",
    "category": "tools",
    "subscribers": "777K subscribers",
-   "lastFetch": "2026-11-08T09:36:29.267Z",
+   "lastFetch": "2026-11-08T12:44:36.185Z",
    "auto": true
   },
   {
@@ -5456,7 +5456,7 @@
    "channelId": "UCABAQID2xmChxHzEDW_UbVw",
    "category": "tools",
    "subscribers": "1.24M subscribers",
-   "lastFetch": "2026-11-08T09:36:29.711Z",
+   "lastFetch": "2026-11-08T12:44:36.600Z",
    "auto": true
   },
   {
@@ -5467,7 +5467,7 @@
    "channelId": "UCS4mOkBlA9JPjX6I5C5a3Vw",
    "category": "tools",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:30.221Z",
+   "lastFetch": "2026-11-08T12:44:37.086Z",
    "auto": true
   },
   {
@@ -5478,7 +5478,7 @@
    "channelId": "UCoUB--ktb5P_g4Z1t7MkH7A",
    "category": "tools",
    "subscribers": "842K subscribers",
-   "lastFetch": "2026-11-08T09:36:30.742Z",
+   "lastFetch": "2026-11-08T12:44:37.537Z",
    "auto": true
   },
   {
@@ -5489,7 +5489,7 @@
    "channelId": "UCOfyvsftRqM5yyqpT392b4A",
    "category": "tools",
    "subscribers": "1.61M subscribers",
-   "lastFetch": "2026-11-08T09:36:31.241Z",
+   "lastFetch": "2026-11-08T12:44:38.014Z",
    "auto": true
   },
   {
@@ -5500,7 +5500,7 @@
    "channelId": "UC6CXkSon1f1Oa8VrXhW0j6w",
    "category": "gfx",
    "subscribers": "922K subscribers",
-   "lastFetch": "2026-11-08T09:36:31.774Z",
+   "lastFetch": "2026-11-08T12:44:38.545Z",
    "auto": true
   },
   {
@@ -5511,7 +5511,7 @@
    "channelId": "UCOhhOO3OdWRMV9NA4XoC_DA",
    "category": "audio",
    "subscribers": "194K subscribers",
-   "lastFetch": "2026-11-08T09:36:32.299Z",
+   "lastFetch": "2026-11-08T12:44:38.996Z",
    "auto": true
   },
   {
@@ -5522,7 +5522,7 @@
    "channelId": "UC_ktoEePM5sCZY149M1nb3A",
    "category": "tools",
    "subscribers": "25.1K subscribers",
-   "lastFetch": "2026-11-08T09:36:32.849Z",
+   "lastFetch": "2026-11-08T12:44:39.452Z",
    "auto": true
   },
   {
@@ -5533,7 +5533,7 @@
    "channelId": "UCR4f9LOjkUsNkgrStAW-shw",
    "category": "tools",
    "subscribers": "5 subscribers",
-   "lastFetch": "2026-11-08T09:36:33.355Z",
+   "lastFetch": "2026-11-08T12:44:40.046Z",
    "auto": true
   },
   {
@@ -5544,7 +5544,7 @@
    "channelId": "UCofsSswvJ02GQdqNXYsIEYA",
    "category": "tools",
    "subscribers": "107 subscribers",
-   "lastFetch": "2026-11-08T09:36:33.854Z",
+   "lastFetch": "2026-11-08T12:44:40.501Z",
    "auto": true
   },
   {
@@ -5555,7 +5555,7 @@
    "channelId": "UCJ-SEPmbVdGyPlAOb22-_ng",
    "category": "tools",
    "subscribers": "121 subscribers",
-   "lastFetch": "2026-11-08T09:36:34.348Z",
+   "lastFetch": "2026-11-08T12:44:41.009Z",
    "auto": true
   },
   {
@@ -5566,7 +5566,7 @@
    "channelId": "UCK-21bv_K3pgkDDz_Pzcwnw",
    "category": "animation",
    "subscribers": "24.7K subscribers",
-   "lastFetch": "2026-11-08T09:36:34.837Z",
+   "lastFetch": "2026-11-08T12:44:41.476Z",
    "auto": true
   },
   {
@@ -5577,7 +5577,7 @@
    "channelId": "UCFZG24_QpQrcqdnjwfOJNYw",
    "category": "tools",
    "subscribers": "8 subscribers",
-   "lastFetch": "2026-11-08T09:36:35.386Z",
+   "lastFetch": "2026-11-08T12:44:41.935Z",
    "auto": true
   },
   {
@@ -5588,7 +5588,7 @@
    "channelId": "UCM88Du8q1ZlY7oRE8Eh589Q",
    "category": "tools",
    "subscribers": "357K subscribers",
-   "lastFetch": "2026-11-08T09:36:35.867Z",
+   "lastFetch": "2026-11-08T12:44:42.395Z",
    "auto": true
   },
   {
@@ -5599,7 +5599,7 @@
    "channelId": "UCchi4pg9R8y6yuQV76fHhHg",
    "category": "tools",
    "subscribers": "42 subscribers",
-   "lastFetch": "2026-11-08T09:36:36.325Z",
+   "lastFetch": "2026-11-08T12:44:42.819Z",
    "auto": true
   },
   {
@@ -5610,7 +5610,7 @@
    "channelId": "UCdCc83ITXVqEUOi_2MoGadw",
    "category": "tools",
    "subscribers": "21 subscribers",
-   "lastFetch": "2026-11-08T09:36:36.852Z",
+   "lastFetch": "2026-11-08T12:44:43.277Z",
    "auto": true
   },
   {
@@ -5621,7 +5621,7 @@
    "channelId": "UCIHvN1zZA8MVpLQWZ4HC2lQ",
    "category": "audio",
    "subscribers": "172K subscribers",
-   "lastFetch": "2026-11-08T09:36:37.329Z",
+   "lastFetch": "2026-11-08T12:44:43.751Z",
    "auto": true
   },
   {
@@ -5632,7 +5632,7 @@
    "channelId": "UCVYpWgVdCz0tWUvJmMm25LQ",
    "category": "tools",
    "subscribers": "763K subscribers",
-   "lastFetch": "2026-11-08T09:36:37.815Z",
+   "lastFetch": "2026-11-08T12:44:44.278Z",
    "auto": true
   },
   {
@@ -5643,7 +5643,7 @@
    "channelId": "UCV_n7sq7lgOnPx1LLCMZDLQ",
    "category": "scripting",
    "subscribers": "1.1M subscribers",
-   "lastFetch": "2026-11-08T09:36:38.355Z",
+   "lastFetch": "2026-11-08T12:44:44.815Z",
    "auto": true
   },
   {
@@ -5654,7 +5654,7 @@
    "channelId": "UCzPhQXUS4ZS3AOre0w9IF6w",
    "category": "animation",
    "subscribers": "451K subscribers",
-   "lastFetch": "2026-11-08T09:36:38.846Z",
+   "lastFetch": "2026-11-08T12:44:45.288Z",
    "auto": true
   },
   {
@@ -5665,7 +5665,7 @@
    "channelId": "UCk7TX5l6jO3N14PGsqxhQhQ",
    "category": "tools",
    "subscribers": "30K subscribers",
-   "lastFetch": "2026-11-08T09:36:39.415Z",
+   "lastFetch": "2026-11-08T12:44:45.810Z",
    "auto": true
   },
   {
@@ -5676,7 +5676,7 @@
    "channelId": "UC8KgIhtzGu_wC5zb5gkervw",
    "category": "tools",
    "subscribers": "554K subscribers",
-   "lastFetch": "2026-11-08T09:36:39.938Z",
+   "lastFetch": "2026-11-08T12:44:46.242Z",
    "auto": true
   },
   {
@@ -5687,7 +5687,7 @@
    "channelId": "UC7VRS3SnBhaTZ4CSvTE5nbw",
    "category": "building",
    "subscribers": "291 subscribers",
-   "lastFetch": "2026-11-08T09:36:40.447Z",
+   "lastFetch": "2026-11-08T12:44:46.760Z",
    "auto": true
   },
   {
@@ -5698,7 +5698,7 @@
    "channelId": "UC5jr3X9X3e3z0JzO6eX5OcA",
    "category": "building",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:40.937Z",
+   "lastFetch": "2026-11-08T12:44:47.279Z",
    "auto": true
   },
   {
@@ -5709,7 +5709,7 @@
    "channelId": "UCM4cJyHTGtJPel9x5QJspdw",
    "category": "gui",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:41.437Z",
+   "lastFetch": "2026-11-08T12:44:47.735Z",
    "auto": true
   },
   {
@@ -5720,7 +5720,7 @@
    "channelId": "UCJq499lrvqN9c3iQTTNCEvg",
    "category": "vfx",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:41.930Z",
+   "lastFetch": "2026-11-08T12:44:48.188Z",
    "auto": true
   },
   {
@@ -5731,7 +5731,7 @@
    "channelId": "UC4WDVkmTG5HnfrDeI5Z3h5Q",
    "category": "scripting",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:42.433Z",
+   "lastFetch": "2026-11-08T12:44:48.650Z",
    "auto": true
   },
   {
@@ -5742,7 +5742,7 @@
    "channelId": "UCajBKgGdaFncgss_eDaNViQ",
    "category": "gfx",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:42.909Z",
+   "lastFetch": "2026-11-08T12:44:49.108Z",
    "auto": true
   },
   {
@@ -5753,7 +5753,7 @@
    "channelId": "UCPLozO87WandRdKuFg42u6A",
    "category": "design",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:43.430Z",
+   "lastFetch": "2026-11-08T12:44:49.548Z",
    "auto": true
   },
   {
@@ -5764,7 +5764,7 @@
    "channelId": "UCOaNUrSA2JbUlwX0AXbtKuw",
    "category": "gui",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:43.947Z",
+   "lastFetch": "2026-11-08T12:44:49.988Z",
    "auto": true
   },
   {
@@ -5775,7 +5775,7 @@
    "channelId": "UCRduWx-quEg2SBDvGqRxHuw",
    "category": "scripting",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:44.515Z",
+   "lastFetch": "2026-11-08T12:44:50.433Z",
    "auto": true
   },
   {
@@ -5786,7 +5786,7 @@
    "channelId": "UCbhFVXQoNF3gZwLCo7bLM5w",
    "category": "vfx",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:45.019Z",
+   "lastFetch": "2026-11-08T12:44:50.890Z",
    "auto": true
   },
   {
@@ -5797,7 +5797,7 @@
    "channelId": "UCWdCOEFAsnzUJQgQOw3vu5Q",
    "category": "gui",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:45.505Z",
+   "lastFetch": "2026-11-08T12:44:51.322Z",
    "auto": true
   },
   {
@@ -5808,7 +5808,7 @@
    "channelId": "UCuA1LgaY5O-kCBPZfjhIx9g",
    "category": "gfx",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:45.988Z",
+   "lastFetch": "2026-11-08T12:44:51.780Z",
    "auto": true
   },
   {
@@ -5819,7 +5819,7 @@
    "channelId": "UCdUTE-WnQgRHwczp27oBs0w",
    "category": "vfx",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:46.522Z",
+   "lastFetch": "2026-11-08T12:44:52.281Z",
    "auto": true
   },
   {
@@ -5830,7 +5830,7 @@
    "channelId": "UC4erIRGyhYR3S2c_6ltfkAw",
    "category": "building",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:47.020Z",
+   "lastFetch": "2026-11-08T12:44:52.773Z",
    "auto": true
   },
   {
@@ -5841,7 +5841,7 @@
    "channelId": "UCWLVg5ds0BUBj2_alTB3qCw",
    "category": "vfx",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:47.514Z",
+   "lastFetch": "2026-11-08T12:44:53.245Z",
    "auto": true
   },
   {
@@ -5852,7 +5852,7 @@
    "channelId": "UCmIFjYx2aXrTjy5H8Zz1IfA",
    "category": "scripting",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:48.006Z",
+   "lastFetch": "2026-11-08T12:44:53.708Z",
    "auto": true
   },
   {
@@ -5863,7 +5863,7 @@
    "channelId": "UC373RfD8X7e0xg-iWp40z6A",
    "category": "scripting",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:48.493Z",
+   "lastFetch": "2026-11-08T12:44:54.160Z",
    "auto": true
   },
   {
@@ -5874,7 +5874,7 @@
    "channelId": "UCwNSFP_rQJa6CMdnVuaWW3g",
    "category": "modeling",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:49.092Z",
+   "lastFetch": "2026-11-08T12:44:54.629Z",
    "auto": true
   },
   {
@@ -5885,7 +5885,7 @@
    "channelId": "UC6CCyRtwehG-bPtr-Hd8P6g",
    "category": "scripting",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:49.578Z",
+   "lastFetch": "2026-11-08T12:44:55.135Z",
    "auto": true
   },
   {
@@ -5896,7 +5896,7 @@
    "channelId": "UCsAmxmzBlsxyPefvwkFiBGQ",
    "category": "scripting",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:50.071Z",
+   "lastFetch": "2026-11-08T12:44:55.571Z",
    "auto": true
   },
   {
@@ -5907,7 +5907,7 @@
    "channelId": "UCHGoBVge1WvoB7sbo5iNyEQ",
    "category": "scripting",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:50.552Z",
+   "lastFetch": "2026-11-08T12:44:56.014Z",
    "auto": true
   },
   {
@@ -5918,7 +5918,7 @@
    "channelId": "UCsmHcf0TgEVJsLABpQ7fd0A",
    "category": "scripting",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:51.054Z",
+   "lastFetch": "2026-11-08T12:44:56.489Z",
    "auto": true
   },
   {
@@ -5929,7 +5929,7 @@
    "channelId": "UCJAUFljou3pBa84r5vybncg",
    "category": "animation",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:51.595Z",
+   "lastFetch": "2026-11-08T12:44:56.923Z",
    "auto": true
   },
   {
@@ -5940,7 +5940,7 @@
    "channelId": "UCBSC_QYb76ivzFCdrLAaz_w",
    "category": "animation",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:52.140Z",
+   "lastFetch": "2026-11-08T12:44:57.360Z",
    "auto": true
   },
   {
@@ -5951,7 +5951,7 @@
    "channelId": "UCUjixmZm6Cxcwzqh5TAX8Ug",
    "category": "scripting",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:52.644Z",
+   "lastFetch": "2026-11-08T12:44:57.867Z",
    "auto": true
   },
   {
@@ -5962,7 +5962,7 @@
    "channelId": "UCTFYnDX1zmsjPajvS2AJQIw",
    "category": "scripting",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:53.125Z",
+   "lastFetch": "2026-11-08T12:44:58.306Z",
    "auto": true
   },
   {
@@ -5973,7 +5973,7 @@
    "channelId": "UCg7MfBxD_ftfOloD2SM19Uw",
    "category": "scripting",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:53.625Z",
+   "lastFetch": "2026-11-08T12:44:58.780Z",
    "auto": true
   },
   {
@@ -5984,7 +5984,7 @@
    "channelId": "UC3mWd193-FxrlO1SVGgJJOQ",
    "category": "animation",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:54.126Z",
+   "lastFetch": "2026-11-08T12:44:59.298Z",
    "auto": true
   },
   {
@@ -5995,7 +5995,7 @@
    "channelId": "UCx2sRXcnlMfTZqDo3npm2cw",
    "category": "gui",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:54.605Z",
+   "lastFetch": "2026-11-08T12:44:59.827Z",
    "auto": true
   },
   {
@@ -6006,7 +6006,7 @@
    "channelId": "UCHglsY24Tq7O3TgtOhB9xhw",
    "category": "gui",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:55.090Z",
+   "lastFetch": "2026-11-08T12:45:00.285Z",
    "auto": true
   },
   {
@@ -6017,7 +6017,7 @@
    "channelId": "UCWaL9X2c8jT5qwBAHGnmdpw",
    "category": "vfx",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:55.567Z",
+   "lastFetch": "2026-11-08T12:45:00.740Z",
    "auto": true
   },
   {
@@ -6028,7 +6028,7 @@
    "channelId": "UCV7bYbAOCYqOidX408Tl1qA",
    "category": "design",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:56.040Z",
+   "lastFetch": "2026-11-08T12:45:01.180Z",
    "auto": true
   },
   {
@@ -6039,7 +6039,7 @@
    "channelId": "UCfILVibvcQNtNp2cwqgOsrw",
    "category": "vfx",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:56.539Z",
+   "lastFetch": "2026-11-08T12:45:01.641Z",
    "auto": true
   },
   {
@@ -6050,7 +6050,7 @@
    "channelId": "UCD_CY-NuRdLTC0_isCezYFA",
    "category": "vfx",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:57.026Z",
+   "lastFetch": "2026-11-08T12:45:02.096Z",
    "auto": true
   },
   {
@@ -6061,7 +6061,7 @@
    "channelId": "UC0p_PNRDZJEIS-6FB4nsPSA",
    "category": "design",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:57.536Z",
+   "lastFetch": "2026-11-08T12:45:02.539Z",
    "auto": true
   },
   {
@@ -6072,7 +6072,7 @@
    "channelId": "UCGGJGx8NTvyVOOyvTFhzL-g",
    "category": "scripting",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:58.046Z",
+   "lastFetch": "2026-11-08T12:45:03.004Z",
    "auto": true
   },
   {
@@ -6083,7 +6083,7 @@
    "channelId": "UCzXQoleXmGTG4Ybob88i_tA",
    "category": "design",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:36:58.609Z",
+   "lastFetch": "2026-11-08T12:45:03.448Z",
    "auto": true
   },
   {
@@ -6094,7 +6094,7 @@
    "channelId": "UCy2a_Q1RUz_0iQx7wDV_54Q",
    "category": "tools",
    "subscribers": "473 subscribers",
-   "lastFetch": "2026-11-08T09:36:59.134Z",
+   "lastFetch": "2026-11-08T12:45:03.914Z",
    "auto": true
   },
   {
@@ -6105,7 +6105,7 @@
    "channelId": "UCVM31XLfoKe1k4tsE0ZJtWQ",
    "category": "tools",
    "subscribers": "19 subscribers",
-   "lastFetch": "2026-11-08T09:36:59.618Z",
+   "lastFetch": "2026-11-08T12:45:04.367Z",
    "auto": true
   },
   {
@@ -6116,7 +6116,7 @@
    "channelId": "UCTuz1SCxbbzNLDaKyhNmt_g",
    "category": "tools",
    "subscribers": "20 subscribers",
-   "lastFetch": "2026-11-08T09:37:00.115Z",
+   "lastFetch": "2026-11-08T12:45:04.810Z",
    "auto": true
   },
   {
@@ -6127,7 +6127,7 @@
    "channelId": "UCqqdorOkL5MYc4HtID3F1QA",
    "category": "tools",
    "subscribers": "128 subscribers",
-   "lastFetch": "2026-11-08T09:37:00.633Z",
+   "lastFetch": "2026-11-08T12:45:05.282Z",
    "auto": true
   },
   {
@@ -6138,7 +6138,7 @@
    "channelId": "UCrW6ioUG0F2i8r4E4FSrfCQ",
    "category": "tools",
    "subscribers": "15 subscribers",
-   "lastFetch": "2026-11-08T09:37:01.144Z",
+   "lastFetch": "2026-11-08T12:45:05.739Z",
    "auto": true
   },
   {
@@ -6149,7 +6149,7 @@
    "channelId": "UCxzX7gBY23MOxKjKL9hKolQ",
    "category": "tools",
    "subscribers": "",
-   "lastFetch": "2026-11-08T09:37:01.642Z",
+   "lastFetch": "2026-11-08T12:45:06.206Z",
    "auto": true
   },
   {
@@ -6160,7 +6160,7 @@
    "channelId": "UC1ZPTmaSYnVuYgcFwH_xDdw",
    "category": "tools",
    "subscribers": "7 subscribers",
-   "lastFetch": "2026-11-08T09:37:02.218Z",
+   "lastFetch": "2026-11-08T12:45:06.675Z",
    "auto": true
   },
   {
@@ -6171,7 +6171,7 @@
    "channelId": "UCPLFhJ-Ly1aIjCVJy5gKDPA",
    "category": "tools",
    "subscribers": "173 subscribers",
-   "lastFetch": "2026-11-08T09:37:02.742Z",
+   "lastFetch": "2026-11-08T12:45:07.129Z",
    "auto": true
   },
   {
@@ -6182,7 +6182,7 @@
    "channelId": "UCLwyrf4TrXkYwUNqqaPdzeg",
    "category": "tools",
    "subscribers": "8 subscribers",
-   "lastFetch": "2026-11-08T09:37:03.243Z",
+   "lastFetch": "2026-11-08T12:45:07.591Z",
    "auto": true
   },
   {
@@ -6193,7 +6193,7 @@
    "channelId": "UCVCwokpRDNht4S7XkaXBR_A",
    "category": "tools",
    "subscribers": "80 subscribers",
-   "lastFetch": "2026-11-08T09:37:03.774Z",
+   "lastFetch": "2026-11-08T12:45:08.059Z",
    "auto": true
   },
   {
@@ -6204,7 +6204,7 @@
    "channelId": "UCM5aeMd1wY33BzirtAofQfQ",
    "category": "tools",
    "subscribers": "69 subscribers",
-   "lastFetch": "2026-11-08T09:37:04.290Z",
+   "lastFetch": "2026-11-08T12:45:08.534Z",
    "auto": true
   },
   {
@@ -6215,7 +6215,7 @@
    "channelId": "UCyukGlO0Xdye6Jm58AIzNqQ",
    "category": "modeling",
    "subscribers": "1.06K subscribers",
-   "lastFetch": "2026-11-08T09:37:04.830Z",
+   "lastFetch": "2026-11-08T12:45:09.005Z",
    "auto": true
   },
   {
@@ -6226,7 +6226,7 @@
    "channelId": "UCeAA3Phmri_XShDgV3IJNTw",
    "category": "building",
    "subscribers": "34 subscribers",
-   "lastFetch": "2026-11-08T09:37:05.335Z",
+   "lastFetch": "2026-11-08T12:45:09.534Z",
    "auto": true
   },
   {
@@ -6237,7 +6237,7 @@
    "channelId": "UC3OxX0F_-n1QPsbOWSyIWMA",
    "category": "tools",
    "subscribers": "9 subscribers",
-   "lastFetch": "2026-11-08T09:37:05.844Z",
+   "lastFetch": "2026-11-08T12:45:09.983Z",
    "auto": true
   },
   {
@@ -6248,7 +6248,7 @@
    "channelId": "UCRtjwXfhaG3ZT6hrTEmFx-w",
    "category": "tools",
    "subscribers": "41 subscribers",
-   "lastFetch": "2026-11-08T09:37:06.355Z",
+   "lastFetch": "2026-11-08T12:45:10.457Z",
    "auto": true
   },
   {
@@ -6259,7 +6259,7 @@
    "channelId": "UCgjupXlWqsx2hGFx00WTpNw",
    "category": "tools",
    "subscribers": "2.55K subscribers",
-   "lastFetch": "2026-11-08T09:37:06.867Z",
+   "lastFetch": "2026-11-08T12:45:10.928Z",
    "auto": true
   },
   {
@@ -6270,7 +6270,7 @@
    "channelId": "UCzY7_sIdEdR8gdGgFf0iZIA",
    "category": "tools",
    "subscribers": "559 subscribers",
-   "lastFetch": "2026-11-08T09:37:07.381Z",
+   "lastFetch": "2026-11-08T12:45:11.422Z",
    "auto": true
   },
   {
@@ -6281,7 +6281,7 @@
    "channelId": "UCYALRCaELDIM0hcZqAwwdWw",
    "category": "tools",
    "subscribers": "23 subscribers",
-   "lastFetch": "2026-11-08T09:37:07.883Z",
+   "lastFetch": "2026-11-08T12:45:11.946Z",
    "auto": true
   },
   {
@@ -6292,7 +6292,7 @@
    "channelId": "UCeNWc8-UK3ASzIRojNxjrfA",
    "category": "scripting",
    "subscribers": "221 subscribers",
-   "lastFetch": "2026-11-08T09:37:08.384Z",
+   "lastFetch": "2026-11-08T12:45:12.410Z",
    "auto": true
   },
   {
@@ -6303,7 +6303,7 @@
    "channelId": "UC-QuyE3T4IoBkO3tihtlqTA",
    "category": "tools",
    "subscribers": "54 subscribers",
-   "lastFetch": "2026-11-08T09:37:08.972Z",
+   "lastFetch": "2026-11-08T12:45:12.877Z",
    "auto": true
   },
   {
@@ -6314,7 +6314,7 @@
    "channelId": "UCZnBt1mF-Are1E_CjgCn0bw",
    "category": "tools",
    "subscribers": "40 subscribers",
-   "lastFetch": "2026-11-08T09:37:09.480Z",
+   "lastFetch": "2026-11-08T12:45:13.417Z",
    "auto": true
   },
   {
@@ -6325,7 +6325,7 @@
    "channelId": "UCKV26L-F5HqqF3whOQrFd0w",
    "category": "tools",
    "subscribers": "3.51K subscribers",
-   "lastFetch": "2026-11-08T09:37:09.998Z",
+   "lastFetch": "2026-11-08T12:45:13.884Z",
    "auto": true
   },
   {
@@ -6336,7 +6336,7 @@
    "channelId": "UC5_Vv00KGbxioPg5s6bfhzA",
    "category": "tools",
    "subscribers": "132K subscribers",
-   "lastFetch": "2026-11-08T09:37:10.473Z",
+   "lastFetch": "2026-11-08T12:45:14.255Z",
    "auto": true
   },
   {
@@ -6347,7 +6347,7 @@
    "channelId": "UC7uLbyjXHOAfaZXl5_kpxqA",
    "category": "tools",
    "subscribers": "68.8K subscribers",
-   "lastFetch": "2026-11-08T09:37:10.997Z",
+   "lastFetch": "2026-11-08T12:45:14.714Z",
    "auto": true
   },
   {
@@ -6358,7 +6358,7 @@
    "channelId": "UCGQeir-Q7_pau-fpulT4ccA",
    "category": "tools",
    "subscribers": "699K subscribers",
-   "lastFetch": "2026-11-08T09:37:11.477Z",
+   "lastFetch": "2026-11-08T12:45:15.152Z",
    "auto": true
   },
   {
@@ -6369,7 +6369,7 @@
    "channelId": "UC8coOsD1DGLgDazU20oAw4Q",
    "category": "tools",
    "subscribers": "1.32K subscribers",
-   "lastFetch": "2026-11-08T09:37:12.004Z",
+   "lastFetch": "2026-11-08T12:45:15.614Z",
    "auto": true
   },
   {
@@ -6380,7 +6380,7 @@
    "channelId": "UCe50kvdIEfKOhTykNr5STwg",
    "category": "tools",
    "subscribers": "36.6K subscribers",
-   "lastFetch": "2026-11-08T09:37:12.511Z",
+   "lastFetch": "2026-11-08T12:45:16.078Z",
    "auto": true
   },
   {
@@ -6391,7 +6391,7 @@
    "channelId": "UCxksJz2iIcngrYM_83RvhLQ",
    "category": "scripting",
    "subscribers": "133 subscribers",
-   "lastFetch": "2026-11-08T09:37:13.011Z",
+   "lastFetch": "2026-11-08T12:45:16.548Z",
    "auto": true
   },
   {
@@ -6402,7 +6402,7 @@
    "channelId": "UCP4nqi-c94zA_4zn3x6xOAw",
    "category": "tools",
    "subscribers": "2 subscribers",
-   "lastFetch": "2026-11-08T09:37:13.502Z",
+   "lastFetch": "2026-11-08T12:45:17.089Z",
    "auto": true
   },
   {
@@ -6413,7 +6413,7 @@
    "channelId": "UCbNpoQ4SoYlkGO2EJGeVGeA",
    "category": "tools",
    "subscribers": "1K subscribers",
-   "lastFetch": "2026-11-08T09:37:13.997Z",
+   "lastFetch": "2026-11-08T12:45:17.545Z",
    "auto": true
   },
   {
@@ -6424,7 +6424,7 @@
    "channelId": "UCBtcCl5J_Fsn_RsIKvkSGnA",
    "category": "scripting",
    "subscribers": "780 subscribers",
-   "lastFetch": "2026-11-08T09:37:14.563Z",
+   "lastFetch": "2026-11-08T12:45:18.020Z",
    "auto": true
   },
   {
@@ -6435,7 +6435,7 @@
    "channelId": "UC1-1EmuWIW9svGZBe70J8bA",
    "category": "scripting",
    "subscribers": "6.68K subscribers",
-   "lastFetch": "2026-11-08T09:37:15.071Z",
+   "lastFetch": "2026-11-08T12:45:18.500Z",
    "auto": true
   },
   {
@@ -19002,16 +19002,35 @@
   }
  ],
  "cursors": {
-  "forum:help-and-feedback/scripting-support": 3235,
-  "forum:help-and-feedback/creations-feedback": 1140,
-  "forum:help-and-feedback/game-design-support": 330,
-  "forum:help-and-feedback/art-design-support": 310,
-  "forum:help-and-feedback/building-support": 260,
-  "forum:resources/community-resources": 165,
-  "sketchfab:roblox": "3120",
-  "forum:resources/community-tutorials": 105,
-  "forum:updates/announcements": 35,
-  "sketchfab:roblox ugc": "840",
+  "forum:help-and-feedback/scripting-support": 3270,
+  "forum:help-and-feedback/creations-feedback": 1175,
+  "forum:help-and-feedback/game-design-support": 365,
+  "forum:help-and-feedback/art-design-support": 345,
+  "forum:help-and-feedback/building-support": 295,
+  "forum:resources/community-resources": 200,
+  "sketchfab:roblox": "3960",
+  "forum:updates/announcements": 70,
+  "devto:gamedev": 60,
+  "sketchfab:roblox low poly": "840",
+  "sketchfab:roblox map": "840",
+  "sketchfab:roblox character": "840",
+  "forum:resources/community-tutorials": 10,
+  "sketchfab:roblox ugc": "240",
+  "sketchfab:roblox weapon": "240",
+  "sketchfab:roblox pet": "240",
+  "store:decal:ui": "MTBfMV8xXzMw_41872fe8f64c2c45bac875d16b88ed95",
+  "store:decal:icon": "MTBfMV8xXzMw_ac73895a948bcbb76450c2c0f26debec",
+  "store:decal:button": "MTBfMV8xXzMw_5c8ae2ca89b60cdc414321d3ced98244",
+  "store:decal:frame": "MTBfMV8xXzMw_2421d2db40f9fd00d441ea836d1aa8d1",
+  "store:decal:background": "MTBfMV8xXzMw_a574aad5f14652e7daf4c360a3130954",
+  "store:decal:texture": "MTBfMV8xXzMw_4bb7b74fd992c4011dce38ed1be687d7",
+  "store:decal:particle": "MTBfMV8xXzMw_012e3344259a06438d9fdadcbf7d975a",
+  "store:decal:vfx": "MTBfMV8xXzMw_9e4a0ac7e752347f1caab942c3b12b62",
+  "store:decal:slash": "MTBfMV8xXzMw_0bd7b39e9d48a6c3043d6d4583e0819d",
+  "store:decal:smoke": "MTBfMV8xXzMw_78fb0dc832f820317e52961dc3b415d3",
+  "store:decal:fire": "MTBfMV8xXzMw_63dcaf1f99fcbd86f56123ae31899a46",
+  "store:decal:glow": "MTBfMV8xXzMw_43c8ce564a9390e04cd5bf2f7f6c9470",
+  "store:decal:sparkle": "MTBfMV8xXzMw_4244162d0e2c1716f17325bb95572674",
   "store:decal:grass": "MTBfMV8xXzMw_4a97ada93c0febae009f874d9bdc506c",
   "store:decal:cartoon": "MTBfMV8xXzMw_449ee4c1f9c80295fd70808e104505a5",
   "store:mesh:sword": "MTBfMV8xXzMw_69c7f86decf2072dcad7f7f8ee1384ab",
@@ -19019,23 +19038,8 @@
   "store:mesh:car": "MTBfMV8xXzMw_81fad5e80f2da6d93860ea91168c7bda",
   "store:mesh:pet": "MTBfMV8xXzMw_55349eedf813d501b9b9ea3a6a647a74",
   "store:mesh:low poly": "MTBfMV8xXzMw_19046767010deee2ef96e6985d3ceef5",
-  "store:mesh:furniture": "MTBfMV8xXzMw_b747e33c444cc07de35a4a1e5ec40b36",
-  "sketchfab:roblox weapon": "600",
-  "devto:gamedev": 25,
-  "store:decal:ui": "MjVfMV8xXzMw_6d8248cd962fcd00977cd0db5fee54aa",
-  "store:decal:icon": "MjVfMV8xXzMw_bde172587fad596c9c9480317dd8a5b0",
-  "store:decal:button": "MjVfMV8xXzMw_cb33c955263f10ef0c51d08daae87c1b",
-  "store:decal:frame": "MjVfMV8xXzMw_0492e38f71d6c1549b3e356cd1bf3f2b",
-  "store:decal:background": "MjVfMV8xXzMw_3edee9b570b59cf7490e61f280a3cfc8",
-  "store:decal:texture": "MjVfMV8xXzMw_1860ddf0ae964ee0dde2768916c1e7e7",
-  "store:decal:particle": "MjVfMV8xXzMw_d4765ab16064a14719f1deedd55ca217",
-  "store:decal:vfx": "MjVfMV8xXzMw_6c3c4ed227173cf45738de983f0645f0",
-  "store:decal:slash": "MjVfMV8xXzMw_c14db494410264293c1f2dc8d4935696",
-  "store:decal:smoke": "MjVfMV8xXzMw_3ab121ed27af84a8457405e59cd06385",
-  "store:decal:fire": "MjVfMV8xXzMw_ce73f8f12ab22553e58ce828db15bd3e",
-  "store:decal:glow": "MjVfMV8xXzMw_b7e0bba018fee38eae2ebf913d24a24e",
-  "store:decal:sparkle": "MTZfMV8xXzMw_d7874f7ae6a94c8022d76cdc7d670697"
+  "store:mesh:furniture": "MTBfMV8xXzMw_b747e33c444cc07de35a4a1e5ec40b36"
  },
  "migrated": false,
- "updatedAt": "2026-11-08T11:52:13.837Z"
+ "updatedAt": "2026-11-08T12:45:19.440Z"
 }
