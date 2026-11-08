@@ -67,6 +67,7 @@ export default async function boards(box, { project, sub }) {
   let unsubItems = null, unsubBoards = null, pres = null;
   const cursors = new Map();
   let lastCursor = 0;
+  const tabId = Math.random().toString(36).slice(2);
   let arrowDraft = null; // { a:{x,y}, b:{x,y}, from, to } pendant la création
   let alive = true;
 
@@ -363,8 +364,8 @@ export default async function boards(box, { project, sub }) {
   function pushOp(op) { undo.push(op); if (undo.length > 120) undo.shift(); redo.length = 0; }
   async function applyOp(op, back) {
     if (op.t === 'update') for (const { id, patch } of back ? op.before : op.after) patchItem(id, patch);
-    if ((op.t === 'create') === back) await deleteItems(op.rows.map(r => r.id), { record: false });
-    else if (op.t === 'create' || op.t === 'delete') await restoreItems(op.rows);
+    else if ((op.t === 'create') === back) await deleteItems(op.rows.map(r => r.id), { record: false });
+    else await restoreItems(op.rows);
     positionSelbar();
   }
   async function doUndo() { const op = undo.pop(); if (!op) return; exitEdit(); await applyOp(op, true); redo.push(op); }
@@ -978,6 +979,7 @@ export default async function boards(box, { project, sub }) {
     const up = ev => {
       removeEventListener('pointermove', move);
       removeEventListener('pointerup', up);
+      removeEventListener('pointercancel', cancel);
       if (ghost) {
         ghost.remove();
         const r = stageRect();
@@ -985,12 +987,16 @@ export default async function boards(box, { project, sub }) {
       } else {
         const r = stageRect();
         const c = toWorld(r.left + r.width / 2, r.top + r.height / 2);
-        const jitter = () => (Math.random() - 0.5) * 60;
-        addAt(kind, { x: c.x - (KINDS[kind].w || 200) / 2 + jitter(), y: c.y - 60 + jitter() });
+        // Au centre de l'écran, en cascade si un élément occupe déjà la place.
+        const pt = { x: Math.round(c.x - (KINDS[kind].w || 200) / 2), y: Math.round(c.y - 60) };
+        for (let i = 0; i < 30 && [...items.values()].some(it => it.kind !== 'arrow' && Math.abs(it.x - pt.x) < 24 && Math.abs(it.y - pt.y) < 24); i++) { pt.x += 32; pt.y += 32; }
+        addAt(kind, pt);
       }
     };
+    const cancel = () => { removeEventListener('pointermove', move); removeEventListener('pointerup', up); removeEventListener('pointercancel', cancel); ghost?.remove(); };
     addEventListener('pointermove', move);
     addEventListener('pointerup', up);
+    addEventListener('pointercancel', cancel);
   }
   async function addAt(kind, p) {
     exitEdit();
@@ -1086,22 +1092,23 @@ export default async function boards(box, { project, sub }) {
     if (!pres || Date.now() - lastCursor < 60) return;
     lastCursor = Date.now();
     const p = toWorld(e.clientX, e.clientY);
-    pres.send({ t: 'cur', id: me.id, name: me.display_name, color: me.color || '#F5B935', x: Math.round(p.x), y: Math.round(p.y) });
+    pres.send({ t: 'cur', tab: tabId, id: me.id, name: me.display_name, color: me.color || '#F5B935', x: Math.round(p.x), y: Math.round(p.y) });
   }
   function onPresence(list, payload) {
     if (list) {
       const seen = new Map();
       list.forEach(m => m?.id && seen.set(m.id, m));
       clear(people, [...seen.values()].slice(0, 6).map(m => avatar({ id: m.id, display_name: m.name, color: m.color, avatar_url: m.avatar }, 28)));
-      for (const [id, c] of cursors) if (!seen.has(id)) { c.el.remove(); cursors.delete(id); }
+      for (const [k, c] of cursors) if (!seen.has(c.id)) { c.el.remove(); cursors.delete(k); }
       return;
     }
-    if (payload?.t !== 'cur' || payload.id === me.id) return;
-    let c = cursors.get(payload.id);
+    if (payload?.t !== 'cur' || payload.tab === tabId) return;
+    const key = payload.tab || payload.id;
+    let c = cursors.get(key);
     if (!c) {
-      c = { el: h('div.bd-cursor', { style: { '--c': payload.color } }, h('svg-holder'), h('span', payload.name)) };
+      c = { id: payload.id, el: h('div.bd-cursor', { style: { '--c': payload.color } }, h('svg-holder'), h('span', payload.name)) };
       c.el.firstChild.replaceWith(Object.assign(s('svg', { viewBox: '0 0 24 24' }), { innerHTML: '<path d="M4 3l16 7-7 2-2 7z"/>' }));
-      cursors.set(payload.id, c);
+      cursors.set(key, c);
       cursorLayer.append(c.el);
     }
     c.el.style.left = payload.x + 'px';

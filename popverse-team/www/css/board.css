@@ -32,7 +32,8 @@
 .bd-people .avatar + .avatar { margin-left: -6px; }
 
 /* ---------- Toile ---------- */
-.bd-wrap { position: relative; flex: 1; min-height: 0; overflow: hidden; }
+.bd-wrap { position: relative; flex: 1; min-height: 0; overflow: hidden; touch-action: none; }
+.bd-rail-list { touch-action: pan-y; }
 .bd-stage { position: absolute; inset: 0; overflow: hidden; outline: none; touch-action: none; cursor: default; user-select: none; -webkit-user-select: none;
   background-color: #0b0805; background-image: radial-gradient(circle, rgba(245, 185, 53, .22) 1.1px, transparent 1.6px); background-size: 26px 26px; }
 .bd-stage.panning, .bd-stage.space { cursor: grabbing; }
@@ -213,6 +214,7 @@
   .bd-main { grid-column: 1; }
   .bd-tools { left: 8px; right: 8px; top: auto; bottom: 8px; transform: none; flex-direction: row; overflow-x: auto; overflow-y: hidden; max-height: none; }
   .bd-tool { flex: none; width: 54px; }
+  .bd-tools, .bd-tool { touch-action: pan-x; }
   .bd-tsep { width: 1px; height: auto; margin: 6px 3px; }
   .bd-zoom { right: 8px; top: 8px; bottom: auto; padding: 3px; }
   .bd-zoom .icon-btn { width: 30px; height: 30px; }
