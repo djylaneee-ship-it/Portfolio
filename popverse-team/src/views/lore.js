@@ -307,7 +307,7 @@ export default async function lore(box, { project: p, sub }) {
     const target = nodes.find(x => x.nodeType === 1);
     const focusEl = target?.querySelector?.('th, td, p') || target;
     if (focusEl) {
-      const r = document.createRange(); r.selectNodeContents(focusEl); r.collapse(focusEl.nodeName === 'P' && target?.classList?.contains('callout') ? false : true);
+      const r = document.createRange(); r.selectNodeContents(focusEl); if (focusEl.nodeName !== 'TH') r.collapse(!(focusEl.nodeName === 'P' && target?.classList?.contains('callout')));
       sel.removeAllRanges(); sel.addRange(r);
     }
     editor.focus();

@@ -58,7 +58,7 @@
 .bi { --bg: #17120B; --fg: #F7F0E1; --bd: #3A2D18; position: absolute; border-radius: 14px; cursor: grab; transition: box-shadow .2s, transform .2s var(--spring); }
 .bi.dragging { cursor: grabbing; transition: none; filter: drop-shadow(0 18px 30px rgba(0, 0, 0, .55)); }
 .bi.sel { outline: 2px solid var(--gold); outline-offset: 3px; }
-.bi.editing { outline: 2px solid var(--gold2); outline-offset: 3px; cursor: text; }
+.bi.editing { outline: 2px solid var(--gold2); outline-offset: 3px; cursor: text; z-index: 99990 !important; }
 .bi.target { outline: 3px dashed var(--gold2); outline-offset: 6px; }
 .bi.locked { cursor: default; }
 [data-ph]:empty::before { content: attr(data-ph); color: color-mix(in srgb, currentColor 40%, transparent); pointer-events: none; }

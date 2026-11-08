@@ -522,7 +522,12 @@ export default async function tasks(box, { project: p, sub }) {
     const ctl = {
       id: c.id,
       close: () => m.close(),
-      redraw: () => { if (!m.box.contains(document.activeElement) || document.activeElement === m.box) draw(); else drawSide(); },
+      redraw: () => {
+        // On ne redessine pas sous les doigts de quelqu'un qui écrit (titre, description, commentaire, étape).
+        const a = document.activeElement;
+        if (a && main.contains(a) && a.matches('.tk-cm-title, .tk-desc-input, .tk-ck-text, .tk-comments textarea')) drawSide();
+        else draw();
+      },
       onComment(evt) {
         if (evt.type === 'INSERT' && !comments.some(x => x.id === evt.row.id)) comments.push(evt.row);
         if (evt.type === 'DELETE') comments = comments.filter(x => x.id !== evt.old?.id);

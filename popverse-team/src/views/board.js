@@ -455,7 +455,7 @@ export default async function boards(box, { project, sub }) {
       target.focus();
       const r = document.createRange();
       r.selectNodeContents(target);
-      r.collapse(caret !== 'start');
+      r.collapse(caret === 'start');
       const s_ = getSelection(); s_.removeAllRanges(); s_.addRange(r);
     }
     if (it.kind === 'note') showFmt(it);
@@ -1004,7 +1004,7 @@ export default async function boards(box, { project, sub }) {
       return;
     }
     const r = await createItem(kind, p.x, p.y);
-    if (r && kind !== 'column') enterEdit(r.id);
+    if (r && kind !== 'column') enterEdit(r.id, { focusSel: { todo: '[data-edit=todo][data-i="0"]', table: '[data-r="1"][data-c="0"]' }[kind] });
   }
   const normUrl = u => (/^https?:\/\//i.test(u) ? u : 'https://' + u.replace(/^\/+/, ''));
   async function addImages(files, p) {
