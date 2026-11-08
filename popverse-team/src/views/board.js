@@ -669,6 +669,7 @@ export default async function boards(box, { project, sub }) {
   // ---------- Pointeur : glisser, redimensionner, flèches, sélection, déplacement, pincement ----------
   stage.addEventListener('pointerdown', e => {
     if (e.target.closest('[data-nodrag]')) return;
+    if (e.isPrimary) ptrs.clear();
     ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
     if (ptrs.size === 2 && e.pointerType === 'touch') { startPinch(); return; }
     if (ptrs.size > 2) return;

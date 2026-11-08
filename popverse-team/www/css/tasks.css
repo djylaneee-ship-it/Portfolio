@@ -179,7 +179,8 @@ button.link { background: none; border: 0; padding: 0; cursor: pointer; font-siz
 .tk-cm-side .field > span { font-size: 12px; }
 .tk-cm-side .input { min-height: 36px; padding: 7px 10px; font-size: 13px; }
 .tk-cm-side select.input { padding-right: 30px; }
-.tk-two { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.tk-two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
+.tk-two .field, .tk-two .input { min-width: 0; }
 .tk-two .input { padding: 7px 6px; }
 .tk-side-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 .tk-side-btns.col1 { grid-template-columns: 1fr; }
@@ -226,7 +227,9 @@ button.link { background: none; border: 0; padding: 0; cursor: pointer; font-siz
 @media (max-width: 820px) {
   .tk-bar { gap: 6px; }
   .tk-search { flex: 1 1 100%; }
-  .tk-bar .btn.primary span, .tk-seg button span { display: none; }
+  .tk-bar .btn.primary span, .tk-seg button span, .tk-lbl { display: none; }
+  .tk-bar > .btn { padding: 0 10px; }
+  .tk-bar .tk-spacer { flex: 1 1 0; min-width: 0; }
   .tk-board { scroll-snap-type: x mandatory; gap: 10px; padding-bottom: 8px; scroll-padding: 0 4px; }
   .tk-col, .tk-col-add { flex-basis: 85vw; scroll-snap-align: start; }
   .tk-card:hover { transform: none; }
@@ -239,3 +242,5 @@ button.link { background: none; border: 0; padding: 0; cursor: pointer; font-siz
   .tk-cm-side { border-left: 0; border-top: 1px solid var(--line); padding: 16px 16px calc(24px + var(--safe-b)); }
   .tk-cm-title { font-size: 18px; }
 }
+/* Pendant un glisser, pas d'aimantation : sinon le défilement automatique est annulé à chaque image. */
+.tk-dragging .tk-board { scroll-snap-type: none !important; }

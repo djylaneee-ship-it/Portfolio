@@ -8,6 +8,10 @@ import {
 import { PRIORITIES, prio, logActivity } from '../store.js';
 
 const STEP = 1000;
+// Variables CSS en ligne : passées en texte (Object.assign sur el.style ignore les propriétés « --x »).
+const cssv = (k, v) => `${k}:${v}`;
+// Valeur d'un textarea (h() pose les chaînes en attribut, ce qui ne remplit pas un textarea).
+const withValue = (el, v) => { el.value = v ?? ''; return el; };
 const isImg = a => /^image\//.test(a?.type || '') || /\.(png|jpe?g|gif|webp|avif|svg)(\?|$)/i.test(a?.url || '');
 const toDateInput = d => (d ? new Date(d).toISOString().slice(0, 10) : '');
 const fromDateInput = (v, end) => (v ? new Date(v + (end ? 'T23:59:00' : 'T00:00:00')).toISOString() : null);
@@ -86,8 +90,8 @@ export default async function tasks(box, { project: p, sub }) {
     }));
     clear(toolbar,
       search,
-      h('button.btn.small' + (n ? '.tk-active' : ''), { onclick: e => filtersPopover(e.currentTarget) }, icon('filter'), 'Filtres', n ? h('span.tk-badge', String(n)) : null),
-      h('button.btn.small' + (S.f.mine ? '.tk-active' : ''), { onclick: () => { S.f.mine = !S.f.mine; drawToolbar(); render(); } }, icon('users'), 'Mes tâches'),
+      h('button.btn.small' + (n ? '.tk-active' : ''), { onclick: e => filtersPopover(e.currentTarget) }, icon('filter'), h('span.tk-lbl', 'Filtres'), n ? h('span.tk-badge', String(n)) : null),
+      h('button.btn.small' + (S.f.mine ? '.tk-active' : ''), { onclick: () => { S.f.mine = !S.f.mine; drawToolbar(); render(); } }, icon('users'), h('span.tk-lbl', 'Mes tâches')),
       h('div.tk-seg',
         h('button' + (S.view === 'board' ? '.on' : ''), { onclick: () => setView('board'), title: 'Vue tableau' }, icon('kanban'), h('span', 'Tableau')),
         h('button' + (S.view === 'list' ? '.on' : ''), { onclick: () => setView('list'), title: 'Vue liste' }, icon('list'), h('span', 'Liste'))),
@@ -144,7 +148,7 @@ export default async function tasks(box, { project: p, sub }) {
     const all = cardsOf(l.id);
     const shown = all.filter(visible).length;
     const over = l.wip_limit && all.length > l.wip_limit;
-    const col = h('section.tk-col' + (l.is_done ? '.done' : ''), { dataset: { id: l.id }, style: { '--lc': l.color || 'var(--line2)' } },
+    const col = h('section.tk-col' + (l.is_done ? '.done' : ''), { dataset: { id: l.id }, style: cssv('--lc', l.color || 'var(--line2)') },
       h('header.tk-col-head', { title: 'Glisser pour déplacer la colonne · double-clic pour renommer', ondblclick: () => renameList(l) },
         l.is_done ? h('span.tk-done-ic', { title: 'Colonne « terminé »' }, icon('check')) : null,
         h('h3', l.name),
@@ -159,13 +163,14 @@ export default async function tasks(box, { project: p, sub }) {
   function quickAddEl(l) {
     if (S.quick?.listId !== l.id) return h('button.tk-add-card', { onclick: () => { S.quick = { listId: l.id, value: '' }; render(); content.querySelector(`.tk-col[data-id="${l.id}"] .tk-quick-input`)?.focus(); } }, icon('plus'), 'Ajouter une tâche');
     const ta = h('textarea.input.tk-quick-input', {
-      rows: 2, placeholder: 'Titre de la tâche… (Entrée pour ajouter)', value: S.quick.value,
+      rows: 2, placeholder: 'Titre de la tâche… (Entrée pour ajouter)',
       oninput: e => { S.quick.value = e.target.value; },
       onkeydown: e => {
         if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submit(); }
         if (e.key === 'Escape') { S.quick = null; render(); }
       },
     });
+    withValue(ta, S.quick.value);
     const submit = async () => {
       const title = ta.value.trim();
       if (!title) return;
@@ -199,16 +204,16 @@ export default async function tasks(box, { project: p, sub }) {
     const cover = c.cover ? (c.cover.startsWith('#') ? h('div.tk-cover.color', { style: { background: c.cover } }) : h('div.tk-cover', h('img', { src: c.cover, alt: '', loading: 'lazy', draggable: false }))) : null;
     return h('article.tk-card' + (isDone(c) ? '.is-done' : '') + (pr ? '.p-' + pr.value : ''), {
       dataset: { id: c.id }, hidden: !visible(c), tabIndex: 0,
-      style: pr ? { '--pc': pr.color } : {},
+      style: pr ? cssv('--pc', pr.color) : undefined,
       onclick: () => { if (justDragged) return; openCard(c.id); },
       onkeydown: e => { if (e.key === 'Enter') openCard(c.id); },
       oncontextmenu: e => { if (e.pointerType === 'touch' || drag) e.preventDefault(); },
     },
       cover,
-      (c.labels || []).length ? h('div.tk-labels', c.labels.map(n => h('span.tk-label', { style: { '--c': labelColor(n) }, title: n }, n))) : null,
+      (c.labels || []).length ? h('div.tk-labels', c.labels.map(n => h('span.tk-label', { style: cssv('--c', labelColor(n)), title: n }, n))) : null,
       h('p.tk-card-title', isDone(c) ? h('span.tk-check', icon('check')) : null, c.title),
       h('div.tk-badges',
-        pr ? h('span.tk-b.prio', { style: { '--c': pr.color }, title: 'Priorité ' + pr.label }, icon('flag'), pr.label) : null,
+        pr ? h('span.tk-b.prio', { style: cssv('--c', pr.color), title: 'Priorité ' + pr.label }, icon('flag'), pr.label) : null,
         c.due_at ? h('span.tk-b' + (late ? '.late' : soon ? '.soon' : isDone(c) ? '.ok' : ''), { title: 'Échéance' }, icon('clock'), fmtDate(c.due_at)) : null,
         ck.length ? h('span.tk-b' + (ckDone === ck.length ? '.ok' : ''), { title: 'Checklist' }, icon('checklist'), `${ckDone}/${ck.length}`) : null,
         c.description ? h('span.tk-b', { title: 'A une description' }, icon('text')) : null,
@@ -255,10 +260,10 @@ export default async function tasks(box, { project: p, sub }) {
               title: isDone(c) ? 'Rouvrir' : 'Marquer terminée',
               onclick: e => { e.stopPropagation(); saveCard(c, { done: !c.done }); },
             }, icon('check')), h('span', c.title)),
-            h('td', l ? h('span.tk-listpill', { style: { '--lc': l.color || 'var(--line2)' } }, l.name) : '—'),
-            h('td', pr ? h('span.tk-b.prio', { style: { '--c': pr.color } }, icon('flag'), pr.label) : h('span.muted', '—')),
+            h('td', l ? h('span.tk-listpill', { style: cssv('--lc', l.color || 'var(--line2)') }, l.name) : '—'),
+            h('td', pr ? h('span.tk-b.prio', { style: cssv('--c', pr.color) }, icon('flag'), pr.label) : h('span.muted', '—')),
             h('td', (c.assignees || []).length ? h('span.avatars', c.assignees.slice(0, 5).map(id => avatar(id, 24))) : h('span.muted', '—')),
-            h('td', h('div.tk-labels', (c.labels || []).map(n => h('span.tk-label', { style: { '--c': labelColor(n) } }, n)))),
+            h('td', h('div.tk-labels', (c.labels || []).map(n => h('span.tk-label', { style: cssv('--c', labelColor(n)) }, n)))),
             h('td', c.due_at ? h('span.tk-b' + (isLate(c) ? '.late' : ''), icon('clock'), fmtDate(c.due_at)) : h('span.muted', '—')),
             h('td', ck.length ? h('span.tk-mini-bar', h('i', { style: { width: Math.round(ck.filter(i => i.done).length / ck.length * 100) + '%' } })) : h('span.muted', '—')),
             h('td.muted', timeAgo(c.updated_at || c.created_at)));
@@ -518,6 +523,8 @@ export default async function tasks(box, { project: p, sub }) {
     const side = h('aside.tk-cm-side');
     const m = modal({ title: '', body: h('div.tk-cm', main, side), wide: true, cls: 'tk-card-modal', onClose: () => { if (openCardCtl === ctl) openCardCtl = null; resetHash(); } });
     const headTitle = m.box.querySelector('.modal-head h3');
+    // modal() met le focus sur le premier champ (le titre) : on l'enlève pour ne pas ouvrir le clavier sur mobile.
+    setTimeout(() => { if (m.box.contains(document.activeElement)) document.activeElement.blur(); }, 80);
 
     const ctl = {
       id: c.id,
@@ -546,11 +553,12 @@ export default async function tasks(box, { project: p, sub }) {
       const l = listOf(c.list_id);
       clear(headTitle, h('span.tk-cm-crumb', icon('kanban'), 'Dans ', h('b', l?.name || '—'), c.archived ? h('span.tag', 'Archivée') : null));
       const title = h('textarea.tk-cm-title', {
-        rows: 1, value: c.title, maxLength: 300,
+        rows: 1, maxLength: 300,
         oninput: e => autosize(e.target),
         onkeydown: e => { if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); } },
         onblur: e => { const v = e.target.value.trim(); if (v && v !== c.title) saveCard(c, { title: v }); else e.target.value = c.title; },
       });
+      withValue(title, c.title);
       setTimeout(() => autosize(title), 0);
       const pr = prio(c.priority);
       const ck = c.checklist || [];
@@ -565,9 +573,9 @@ export default async function tasks(box, { project: p, sub }) {
             (c.assignees || []).map(id => h('span.tk-person', avatar(id, 26), person(id).display_name)),
             h('button.icon-btn.small', { title: 'Choisir les membres', onclick: e => membersPopover(e.currentTarget, c) }, icon('plus')))),
           metaBlock('Étiquettes', h('div.row.tk-gap6',
-            (c.labels || []).map(n => h('span.tk-label.big', { style: { '--c': labelColor(n) } }, n)),
+            (c.labels || []).map(n => h('span.tk-label.big', { style: cssv('--c', labelColor(n)) }, n)),
             h('button.icon-btn.small', { title: 'Choisir les étiquettes', onclick: e => labelsPopover(e.currentTarget, c) }, icon('plus')))),
-          pr ? metaBlock('Priorité', h('span.tk-b.prio.big', { style: { '--c': pr.color } }, icon('flag'), pr.label)) : null,
+          pr ? metaBlock('Priorité', h('span.tk-b.prio.big', { style: cssv('--c', pr.color) }, icon('flag'), pr.label)) : null,
           c.due_at ? metaBlock('Échéance', h('span.tk-b.big' + (isLate(c) ? '.late' : isDone(c) ? '.ok' : ''), icon('clock'), fmtDate(c.due_at, { weekday: 'short', day: 'numeric', month: 'short' }))) : null),
         section('text', 'Description', !editingDesc && c.description ? h('button.btn.small.ghost', { onclick: () => { editingDesc = true; drawMain(); } }, icon('edit'), 'Modifier') : null,
           editingDesc ? descEditor() : c.description
@@ -609,7 +617,8 @@ export default async function tasks(box, { project: p, sub }) {
 
     function descEditor() {
       let tab = 'write';
-      const ta = h('textarea.input.tk-desc-input', { rows: 8, value: c.description || '', placeholder: 'Décris la tâche : objectif, détails, critères de réussite…' });
+      const ta = h('textarea.input.tk-desc-input', { rows: 8, placeholder: 'Décris la tâche : objectif, détails, critères de réussite…' });
+      withValue(ta, c.description || '');
       const prev = h('div.md.tk-desc', { hidden: true });
       const tabs = h('div.tk-seg.small',
         h('button.on', { type: 'button', onclick: e => sw('write', e) }, 'Écrire'),
@@ -770,7 +779,7 @@ export default async function tasks(box, { project: p, sub }) {
       const on = (c.labels || []).includes(l.name);
       return h('button.tk-pick' + (on ? '.on' : ''), {
         onclick: () => { saveCard(c, { labels: on ? c.labels.filter(n => n !== l.name) : [...(c.labels || []), l.name] }); draw(); },
-      }, h('span.tk-label.big', { style: { '--c': l.color } }, l.name), on ? icon('check') : null);
+      }, h('span.tk-label.big', { style: cssv('--c', l.color) }, l.name), on ? icon('check') : null);
     }) : h('p.muted.small', 'Aucune étiquette.'));
     draw();
     const pop = popover(anchor, h('div', h('div.tk-pop-title', 'Étiquettes'), list, h('button.btn.small.full', { onclick: () => { pop.close(); manageLabels(); } }, icon('tag'), 'Gérer les étiquettes')));
@@ -791,7 +800,7 @@ export default async function tasks(box, { project: p, sub }) {
     const box = h('div.tk-labels-admin');
     const draw = () => clear(box,
       S.labels.length ? S.labels.map(l => h('div.tk-lrow',
-        h('span.tk-label.big', { style: { '--c': l.color } }, l.name),
+        h('span.tk-label.big', { style: cssv('--c', l.color) }, l.name),
         h('small.muted', `${S.cards.filter(c => (c.labels || []).includes(l.name)).length} tâche(s)`),
         h('div.tk-spacer'),
         h('button.icon-btn.small', { title: 'Modifier', onclick: () => editLabel(l) }, icon('edit')),

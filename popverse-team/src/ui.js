@@ -7,11 +7,13 @@ export function h(sel, props, ...kids) {
   if (props instanceof Node || typeof props !== 'object' || props === null || Array.isArray(props)) { kids.unshift(props); props = {}; }
   const m = sel.match(/^([a-z0-9-]+)?((?:[.#][\w-]+)*)$/i) || [];
   const el = document.createElement(m[1] || 'div');
+  let deferredValue;
   (m[2] || '').replace(/([.#])([\w-]+)/g, (_, t, v) => { t === '.' ? el.classList.add(v) : (el.id = v); });
   for (const [k, v] of Object.entries(props)) {
     if (v === undefined || v === null || v === false) continue;
     if (k === 'class') el.className += ' ' + v;
-    else if (k === 'style' && typeof v === 'object') Object.assign(el.style, v);
+    else if (k === 'style' && typeof v === 'object') { for (const [sk, sv] of Object.entries(v)) sk.startsWith('--') ? el.style.setProperty(sk, sv) : (el.style[sk] = sv); }
+    else if (k === 'value' && 'value' in el) deferredValue = v;
     else if (k === 'dataset') Object.assign(el.dataset, v);
     else if (k === 'html') el.innerHTML = v;
     else if (k.startsWith('on') && typeof v === 'function') el.addEventListener(k.slice(2), v);
@@ -19,6 +21,7 @@ export function h(sel, props, ...kids) {
     else el.setAttribute(k, v === true ? '' : v);
   }
   append(el, kids);
+  if (deferredValue !== undefined) el.value = deferredValue;
   return el;
 }
 function append(el, kids) {
