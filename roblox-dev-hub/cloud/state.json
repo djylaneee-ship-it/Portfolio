@@ -1,7 +1,7 @@
 {
  "version": 2,
- "cursor": 1433,
- "runs": 367,
+ "cursor": 1437,
+ "runs": 368,
  "channels": [
   {
    "id": "ff1bc5c8316c",
@@ -19596,22 +19596,24 @@
   }
  ],
  "cursors": {
-  "forum:help-and-feedback/scripting-support": 4360,
-  "forum:help-and-feedback/creations-feedback": 650,
-  "sketchfab:roblox": "8280",
-  "forum:help-and-feedback/game-design-support": 285,
-  "forum:resources/community-resources": 225,
-  "forum:help-and-feedback/building-support": 120,
-  "devto:gamedev": 95,
-  "forum:help-and-feedback/art-design-support": 95,
-  "forum:updates/announcements": 70,
-  "sketchfab:roblox map": "840",
-  "forum:resources/community-tutorials": 14,
-  "sketchfab:roblox low poly": "240",
-  "sketchfab:roblox ugc": "240",
+  "forum:help-and-feedback/scripting-support": 4395,
+  "forum:help-and-feedback/creations-feedback": 685,
+  "sketchfab:roblox": "9120",
+  "forum:help-and-feedback/game-design-support": 320,
+  "forum:resources/community-resources": 260,
+  "forum:help-and-feedback/building-support": 155,
+  "forum:help-and-feedback/art-design-support": 130,
+  "forum:resources/community-tutorials": 49,
+  "sketchfab:roblox low poly": "1080",
+  "sketchfab:roblox ugc": "1080",
+  "sketchfab:roblox character": "1080",
+  "store:mesh:egg": "MjVfMV8xXzMw_d2ee7fcd78262ce54540a46dc27577b4",
+  "store:mesh:crystal": "MjVfMV8xXzMw_133c488aeebd37a1c7766098da3211df",
+  "forum:updates/announcements": 10,
+  "sketchfab:roblox map": "240",
   "sketchfab:roblox weapon": "240",
-  "sketchfab:roblox character": "240",
   "sketchfab:roblox pet": "240",
+  "devto:gamedev": 10,
   "store:decal:button": "MTBfMV8xXzMw_5c8ae2ca89b60cdc414321d3ced98244",
   "store:decal:frame": "MTBfMV8xXzMw_2421d2db40f9fd00d441ea836d1aa8d1",
   "store:decal:background": "MTBfMV8xXzMw_a574aad5f14652e7daf4c360a3130954",
@@ -19625,14 +19627,8 @@
   "store:mesh:gun": "MTBfMV8xXzMw_ea1de00b6323ef2b10b517bffda19397",
   "store:mesh:tree": "MTBfMV8xXzMw_be56d90c1b2f98defbdc42815f0047c2",
   "store:mesh:rock": "MTBfMV8xXzMw_fce304b2032c7d0deca17b7d6a8831e6",
-  "store:mesh:house": "MTBfMV8xXzMw_2c22625097ecc99832a9a8655f2f79e4",
-  "store:mesh:car": "MTBfMV8xXzMw_81fad5e80f2da6d93860ea91168c7bda",
-  "store:mesh:pet": "MTBfMV8xXzMw_55349eedf813d501b9b9ea3a6a647a74",
-  "store:mesh:chest": "MTBfMV8xXzMw_8074213b8b873a99498d5c168de09ed0",
-  "store:mesh:weapon": "MTBfMV8xXzMw_232bd806545e807cb612435a1806b46b",
-  "store:mesh:low poly": "MTBfMV8xXzMw_19046767010deee2ef96e6985d3ceef5",
-  "store:mesh:furniture": "MTBfMV8xXzMw_b747e33c444cc07de35a4a1e5ec40b36"
+  "store:mesh:house": "OV8xXzFfMzA=_06b56db604dced7379b96ce6b62d6d92"
  },
  "migrated": false,
- "updatedAt": "2026-11-09T18:04:33.566Z"
+ "updatedAt": "2026-11-09T18:57:58.496Z"
 }
