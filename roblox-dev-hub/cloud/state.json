@@ -1,7 +1,7 @@
 {
  "version": 2,
- "cursor": 1530,
- "runs": 390,
+ "cursor": 1535,
+ "runs": 391,
  "channels": [
   {
    "id": "ff1bc5c8316c",
@@ -19861,19 +19861,19 @@
  ],
  "cursors": {
   "forum:help-and-feedback/scripting-support": 4665,
-  "forum:help-and-feedback/creations-feedback": 1259,
-  "forum:help-and-feedback/game-design-support": 330,
-  "sketchfab:roblox": "5880",
-  "forum:resources/community-resources": 140,
-  "forum:help-and-feedback/building-support": 120,
-  "sketchfab:roblox low poly": "1680",
-  "devto:gamedev": 70,
-  "forum:help-and-feedback/art-design-support": 60,
-  "sketchfab:roblox character": "840",
-  "forum:resources/community-tutorials": 10,
-  "forum:updates/announcements": 10,
-  "sketchfab:roblox ugc": "240",
-  "sketchfab:roblox map": "240",
+  "forum:help-and-feedback/creations-feedback": 1294,
+  "forum:help-and-feedback/game-design-support": 365,
+  "sketchfab:roblox": "6120",
+  "forum:resources/community-resources": 175,
+  "forum:help-and-feedback/building-support": 155,
+  "forum:help-and-feedback/art-design-support": 95,
+  "sketchfab:roblox character": "1080",
+  "forum:resources/community-tutorials": 45,
+  "forum:updates/announcements": 45,
+  "sketchfab:roblox ugc": "336",
+  "sketchfab:roblox map": "696",
+  "sketchfab:roblox weapon": "384",
+  "sketchfab:roblox building": "96",
   "sketchfab:roblox pet": "240",
   "store:decal:frame": "MTBfMV8xXzMw_2421d2db40f9fd00d441ea836d1aa8d1",
   "store:decal:background": "MTBfMV8xXzMw_a574aad5f14652e7daf4c360a3130954",
@@ -19894,10 +19894,8 @@
   "store:mesh:egg": "MTBfMV8xXzMw_0471c6ab6db52fdb23c087c6b56115b3",
   "store:mesh:crystal": "MTBfMV8xXzMw_d4730e8d3f4a04239b88a6700e9014ce",
   "store:mesh:chest": "MTBfMV8xXzMw_8074213b8b873a99498d5c168de09ed0",
-  "store:mesh:weapon": "MTBfMV8xXzMw_232bd806545e807cb612435a1806b46b",
-  "store:mesh:low poly": "MTBfMV8xXzMw_19046767010deee2ef96e6985d3ceef5",
-  "store:mesh:furniture": "MTBfMV8xXzMw_b747e33c444cc07de35a4a1e5ec40b36"
+  "store:mesh:weapon": "Nl8xXzFfMzA=_cdd4c6bbaf1b8d043345a826f1e2918d"
  },
  "migrated": false,
- "updatedAt": "2026-11-10T14:30:08.706Z"
+ "updatedAt": "2026-11-10T15:23:13.387Z"
 }
