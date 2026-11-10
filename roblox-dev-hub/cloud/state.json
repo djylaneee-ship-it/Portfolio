@@ -1,7 +1,7 @@
 {
  "version": 2,
- "cursor": 1471,
- "runs": 376,
+ "cursor": 1475,
+ "runs": 377,
  "channels": [
   {
    "id": "ff1bc5c8316c",
@@ -6941,7 +6941,7 @@
    "channelId": "UCjOSNjDGycTBqRo2oHRFQGw",
    "category": "scripting",
    "subscribers": "6 subscribers",
-   "lastFetch": "2026-11-09T23:42:25.546Z",
+   "lastFetch": "2026-11-10T02:27:50.036Z",
    "auto": true
   },
   {
@@ -11341,7 +11341,7 @@
    "channelId": "UCkpb5kdNbr8h4L8NPPPvJtQ",
    "category": "building",
    "subscribers": "3 subscribers",
-   "lastFetch": "2026-11-09T21:17:55.611Z",
+   "lastFetch": "2026-11-10T02:30:46.334Z",
    "auto": true
   },
   {
@@ -11583,7 +11583,7 @@
    "channelId": "UCDpNFfkotNL4UbmdLtJBKJg",
    "category": "building",
    "subscribers": "",
-   "lastFetch": "2026-11-09T21:18:05.919Z",
+   "lastFetch": "2026-11-10T02:30:56.023Z",
    "auto": true
   },
   {
@@ -11638,7 +11638,7 @@
    "channelId": "UC3y88GWRX91McAStdrszq3A",
    "category": "tools",
    "subscribers": "11 subscribers",
-   "lastFetch": "2026-11-09T21:18:08.348Z",
+   "lastFetch": "2026-11-10T02:30:58.324Z",
    "auto": true
   },
   {
@@ -16401,7 +16401,7 @@
    "channelId": "UC-KkyIATSEOk60bwSuTHwAA",
    "category": "vfx",
    "subscribers": "165 subscribers",
-   "lastFetch": "2026-11-09T21:21:31.975Z",
+   "lastFetch": "2026-11-10T02:34:06.222Z",
    "auto": true
   },
   {
@@ -19129,7 +19129,7 @@
    "channelId": "UCgnpB24obc7mJ-csj8BJ_Aw",
    "category": "vfx",
    "subscribers": "3.57K subscribers",
-   "lastFetch": "2026-11-09T21:23:27.936Z",
+   "lastFetch": "2026-11-10T02:35:53.143Z",
    "auto": true
   },
   {
@@ -19294,7 +19294,7 @@
    "channelId": "UCVhLKZa-EjPHhT5-yEdfMDA",
    "category": "tools",
    "subscribers": "17 subscribers",
-   "lastFetch": "2026-11-09T21:23:34.820Z",
+   "lastFetch": "2026-11-10T02:35:59.750Z",
    "auto": true
   },
   {
@@ -19754,28 +19754,27 @@
   "forum:help-and-feedback/creations-feedback": 955,
   "forum:help-and-feedback/building-support": 425,
   "forum:help-and-feedback/art-design-support": 400,
-  "sketchfab:roblox": "5040",
+  "sketchfab:roblox": "5880",
   "forum:resources/community-resources": 190,
   "forum:resources/community-tutorials": 95,
-  "sketchfab:roblox low poly": "1440",
-  "devto:gamedev": 60,
-  "sketchfab:roblox map": "840",
-  "store:mesh:egg": "MjVfMV8xXzMw_d2ee7fcd78262ce54540a46dc27577b4",
-  "store:mesh:crystal": "MjVfMV8xXzMw_133c488aeebd37a1c7766098da3211df",
+  "devto:gamedev": 95,
   "forum:help-and-feedback/game-design-support": 10,
   "forum:updates/announcements": 10,
-  "sketchfab:roblox ugc": "240",
-  "sketchfab:roblox weapon": "240",
-  "sketchfab:roblox character": "240",
-  "sketchfab:roblox pet": "240",
-  "store:decal:ui": "MTBfMV8xXzMw_41872fe8f64c2c45bac875d16b88ed95",
-  "store:decal:icon": "MTBfMV8xXzMw_ac73895a948bcbb76450c2c0f26debec",
-  "store:decal:button": "MTBfMV8xXzMw_5c8ae2ca89b60cdc414321d3ced98244",
-  "store:decal:frame": "MTBfMV8xXzMw_2421d2db40f9fd00d441ea836d1aa8d1",
-  "store:decal:background": "MTBfMV8xXzMw_a574aad5f14652e7daf4c360a3130954",
-  "store:decal:texture": "MTBfMV8xXzMw_4bb7b74fd992c4011dce38ed1be687d7",
-  "store:decal:particle": "MTBfMV8xXzMw_012e3344259a06438d9fdadcbf7d975a"
+  "sketchfab:roblox ugc": "1080",
+  "sketchfab:roblox character": "1080",
+  "store:mesh:sword": "MjlfMV8xXzMw_d452fafcdc661e3308aa92d83732843a",
+  "store:mesh:gun": "MTBfMV8xXzMw_ea1de00b6323ef2b10b517bffda19397",
+  "store:mesh:tree": "MTBfMV8xXzMw_be56d90c1b2f98defbdc42815f0047c2",
+  "store:mesh:rock": "MTBfMV8xXzMw_fce304b2032c7d0deca17b7d6a8831e6",
+  "store:mesh:house": "MTBfMV8xXzMw_2c22625097ecc99832a9a8655f2f79e4",
+  "store:mesh:car": "MTBfMV8xXzMw_81fad5e80f2da6d93860ea91168c7bda",
+  "store:mesh:pet": "MTBfMV8xXzMw_55349eedf813d501b9b9ea3a6a647a74",
+  "store:mesh:chest": "MTBfMV8xXzMw_8074213b8b873a99498d5c168de09ed0",
+  "store:mesh:weapon": "MTBfMV8xXzMw_232bd806545e807cb612435a1806b46b",
+  "store:mesh:low poly": "MTBfMV8xXzMw_19046767010deee2ef96e6985d3ceef5",
+  "store:mesh:furniture": "MTBfMV8xXzMw_b747e33c444cc07de35a4a1e5ec40b36",
+  "sketchfab:roblox map": "600"
  },
  "migrated": false,
- "updatedAt": "2026-11-10T02:03:34.860Z"
+ "updatedAt": "2026-11-10T02:57:21.751Z"
 }
