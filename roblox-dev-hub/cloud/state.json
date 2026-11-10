@@ -1,7 +1,7 @@
 {
  "version": 2,
- "cursor": 1475,
- "runs": 377,
+ "cursor": 1479,
+ "runs": 378,
  "channels": [
   {
    "id": "ff1bc5c8316c",
@@ -19754,15 +19754,18 @@
   "forum:help-and-feedback/creations-feedback": 955,
   "forum:help-and-feedback/building-support": 425,
   "forum:help-and-feedback/art-design-support": 400,
-  "sketchfab:roblox": "5880",
+  "sketchfab:roblox": "6720",
   "forum:resources/community-resources": 190,
   "forum:resources/community-tutorials": 95,
-  "devto:gamedev": 95,
   "forum:help-and-feedback/game-design-support": 10,
   "forum:updates/announcements": 10,
-  "sketchfab:roblox ugc": "1080",
-  "sketchfab:roblox character": "1080",
-  "store:mesh:sword": "MjlfMV8xXzMw_d452fafcdc661e3308aa92d83732843a",
+  "sketchfab:roblox low poly": "840",
+  "sketchfab:roblox ugc": "240",
+  "sketchfab:roblox map": "240",
+  "sketchfab:roblox character": "240",
+  "sketchfab:roblox pet": "240",
+  "devto:gamedev": 10,
+  "store:mesh:sword": "MTBfMV8xXzMw_69c7f86decf2072dcad7f7f8ee1384ab",
   "store:mesh:gun": "MTBfMV8xXzMw_ea1de00b6323ef2b10b517bffda19397",
   "store:mesh:tree": "MTBfMV8xXzMw_be56d90c1b2f98defbdc42815f0047c2",
   "store:mesh:rock": "MTBfMV8xXzMw_fce304b2032c7d0deca17b7d6a8831e6",
@@ -19772,9 +19775,8 @@
   "store:mesh:chest": "MTBfMV8xXzMw_8074213b8b873a99498d5c168de09ed0",
   "store:mesh:weapon": "MTBfMV8xXzMw_232bd806545e807cb612435a1806b46b",
   "store:mesh:low poly": "MTBfMV8xXzMw_19046767010deee2ef96e6985d3ceef5",
-  "store:mesh:furniture": "MTBfMV8xXzMw_b747e33c444cc07de35a4a1e5ec40b36",
-  "sketchfab:roblox map": "600"
+  "store:mesh:furniture": "N18xXzFfMzA=_c6b88da2222810fd1f8958484ff4ef6f"
  },
  "migrated": false,
- "updatedAt": "2026-11-10T02:57:21.751Z"
+ "updatedAt": "2026-11-10T03:50:56.951Z"
 }
