@@ -1,7 +1,7 @@
 {
  "version": 2,
- "cursor": 1559,
- "runs": 397,
+ "cursor": 1564,
+ "runs": 398,
  "channels": [
   {
    "id": "ff1bc5c8316c",
@@ -20004,20 +20004,21 @@
  ],
  "cursors": {
   "forum:help-and-feedback/scripting-support": 4665,
-  "forum:help-and-feedback/creations-feedback": 1504,
-  "forum:help-and-feedback/game-design-support": 575,
-  "forum:help-and-feedback/building-support": 365,
-  "forum:help-and-feedback/art-design-support": 305,
-  "devto:gamedev": 80,
-  "forum:resources/community-resources": 45,
-  "forum:updates/announcements": 45,
-  "sketchfab:roblox": "1080",
-  "sketchfab:roblox low poly": "1080",
-  "sketchfab:roblox ugc": "1080",
-  "store:decal:smoke": "MjNfMV8xXzMw_44256676f4ab94fd7af505effa243c3b",
-  "store:decal:fire": "MjBfMV8xXzMw_c16ec3285eb1b97e851402d9581224d5",
-  "store:decal:glow": "MTNfMV8xXzMw_70222e7c4e4b0c5e086892deb468d482",
-  "sketchfab:roblox character": "840",
+  "forum:help-and-feedback/creations-feedback": 1539,
+  "forum:help-and-feedback/building-support": 400,
+  "forum:help-and-feedback/art-design-support": 340,
+  "forum:resources/community-resources": 80,
+  "forum:updates/announcements": 80,
+  "sketchfab:roblox": "1920",
+  "forum:resources/community-tutorials": 60,
+  "forum:help-and-feedback/game-design-support": 10,
+  "sketchfab:roblox ugc": "240",
+  "sketchfab:roblox map": "240",
+  "sketchfab:roblox pet": "240",
+  "devto:gamedev": 10,
+  "store:decal:smoke": "MTBfMV8xXzMw_78fb0dc832f820317e52961dc3b415d3",
+  "store:decal:fire": "MTBfMV8xXzMw_63dcaf1f99fcbd86f56123ae31899a46",
+  "store:decal:glow": "MTBfMV8xXzMw_43c8ce564a9390e04cd5bf2f7f6c9470",
   "store:decal:sparkle": "MTBfMV8xXzMw_4244162d0e2c1716f17325bb95572674",
   "store:decal:aura": "MTBfMV8xXzMw_83bd7c91a022b57e578f0dc4d0515a9c",
   "store:decal:gradient": "MTBfMV8xXzMw_1ca8bc484c4ea08588f41879cc5762ea",
@@ -20040,10 +20041,8 @@
   "store:mesh:crystal": "MTBfMV8xXzMw_d4730e8d3f4a04239b88a6700e9014ce",
   "store:mesh:chest": "MTBfMV8xXzMw_8074213b8b873a99498d5c168de09ed0",
   "store:mesh:weapon": "MTBfMV8xXzMw_232bd806545e807cb612435a1806b46b",
-  "store:mesh:furniture": "MTBfMV8xXzMw_b747e33c444cc07de35a4a1e5ec40b36",
-  "forum:resources/community-tutorials": 25,
-  "sketchfab:roblox map": "600"
+  "store:mesh:furniture": "MTBfMV8xXzMw_b747e33c444cc07de35a4a1e5ec40b36"
  },
  "migrated": false,
- "updatedAt": "2026-11-10T20:44:51.079Z"
+ "updatedAt": "2026-11-10T21:38:23.005Z"
 }
