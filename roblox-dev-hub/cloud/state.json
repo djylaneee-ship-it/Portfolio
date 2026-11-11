@@ -1,7 +1,7 @@
 {
  "version": 2,
- "cursor": 1602,
- "runs": 409,
+ "cursor": 1609,
+ "runs": 410,
  "channels": [
   {
    "id": "ff1bc5c8316c",
@@ -20253,20 +20253,53 @@
    "subscribers": "",
    "lastFetch": null,
    "auto": true
+  },
+  {
+   "id": "f18f59ac60c3",
+   "handle": "@Roblox4982-n1y",
+   "name": "SussyRoBlOx",
+   "avatar": "https://yt3.ggpht.com/2XYddT22d0THDh2psFJabSgn0nxiyY7EdY1Ha16FsCkkIWPRZvcLpay9ZNS6sH5fNuXpmH9ovwk=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCDYiEaj73MF_V7Z28BD4j3Q",
+   "category": "modeling",
+   "subscribers": "19 subscribers",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "e47bdad04e07",
+   "handle": "@rbxdevlog7",
+   "name": "RBX DevLog",
+   "avatar": "https://yt3.ggpht.com/vC5y02OYRdzr7RL2rVg1DUGAEzcTT-GPmQJ-irFiDssGywvnP5-rh9gutCh1Ivazx6nJElbE=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UC9T1B6gnvL7V_43Nicfx9cA",
+   "category": "tools",
+   "subscribers": "33 subscribers",
+   "lastFetch": null,
+   "auto": true
   }
  ],
  "cursors": {
   "forum:help-and-feedback/scripting-support": 4665,
-  "sketchfab:roblox": "9960",
-  "forum:help-and-feedback/game-design-support": 345,
-  "forum:help-and-feedback/creations-feedback": 250,
-  "forum:help-and-feedback/building-support": 85,
-  "forum:resources/community-resources": 60,
-  "sketchfab:roblox low poly": "1440",
-  "forum:resources/community-tutorials": 25,
-  "forum:updates/announcements": 25,
-  "sketchfab:roblox ugc": "600",
-  "sketchfab:roblox character": "600",
+  "forum:help-and-feedback/game-design-support": 380,
+  "forum:help-and-feedback/creations-feedback": 285,
+  "forum:help-and-feedback/building-support": 120,
+  "forum:resources/community-resources": 95,
+  "forum:resources/community-tutorials": 60,
+  "forum:updates/announcements": 60,
+  "sketchfab:roblox character": "1440",
+  "forum:help-and-feedback/art-design-support": 35,
+  "sketchfab:roblox map": "840",
+  "devto:gamedev": 35,
+  "store:decal:wood": "MTBfMV8xXzMw_6b87ff3c3dbd502adee5e6d62b59b62f",
+  "store:mesh:sword": "MTBfMV8xXzMw_69c7f86decf2072dcad7f7f8ee1384ab",
+  "store:mesh:gun": "MTBfMV8xXzMw_ea1de00b6323ef2b10b517bffda19397",
+  "store:mesh:tree": "MTBfMV8xXzMw_be56d90c1b2f98defbdc42815f0047c2",
+  "store:mesh:house": "MTBfMV8xXzMw_2c22625097ecc99832a9a8655f2f79e4",
+  "store:mesh:car": "MTBfMV8xXzMw_81fad5e80f2da6d93860ea91168c7bda",
+  "store:mesh:pet": "MTBfMV8xXzMw_55349eedf813d501b9b9ea3a6a647a74",
+  "store:mesh:chest": "MTBfMV8xXzMw_8074213b8b873a99498d5c168de09ed0",
+  "store:mesh:weapon": "MTBfMV8xXzMw_232bd806545e807cb612435a1806b46b",
+  "store:mesh:furniture": "MTBfMV8xXzMw_b747e33c444cc07de35a4a1e5ec40b36",
+  "sketchfab:roblox": "600",
   "store:decal:particle": "MjVfMV8xXzMw_d4765ab16064a14719f1deedd55ca217",
   "store:decal:vfx": "MjVfMV8xXzMw_6c3c4ed227173cf45738de983f0645f0",
   "store:decal:slash": "MjVfMV8xXzMw_c14db494410264293c1f2dc8d4935696",
@@ -20279,15 +20312,8 @@
   "store:decal:logo": "MjVfMV8xXzMw_f86b6d73709c17209fa3e35d91480645",
   "store:decal:emoji": "MjVfMV8xXzMw_a669f172459ea6e4b6e25b08be30709e",
   "store:decal:sky": "MjVfMV8xXzMw_3767ec32820cd0c4c38677f705695deb",
-  "store:decal:stone": "MjVfMV8xXzMw_07dcf90e0ce133433c04ea736373ba7b",
-  "store:decal:brick": "MjVfMV8xXzMw_5da163b19fbeaf570a45051ff7e5bdbe",
-  "store:decal:anime": "MjVfMV8xXzMw_0678e316f0e394c5e6f709cc7cf5d231",
-  "store:decal:cartoon": "MjVfMV8xXzMw_6ee2ffb528f0263fd7fc177c3dfd1937",
-  "store:mesh:rock": "MjVfMV8xXzMw_92c847e986a6e720154c48755b26062a",
-  "store:mesh:egg": "MjVfMV8xXzMw_d2ee7fcd78262ce54540a46dc27577b4",
-  "store:mesh:crystal": "MjVfMV8xXzMw_133c488aeebd37a1c7766098da3211df",
-  "store:mesh:low poly": "MjVfMV8xXzMw_2fa7bd44025e75c98bf606befd4efdac"
+  "store:decal:stone": "MTdfMV8xXzMw_128733b8c28dbb5e2c5dce927febb1fb"
  },
  "migrated": false,
- "updatedAt": "2026-11-11T08:18:15.808Z"
+ "updatedAt": "2026-11-11T09:11:29.872Z"
 }
