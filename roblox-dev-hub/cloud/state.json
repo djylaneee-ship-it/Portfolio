@@ -1,7 +1,7 @@
 {
  "version": 2,
- "cursor": 1637,
- "runs": 416,
+ "cursor": 1639,
+ "runs": 417,
  "channels": [
   {
    "id": "ff1bc5c8316c",
@@ -20411,34 +20411,23 @@
  ],
  "cursors": {
   "forum:help-and-feedback/scripting-support": 4665,
-  "forum:help-and-feedback/creations-feedback": 495,
-  "forum:help-and-feedback/building-support": 355,
-  "forum:resources/community-resources": 305,
-  "forum:help-and-feedback/art-design-support": 268,
-  "sketchfab:roblox": "5640",
-  "sketchfab:roblox low poly": "840",
-  "sketchfab:roblox map": "840",
-  "sketchfab:roblox character": "840",
-  "devto:gamedev": 35,
-  "forum:help-and-feedback/game-design-support": 10,
-  "forum:resources/community-tutorials": 10,
-  "forum:updates/announcements": 10,
-  "sketchfab:roblox ugc": "240",
+  "forum:help-and-feedback/creations-feedback": 530,
+  "forum:help-and-feedback/building-support": 390,
+  "forum:help-and-feedback/art-design-support": 303,
+  "sketchfab:roblox": "6480",
+  "sketchfab:roblox low poly": "1680",
+  "devto:gamedev": 70,
+  "forum:help-and-feedback/game-design-support": 45,
+  "forum:resources/community-tutorials": 45,
+  "forum:updates/announcements": 45,
+  "sketchfab:roblox ugc": "1080",
+  "sketchfab:roblox map": "240",
   "sketchfab:roblox pet": "240",
   "store:mesh:sword": "MTBfMV8xXzMw_69c7f86decf2072dcad7f7f8ee1384ab",
   "store:mesh:gun": "MTBfMV8xXzMw_ea1de00b6323ef2b10b517bffda19397",
   "store:mesh:tree": "MTBfMV8xXzMw_be56d90c1b2f98defbdc42815f0047c2",
-  "store:mesh:rock": "MTBfMV8xXzMw_fce304b2032c7d0deca17b7d6a8831e6",
-  "store:mesh:house": "MTBfMV8xXzMw_2c22625097ecc99832a9a8655f2f79e4",
-  "store:mesh:car": "MTBfMV8xXzMw_81fad5e80f2da6d93860ea91168c7bda",
-  "store:mesh:pet": "MTBfMV8xXzMw_55349eedf813d501b9b9ea3a6a647a74",
-  "store:mesh:egg": "MTBfMV8xXzMw_0471c6ab6db52fdb23c087c6b56115b3",
-  "store:mesh:crystal": "MTBfMV8xXzMw_d4730e8d3f4a04239b88a6700e9014ce",
-  "store:mesh:chest": "MTBfMV8xXzMw_8074213b8b873a99498d5c168de09ed0",
-  "store:mesh:weapon": "MTBfMV8xXzMw_232bd806545e807cb612435a1806b46b",
-  "store:mesh:low poly": "MTBfMV8xXzMw_19046767010deee2ef96e6985d3ceef5",
-  "store:mesh:furniture": "MTBfMV8xXzMw_b747e33c444cc07de35a4a1e5ec40b36"
+  "store:mesh:rock": "Nl8xXzFfMzA=_b3156b6b35aad5bc53c1693595e457e3"
  },
  "migrated": false,
- "updatedAt": "2026-11-11T14:31:38.116Z"
+ "updatedAt": "2026-11-11T15:24:58.897Z"
 }
