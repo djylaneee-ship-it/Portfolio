@@ -1,7 +1,7 @@
 {
  "version": 2,
- "cursor": 1629,
- "runs": 415,
+ "cursor": 1637,
+ "runs": 416,
  "channels": [
   {
    "id": "ff1bc5c8316c",
@@ -20286,20 +20286,146 @@
    "subscribers": "6 subscribers",
    "lastFetch": "2026-11-11T13:00:58.587Z",
    "auto": true
+  },
+  {
+   "id": "24b211e42465",
+   "handle": "@DivStudioYT",
+   "name": "DivStudio",
+   "avatar": "https://yt3.ggpht.com/shyKGdW-axF8ju7Vlpe13BcZw41nOR8hDJW4vPWwc5miICJuTuUDvi2LyBKgKmuAVq5CO7iP=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCtL2L8uw0x4iGhTaNSGGefQ",
+   "category": "modeling",
+   "subscribers": "308K subscribers",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "5efd67032f8f",
+   "handle": "@untamedstudios-h5y",
+   "name": "untamedstudios",
+   "avatar": "https://yt3.ggpht.com/u6ziipsdpUnojdqRaXYgf_8RKPMsCdJq-QTBReRDFgdCyR3tNMG7k0EXiXp-ocuZVCQHggb-=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCUeAsIM0-eGRdE6sXZum2Jg",
+   "category": "tools",
+   "subscribers": "3 subscribers",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "7e1a09d3644b",
+   "handle": "@Bain-Dev",
+   "name": "BainDev",
+   "avatar": "https://yt3.ggpht.com/TIGoBHxxeYK89H6S2akPljUSO7e29LVVTh0mX1RR0v13dM_rbZfOhofKeUY2BQ4aTE9dII_Cxw=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UC1UMZ0Cw5x6Bp7v8vf0EiRg",
+   "category": "tools",
+   "subscribers": "3 subscribers",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "d714d049d9ce",
+   "handle": "@Tonndev",
+   "name": "Tonn",
+   "avatar": "https://yt3.ggpht.com/BcJr-84m3rPnhQJd8bUiUdn_1YlENH9Ve-GBuWJRgS-EMGDBtyh40JSqvxIFC8AlY8gQvFlXELs=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UC9E1cC7W3AzbXdva05mS8Og",
+   "category": "tools",
+   "subscribers": "",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "d6e5c5b39bee",
+   "handle": "@burritowithme",
+   "name": "burritowithme",
+   "avatar": "https://yt3.ggpht.com/dTPnTh8ZoVx0PdfiMsA4MGmONE8M2-5Gq3AkPQBus_ou39WdIEPSlZtBPTxA5H8EH4TZmBcWRNU=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UC0Ueots7vmrNqxI76svIqUA",
+   "category": "tools",
+   "subscribers": "4 subscribers",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "59e768ac434f",
+   "handle": "@I_Logicall",
+   "name": "Logicall",
+   "avatar": "https://yt3.ggpht.com/DGifBFJwVjuXryStwBpwCR2hAEWNPV_Ygn_pYIM5z_mEZFf_ceqEeCOhaFbGbL8JN4dmVi9XPQ=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCShD3LgdF_mqDY9CWAs-N0Q",
+   "category": "tools",
+   "subscribers": "6.09K subscribers",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "b8a195148c6e",
+   "handle": "@robloxbuilder1353",
+   "name": "Roblox Builder",
+   "avatar": "https://yt3.googleusercontent.com/ytc/AIdro_meovYfW4FurRaOJ5xofYMLCw0uv1jqlwQ35H9ag4JYAA=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UC2b8Kuv1OTwpwQDHzwAoSdg",
+   "category": "modeling",
+   "subscribers": "4 subscribers",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "90a09042fef9",
+   "handle": "@robloxbuilder92",
+   "name": "roblox builder",
+   "avatar": "https://yt3.googleusercontent.com/ytc/AIdro_lvpj81R8gKeiCEt1e5HOzypTUIde6TUJLSZ2BfRhY=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCd51jf8J-lEkW25zIGlcpgQ",
+   "category": "building",
+   "subscribers": "",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "353b0bd0d9e4",
+   "handle": "@AliiLuau",
+   "name": "Ali'i Luau ",
+   "avatar": "https://yt3.ggpht.com/ytc/AIdro_li0yM6cYLIOWjD11MRFrJBTyO1UpGuxl0HXyI_Shaix_AohWC1X6iVYA2plRVEmtsyaw=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCEnc4dJU2K7OxKE5moRTtSQ",
+   "category": "scripting",
+   "subscribers": "",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "7ca31e8d0635",
+   "handle": "@ropilotai",
+   "name": "Ropilot AI",
+   "avatar": "https://yt3.ggpht.com/LJ4eaE44KywUdiffNy0RjlaaI88k4Ksz_p2LYc7isbu4tuxZsJxUcLxmit_KEnANFjSkWYIfqg=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UC_v0qho-Wg6KQ6UWDs53JoA",
+   "category": "tools",
+   "subscribers": "2.23K subscribers",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "013dcfd7660a",
+   "handle": "@RedKill-Roblox",
+   "name": "REDKILL Roblox",
+   "avatar": "https://yt3.ggpht.com/Ik_OHpOKDd97nHDb3dvUnQ-BAZN5gsF3ShGqBsK3Mdfl11tfSFMuCl_kfmjadNxrgYAMXq5U=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UC6-JRITFPtrWxaBHLygbhRQ",
+   "category": "tools",
+   "subscribers": "53.9K subscribers",
+   "lastFetch": null,
+   "auto": true
   }
  ],
  "cursors": {
   "forum:help-and-feedback/scripting-support": 4665,
-  "forum:help-and-feedback/game-design-support": 555,
-  "forum:help-and-feedback/creations-feedback": 460,
-  "forum:help-and-feedback/building-support": 295,
-  "forum:resources/community-resources": 270,
-  "forum:help-and-feedback/art-design-support": 210,
-  "sketchfab:roblox": "4800",
-  "forum:resources/community-tutorials": 105,
-  "forum:updates/announcements": 60,
-  "sketchfab:roblox ugc": "840",
-  "store:mesh:sword": "MjRfMV8xXzMw_dbf6c9daad3600229edbddbe23ff24f9",
+  "forum:help-and-feedback/creations-feedback": 495,
+  "forum:help-and-feedback/building-support": 355,
+  "forum:resources/community-resources": 305,
+  "forum:help-and-feedback/art-design-support": 268,
+  "sketchfab:roblox": "5640",
+  "sketchfab:roblox low poly": "840",
+  "sketchfab:roblox map": "840",
+  "sketchfab:roblox character": "840",
+  "devto:gamedev": 35,
+  "forum:help-and-feedback/game-design-support": 10,
+  "forum:resources/community-tutorials": 10,
+  "forum:updates/announcements": 10,
+  "sketchfab:roblox ugc": "240",
+  "sketchfab:roblox pet": "240",
+  "store:mesh:sword": "MTBfMV8xXzMw_69c7f86decf2072dcad7f7f8ee1384ab",
   "store:mesh:gun": "MTBfMV8xXzMw_ea1de00b6323ef2b10b517bffda19397",
   "store:mesh:tree": "MTBfMV8xXzMw_be56d90c1b2f98defbdc42815f0047c2",
   "store:mesh:rock": "MTBfMV8xXzMw_fce304b2032c7d0deca17b7d6a8831e6",
@@ -20314,5 +20440,5 @@
   "store:mesh:furniture": "MTBfMV8xXzMw_b747e33c444cc07de35a4a1e5ec40b36"
  },
  "migrated": false,
- "updatedAt": "2026-11-11T13:38:15.768Z"
+ "updatedAt": "2026-11-11T14:31:38.116Z"
 }
