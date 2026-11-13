@@ -1,7 +1,7 @@
 {
  "version": 2,
- "cursor": 1801,
- "runs": 461,
+ "cursor": 1805,
+ "runs": 462,
  "channels": [
   {
    "id": "ff1bc5c8316c",
@@ -20869,28 +20869,167 @@
    "subscribers": "312 subscribers",
    "lastFetch": "2026-11-13T10:11:21.749Z",
    "auto": true
+  },
+  {
+   "id": "9aa9335fe3ea",
+   "handle": "@RobloxStudioPro-i7r",
+   "name": "Roblox Studio Pro",
+   "avatar": "https://yt3.ggpht.com/FF4Cx5W9cwySqoQzFVdNAVfTJKBMd9etGn5HjBUODOo5-rntF---nx62kwUu3u0AeOgF2dHJK14=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCCz7vhvKmunR-2z4vN6nqQg",
+   "category": "tools",
+   "subscribers": "3 subscribers",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "4647a70a5d9d",
+   "handle": "@robloxdeveloper8034",
+   "name": "Roblox Developer",
+   "avatar": "https://yt3.googleusercontent.com/ytc/AIdro_m5DVdRkFGQ4mPw4TEnEc43q-Jj2hVZeFcSSLZi1_PhSQ=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCLr9M9T6q4uAMnJzdxoUtOQ",
+   "category": "tools",
+   "subscribers": "",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "96000f83336f",
+   "handle": "@Robloxdeveloper-w1m",
+   "name": "Roblox developer ",
+   "avatar": "https://yt3.ggpht.com/bzCo3kcxh0dqqEjo2qkGfQj0dAfnlgVfoVJfSfL3zRtX6Cws0Vbl36rLMqbvdjWobIYoYUIc5OE=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCPMqgPAfCO-N2quVlUoaGlg",
+   "category": "tools",
+   "subscribers": "1 subscriber",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "215580779742",
+   "handle": "@robloxdeveloper8028",
+   "name": "ROBLOX Developer",
+   "avatar": "https://yt3.googleusercontent.com/ytc/AIdro_kwg2b-U7un9kkyi45orLuDE2kElqq12ROEb724Z8XlVw=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCjENFrL7Dzie4UHuh9dmNuQ",
+   "category": "tools",
+   "subscribers": "16 subscribers",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "6348845d6975",
+   "handle": "@roblox.developer5496",
+   "name": "Roblox.developer",
+   "avatar": "https://yt3.ggpht.com/EesiHgFVAaybvp0CU9p0OgmPAEFatuZgOi7Fu7XTgBOKBcfdtwZ3jciSXK1LrbR5QmXlt8pE=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCigSfBYt6inMSR0GNEs-g0A",
+   "category": "tools",
+   "subscribers": "",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "87d0ebf3321b",
+   "handle": "@RobloxDeveloper123",
+   "name": "Roblox Developer",
+   "avatar": "https://yt3.ggpht.com/VXRckCvZf_rdILBPbXl_Kjzt3_ZKuhHXedJIQarVi0pH8jugwHH6xr_FxDl3WUBhNBA-2ZzbD9k=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCnvBR47Idw0ic36Iz69vaBw",
+   "category": "tools",
+   "subscribers": "1 subscriber",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "8027b51829dd",
+   "handle": "@voltdev",
+   "name": "voltdev (roblox developer)",
+   "avatar": "https://yt3.ggpht.com/Hy-S_u4nGN75I0YWjVTPRkYsRpZaJ_9ZDoxKJ406wPJI70UmeP5Zflo1N8hZrLVFZMNsHbRb=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCdi9nCYCoTWltqZaEdvTpag",
+   "category": "tools",
+   "subscribers": "2 subscribers",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "92dd39013f7b",
+   "handle": "@robloxdeveloper4711",
+   "name": "ROBLOX Developer",
+   "avatar": "https://yt3.googleusercontent.com/ytc/AIdro_kQedDrNQig1uXkj3dcQ1-DJGLkWyo6HpG-FKj_Mc-i=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCnzUpBhpKF4dZb3SiwGpI-g",
+   "category": "tools",
+   "subscribers": "",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "12e6aeb6b1a1",
+   "handle": "@robloxdeveloper6006",
+   "name": "Roblox developer",
+   "avatar": "https://yt3.googleusercontent.com/ytc/AIdro_nnsBLAQcHYFStBTJxchSZsIdBglI-G8YcxnACm2x8=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UC9UF1sBfFhuGEJ7iU-SSAxg",
+   "category": "tools",
+   "subscribers": "3 subscribers",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "006401039ae0",
+   "handle": "@robloxdeveloper4831",
+   "name": "Roblox Developer",
+   "avatar": "https://yt3.googleusercontent.com/ytc/AIdro_mKrxzh-P0QvelvpgA6IXgysDGvq7wncR9RUzVg8D0CrQ=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCVlovnzRXQG-e6piNbaqT8g",
+   "category": "tools",
+   "subscribers": "",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "6af14f8fa703",
+   "handle": "@RobDev12",
+   "name": "Roblox Developer",
+   "avatar": "https://yt3.ggpht.com/ytc/AIdro_lTsn_SEf4XL2vXIaaoqLUud5NQ9oq-8qVva6nli6qHfYKIw450e_k2BCXQMQ4EGZfOvw=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCqk8NnVL4GqjMI1FA2CZNnw",
+   "category": "tools",
+   "subscribers": "2 subscribers",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "b4f5ff79944f",
+   "handle": "@39P4",
+   "name": "ROBLOX DEVELOPER",
+   "avatar": "https://yt3.ggpht.com/ytc/AIdro_lkvZL6_kz1dOZZNlAfaTAAvzD815r_d0GFkV8C9bR31YRZeGPylgyyE4sM5v8Yxu6Veg=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UC4wC3rCyH3sz9L38259l90A",
+   "category": "tools",
+   "subscribers": "",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "5ef1d72186d5",
+   "handle": "@robloxtutorials-zq7kk",
+   "name": "Roblox Tutorials",
+   "avatar": "https://yt3.ggpht.com/O3O3iOWsSdpVX2Z75ibXSGrqBPgX9nKLDKSTRgnxxZ0y6Sb8-YX-AFP_mpYe_-sbycFvYpwoTQ=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCbLwXlXy1jxnrjpbvN-kKHw",
+   "category": "tools",
+   "subscribers": "",
+   "lastFetch": null,
+   "auto": true
   }
  ],
  "cursors": {
   "forum:help-and-feedback/scripting-support": 4665,
-  "forum:help-and-feedback/building-support": 600,
-  "forum:help-and-feedback/art-design-support": 425,
-  "forum:help-and-feedback/creations-feedback": 365,
-  "forum:help-and-feedback/game-design-support": 340,
-  "forum:resources/community-resources": 80,
-  "devto:gamedev": 70,
-  "forum:updates/announcements": 60,
-  "forum:resources/community-tutorials": 35,
-  "sketchfab:roblox map": "840",
-  "store:mesh:chest": "MjVfMV8xXzMw_ca76b61f635b7b7541608adc94dd5815",
-  "store:mesh:low poly": "MjVfMV8xXzMw_2fa7bd44025e75c98bf606befd4efdac",
-  "sketchfab:roblox": "240",
-  "sketchfab:roblox ugc": "240",
-  "sketchfab:roblox pet": "240",
-  "store:decal:sparkle": "MTBfMV8xXzMw_4244162d0e2c1716f17325bb95572674",
-  "store:decal:aura": "MTBfMV8xXzMw_83bd7c91a022b57e578f0dc4d0515a9c",
-  "store:decal:gradient": "MTBfMV8xXzMw_1ca8bc484c4ea08588f41879cc5762ea"
+  "forum:help-and-feedback/art-design-support": 460,
+  "forum:help-and-feedback/creations-feedback": 400,
+  "forum:help-and-feedback/game-design-support": 375,
+  "forum:resources/community-resources": 115,
+  "forum:resources/community-tutorials": 70,
+  "sketchfab:roblox": "1080",
+  "sketchfab:roblox ugc": "1080",
+  "sketchfab:roblox low poly": "840",
+  "sketchfab:roblox character": "840",
+  "store:mesh:weapon": "MTBfMV8xXzMw_232bd806545e807cb612435a1806b46b",
+  "store:mesh:furniture": "MTBfMV8xXzMw_b747e33c444cc07de35a4a1e5ec40b36",
+  "sketchfab:roblox map": "600",
+  "store:mesh:chest": "MTVfMV8xXzMw_2da6984fa9d5e4dc545bb88d3f969d60"
  },
  "migrated": false,
- "updatedAt": "2026-11-13T11:20:54.966Z"
+ "updatedAt": "2026-11-13T12:14:38.007Z"
 }
