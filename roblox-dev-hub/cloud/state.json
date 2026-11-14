@@ -1,7 +1,7 @@
 {
  "version": 2,
- "cursor": 1877,
- "runs": 482,
+ "cursor": 1881,
+ "runs": 483,
  "channels": [
   {
    "id": "ff1bc5c8316c",
@@ -528,7 +528,7 @@
    "channelId": "UC7NoLRTlRnaoGQM2COEU_Ow",
    "category": "tools",
    "subscribers": "188K subscribers",
-   "lastFetch": "2026-11-13T21:10:53.566Z",
+   "lastFetch": "2026-11-14T06:25:44.638Z",
    "auto": true
   },
   {
@@ -572,7 +572,7 @@
    "channelId": "UC6vbgSmPsXjPDjBWhtLcmaA",
    "category": "tools",
    "subscribers": "2.9K subscribers",
-   "lastFetch": "2026-11-13T21:10:55.308Z",
+   "lastFetch": "2026-11-14T06:25:46.327Z",
    "auto": true
   },
   {
@@ -1078,7 +1078,7 @@
    "channelId": "UCBDu30TqRRaIkaCPZblJ1lw",
    "category": "scripting",
    "subscribers": "381 subscribers",
-   "lastFetch": "2026-11-13T21:11:16.174Z",
+   "lastFetch": "2026-11-14T06:26:05.092Z",
    "auto": true
   },
   {
@@ -1133,7 +1133,7 @@
    "channelId": "UCbJHt5IIyM2AJGF9z5YPr5w",
    "category": "scripting",
    "subscribers": "1 subscriber",
-   "lastFetch": "2026-11-13T21:11:18.265Z",
+   "lastFetch": "2026-11-14T06:26:07.150Z",
    "auto": true
   },
   {
@@ -9317,7 +9317,7 @@
    "channelId": "UC_TqTCD3ux338xPQbzZ40ng",
    "category": "tools",
    "subscribers": "6.65K subscribers",
-   "lastFetch": "2026-11-13T21:16:53.219Z",
+   "lastFetch": "2026-11-14T06:30:56.694Z",
    "auto": true
   },
   {
@@ -9438,7 +9438,7 @@
    "channelId": "UCTc3iDWsvolsJNbnCdTQo0A",
    "category": "building",
    "subscribers": "",
-   "lastFetch": "2026-11-13T21:16:58.247Z",
+   "lastFetch": "2026-11-14T06:31:01.059Z",
    "auto": true
   },
   {
@@ -9746,7 +9746,7 @@
    "channelId": "UC7cvgA36SEZySYemiIrmdhg",
    "category": "animation",
    "subscribers": "1 subscriber",
-   "lastFetch": "2026-11-13T21:17:11.009Z",
+   "lastFetch": "2026-11-14T06:31:12.309Z",
    "auto": true
   },
   {
@@ -9812,7 +9812,7 @@
    "channelId": "UCaRGqdEnhZfTlF_n3NpMC1w",
    "category": "gfx",
    "subscribers": "262 subscribers",
-   "lastFetch": "2026-11-13T21:17:13.667Z",
+   "lastFetch": "2026-11-14T06:31:14.713Z",
    "auto": true
   },
   {
@@ -17083,7 +17083,7 @@
    "channelId": "UCZLYbETi-hygKzyCerJ5daw",
    "category": "building",
    "subscribers": "628K subscribers",
-   "lastFetch": "2026-11-13T21:22:11.203Z",
+   "lastFetch": "2026-11-14T06:35:33.461Z",
    "auto": true
   },
   {
@@ -21280,32 +21280,43 @@
  ],
  "cursors": {
   "forum:help-and-feedback/scripting-support": 4665,
-  "forum:help-and-feedback/creations-feedback": 1075,
-  "forum:help-and-feedback/art-design-support": 460,
-  "forum:help-and-feedback/game-design-support": 460,
-  "sketchfab:roblox": "7080",
-  "forum:resources/community-tutorials": 105,
-  "forum:resources/community-resources": 80,
-  "sketchfab:roblox character": "1440",
-  "forum:help-and-feedback/building-support": 35,
-  "sketchfab:roblox map": "840",
-  "store:mesh:egg": "MjVfMV8xXzMw_d2ee7fcd78262ce54540a46dc27577b4",
-  "forum:updates/announcements": 10,
-  "sketchfab:roblox ugc": "240",
-  "sketchfab:roblox pet": "240",
-  "devto:gamedev": 10,
-  "store:decal:logo": "MTBfMV8xXzMw_ca292db5c9bd64891b03a302fe1f073c",
-  "store:decal:emoji": "MTBfMV8xXzMw_aaaa0cbca9fc890f91773d296147e433",
-  "store:decal:sky": "MTBfMV8xXzMw_6750a3db89074d543a98725d324da671",
-  "store:decal:grass": "MTBfMV8xXzMw_4a97ada93c0febae009f874d9bdc506c",
-  "store:decal:stone": "MTBfMV8xXzMw_aef9a78e0e6759e2cb9fa7360317906a",
-  "store:decal:wood": "MTBfMV8xXzMw_6b87ff3c3dbd502adee5e6d62b59b62f",
-  "store:decal:brick": "MTBfMV8xXzMw_4c82b359dabc32806976de64b70b1f6e",
-  "store:decal:anime": "MTBfMV8xXzMw_502d4d1346c77bb815e67e4e0197a035",
-  "store:mesh:sword": "MTBfMV8xXzMw_69c7f86decf2072dcad7f7f8ee1384ab",
-  "store:mesh:gun": "MTBfMV8xXzMw_ea1de00b6323ef2b10b517bffda19397",
-  "store:mesh:tree": "N18xXzFfMzA=_8c13de6a8cba7226a06abdee7e0c7865"
+  "forum:help-and-feedback/creations-feedback": 1110,
+  "forum:help-and-feedback/art-design-support": 495,
+  "forum:help-and-feedback/game-design-support": 495,
+  "sketchfab:roblox": "7920",
+  "forum:resources/community-resources": 115,
+  "forum:help-and-feedback/building-support": 70,
+  "forum:updates/announcements": 45,
+  "sketchfab:roblox ugc": "1080",
+  "devto:gamedev": 45,
+  "store:decal:logo": "MjBfMV8xXzMw_10fa9c5046aea46ce4a799b3493e9ab7",
+  "store:decal:emoji": "MjBfMV8xXzMw_584076dd463a58fa66562defe5f07c04",
+  "store:decal:sky": "MjBfMV8xXzMw_895fce8d59f8c60dc479e67586ea9051",
+  "store:decal:grass": "MjBfMV8xXzMw_18b6d5277d3497ef85a471278ac0c6fd",
+  "store:decal:stone": "MjBfMV8xXzMw_4337477971a4fd652188a29443d44a38",
+  "store:decal:wood": "MjBfMV8xXzMw_6bde7637e31c1b3eb4642403a432a8fc",
+  "store:decal:brick": "MjBfMV8xXzMw_24681d1ba424662839090b9a68744a9f",
+  "store:decal:anime": "MjBfMV8xXzMw_8f6e13dac62bf082f996529bd17e0ad9",
+  "store:mesh:sword": "MjBfMV8xXzMw_9a2803d61729b6edaf7ccc7dadf0903e",
+  "store:mesh:gun": "MjBfMV8xXzMw_029bbe9bfc37c0d26cfcbd950b2dd2b7",
+  "store:mesh:tree": "MTdfMV8xXzMw_7fd4e66e1c97e5006fb5ba7526c343c9",
+  "sketchfab:roblox low poly": "840",
+  "store:decal:aura": "MTdfMV8xXzMw_9d5370c46a9fcaa9f3cbe49b7b006788",
+  "store:decal:gradient": "MTBfMV8xXzMw_1ca8bc484c4ea08588f41879cc5762ea",
+  "store:decal:cartoon": "MTBfMV8xXzMw_449ee4c1f9c80295fd70808e104505a5",
+  "store:mesh:rock": "MTBfMV8xXzMw_fce304b2032c7d0deca17b7d6a8831e6",
+  "store:mesh:house": "MTBfMV8xXzMw_2c22625097ecc99832a9a8655f2f79e4",
+  "store:mesh:car": "MTBfMV8xXzMw_81fad5e80f2da6d93860ea91168c7bda",
+  "store:mesh:pet": "MTBfMV8xXzMw_55349eedf813d501b9b9ea3a6a647a74",
+  "store:mesh:crystal": "MTBfMV8xXzMw_d4730e8d3f4a04239b88a6700e9014ce",
+  "store:mesh:chest": "MTBfMV8xXzMw_8074213b8b873a99498d5c168de09ed0",
+  "store:mesh:weapon": "MTBfMV8xXzMw_232bd806545e807cb612435a1806b46b",
+  "store:mesh:low poly": "MTBfMV8xXzMw_19046767010deee2ef96e6985d3ceef5",
+  "store:mesh:furniture": "MTBfMV8xXzMw_b747e33c444cc07de35a4a1e5ec40b36",
+  "forum:resources/community-tutorials": 25,
+  "sketchfab:roblox map": "600",
+  "sketchfab:roblox character": "600"
  },
  "migrated": false,
- "updatedAt": "2026-11-14T06:04:49.736Z"
+ "updatedAt": "2026-11-14T06:58:26.866Z"
 }
