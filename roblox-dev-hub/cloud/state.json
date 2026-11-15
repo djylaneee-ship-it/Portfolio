@@ -1,7 +1,7 @@
 {
  "version": 2,
- "cursor": 2021,
- "runs": 518,
+ "cursor": 2029,
+ "runs": 519,
  "channels": [
   {
    "id": "ff1bc5c8316c",
@@ -21958,20 +21958,80 @@
    "subscribers": "981K subscribers",
    "lastFetch": "2026-11-15T13:43:46.323Z",
    "auto": true
+  },
+  {
+   "id": "1613e13d14b3",
+   "handle": "@YobestRobloxStudio",
+   "name": "Yobest Roblox Studio #2",
+   "avatar": "https://yt3.ggpht.com/TuC6OlHroZJ3AWYbhhzBMRwBMSSbGXHdj0fGUwHWy_W4kPcll9cA-o3OZVGc6Vp7sBlu0WsbUg=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCsV3X3EyEowLEdRW1RileuA",
+   "category": "tools",
+   "subscribers": "926 subscribers",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "c4b793e88fb6",
+   "handle": "@ROBLOXJJ22-o5d",
+   "name": "JJ ROBLOX STUDIO",
+   "avatar": "https://yt3.ggpht.com/HZ88PErR55l2t4zEK7ZswMsg6B2BWEKlMYZt3WQSRldUVvYTSwPNZDomGCx7eVN_YrBMD35_KFE=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCKXKWAiOPJc7MofpTFjmpiw",
+   "category": "tools",
+   "subscribers": "138 subscribers",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "658fcabb835c",
+   "handle": "@FronteiradoBrasilRoblox",
+   "name": "Studio Fantasma Roblox",
+   "avatar": "https://yt3.ggpht.com/XtGy9fKVe_wgWQTGcwgu_sq4ETI56wdsNGbHYYTkrXDFthequtEv2jUtVh24arOQ1defgDjwPg=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UC4EHv6oUhXq--VDLX_RA9xQ",
+   "category": "tools",
+   "subscribers": "3.42K subscribers",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "4cf58429e8f9",
+   "handle": "@DawnStudiosOG",
+   "name": "Dawn Studios | OG",
+   "avatar": "https://yt3.ggpht.com/Wg4OlZ5Km3rOWF99iwhY0TPviRRjdUHUJZoNASE2gBFXQ97aeA7Qp5qmeVlxAkPMYpfGIgoF-Vk=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UC75Vhp5XzRXcwUXY7RGebwQ",
+   "category": "vfx",
+   "subscribers": "5.68K subscribers",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "72d5106dbee5",
+   "handle": "@MrBeastGaming",
+   "name": "MrBeast Gaming",
+   "avatar": "https://yt3.googleusercontent.com/ytc/AIdro_lMiSL6eHqg2dVxvll6mVMeXo1qVak4TZ4_7mEWdobRRCk=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCIPPMRA040LQr5QPyJEbmXA",
+   "category": "building",
+   "subscribers": "62.2M subscribers",
+   "lastFetch": null,
+   "auto": true
   }
  ],
  "cursors": {
   "forum:help-and-feedback/scripting-support": 4665,
-  "forum:help-and-feedback/creations-feedback": 670,
-  "forum:help-and-feedback/game-design-support": 505,
-  "forum:help-and-feedback/art-design-support": 355,
-  "forum:resources/community-resources": 260,
-  "sketchfab:roblox": "5640",
-  "forum:updates/announcements": 80,
-  "sketchfab:roblox low poly": "1080",
-  "devto:gamedev": 45,
-  "forum:resources/community-tutorials": 35,
-  "store:mesh:tree": "MjNfMV8xXzMw_56463b8a4785514288f43e50891f4ce4",
+  "forum:help-and-feedback/creations-feedback": 730,
+  "forum:help-and-feedback/game-design-support": 565,
+  "forum:help-and-feedback/art-design-support": 415,
+  "forum:resources/community-resources": 320,
+  "sketchfab:roblox": "6480",
+  "devto:gamedev": 80,
+  "forum:resources/community-tutorials": 95,
+  "forum:help-and-feedback/building-support": 60,
+  "sketchfab:roblox map": "840",
+  "sketchfab:roblox character": "840",
+  "store:decal:emoji": "MjVfMV8xXzMw_a669f172459ea6e4b6e25b08be30709e",
+  "forum:updates/announcements": 33,
+  "sketchfab:roblox ugc": "240",
+  "sketchfab:roblox pet": "240",
+  "store:mesh:tree": "MTBfMV8xXzMw_be56d90c1b2f98defbdc42815f0047c2",
   "store:mesh:rock": "MTBfMV8xXzMw_fce304b2032c7d0deca17b7d6a8831e6",
   "store:mesh:house": "MTBfMV8xXzMw_2c22625097ecc99832a9a8655f2f79e4",
   "store:mesh:car": "MTBfMV8xXzMw_81fad5e80f2da6d93860ea91168c7bda",
@@ -21979,9 +22039,8 @@
   "store:mesh:egg": "MTBfMV8xXzMw_0471c6ab6db52fdb23c087c6b56115b3",
   "store:mesh:chest": "MTBfMV8xXzMw_8074213b8b873a99498d5c168de09ed0",
   "store:mesh:low poly": "MTBfMV8xXzMw_19046767010deee2ef96e6985d3ceef5",
-  "store:mesh:furniture": "MTBfMV8xXzMw_b747e33c444cc07de35a4a1e5ec40b36",
-  "sketchfab:roblox ugc": "600"
+  "store:mesh:furniture": "MTBfMV8xXzMw_b747e33c444cc07de35a4a1e5ec40b36"
  },
  "migrated": false,
- "updatedAt": "2026-11-15T14:05:12.019Z"
+ "updatedAt": "2026-11-15T14:58:42.861Z"
 }
