@@ -1,7 +1,7 @@
 {
  "version": 2,
- "cursor": 1961,
- "runs": 503,
+ "cursor": 1965,
+ "runs": 504,
  "channels": [
   {
    "id": "ff1bc5c8316c",
@@ -3410,7 +3410,7 @@
    "channelId": "UC4S7REVGs6bt9tfBhV7AKhA",
    "category": "modeling",
    "subscribers": "12.2K subscribers",
-   "lastFetch": "2026-11-14T22:08:34.582Z",
+   "lastFetch": "2026-11-15T01:05:10.998Z",
    "auto": true
   },
   {
@@ -4972,7 +4972,7 @@
    "channelId": "UCAe2YxSAoysREqOavhpsoxw",
    "category": "tools",
    "subscribers": "2 subscribers",
-   "lastFetch": "2026-11-14T22:09:46.568Z",
+   "lastFetch": "2026-11-15T01:06:06.635Z",
    "auto": true
   },
   {
@@ -5456,7 +5456,7 @@
    "channelId": "UCABAQID2xmChxHzEDW_UbVw",
    "category": "tools",
    "subscribers": "1.24M subscribers",
-   "lastFetch": "2026-11-14T22:10:08.348Z",
+   "lastFetch": "2026-11-15T01:06:23.540Z",
    "auto": true
   },
   {
@@ -8162,7 +8162,7 @@
    "channelId": "UC-ysKV_ti4voY9T7o_c-1cQ",
    "category": "tools",
    "subscribers": "",
-   "lastFetch": "2026-11-14T22:12:12.547Z",
+   "lastFetch": "2026-11-15T01:07:59.396Z",
    "auto": true
   },
   {
@@ -9174,7 +9174,7 @@
    "channelId": "UCaRuGZ_Zgi9usLhDXpTKBVg",
    "category": "building",
    "subscribers": "18 subscribers",
-   "lastFetch": "2026-11-14T22:12:58.921Z",
+   "lastFetch": "2026-11-15T01:08:35.055Z",
    "auto": true
   },
   {
@@ -9372,7 +9372,7 @@
    "channelId": "UCQ3BCpXbhhScy3EXudZdQeQ",
    "category": "animation",
    "subscribers": "13 subscribers",
-   "lastFetch": "2026-11-14T22:13:07.977Z",
+   "lastFetch": "2026-11-15T01:08:42.062Z",
    "auto": true
   },
   {
@@ -11484,7 +11484,7 @@
    "channelId": "UCFN-PpPe_9zjUnPPFq7rCtw",
    "category": "tools",
    "subscribers": "3 subscribers",
-   "lastFetch": "2026-11-14T22:14:44.154Z",
+   "lastFetch": "2026-11-15T01:09:56.382Z",
    "auto": true
   },
   {
@@ -11638,7 +11638,7 @@
    "channelId": "UC3y88GWRX91McAStdrszq3A",
    "category": "tools",
    "subscribers": "11 subscribers",
-   "lastFetch": "2026-11-14T22:14:51.339Z",
+   "lastFetch": "2026-11-15T01:10:01.985Z",
    "auto": true
   },
   {
@@ -12650,7 +12650,7 @@
    "channelId": "UCWnDPehxjkZ48u8vxezO5Zw",
    "category": "tools",
    "subscribers": "",
-   "lastFetch": "2026-11-14T22:15:38.498Z",
+   "lastFetch": "2026-11-15T01:10:37.623Z",
    "auto": true
   },
   {
@@ -14300,7 +14300,7 @@
    "channelId": "UCFjekNESCOHuGeh0ugDB_iw",
    "category": "building",
    "subscribers": "1 subscriber",
-   "lastFetch": "2026-11-14T19:01:10.164Z",
+   "lastFetch": "2026-11-15T01:11:36.061Z",
    "auto": true
   },
   {
@@ -15455,7 +15455,7 @@
    "channelId": "UCP2Hu_zEhoBx6FwmPdHDBPQ",
    "category": "tools",
    "subscribers": "27 subscribers",
-   "lastFetch": "2026-11-14T19:01:58.248Z",
+   "lastFetch": "2026-11-15T01:12:16.724Z",
    "auto": true
   },
   {
@@ -21643,37 +21643,29 @@
  ],
  "cursors": {
   "forum:help-and-feedback/scripting-support": 4665,
-  "forum:help-and-feedback/art-design-support": 525,
-  "forum:help-and-feedback/creations-feedback": 175,
-  "sketchfab:roblox": "4200",
-  "forum:help-and-feedback/building-support": 130,
-  "forum:resources/community-resources": 105,
-  "forum:updates/announcements": 70,
-  "sketchfab:roblox low poly": "1080",
-  "sketchfab:roblox ugc": "1080",
-  "devto:gamedev": 45,
-  "sketchfab:roblox character": "840",
-  "forum:help-and-feedback/game-design-support": 10,
-  "forum:resources/community-tutorials": 10,
-  "sketchfab:roblox pet": "240",
-  "store:decal:ui": "MTBfMV8xXzMw_41872fe8f64c2c45bac875d16b88ed95",
-  "store:decal:frame": "MTBfMV8xXzMw_2421d2db40f9fd00d441ea836d1aa8d1",
-  "store:decal:background": "MTBfMV8xXzMw_a574aad5f14652e7daf4c360a3130954",
-  "store:decal:vfx": "MTBfMV8xXzMw_9e4a0ac7e752347f1caab942c3b12b62",
-  "store:decal:smoke": "MTBfMV8xXzMw_78fb0dc832f820317e52961dc3b415d3",
-  "store:decal:glow": "MTBfMV8xXzMw_43c8ce564a9390e04cd5bf2f7f6c9470",
-  "store:decal:sparkle": "MTBfMV8xXzMw_4244162d0e2c1716f17325bb95572674",
-  "store:decal:aura": "MTBfMV8xXzMw_83bd7c91a022b57e578f0dc4d0515a9c",
-  "store:decal:grass": "MTBfMV8xXzMw_4a97ada93c0febae009f874d9bdc506c",
-  "store:decal:stone": "MTBfMV8xXzMw_aef9a78e0e6759e2cb9fa7360317906a",
-  "store:decal:wood": "MTBfMV8xXzMw_6b87ff3c3dbd502adee5e6d62b59b62f",
-  "store:decal:brick": "MTBfMV8xXzMw_4c82b359dabc32806976de64b70b1f6e",
-  "store:decal:cartoon": "MTBfMV8xXzMw_449ee4c1f9c80295fd70808e104505a5",
-  "store:mesh:sword": "MTBfMV8xXzMw_69c7f86decf2072dcad7f7f8ee1384ab",
-  "store:mesh:gun": "MTBfMV8xXzMw_ea1de00b6323ef2b10b517bffda19397",
-  "store:mesh:tree": "MTBfMV8xXzMw_be56d90c1b2f98defbdc42815f0047c2",
-  "store:mesh:rock": "OV8xXzFfMzA=_11de7a3f1cd94107267e2145ece957c6"
+  "forum:help-and-feedback/art-design-support": 560,
+  "forum:help-and-feedback/creations-feedback": 210,
+  "sketchfab:roblox": "5040",
+  "forum:help-and-feedback/building-support": 165,
+  "forum:resources/community-resources": 140,
+  "devto:gamedev": 80,
+  "forum:help-and-feedback/game-design-support": 45,
+  "forum:resources/community-tutorials": 45,
+  "store:mesh:gun": "MjRfMV8xXzMw_e73909e9b8d5ca148a68c50c78d94290",
+  "store:mesh:tree": "MjBfMV8xXzMw_5d7210c69a942bd421cbff97b2b7de53",
+  "store:mesh:rock": "MTlfMV8xXzMw_afe3a3acf65ad7ac20e58014db1cd54e",
+  "sketchfab:roblox map": "840",
+  "store:mesh:house": "MTBfMV8xXzMw_2c22625097ecc99832a9a8655f2f79e4",
+  "store:mesh:car": "MTBfMV8xXzMw_81fad5e80f2da6d93860ea91168c7bda",
+  "store:mesh:pet": "MTBfMV8xXzMw_55349eedf813d501b9b9ea3a6a647a74",
+  "store:mesh:egg": "MTBfMV8xXzMw_0471c6ab6db52fdb23c087c6b56115b3",
+  "store:mesh:crystal": "MTBfMV8xXzMw_d4730e8d3f4a04239b88a6700e9014ce",
+  "store:mesh:chest": "MTBfMV8xXzMw_8074213b8b873a99498d5c168de09ed0",
+  "store:mesh:weapon": "MTBfMV8xXzMw_232bd806545e807cb612435a1806b46b",
+  "store:mesh:low poly": "MTBfMV8xXzMw_19046767010deee2ef96e6985d3ceef5",
+  "store:mesh:furniture": "MTBfMV8xXzMw_b747e33c444cc07de35a4a1e5ec40b36",
+  "sketchfab:roblox ugc": "600"
  },
  "migrated": false,
- "updatedAt": "2026-11-15T00:44:54.884Z"
+ "updatedAt": "2026-11-15T01:38:21.688Z"
 }
