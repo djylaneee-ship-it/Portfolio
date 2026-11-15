@@ -1,7 +1,7 @@
 {
  "version": 2,
- "cursor": 1956,
- "runs": 502,
+ "cursor": 1961,
+ "runs": 503,
  "channels": [
   {
    "id": "ff1bc5c8316c",
@@ -21595,23 +21595,67 @@
    "subscribers": "111 subscribers",
    "lastFetch": "2026-11-14T22:21:58.964Z",
    "auto": true
+  },
+  {
+   "id": "d06d508f5af9",
+   "handle": "@RobloxAIStudio-ENG",
+   "name": "Roblox AI Studio",
+   "avatar": "https://yt3.ggpht.com/tRVT15FOn3ZzyUucVBj8k0eAP_Rxc3y270lq8taA948D-YrMZdFZ5-9zihwVAivyFZjPoksaPQ=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCgh_UH_slGidaKllqj88MUw",
+   "category": "building",
+   "subscribers": "",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "c036c4c71e9c",
+   "handle": "@TURKYOFF",
+   "name": "TURKYOFF - تركوف",
+   "avatar": "https://yt3.ggpht.com/0f1NEWiiP11IoVS9GG26WkIUXh0mmqxZfoyGFyrqWw5v9AzzDfCBC9Ozdd8IoQgMiCIVj0bPpEY=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCLJZnUXCL9M1zYKf08dtHtQ",
+   "category": "tools",
+   "subscribers": "223K subscribers",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "af859eec661c",
+   "handle": "@BrawlBattle",
+   "name": "BrawlBattle",
+   "avatar": "https://yt3.ggpht.com/aUPT9iJwcCJV6IZnothcCu-Wzri3IyUVA_sfIfYBbVeEVfIgeqRS_NE-fv2eIxbjz51ngi8zrFY=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCuw-jHjL1pDyECOdJAnKLLw",
+   "category": "scripting",
+   "subscribers": "5.77K subscribers",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "a867fe768ceb",
+   "handle": "@KingSammelot",
+   "name": "KingSammelot",
+   "avatar": "https://yt3.googleusercontent.com/ytc/AIdro_kTk7hhEG9ymIpHepn6uh6Y1L_oRXuM2pS9kuKjr2V_pXY=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCIPKDdl4776Bmw7lJYvZzLg",
+   "category": "tools",
+   "subscribers": "1.7M subscribers",
+   "lastFetch": null,
+   "auto": true
   }
  ],
  "cursors": {
   "forum:help-and-feedback/scripting-support": 4665,
-  "forum:help-and-feedback/game-design-support": 560,
-  "forum:help-and-feedback/art-design-support": 490,
-  "forum:help-and-feedback/creations-feedback": 140,
-  "sketchfab:roblox": "3360",
-  "forum:help-and-feedback/building-support": 95,
-  "forum:resources/community-tutorials": 95,
-  "forum:resources/community-resources": 70,
-  "forum:updates/announcements": 35,
-  "sketchfab:roblox low poly": "240",
-  "sketchfab:roblox ugc": "240",
-  "sketchfab:roblox map": "240",
+  "forum:help-and-feedback/art-design-support": 525,
+  "forum:help-and-feedback/creations-feedback": 175,
+  "sketchfab:roblox": "4200",
+  "forum:help-and-feedback/building-support": 130,
+  "forum:resources/community-resources": 105,
+  "forum:updates/announcements": 70,
+  "sketchfab:roblox low poly": "1080",
+  "sketchfab:roblox ugc": "1080",
+  "devto:gamedev": 45,
+  "sketchfab:roblox character": "840",
+  "forum:help-and-feedback/game-design-support": 10,
+  "forum:resources/community-tutorials": 10,
   "sketchfab:roblox pet": "240",
-  "devto:gamedev": 10,
   "store:decal:ui": "MTBfMV8xXzMw_41872fe8f64c2c45bac875d16b88ed95",
   "store:decal:frame": "MTBfMV8xXzMw_2421d2db40f9fd00d441ea836d1aa8d1",
   "store:decal:background": "MTBfMV8xXzMw_a574aad5f14652e7daf4c360a3130954",
@@ -21628,17 +21672,8 @@
   "store:mesh:sword": "MTBfMV8xXzMw_69c7f86decf2072dcad7f7f8ee1384ab",
   "store:mesh:gun": "MTBfMV8xXzMw_ea1de00b6323ef2b10b517bffda19397",
   "store:mesh:tree": "MTBfMV8xXzMw_be56d90c1b2f98defbdc42815f0047c2",
-  "store:mesh:rock": "MTBfMV8xXzMw_fce304b2032c7d0deca17b7d6a8831e6",
-  "store:mesh:house": "MTBfMV8xXzMw_2c22625097ecc99832a9a8655f2f79e4",
-  "store:mesh:car": "MTBfMV8xXzMw_81fad5e80f2da6d93860ea91168c7bda",
-  "store:mesh:pet": "MTBfMV8xXzMw_55349eedf813d501b9b9ea3a6a647a74",
-  "store:mesh:egg": "MTBfMV8xXzMw_0471c6ab6db52fdb23c087c6b56115b3",
-  "store:mesh:crystal": "MTBfMV8xXzMw_d4730e8d3f4a04239b88a6700e9014ce",
-  "store:mesh:chest": "MTBfMV8xXzMw_8074213b8b873a99498d5c168de09ed0",
-  "store:mesh:weapon": "MTBfMV8xXzMw_232bd806545e807cb612435a1806b46b",
-  "store:mesh:low poly": "MTBfMV8xXzMw_19046767010deee2ef96e6985d3ceef5",
-  "store:mesh:furniture": "MTBfMV8xXzMw_b747e33c444cc07de35a4a1e5ec40b36"
+  "store:mesh:rock": "OV8xXzFfMzA=_11de7a3f1cd94107267e2145ece957c6"
  },
  "migrated": false,
- "updatedAt": "2026-11-14T23:51:24.779Z"
+ "updatedAt": "2026-11-15T00:44:54.884Z"
 }
