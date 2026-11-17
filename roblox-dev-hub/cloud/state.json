@@ -1,7 +1,7 @@
 {
  "version": 2,
- "cursor": 2203,
- "runs": 562,
+ "cursor": 2208,
+ "runs": 563,
  "channels": [
   {
    "id": "ff1bc5c8316c",
@@ -22864,17 +22864,22 @@
  ],
  "cursors": {
   "forum:help-and-feedback/scripting-support": 4665,
-  "forum:help-and-feedback/creations-feedback": 540,
-  "forum:help-and-feedback/art-design-support": 530,
-  "forum:help-and-feedback/building-support": 260,
-  "forum:help-and-feedback/game-design-support": 260,
-  "forum:updates/announcements": 70,
-  "sketchfab:roblox low poly": "1440",
-  "forum:resources/community-tutorials": 35,
-  "forum:resources/community-resources": 35,
-  "sketchfab:roblox ugc": "840",
-  "sketchfab:roblox map": "840",
-  "store:decal:ui": "MzFfMV8xXzMw_7aaae7035be1356727953d8740ae25a7",
+  "forum:help-and-feedback/creations-feedback": 575,
+  "forum:help-and-feedback/art-design-support": 565,
+  "forum:help-and-feedback/building-support": 295,
+  "forum:help-and-feedback/game-design-support": 295,
+  "forum:resources/community-tutorials": 70,
+  "forum:resources/community-resources": 70,
+  "devto:gamedev": 60,
+  "sketchfab:roblox": "840",
+  "sketchfab:roblox character": "840",
+  "forum:updates/announcements": 10,
+  "sketchfab:roblox low poly": "240",
+  "sketchfab:roblox ugc": "240",
+  "sketchfab:roblox map": "240",
+  "sketchfab:roblox weapon": "240",
+  "sketchfab:roblox pet": "240",
+  "store:decal:ui": "MTBfMV8xXzMw_41872fe8f64c2c45bac875d16b88ed95",
   "store:decal:icon": "MTBfMV8xXzMw_ac73895a948bcbb76450c2c0f26debec",
   "store:decal:button": "MTBfMV8xXzMw_5c8ae2ca89b60cdc414321d3ced98244",
   "store:decal:frame": "MTBfMV8xXzMw_2421d2db40f9fd00d441ea836d1aa8d1",
@@ -22907,10 +22912,8 @@
   "store:mesh:chest": "MTBfMV8xXzMw_8074213b8b873a99498d5c168de09ed0",
   "store:mesh:weapon": "MTBfMV8xXzMw_232bd806545e807cb612435a1806b46b",
   "store:mesh:low poly": "MTBfMV8xXzMw_19046767010deee2ef96e6985d3ceef5",
-  "store:mesh:furniture": "MTBfMV8xXzMw_b747e33c444cc07de35a4a1e5ec40b36",
-  "sketchfab:roblox weapon": "600",
-  "devto:gamedev": 25
+  "store:mesh:furniture": "MTBfMV8xXzMw_b747e33c444cc07de35a4a1e5ec40b36"
  },
  "migrated": false,
- "updatedAt": "2026-11-17T05:21:54.865Z"
+ "updatedAt": "2026-11-17T06:15:22.742Z"
 }
