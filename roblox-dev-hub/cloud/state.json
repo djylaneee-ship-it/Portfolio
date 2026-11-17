@@ -1,7 +1,7 @@
 {
  "version": 2,
- "cursor": 2273,
- "runs": 579,
+ "cursor": 2281,
+ "runs": 580,
  "channels": [
   {
    "id": "ff1bc5c8316c",
@@ -22926,21 +22926,125 @@
    "subscribers": "88.4K subscribers",
    "lastFetch": "2026-11-17T20:21:44.760Z",
    "auto": true
+  },
+  {
+   "id": "28e16b0d049d",
+   "handle": "@robloxstudioroblox-h5m",
+   "name": "roblox studio & roblox",
+   "avatar": "https://yt3.ggpht.com/4jv9_MhkCPfIcwoXmRGgvVGRRnfUNXp9pyMtYpNx19K75k0qfStuInp5m_ulDqEIeRtraOw4QA=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCnpdZaaHPfIgIX2K5XPgttQ",
+   "category": "tools",
+   "subscribers": "",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "65da40ee9bd2",
+   "handle": "@aotrequiem",
+   "name": "Requiem",
+   "avatar": "https://yt3.ggpht.com/9mpmiIj2bwl1uUy6F9Wx9gkDdLIaiXlNf2sIkgloFgwVtDVMg26xJOVJ3fnlZU06hS-eqncJ=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCNFEbwU1ZUHvhWDP2JCOm2w",
+   "category": "tools",
+   "subscribers": "819 subscribers",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "86be8e93e872",
+   "handle": "@Bloosseph",
+   "name": "Bloo",
+   "avatar": "https://yt3.ggpht.com/mv6uVCAtItgWPXv0TDLlOl8bhLII64DgCKHb3_Om_AQdpLfmEvghoj5SaOMu-SDIXwluyoMCuQ=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCD3gu97SjWipM5hq61ZtHiA",
+   "category": "scripting",
+   "subscribers": "44.6K subscribers",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "dadf88762b6f",
+   "handle": "@robloxdev-00",
+   "name": "RobloxDev",
+   "avatar": "https://yt3.ggpht.com/68G0sR1ELu1K7e7YJno7e9fJJXcZivts7FyS8pomYdGg3JKFwN_EAc8W1Ay6w5r9zdbZlGUnepg=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCgcOWmbpJ0SBj1FSN_atA0g",
+   "category": "building",
+   "subscribers": "",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "72f5db12d34f",
+   "handle": "@liabloxx",
+   "name": "Lia",
+   "avatar": "https://yt3.ggpht.com/VWaKZRurGKm3VTujtS_fQWmY_yy6rcW93AR5sFv3kARBfW1rn45BVcEnZwAEHkZ5Zi8znBU=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCZFNWv60vxM8dBmGUm7-CIg",
+   "category": "tools",
+   "subscribers": "1.45M subscribers",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "ecb74758cfbd",
+   "handle": "@LawByMike",
+   "name": "Law By Mike",
+   "avatar": "https://yt3.ggpht.com/I01ufsSeJLlmEGw6ufYtYNj1FuOgBFXmBFLJjMhQb0uXiSPt-fiubzvYIxP8gBZK_zZunuZKYQ=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCKmmERguliWTynG9OIoDhDw",
+   "category": "animation",
+   "subscribers": "20M subscribers",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "7be6715828aa",
+   "handle": "@MisterBro33",
+   "name": "MisterBro",
+   "avatar": "https://yt3.ggpht.com/6_tXiT6NX3Kv_hpts946f1o1UlXeSTyTZKsaQt0G_cNMHB9z0yqXHPt-egJ2r5ImtHoAYDMA4w=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UC6zclzFF-rdrwMIphxF_Gpw",
+   "category": "animation",
+   "subscribers": "187K subscribers",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "a6b0cb3f8c5a",
+   "handle": "@Technoblade",
+   "name": "Technoblade",
+   "avatar": "https://yt3.googleusercontent.com/ytc/AIdro_lrcAGP3htFIscbmyoevZ_YtEXgpuW1YvtnCs5PY4CK0NA=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCFAiFyGs6oDiF1Nf-rRJpZA",
+   "category": "tools",
+   "subscribers": "23.3M subscribers",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "8ca83717a5d1",
+   "handle": "@Vindooly",
+   "name": "Vindooly",
+   "avatar": "https://yt3.ggpht.com/p7cG0HVGxLFBJac5U_98Vlxl_yZ20j05K7GWjP9Phst2jUUtb17_sjCdPNWi-7utoC-f7RhbXQ=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCj4hfQEWcGtF08SLEZCZc5Q",
+   "category": "animation",
+   "subscribers": "10.2M subscribers",
+   "lastFetch": null,
+   "auto": true
   }
  ],
  "cursors": {
   "forum:help-and-feedback/scripting-support": 4665,
-  "forum:help-and-feedback/creations-feedback": 1155,
-  "forum:help-and-feedback/art-design-support": 485,
-  "forum:help-and-feedback/game-design-support": 295,
-  "forum:resources/community-resources": 295,
-  "forum:help-and-feedback/building-support": 235,
-  "sketchfab:roblox": "4560",
-  "devto:gamedev": 95,
-  "forum:resources/community-tutorials": 35,
+  "forum:help-and-feedback/creations-feedback": 1215,
+  "forum:help-and-feedback/art-design-support": 545,
+  "forum:help-and-feedback/game-design-support": 355,
+  "forum:help-and-feedback/building-support": 295,
+  "sketchfab:roblox": "6000",
+  "forum:resources/community-tutorials": 95,
+  "forum:updates/announcements": 60,
+  "sketchfab:roblox low poly": "1440",
   "sketchfab:roblox ugc": "840",
   "sketchfab:roblox map": "840",
-  "store:decal:slash": "MTdfMV8xXzMw_68525a33c364bd65dbeaa81cb2736fac",
+  "devto:gamedev": 35,
+  "store:decal:frame": "MTVfMV8xXzMw_6cf0f4b2499d0cac50270495015bb942",
+  "store:decal:background": "MTBfMV8xXzMw_a574aad5f14652e7daf4c360a3130954",
+  "store:decal:texture": "MTBfMV8xXzMw_4bb7b74fd992c4011dce38ed1be687d7",
+  "store:decal:particle": "MTBfMV8xXzMw_012e3344259a06438d9fdadcbf7d975a",
+  "store:decal:slash": "MTBfMV8xXzMw_0bd7b39e9d48a6c3043d6d4583e0819d",
   "store:decal:smoke": "MTBfMV8xXzMw_78fb0dc832f820317e52961dc3b415d3",
   "store:decal:fire": "MTBfMV8xXzMw_63dcaf1f99fcbd86f56123ae31899a46",
   "store:decal:glow": "MTBfMV8xXzMw_43c8ce564a9390e04cd5bf2f7f6c9470",
@@ -22969,15 +23073,8 @@
   "store:mesh:weapon": "MTBfMV8xXzMw_232bd806545e807cb612435a1806b46b",
   "store:mesh:low poly": "MTBfMV8xXzMw_19046767010deee2ef96e6985d3ceef5",
   "store:mesh:furniture": "MTBfMV8xXzMw_b747e33c444cc07de35a4a1e5ec40b36",
-  "sketchfab:roblox weapon": "600",
-  "sketchfab:roblox character": "600",
-  "store:decal:icon": "MjVfMV8xXzMw_bde172587fad596c9c9480317dd8a5b0",
-  "store:decal:button": "MjVfMV8xXzMw_cb33c955263f10ef0c51d08daae87c1b",
-  "store:decal:frame": "MjVfMV8xXzMw_0492e38f71d6c1549b3e356cd1bf3f2b",
-  "store:decal:background": "MjVfMV8xXzMw_3edee9b570b59cf7490e61f280a3cfc8",
-  "store:decal:texture": "MjVfMV8xXzMw_1860ddf0ae964ee0dde2768916c1e7e7",
-  "store:decal:particle": "MjVfMV8xXzMw_d4765ab16064a14719f1deedd55ca217"
+  "store:decal:ui": "MjVfMV8xXzMw_6d8248cd962fcd00977cd0db5fee54aa"
  },
  "migrated": false,
- "updatedAt": "2026-11-17T20:31:58.419Z"
+ "updatedAt": "2026-11-17T21:25:44.885Z"
 }
