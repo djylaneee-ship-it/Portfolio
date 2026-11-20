@@ -1,7 +1,7 @@
 {
  "version": 2,
- "cursor": 2511,
- "runs": 640,
+ "cursor": 2516,
+ "runs": 641,
  "channels": [
   {
    "id": "ff1bc5c8316c",
@@ -23469,18 +23469,20 @@
  ],
  "cursors": {
   "forum:help-and-feedback/scripting-support": 4665,
-  "forum:help-and-feedback/art-design-support": 580,
-  "forum:help-and-feedback/building-support": 460,
-  "forum:resources/community-resources": 330,
-  "sketchfab:roblox": "3120",
-  "forum:resources/community-tutorials": 95,
-  "devto:gamedev": 95,
-  "forum:help-and-feedback/game-design-support": 60,
-  "forum:updates/announcements": 35,
-  "sketchfab:roblox low poly": "840",
-  "sketchfab:roblox ugc": "840",
-  "sketchfab:roblox map": "840",
-  "sketchfab:roblox character": "840",
+  "forum:help-and-feedback/art-design-support": 615,
+  "forum:help-and-feedback/building-support": 495,
+  "sketchfab:roblox": "3960",
+  "forum:help-and-feedback/game-design-support": 95,
+  "forum:updates/announcements": 70,
+  "sketchfab:roblox low poly": "1680",
+  "forum:help-and-feedback/creations-feedback": 60,
+  "forum:resources/community-tutorials": 10,
+  "forum:resources/community-resources": 10,
+  "sketchfab:roblox ugc": "240",
+  "sketchfab:roblox map": "240",
+  "sketchfab:roblox weapon": "240",
+  "sketchfab:roblox pet": "240",
+  "devto:gamedev": 10,
   "store:decal:button": "MTBfMV8xXzMw_5c8ae2ca89b60cdc414321d3ced98244",
   "store:decal:frame": "MTBfMV8xXzMw_2421d2db40f9fd00d441ea836d1aa8d1",
   "store:decal:slash": "MTBfMV8xXzMw_0bd7b39e9d48a6c3043d6d4583e0819d",
@@ -23510,11 +23512,8 @@
   "store:mesh:chest": "MTBfMV8xXzMw_8074213b8b873a99498d5c168de09ed0",
   "store:mesh:weapon": "MTBfMV8xXzMw_232bd806545e807cb612435a1806b46b",
   "store:mesh:low poly": "MTBfMV8xXzMw_19046767010deee2ef96e6985d3ceef5",
-  "store:mesh:furniture": "MTBfMV8xXzMw_b747e33c444cc07de35a4a1e5ec40b36",
-  "forum:help-and-feedback/creations-feedback": 25,
-  "sketchfab:roblox weapon": "600",
-  "store:decal:ui": "OF8xXzFfMzA=_c3867328190429b0590489e9108956da"
+  "store:mesh:furniture": "MTBfMV8xXzMw_b747e33c444cc07de35a4a1e5ec40b36"
  },
  "migrated": false,
- "updatedAt": "2026-11-20T02:56:06.834Z"
+ "updatedAt": "2026-11-20T03:50:17.871Z"
 }
