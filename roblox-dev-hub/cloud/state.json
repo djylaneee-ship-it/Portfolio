@@ -1,7 +1,7 @@
 {
  "version": 2,
- "cursor": 2641,
- "runs": 676,
+ "cursor": 2645,
+ "runs": 677,
  "channels": [
   {
    "id": "ff1bc5c8316c",
@@ -23773,37 +23773,45 @@
    "subscribers": "1.72M subscribers",
    "lastFetch": "2026-11-21T10:49:58.112Z",
    "auto": true
+  },
+  {
+   "id": "723fcdbf1058",
+   "handle": "@OfficialDecayRBLX",
+   "name": "Official Decay Team",
+   "avatar": "https://yt3.ggpht.com/Z28cWZoY8tTpCX3Vm-M_jEbTM7b7Ew8A1zWcAqGZYoT5GyylC7hQyQYh9G_nfFeV786I0YKKmw=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCFh25gAqgmlRKvEFBwQsrlA",
+   "category": "tools",
+   "subscribers": "5.42K subscribers",
+   "lastFetch": null,
+   "auto": true
+  },
+  {
+   "id": "b2cc1433bdbc",
+   "handle": "@OfficialRobloxTagGameDeveloper",
+   "name": "Roblox Tag game Developer",
+   "avatar": "https://yt3.ggpht.com/9lWm77HuXBLV8fPJBSEq2fJ1Yjsy1DyABgeNPHYSY-984ONZ01kGMlvYUCHWd8glq3p6mfw8fQ=s176-c-k-c0x00ffffff-no-rj-mo",
+   "channelId": "UCJ8RxkOkMClTYgoUyMyiV3g",
+   "category": "tools",
+   "subscribers": "8 subscribers",
+   "lastFetch": null,
+   "auto": true
   }
  ],
  "cursors": {
   "forum:help-and-feedback/scripting-support": 4665,
-  "forum:help-and-feedback/creations-feedback": 1240,
-  "forum:help-and-feedback/art-design-support": 470,
-  "forum:help-and-feedback/building-support": 410,
-  "forum:resources/community-resources": 150,
-  "forum:resources/community-tutorials": 105,
-  "forum:help-and-feedback/game-design-support": 80,
-  "forum:updates/announcements": 35,
-  "sketchfab:roblox": "840",
-  "sketchfab:roblox character": "840",
-  "devto:gamedev": 35,
-  "sketchfab:roblox ugc": "240",
-  "sketchfab:roblox map": "240",
-  "sketchfab:roblox pet": "240",
-  "store:decal:background": "MTBfMV8xXzMw_a574aad5f14652e7daf4c360a3130954",
-  "store:decal:texture": "MTBfMV8xXzMw_4bb7b74fd992c4011dce38ed1be687d7",
-  "store:decal:particle": "MTBfMV8xXzMw_012e3344259a06438d9fdadcbf7d975a",
-  "store:decal:vfx": "MTBfMV8xXzMw_9e4a0ac7e752347f1caab942c3b12b62",
-  "store:decal:slash": "MTBfMV8xXzMw_0bd7b39e9d48a6c3043d6d4583e0819d",
-  "store:decal:smoke": "MTBfMV8xXzMw_78fb0dc832f820317e52961dc3b415d3",
-  "store:decal:fire": "MTBfMV8xXzMw_63dcaf1f99fcbd86f56123ae31899a46",
-  "store:decal:glow": "MTBfMV8xXzMw_43c8ce564a9390e04cd5bf2f7f6c9470",
-  "store:decal:sparkle": "MTBfMV8xXzMw_4244162d0e2c1716f17325bb95572674",
-  "store:decal:aura": "MTBfMV8xXzMw_83bd7c91a022b57e578f0dc4d0515a9c",
-  "store:decal:gradient": "MTBfMV8xXzMw_1ca8bc484c4ea08588f41879cc5762ea",
-  "store:decal:logo": "MTBfMV8xXzMw_ca292db5c9bd64891b03a302fe1f073c",
-  "store:decal:emoji": "Ml8xXzFfMzA=_ccb6fd6e2fffc509e122c1d5e1f0ac51"
+  "forum:help-and-feedback/creations-feedback": 1275,
+  "forum:help-and-feedback/art-design-support": 505,
+  "forum:help-and-feedback/building-support": 445,
+  "forum:resources/community-resources": 185,
+  "forum:help-and-feedback/game-design-support": 115,
+  "forum:updates/announcements": 70,
+  "sketchfab:roblox": "1680",
+  "devto:gamedev": 70,
+  "sketchfab:roblox ugc": "1080",
+  "sketchfab:roblox low poly": "840",
+  "store:mesh:furniture": "MTFfMV8xXzMw_4001b3af8b2c99344f1594f351e7bd35",
+  "forum:resources/community-tutorials": 25
  },
  "migrated": false,
- "updatedAt": "2026-11-21T11:55:47.871Z"
+ "updatedAt": "2026-11-21T12:49:19.984Z"
 }
