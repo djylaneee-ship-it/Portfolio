@@ -1,7 +1,7 @@
 {
  "version": 2,
- "cursor": 2659,
- "runs": 682,
+ "cursor": 2663,
+ "runs": 683,
  "channels": [
   {
    "id": "ff1bc5c8316c",
@@ -23799,21 +23799,23 @@
  ],
  "cursors": {
   "forum:help-and-feedback/scripting-support": 4665,
-  "forum:help-and-feedback/creations-feedback": 1395,
-  "forum:help-and-feedback/art-design-support": 625,
-  "forum:help-and-feedback/building-support": 565,
-  "forum:resources/community-resources": 305,
-  "forum:help-and-feedback/game-design-support": 235,
-  "sketchfab:roblox": "4560",
-  "sketchfab:roblox low poly": "1680",
-  "devto:gamedev": 70,
-  "forum:resources/community-tutorials": 35,
-  "sketchfab:roblox ugc": "840",
-  "sketchfab:roblox character": "840",
-  "store:mesh:weapon": "MjJfMV8xXzMw_cad0d21f8cc67bf0315f5a62be7d1ce1",
-  "store:mesh:furniture": "MTBfMV8xXzMw_b747e33c444cc07de35a4a1e5ec40b36",
-  "sketchfab:roblox map": "600"
+  "forum:help-and-feedback/creations-feedback": 1430,
+  "forum:help-and-feedback/building-support": 600,
+  "forum:help-and-feedback/game-design-support": 270,
+  "sketchfab:roblox": "5400",
+  "devto:gamedev": 105,
+  "forum:resources/community-tutorials": 70,
+  "forum:updates/announcements": 35,
+  "sketchfab:roblox low poly": "240",
+  "sketchfab:roblox ugc": "240",
+  "sketchfab:roblox map": "240",
+  "sketchfab:roblox pet": "240",
+  "store:mesh:house": "MTBfMV8xXzMw_2c22625097ecc99832a9a8655f2f79e4",
+  "store:mesh:car": "MTBfMV8xXzMw_81fad5e80f2da6d93860ea91168c7bda",
+  "store:mesh:pet": "MTBfMV8xXzMw_55349eedf813d501b9b9ea3a6a647a74",
+  "store:mesh:weapon": "MTBfMV8xXzMw_232bd806545e807cb612435a1806b46b",
+  "store:mesh:furniture": "MTBfMV8xXzMw_b747e33c444cc07de35a4a1e5ec40b36"
  },
  "migrated": false,
- "updatedAt": "2026-11-21T17:17:12.140Z"
+ "updatedAt": "2026-11-21T18:10:37.327Z"
 }
