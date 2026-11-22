@@ -5,6 +5,7 @@ const readline = require('readline');
 const fs = require('fs');
 const path = require('path');
 const db = require('./db');
+const team = require('./team');
 const web = require('./web');
 const skills = require('./skills');
 const gen = require('./gen');
@@ -131,6 +132,14 @@ Images: you cannot draw yourself, but Rovex can. When the user asks for an icon,
 const CHAT_PROMPT = `Connect to the Claude chat of the Rovex Hub app and stay connected.
 Loop: call chat_listen. When it returns messages, look at the reference images and video key frames the user attached (they show the result wanted), do what the user asks with the Rovex and Roblox Studio tools (load_skill first for Roblox work; chat_status with one short sentence for each long step), then answer with chat_reply in the user's language, short and clear. Then call chat_listen again. When it returns no message, call chat_listen again immediately, without writing anything.
 The user reads only the Rovex chat, never this conversation: do not write text here, only call the tools. Stop only if the user writes "stop" in Rovex.`;
+
+// Consigne à coller dans une IA (n'importe quelle app MCP) pour la faire entrer dans l'équipe IA de Rovex.
+const teamPrompt = (name, role) => `Join the AI team of the Rovex Hub app and stay in it.
+Call team_join with name "${name}"${role ? ` and role "${role}"` : ''} (and the app you run in). Then loop: call team_listen. When it returns events:
+- a task assigned to you, or open to anyone and fitting your role: claim it with team_task_update (status "doing"), do it with your own tools (Rovex, Roblox Studio, Blender, files…), then team_task_update with status "done" and a short result. If you are stuck, status "blocked" with a note.
+- a message: answer with team_send when an answer is useful.
+- you can split big work: create tasks for the other agents with team_task_create (see who does what with team_agents).
+Then call team_listen again. When it returns nothing, call team_listen again right away, without writing anything. Keep going until the user writes "stop" to you in the team.`;
 
 const DEFAULT_INSTRUCTIONS = `Before writing any Luau, search Rovex Hub.
 1. Start with the validated examples for the category (list_examples / get_example).
@@ -266,6 +275,58 @@ const TOOLS = [
     name: 'chat_status',
     description: 'Rovex chat: show what you are doing right now (one short sentence) in the Rovex chat, during a long task.',
     inputSchema: { type: 'object', properties: { text: { type: 'string' } }, required: ['text'] },
+    annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false },
+  },
+  {
+    name: 'team_join',
+    description: 'Rovex AI team: join (or rejoin) the team room of the Rovex Hub app, where several AIs connected to Rovex by MCP (Claude Desktop, Claude Code, Cursor, Codex, Gemini…) and the user talk and hand tasks to each other. Give a short unique name and your role. Returns your agent id (pass it as "me" to the other team_* tools), the other agents and the open tasks. Use the team tools only when the user asked you to join the Rovex team.',
+    inputSchema: { type: 'object', properties: {
+      name: { type: 'string', description: 'Your name in the team, short and unique (e.g. "Builder", "Scripter", "Claude Code")' },
+      role: { type: 'string', description: 'What you do in the team (e.g. "Luau scripting and systems", "Blender modeling", "review and tests")' },
+      app: { type: 'string', description: 'The app you run in (e.g. "Claude Desktop", "Claude Code", "Cursor", "Codex")' },
+    }, required: ['name'] },
+    annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false },
+  },
+  {
+    name: 'team_listen',
+    description: 'Rovex AI team: wait for what is new for you (messages to you or to all, tasks assigned to you or open to anyone, progress on tasks you created). Returns the events, or an empty list after the wait: then call team_listen again. Loop on it while you are in the team.',
+    inputSchema: { type: 'object', properties: { me: { type: 'string', description: 'Your agent id from team_join' }, wait: { type: 'number', description: 'Seconds to wait when nothing is new (0-55, default 40)' } }, required: ['me'] },
+    annotations: { readOnlyHint: true, openWorldHint: false },
+  },
+  {
+    name: 'team_send',
+    description: 'Rovex AI team: send a message to another agent (by name), to "all" agents, or to "user" (the human, who reads the team page of Rovex). Use it to ask a question, give context, or hand over a result.',
+    inputSchema: { type: 'object', properties: { me: { type: 'string', description: 'Your agent id from team_join' }, to: { type: 'string', description: 'Agent name, "all" or "user"' }, text: { type: 'string' } }, required: ['me', 'to', 'text'] },
+    annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false },
+  },
+  {
+    name: 'team_agents',
+    description: 'Rovex AI team: list the agents of the team with their role, app, whether they are online and what they are working on. Use it to pick who should do a task.',
+    inputSchema: { type: 'object', properties: {} },
+    annotations: { readOnlyHint: true, openWorldHint: false },
+  },
+  {
+    name: 'team_task_create',
+    description: 'Rovex AI team: create a task for another agent (to = its name) or for anyone (no "to"). Write a clear title and the details needed to do it alone (files, place, expected result). The agent gets it in team_listen; you get its progress the same way.',
+    inputSchema: { type: 'object', properties: {
+      me: { type: 'string', description: 'Your agent id from team_join' }, title: { type: 'string' }, details: { type: 'string', description: 'Everything needed to do the task' },
+      to: { type: 'string', description: 'Agent name, or empty for anyone' }, priority: { type: 'string', enum: ['low', 'normal', 'high'] },
+    }, required: ['me', 'title'] },
+    annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false },
+  },
+  {
+    name: 'team_tasks',
+    description: 'Rovex AI team: list the tasks (newest first), optionally only one status (todo, doing, blocked, done) or only yours.',
+    inputSchema: { type: 'object', properties: { me: { type: 'string', description: 'Your agent id from team_join' }, status: { type: 'string', enum: ['todo', 'doing', 'blocked', 'done'] }, mine: { type: 'boolean' }, limit: { type: 'number' } } },
+    annotations: { readOnlyHint: true, openWorldHint: false },
+  },
+  {
+    name: 'team_task_update',
+    description: 'Rovex AI team: update a task. status "doing" claims it (a free task becomes yours), "blocked" says you are stuck (add a note why), "done" finishes it (put what you did in result). You can also add a note or reassign it (to = agent name, or empty for anyone). The creator of the task is told.',
+    inputSchema: { type: 'object', properties: {
+      me: { type: 'string', description: 'Your agent id from team_join' }, id: { type: 'string', description: 'Task id' }, status: { type: 'string', enum: ['todo', 'doing', 'blocked', 'done'] },
+      note: { type: 'string' }, result: { type: 'string', description: 'What you did (with status done)' }, to: { type: 'string' },
+    }, required: ['me', 'id'] },
     annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false },
   },
   {
@@ -746,6 +807,14 @@ async function call(name, a = {}) {
       if (!a.id || !fs.existsSync(file)) throw new Error('Attachment not found');
       return { id: a.id, images: [fs.readFileSync(file)] };
     }
+    case 'team_join': case 'team_listen': case 'team_send': case 'team_agents':
+    case 'team_task_create': case 'team_tasks': case 'team_task_update': {
+      // La salle de l'équipe vit dans l'app : en stdio, on n'arrive ici que si l'app est fermée.
+      if (MODE === 'stdio') throw new Error('Open the Rovex Hub app first: the AI team lives in the app.');
+      const fn = { team_join: team.join, team_listen: team.listen, team_send: team.send, team_agents: team.roster,
+        team_task_create: team.createTask, team_tasks: team.listTasks, team_task_update: team.updateTask }[name];
+      return fn(a);
+    }
     case 'chat_reply':
       await agentApi('/agent/reply', { method: 'POST', body: { text: String(a.text || '') } });
       return { sent: true, next: 'call chat_listen again' };
@@ -986,7 +1055,7 @@ async function handle(msg) {
         // Images générées : aperçu envoyé à Claude (s'il n'est pas trop lourd), jamais gardé dans le journal.
         const images = (out && out.images) || [];
         if (out && out.images) delete out.images;
-        if (!params.name.startsWith('chat_')) logCall(params.name, params.arguments || {}, out);
+        if (!params.name.startsWith('chat_') && params.name !== 'team_listen') logCall(params.name, params.arguments || {}, out);
         seen();
         const previews = images.filter((b) => b.length < 900 * 1024).map((b) => ({ type: 'image', data: b.toString('base64'), mimeType: b[0] === 0xff && b[1] === 0xd8 ? 'image/jpeg' : b[0] === 0x52 && b[1] === 0x49 ? 'image/webp' : 'image/png' }));
         return ok({ content: [{ type: 'text', text: JSON.stringify(out, null, 2) }, ...previews] });
@@ -1000,7 +1069,7 @@ async function handle(msg) {
   }
 }
 
-module.exports = { handle, call, useStore, clients, activity, TOOLS, DEFAULT_INSTRUCTIONS, CHAT_PROMPT };
+module.exports = { handle, call, useStore, clients, activity, TOOLS, DEFAULT_INSTRUCTIONS, CHAT_PROMPT, teamPrompt };
 
 // Mode stdio : `node mcp.js` (le client MCP lance ce fichier lui-même).
 if (require.main === module) {
