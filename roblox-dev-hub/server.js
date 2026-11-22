@@ -21,6 +21,7 @@ const skills = require('./skills');
 const cloud = require('./cloud');
 const gen = require('./gen');
 const agents = require('./agents');
+const team = require('./team');
 const blender = require('./blender');
 const folders = require('./folders');
 const cowork = require('./cowork');
@@ -628,6 +629,15 @@ const agentLocal = (req) => {
 };
 routes.push(
   ['GET', /^\/api\/agents$/, (req) => { agentLocal(req); return agents.view(); }],
+  // Équipe IA : les IA branchées par MCP se parlent et s'échangent des tâches ; l'utilisateur y est « user ».
+  ['GET', /^\/api\/team$/, (req) => { agentLocal(req); return { ...team.view(), mcpUrl: `http://127.0.0.1:${PORT}/mcp`, stdio: claude.entry() }; }],
+  ['POST', /^\/api\/team\/prompt$/, async (req) => { agentLocal(req); const b = await json(req); return { text: mcp.teamPrompt(String(b.name || 'Agent').slice(0, 40), String(b.role || '').slice(0, 80)) }; }],
+  ['POST', /^\/api\/team\/send$/, async (req) => { agentLocal(req); return team.send(await json(req), 'user'); }],
+  ['POST', /^\/api\/team\/tasks$/, async (req) => { agentLocal(req); return team.createTask(await json(req), 'user'); }],
+  ['PUT', /^\/api\/team\/tasks\/([\w-]+)$/, async (req, m) => { agentLocal(req); return team.updateTask({ ...(await json(req)), id: m[1] }, 'user'); }],
+  ['DELETE', /^\/api\/team\/tasks\/([\w-]+)$/, (req, m) => { agentLocal(req); return team.removeTask(m[1]); }],
+  ['DELETE', /^\/api\/team\/agents\/([\w-]+)$/, (req, m) => { agentLocal(req); return team.removeAgent(m[1]); }],
+  ['POST', /^\/api\/team\/clear$/, (req) => { agentLocal(req); return team.clear(); }],
   ['GET', /^\/api\/agents\/prompt$/, (req) => { agentLocal(req); return { text: mcp.CHAT_PROMPT }; }],
   // Avec les images de référence (et les images clés des vidéos), le message peut peser plusieurs Mo.
   ['POST', /^\/api\/agents\/send$/, async (req) => { agentLocal(req); return agents.send(JSON.parse((await readBody(req, 40 * 1024 * 1024)).toString('utf8') || '{}')); }],
@@ -644,7 +654,7 @@ routes.push(
   ['POST', /^\/api\/agents\/clear$/, (req) => { agentLocal(req); return agents.clear(); }],
 );
 
-const MEMBER_ACTIONS = [/^\/api\/lessons(\/[\w-]+(\/(frames|analyze))?)?$/, /^\/api\/meshy(\/thumb\/[\w-]+)?$/, /^\/api\/cowork(\/[\w-]+(\/(sync|nodes|files|members)(\/[\w-]+)?)?)?$/, /^\/api\/folders(\/[\w-]+(\/(items|upload))?)?$/, /^\/api\/folder-items\/[\w-]+(\/previews)?$/, /^\/api\/agents(\/[\w-]+)?$/, /^\/api\/blender(\/addon)?$/, /^\/api\/custom(\/background)?$/, /^\/api\/textures\/thumbs$/, /^\/api\/place\/(read|write|value)$/, /^\/api\/robloxstudio(\/restart|\/assets)?$/, /^\/api\/claude\/(desktop|code|send)$/, /^\/api\/mcp\/test$/, /^\/api\/update\/(check|install)$/, /^\/api\/gen(\/.*)?$/];
+const MEMBER_ACTIONS = [/^\/api\/team(\/(prompt|send|clear|tasks(\/[\w-]+)?|agents\/[\w-]+))?$/, /^\/api\/lessons(\/[\w-]+(\/(frames|analyze))?)?$/, /^\/api\/meshy(\/thumb\/[\w-]+)?$/, /^\/api\/cowork(\/[\w-]+(\/(sync|nodes|files|members)(\/[\w-]+)?)?)?$/, /^\/api\/folders(\/[\w-]+(\/(items|upload))?)?$/, /^\/api\/folder-items\/[\w-]+(\/previews)?$/, /^\/api\/agents(\/[\w-]+)?$/, /^\/api\/blender(\/addon)?$/, /^\/api\/custom(\/background)?$/, /^\/api\/textures\/thumbs$/, /^\/api\/place\/(read|write|value)$/, /^\/api\/robloxstudio(\/restart|\/assets)?$/, /^\/api\/claude\/(desktop|code|send)$/, /^\/api\/mcp\/test$/, /^\/api\/update\/(check|install)$/, /^\/api\/gen(\/.*)?$/];
 const USER_ROUTES = [/^\/api\/custom$/, /^\/api\/textures$/, /^\/api\/place\/(studios|scripts|values)$/, /^\/api\/robloxstudio(\/assets)?$/, /^\/api\/claude$/, /^\/api\/version$/, /^\/api\/prompts$/, /^\/api\/skills$/, /^\/api\/skills\/\w+$/, /^\/api\/level$/, /^\/api\/meta$/, /^\/api\/stats$/, /^\/api\/resources$/, /^\/api\/channels$/, /^\/api\/youtube$/, /^\/api\/crawl$/, /^\/api\/examples$/, /^\/api\/mcp$/];
 
 const cookies = (req) => Object.fromEntries(String(req.headers.cookie || '').split(';').map((c) => c.trim().split('=')).filter((p) => p[0]).map(([k, ...v]) => [k, decodeURIComponent(v.join('='))]));

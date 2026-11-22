@@ -1144,3 +1144,46 @@ body.chat-mode .view { gap: 0; }
 .cg-more { border: 1px solid var(--line2); border-radius: 12px; padding: 10px 14px; }
 .cg-more summary { cursor: pointer; font-weight: 600; }
 .cg-more ul { margin: 8px 0 0; padding-left: 20px; display: grid; gap: 6px; }
+
+/* ---------- Équipe IA ---------- */
+.tm-form { display: flex; flex-direction: column; gap: 10px; }
+.tm-form .row { flex-wrap: nowrap; }
+.tm-form .row .input { flex: 1; min-width: 0; }
+.tm-cfg { margin-top: 12px; } .tm-cfg summary { cursor: pointer; color: var(--muted2); font-size: 13px; margin-bottom: 8px; }
+.tm-cfg .codebox code { white-space: pre; font-size: 11.5px; }
+.tm-empty { color: var(--muted2); }
+.tm-agents { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+.tm-agent { display: flex; flex-direction: column; gap: 8px; padding: 16px; }
+.tm-agent-top { display: flex; align-items: center; gap: 10px; }
+.tm-agent-top > div { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.tm-agent-top small { color: var(--muted); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tm-av { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; font-weight: 800; font-size: 13px; color: #fff; background: hsl(var(--h) 55% 45%); flex: none; }
+.tm-kick { width: 28px; height: 28px; font-size: 16px; opacity: .5; } .tm-kick:hover { opacity: 1; }
+.tm-state { margin: 0; display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 600; color: var(--muted2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tm-state i { width: 9px; height: 9px; border-radius: 50%; background: var(--line2); flex: none; }
+.tm-agent.on .tm-state { color: var(--ok2); } .tm-agent.on .tm-state i { background: var(--ok); animation: pulse 1.6s infinite; }
+.tm-agent.busy .tm-state { color: var(--warn); } .tm-agent.busy .tm-state i { background: var(--warn); }
+.tm-board { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; align-items: start; }
+.tm-col { display: flex; flex-direction: column; gap: 8px; padding: 10px; border-radius: 16px; background: var(--panel); border: 1px solid var(--line); max-height: 520px; overflow-y: auto; }
+.tm-col header { display: flex; align-items: center; justify-content: space-between; padding: 2px 4px; font-size: 14px; }
+.tm-col header small { color: var(--muted); font: 600 12px var(--mono); }
+.tm-col.doing header b { color: var(--warn); } .tm-col.blocked header b { color: var(--danger); } .tm-col.done header b { color: var(--ok2); }
+.tm-card { text-align: left; display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line2); background: var(--panel2); color: var(--text); cursor: pointer; font: inherit; transition: border-color .2s, transform .2s; }
+.tm-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+.tm-card.prio-high { box-shadow: inset 3px 0 0 var(--danger); } .tm-card.prio-low { opacity: .85; }
+.tm-card b { font-size: 13.5px; overflow-wrap: anywhere; }
+.tm-card-meta { font-size: 11.5px; color: var(--muted); display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.tm-who { display: inline-block; padding: 1px 7px; border-radius: 7px; font-size: 11.5px; font-weight: 700; color: hsl(var(--h) 70% 72%); background: hsl(var(--h) 50% 40% / .18); }
+.tm-any { font-style: italic; }
+.tm-none { margin: 4px; }
+.tm-send { flex-wrap: nowrap; margin-bottom: 12px; } .tm-send .select { max-width: 180px; }
+.tm-feed { display: flex; flex-direction: column; gap: 10px; max-height: 460px; overflow-y: auto; }
+.tm-ev { font-size: 13px; padding: 8px 10px; border-radius: 10px; background: var(--panel2); display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; }
+.tm-ev > small { margin-left: auto; color: var(--muted); font-size: 11px; }
+.tm-ev a { color: var(--accent2); }
+.tm-msg { flex-basis: 100%; color: var(--soft); line-height: 1.55; overflow-wrap: anywhere; }
+.tm-details { padding: 10px 14px; border-radius: 10px; background: var(--panel2); margin-bottom: 10px; }
+.tm-actions { margin: 14px 0 10px; }
+#tmt-note { width: 100%; resize: vertical; }
+@media (max-width: 1100px) { .tm-board { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 620px) { .tm-board { grid-template-columns: 1fr; } .tm-form .row, .tm-send { flex-wrap: wrap; } }
