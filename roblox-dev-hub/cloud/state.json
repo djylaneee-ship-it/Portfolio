@@ -24684,12 +24684,8 @@
   "store:decal:sky": "MTBfMV8xXzMw_6750a3db89074d543a98725d324da671",
   "store:decal:grass": "MTBfMV8xXzMw_4a97ada93c0febae009f874d9bdc506c",
   "store:decal:stone": "MTBfMV8xXzMw_aef9a78e0e6759e2cb9fa7360317906a",
-  "store:decal:wood": "MTBfMV8xXzMw_6b87ff3c3dbd502adee5e6d62b59b62f",
-  "store:decal:brick": "MTBfMV8xXzMw_4c82b359dabc32806976de64b70b1f6e",
-  "store:decal:anime": "MTBfMV8xXzMw_502d4d1346c77bb815e67e4e0197a035",
-  "store:decal:cartoon": "MTBfMV8xXzMw_449ee4c1f9c80295fd70808e104505a5",
-  "store:mesh:sword": "M18xXzFfMzA=_0bd4a6e37b34c9f82703309295467331"
+  "store:decal:wood": "OF8xXzFfMzA=_b01660f64f920950f5f1a0dddfb19853"
  },
  "migrated": false,
- "updatedAt": "2026-11-24T06:47:19.003Z"
+ "updatedAt": "2026-11-24T07:41:55.948Z"
 }
