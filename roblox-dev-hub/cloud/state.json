@@ -25133,14 +25133,14 @@
   "forum:help-and-feedback/building-support": 330,
   "forum:resources/community-resources": 280,
   "forum:help-and-feedback/game-design-support": 251,
-  "sketchfab:roblox": "3816",
+  "sketchfab:roblox": "4200",
   "forum:help-and-feedback/art-design-support": 180,
   "forum:updates/announcements": 70,
-  "sketchfab:roblox low poly": "720",
+  "sketchfab:roblox low poly": "1032",
   "forum:resources/community-tutorials": 50,
   "forum:help-and-feedback/creations-feedback": 25,
   "sketchfab:roblox ugc": "600",
-  "sketchfab:roblox map": "456",
+  "sketchfab:roblox map": "600",
   "sketchfab:roblox weapon": "600",
   "store:decal:glow": "MjVfMV8xXzMw_b7e0bba018fee38eae2ebf913d24a24e",
   "store:decal:emoji": "MjVfMV8xXzMw_a669f172459ea6e4b6e25b08be30709e",
@@ -25154,5 +25154,5 @@
   "store:mesh:rock": "MjVfMV8xXzMw_92c847e986a6e720154c48755b26062a"
  },
  "migrated": false,
- "updatedAt": "2026-11-25T13:10:49.639Z"
+ "updatedAt": "2026-11-25T14:04:21.164Z"
 }
