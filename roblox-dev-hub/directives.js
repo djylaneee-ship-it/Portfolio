@@ -79,7 +79,7 @@ function softwareOf(name) {
 
 // Une texture par ID (« 10024120805 », « rbxassetid://… ») ou par nom (« Wood Planks », « ToonFire 4x4 »).
 function textureOf(asked, list) {
-  const id = (asked.match(/\d{6,13}/) || [])[0];
+  const id = (asked.match(/\d{6,16}/) || [])[0];
   if (id) return list.find((t) => t.id === id) || { id, unknown: true };
   const n = norm(asked);
   const full = (t) => norm(`${t.name} ${t.variant || ''}`);

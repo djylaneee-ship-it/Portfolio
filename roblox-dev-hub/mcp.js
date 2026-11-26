@@ -747,6 +747,7 @@ async function call(name, a = {}) {
       let budget = 1200 * 1024;
       for (const t of out.textures) {
         if (!urls[t.id]) { t.image = 'not available'; continue; }
+        if (budget < 24 * 1024) { t.image = 'not shown (size): search by name to see it'; continue; } // plus de place : on ne télécharge plus
         try {
           const r = await fetch(urls[t.id], { signal: AbortSignal.timeout(10000) });
           const buf = Buffer.from(await r.arrayBuffer());
